@@ -1,0 +1,94 @@
+# Two small instruct models, two 24GB cards, two different traffic shapes.
+#
+# The pairing is deliberate: model_a takes long prompts with short answers (prefill
+# heavy), model_b takes short prompts with long answers (decode heavy). They stress
+# different parts of the device, which is what makes the consolidation question
+# interesting rather than obvious.
+
+meta:
+  name: demo
+  note: >-
+    Architecture numbers are read from each model's published config. Change the
+    models and these must change with them; nothing downstream infers them.
+
+seed: 7
+
+models:
+  - name: model_a
+    hf_id: Qwen/Qwen2.5-1.5B-Instruct
+    params_b: 1.54
+    num_layers: 28
+    hidden_size: 1536
+    num_attn_heads: 12
+    num_kv_heads: 2
+    max_model_len: 4096
+    base_dtype: bf16
+
+  - name: model_b
+    hf_id: meta-llama/Llama-3.2-1B-Instruct
+    params_b: 1.24
+    num_layers: 16
+    hidden_size: 2048
+    num_attn_heads: 32
+    num_kv_heads: 8
+    max_model_len: 4096
+    base_dtype: bf16
+
+gpus:
+  - id: gpu0
+    name: A10G
+    vram_gb: 24.0
+    mem_bandwidth_gbs: 600.0
+    tflops_bf16: 125.0
+    overhead_frac: 0.10
+  - id: gpu1
+    name: A10G
+    vram_gb: 24.0
+    mem_bandwidth_gbs: 600.0
+    tflops_bf16: 125.0
+    overhead_frac: 0.10
+
+workloads:
+  # Prefill heavy, and bursty — this is the tenant that hurts a neighbour.
+  - model: model_a
+    request_rate_rps: 14.0
+    input_len_mean: 1024
+    input_len_stdev: 256
+    output_len_mean: 64
+    output_len_stdev: 16
+    duration_s: 45
+    burstiness: 2.5
+
+  # Decode heavy, steady. Its tail is what consolidation puts at risk.
+  - model: model_b
+    request_rate_rps: 8.0
+    input_len_mean: 192
+    input_len_stdev: 48
+    output_len_mean: 192
+    output_len_stdev: 32
+    duration_s: 45
+    burstiness: 1.0
+
+slos:
+  - model: model_a
+    p99_latency_ms: 4000.0
+    min_throughput_rps: 4.0
+  - model: model_b
+    p99_latency_ms: 3000.0
+    min_throughput_rps: 6.0
+
+quality_floors:
+  - model: model_a
+    min_score: 0.980
+    eval_name: demo_eval
+    smoke_min_score: 0.5
+  - model: model_b
+    min_score: 0.975
+    eval_name: demo_eval
+    smoke_min_score: 0.5
+
+budget:
+  phase1_trials: 12
+  phase2_trials: 4
+  concurrent_slots: 3
+  max_rounds: 3
