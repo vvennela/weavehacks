@@ -37,7 +37,7 @@ Use a separately approved, bounded set of isolated calibration runs to choose th
 
 Let `P` be measured physical GPU bytes, `B` the declared smaller-card budget, and `b_i` each service's byte allocation:
 
-- Set each service's `gpu_memory_utilization` to `b_i / P`.
+- Reserve process overhead `h_i` inside each hard allocation. Set each service's `gpu_memory_utilization` to `(b_i - h_i) / P`, never above `b_i / P`. Save this estimate before measurement and gate observed per-service memory against `b_i`.
 - Require `sum(b_i) <= 0.90 * B`, keeping the specification's 10% shared reserve.
 - Enforce physical headroom as well as the declared budget.
 - Leave `kv_cache_memory_bytes` unset.

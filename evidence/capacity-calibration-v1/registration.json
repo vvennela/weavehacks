@@ -1,0 +1,21 @@
+{
+  "physical_gpu_uuid": "GPU-3119bd7a-a9d8-bbf2-2dc3-f5954d41e7e9",
+  "plan_labels": {
+    "ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23": "qwen-3-glm-17-fp8",
+    "e793a1faed3bbf8b90c17064ff5839e1ec257aa51aff667ead72dfd6de4a2c56": "qwen-3-glm-17-bf16-estimate-only",
+    "91da5d1691d9716d9aa97ab2f8919d2f7438d1dd57c0119c19334066163c093a": "qwen-2.5-glm-15-fp8",
+    "e19c71b75aca03ac71237489f3301aeb08178963245714163b09d43cc26ec4da": "qwen-2.5-glm-15-bf16-estimate-only"
+  },
+  "source_hashes": {
+    "evidence/glm-preparation-v1/result.json": "fe264b7968cd07488b4646e3a3368e882c1209cbbeddea2d44750f7bd9a7c761",
+    "evidence/glm-bf16-v1/runtime/server.log": "e652e153d900ff7db2f28784f7af827f02e240ac1545f23f340b604dd334ad5d",
+    "evidence/glm-fp8-weights-v1/runtime/server.log": "c9bd03811ad040dcff08445431735b0ab3e12037bd0be725008d94cb31159d8e",
+    "evidence/qwen-structured-quality-v3/runtime/server.log": "99b53892d8ad76f144ca4291790ce1816bb8686693cdbe9c41d7a7f76e99198b"
+  },
+  "process_reserve_basis": "Prior pressure samples exceeded the requested vLLM budget by 880\u2013894 MiB; reserve 1 GiB inside each allocation.",
+  "estimate_scope": "Prior startup weights/workspace rounded up, plus explicit KV, process, and fragmentation estimates; not a measured fit guarantee.",
+  "kv_scope": "One 4096-token BF16 KV sequence: 2 * layers * KV heads * head dimension * 2 bytes * 4096. This is not eight full-context requests.",
+  "hardware_scope": "24 GiB declared budget on a physical 97887 MiB GPU; not a smaller card speed simulation.",
+  "counterfactual_scope": "BF16 counterparts retain the same allocations and all settings except weight quantization. Reject by estimate; do not launch an unsafe BF16 pair.",
+  "thresholds_frozen_before_measurement": true
+}
