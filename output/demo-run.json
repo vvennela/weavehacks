@@ -1,0 +1,778 @@
+{
+  "run_id": "openai-example-v2",
+  "source": "measured GPU recording",
+  "model": "Qwen/Qwen2.5-72B-Instruct",
+  "parameters": {
+    "model": "Qwen/Qwen2.5-72B-Instruct",
+    "quantization": "fp8_per_tensor",
+    "kv_cache_dtype": "auto",
+    "quality_floor": 0.99,
+    "min_latency_improvement_fraction": 0.05,
+    "concurrency": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "max_candidate_trials": null,
+    "workload": "unchanged eight easy strict-JSON tasks"
+  },
+  "decision": {
+    "selected": "trial-3",
+    "outcome": "improved",
+    "reason": "objective-plateau-confirmed"
+  },
+  "stop_reason": "objective-plateau-confirmed",
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09c11-ca49-7d43-94cf-e56c54f98ac4",
+  "weave_calls": 746,
+  "weave_exceptions": [],
+  "trials": [
+    {
+      "trial_id": "baseline",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "startup_seconds": 71.08127870899989,
+      "sampled_peak_memory_mib": 88687,
+      "reduced": {
+        "request_count": 96,
+        "successful_requests": 96,
+        "generation_errors": 0,
+        "request_wall_seconds": 25.146960361998936,
+        "output_tokens": 660,
+        "input_tokens": 9060,
+        "p50_latency_ms": 702.1335280005587,
+        "p95_latency_ms": 771.0464070005401,
+        "p99_latency_ms": 831.673654000042,
+        "output_tokens_per_second": 26.245716798335803,
+        "input_tokens_per_second": 360.28211241351875,
+        "p99_reliable": false,
+        "p95_ttft_ms": null,
+        "p95_queue_ms": null,
+        "p95_time_per_output_token_ms": null
+      },
+      "task_quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 1,
+        "valid_outputs": true,
+        "passed": true,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 1,
+            "error": null
+          }
+        ]
+      },
+      "component_trial_ids": []
+    },
+    {
+      "trial_id": "trial-1",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": true,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "startup_seconds": 65.07008614900042,
+      "sampled_peak_memory_mib": 88431,
+      "reduced": {
+        "request_count": 96,
+        "successful_requests": 96,
+        "generation_errors": 0,
+        "request_wall_seconds": 23.421245076999185,
+        "output_tokens": 660,
+        "input_tokens": 9060,
+        "p50_latency_ms": 562.5785310003266,
+        "p95_latency_ms": 624.7854280009051,
+        "p99_latency_ms": 632.2497690016462,
+        "output_tokens_per_second": 28.17954373604811,
+        "input_tokens_per_second": 386.82828219484225,
+        "p99_reliable": false,
+        "p95_ttft_ms": null,
+        "p95_queue_ms": null,
+        "p95_time_per_output_token_ms": null
+      },
+      "task_quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 1,
+        "valid_outputs": true,
+        "passed": true,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 1,
+            "error": null
+          }
+        ]
+      },
+      "component_trial_ids": []
+    },
+    {
+      "trial_id": "trial-2",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": false
+      },
+      "startup_seconds": 77.08191141199859,
+      "sampled_peak_memory_mib": 88347,
+      "reduced": {
+        "request_count": 96,
+        "successful_requests": 96,
+        "generation_errors": 0,
+        "request_wall_seconds": 25.007569300996693,
+        "output_tokens": 660,
+        "input_tokens": 9060,
+        "p50_latency_ms": 694.5258380001178,
+        "p95_latency_ms": 764.0717579997727,
+        "p99_latency_ms": 824.12304600075,
+        "output_tokens_per_second": 26.392009237526945,
+        "input_tokens_per_second": 362.29030862423355,
+        "p99_reliable": false,
+        "p95_ttft_ms": null,
+        "p95_queue_ms": null,
+        "p95_time_per_output_token_ms": null
+      },
+      "task_quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 1,
+        "valid_outputs": true,
+        "passed": true,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 1,
+            "error": null
+          }
+        ]
+      },
+      "component_trial_ids": []
+    },
+    {
+      "trial_id": "trial-3",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": true,
+        "enable_chunked_prefill": true,
+        "enforce_eager": false
+      },
+      "startup_seconds": 80.07805119299883,
+      "sampled_peak_memory_mib": 88347,
+      "reduced": {
+        "request_count": 96,
+        "successful_requests": 96,
+        "generation_errors": 0,
+        "request_wall_seconds": 23.255349384999136,
+        "output_tokens": 660,
+        "input_tokens": 9060,
+        "p50_latency_ms": 555.3314120006689,
+        "p95_latency_ms": 618.5879460026626,
+        "p99_latency_ms": 618.7222099979408,
+        "output_tokens_per_second": 28.380566942835657,
+        "input_tokens_per_second": 389.58778257892584,
+        "p99_reliable": false,
+        "p95_ttft_ms": null,
+        "p95_queue_ms": null,
+        "p95_time_per_output_token_ms": null
+      },
+      "task_quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 1,
+        "valid_outputs": true,
+        "passed": true,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 1,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 1,
+            "error": null
+          }
+        ]
+      },
+      "component_trial_ids": [
+        "trial-1",
+        "trial-2"
+      ]
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "confirmation": false,
+      "trial_ids": [
+        "trial-1"
+      ],
+      "reads": [
+        {
+          "investigator": "scheduling",
+          "query": "load_metrics",
+          "matched": 4,
+          "returned": 4
+        },
+        {
+          "investigator": "scheduling",
+          "query": "latency_outliers",
+          "matched": 96,
+          "returned": 2
+        },
+        {
+          "investigator": "memory_context",
+          "query": "load_metrics",
+          "matched": 4,
+          "returned": 4
+        },
+        {
+          "investigator": "memory_context",
+          "query": "latency_outliers",
+          "matched": 96,
+          "returned": 2
+        },
+        {
+          "investigator": "output_quality",
+          "query": "latency_outliers",
+          "matched": 96,
+          "returned": 2
+        },
+        {
+          "investigator": "output_quality",
+          "query": "load_metrics",
+          "matched": 4,
+          "returned": 4
+        }
+      ],
+      "proposals": [
+        {
+          "investigator": "scheduling",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "scheduling-refine-prefix-reuse-01",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enable_prefix_caching",
+            "proposed_value": true,
+            "evidence_used": [
+              "p95_latency_ms",
+              "generation_errors",
+              "successful_requests",
+              "concurrency_8_cumulative_snapshot_mean_ttft_ms",
+              "concurrency_8_cumulative_snapshot_mean_queue_ms",
+              "concurrency_8_cumulative_snapshot_preemptions"
+            ],
+            "predicted_metric_change": "Hypothesis, not a measured gain: prefix caching will reduce worst-per-load p95_latency_ms by at least 5% from 771.0464070005401 ms under the same repeated-prompts-after-per-load-warmup protocol, with generation_errors remaining zero. The reference is read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records (load_metrics, concurrency=8). Reuse specified at workload.cache_evaluation makes avoided prefill a testable mechanism; a decrease in concurrency_8_cumulative_snapshot_mean_ttft_ms would be supporting, not causal, evidence.",
+            "confidence": 0.62,
+            "expected_trial_cost": 1,
+            "falsification_condition": "Under matched loads and warmup, p95_latency_ms greater than 0.95 times the baseline 771.0464070005401 ms refutes the predicted objective-sized benefit. Compare against read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records (load_metrics, concurrency=8). New generation_errors refute the error-preservation prediction; startup failure or verified quality below 0.99 makes the candidate unsuitable regardless of latency. The baseline quality reference is measured_facts.baseline.quality. Any benefit remains limited to workload.cache_evaluation, not cold-cache traffic.",
+            "reason": "No execution, quality, or read failure is observed: read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records reports 24 successful_requests and generation_errors=0 at each load; inspection_log records complete reads, and measured_facts.baseline.quality reports mean 1.0. The observed issue is increasing p95_latency_ms, from 572.4233250002726 at concurrency 1 to 771.0464070005401 at concurrency 8, not an established causal bottleneck. Independently reviewing peers, I accept the prefix-reuse claim as a hypothesis because workload.cache_evaluation explicitly repeats warmed prompts and the available-for-trial prefix-reuse technique cites https://docs.vllm.ai/en/v0.26.0/features/automatic_prefix_caching/. I reject memory_context's headroom experiment as the first latency experiment: metrics shows zero concurrency_8_cumulative_snapshot_preemptions and no supplied memory constraint. I accept output_quality's graph-execution idea as plausible but not proven superior to reuse. Short prepared prompts of 85–109 tokens at measured_facts.baseline.prepared_prompt_tokens and negligible cumulative queueing weaken the case for changing batch or sequence capacity first; these snapshots do not prove a mechanism. Therefore choose the legal untested prefix-caching candidate from baseline, with no component trials and all other controls unchanged. Measurement must determine compatibility, quality, and actual gain."
+          }
+        },
+        {
+          "investigator": "memory_context",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "memory-context-refine-prefix-cache",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enable_prefix_caching",
+            "proposed_value": true,
+            "evidence_used": [
+              "p95_latency_ms",
+              "generation_errors",
+              "successful_requests",
+              "sampled_peak_memory_mib",
+              "concurrency_8_cumulative_snapshot_preemptions",
+              "concurrency_8_cumulative_snapshot_mean_ttft_ms"
+            ],
+            "predicted_metric_change": "Testable hypothesis, not a measured gain: enabling prefix caching will reduce worst-per-load p95_latency_ms by at least 5% relative to 771.0464070005401 in read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298, measured_facts.inspection_records (load_metrics, concurrency=8), while preserving generation_errors=0. workload.cache_evaluation specifies repeated prompts after warmup, supporting a reusable-prefill experiment rather than a cold-cache prediction.",
+            "confidence": 0.57,
+            "expected_trial_cost": 1,
+            "falsification_condition": "With the same requests and warmup protocol, p95_latency_ms greater than 0.95 times the baseline 771.0464070005401 from read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records (load_metrics, concurrency=8) refutes the predicted objective-sized improvement. Startup failure, new generation_errors, or verified quality below 0.99 would make this setting unsuitable. Compare quality against measured_facts.baseline.quality; no cold-cache benefit is predicted.",
+            "reason": "No observed execution or quality failure is supplied: read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records reports successful_requests=24 and generation_errors=0 for each load; measured_facts.baseline.quality reports mean=1.0. Inspections are complete. The observation to improve is p95_latency_ms rising from 572.4233250002726 at concurrency 1 to 771.0464070005401 at concurrency 8; its cause is unknown. Independently reviewing peers, I accept scheduling's prefix-reuse mechanism as testable because workload.cache_evaluation explicitly measures repeated prompts after warmup, not because its proposed gain is established. I reject my earlier allocation-headroom proposal as the next priority: metrics.sampled_peak_memory_mib=88687 alone does not establish pressure, metrics.concurrency_8_cumulative_snapshot_preemptions=0, and lowering allocation risks capacity without a clear latency mechanism. Output_quality's graph proposal remains plausible but compatibility and capture memory are unmeasured. Prepared prompts are only 85–109 tokens at measured_facts.baseline.prepared_prompt_tokens; shrinking max_model_len at fixed utilization would not establish a smaller reserved cache. Therefore use the legal untested prefix-cache candidate, leaving other baseline controls unchanged. This is a single-control trial, not a combination; no measured component trials exist. Quality and performance require subsequent measurement."
+          }
+        },
+        {
+          "investigator": "output_quality",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "refine-graph-execution-baseline",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "evidence_used": [
+              "p95_latency_ms",
+              "successful_requests",
+              "generation_errors",
+              "trace_failed_task_count",
+              "concurrency_8_cumulative_snapshot_mean_queue_ms",
+              "concurrency_8_cumulative_snapshot_preemptions",
+              "sampled_peak_memory_mib"
+            ],
+            "predicted_metric_change": "Testable hypothesis, not a measured gain: enforce_eager=false reduces worst-per-load p95_latency_ms by at least 5% relative to 771.0464070005401 ms, recorded by read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records (load_metrics, concurrency=8), while retaining generation_errors=0 and quality at least 0.99 (reference: measured_facts.baseline.quality). Graph capture may increase sampled_peak_memory_mib; compatibility and memory cost remain unmeasured.",
+            "confidence": 0.56,
+            "expected_trial_cost": 1,
+            "falsification_condition": "Under the same load protocol, p95_latency_ms exceeding 95% of the baseline recorded by read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records (load_metrics, concurrency=8) refutes the predicted objective-sized improvement. Startup failure, new generation_errors, or verified quality below 0.99 refutes the usable, quality-preserving configuration hypothesis; baseline quality is documented at measured_facts.baseline.quality. A startup failure would provide no latency or quality result.",
+            "reason": "No observed failed trial, failed read, or quality failure is supplied. Read call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at measured_facts.inspection_records reports successful_requests=24 and generation_errors=0 at each load; measured_facts.baseline.quality reports mean=1.0. The observed issue is latency, not incorrect output: p95_latency_ms rises from 572.4233250002726 at concurrency 1 to 771.0464070005401 at concurrency 8. Its cause is unknown. The tiny cumulative queue snapshot and zero preemptions in metrics do not establish causality, but offer little positive evidence for queue or cache-capacity pressure. Independently reviewing peers, I accept scheduling's repeated-prefix reuse mechanism as plausible under this warmup protocol, but not its unmeasured 5% benefit. I deprioritize memory_context's headroom trial because reducing memory is not the latency objective and no allocation failure is observed. I accept the earlier output_quality graph hypothesis only as an experiment: short prepared prompts (measured_facts.baseline.prepared_prompt_tokens, 85–109 tokens) and eager execution make launch-overhead reduction worth testing, without proving that overhead dominates. The supplied available-for-trial graph-execution technique, sourced to https://docs.vllm.ai/en/v0.26.0/design/cuda_graphs/, supports this mechanism. Select the legal untested enforce_eager=false candidate with every other baseline setting unchanged; no combination or measured components are involved."
+          }
+        }
+      ],
+      "arbiter": {
+        "ranked_proposal_ids": [
+          "scheduling:scheduling-refine-prefix-reuse-01"
+        ],
+        "reason": "No execution, quality, or inspection failure is observed. Source call 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 reports successful_requests=24 and generation_errors=0 at each load; p95_latency_ms rises from 572.4233250002726 at concurrency 1 to 771.0464070005401 at concurrency 8. Baseline measured quality.mean is 1.0. The latency increase is observed, but its cause is unknown; cumulative TTFT snapshots do not establish a prefill bottleneck. I accept scheduling and memory_context's prefix-caching proposal as a useful hypothesis because the specified workload repeats prompts after per-load warmup, providing a direct opportunity to test prefix reuse. Their predicted 5% gain is not established. Select scheduling's proposal alone, since memory_context proposes the same change. The output_quality graph-execution proposal is also plausible, but no measurement establishes launch overhead as the cause; defer it in this one-trial round in favor of the workload-specific cache test. Test enable_prefix_caching=true with all other baseline settings unchanged under matched loads and warmup. Candidate compatibility, quality, and latency remain unmeasured, and any benefit would apply to this warm repeated-prompt scope, not cold-cache performance. This selects an experiment only; deterministic post-execution gates must assess the 0.99 quality floor and 5% latency-improvement objective before baseline replacement."
+      }
+    },
+    {
+      "round": 2,
+      "confirmation": false,
+      "trial_ids": [
+        "trial-2"
+      ],
+      "reads": [
+        {
+          "investigator": "scheduling",
+          "query": "load_metrics",
+          "matched": 9,
+          "returned": 9
+        },
+        {
+          "investigator": "scheduling",
+          "query": "latency_outliers",
+          "matched": 193,
+          "returned": 3
+        },
+        {
+          "investigator": "memory_context",
+          "query": "load_metrics",
+          "matched": 9,
+          "returned": 9
+        },
+        {
+          "investigator": "memory_context",
+          "query": "latency_outliers",
+          "matched": 193,
+          "returned": 3
+        },
+        {
+          "investigator": "output_quality",
+          "query": "latency_outliers",
+          "matched": 193,
+          "returned": 3
+        },
+        {
+          "investigator": "output_quality",
+          "query": "load_metrics",
+          "matched": 9,
+          "returned": 9
+        }
+      ],
+      "proposals": [
+        {
+          "investigator": "scheduling",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "scheduling-refine-graph-execution",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "evidence_used": [
+              "p95_latency_ms",
+              "trial_1_p95_latency_ms",
+              "generation_errors",
+              "concurrency_8_cumulative_snapshot_mean_queue_ms",
+              "concurrency_8_cumulative_snapshot_preemptions",
+              "sampled_peak_memory_mib"
+            ],
+            "predicted_metric_change": "Allowing graph execution may reduce execution overhead and lower p95_latency_ms below baseline's 771.0464070005401 ms, with generation_errors remaining zero. The comparator is read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298, path reduced/p95_latency_ms. This is an unmeasured directional prediction, not a promised 5% gain or a claim to beat trial_1_p95_latency_ms of 624.7854280009051 ms recorded in diagnosis read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at reduced.",
+            "confidence": 0.57,
+            "expected_trial_cost": 1,
+            "falsification_condition": "Matched-workload p95_latency_ms at or above baseline's 771.0464070005401 ms refutes the directional prediction against read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298, path reduced/p95_latency_ms. Startup or capture failure would establish an execution failure, not its underlying cause; nonzero generation_errors refutes the error-free prediction. Quality must be measured against the fixed 0.99 floor using task_quality/per_prompt, the evidence path recorded by diagnosis read 01a09c16-0bfd-7fd9-b342-3a63620c9baa. A baseline-relative improvement alone does not establish qualifying progress over the saved trial-1 result.",
+            "reason": "No execution or quality failure is observed: diagnosis read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at status, decision, reduced and task_quality/per_prompt records trial-1 as accepted with zero generation_errors and quality mean 1.0. Its underlying performance mechanism remains unestablished. Independently reviewing peers, I accept memory_context's graph-overhead hypothesis as testable, but not as a measured explanation; I reject output_quality's stronger 5% prediction as unsupported by execution profiling. I deprioritize the scheduling peer's chunking proposal: prepared prompts are only 85–109 tokens, so an eight-request prompt wave fits the existing 4096-token budget without needing chunking. The supplied vLLM optimization technique supports examining prefill/decode competition, but the observed workload offers limited evidence of that competition. Baseline read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at reduced shows p95_latency_ms increasing with concurrency, while the available cumulative queue and preemption metrics provide little evidence of admission pressure; these snapshots do not prove causality. Thus I favor the legal untested enforce_eager=false execution experiment over increasing sequence capacity or changing a nonbinding token budget. Candidate fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f has actual parent baseline and no measured components; prefix caching remains false, so this is not a combination with trial-1. Graph compatibility and memory effects remain unmeasured, and sampled_peak_memory_mib should be checked rather than assuming an allocation benefit."
+          }
+        },
+        {
+          "investigator": "memory_context",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "refine-graph-execution-baseline",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "evidence_used": [
+              "p95_latency_ms",
+              "trial_1_p95_latency_ms",
+              "generation_errors",
+              "sampled_peak_memory_mib",
+              "concurrency_8_cumulative_snapshot_preemptions",
+              "concurrency_8_cumulative_snapshot_mean_queue_ms"
+            ],
+            "predicted_metric_change": "Allowing graph execution may lower p95_latency_ms relative to baseline 771.0464070005401 ms, recorded by read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at reduced/p95_latency_ms, while generation_errors remains zero. This is an unmeasured execution-overhead hypothesis, not a memory-saving claim. It may not outperform trial_1_p95_latency_ms of 624.7854280009051 ms; diagnosis read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at reduced supplies that stronger comparator. Graph capture may increase sampled_peak_memory_mib.",
+            "confidence": 0.58,
+            "expected_trial_cost": 1,
+            "falsification_condition": "Matched-workload p95_latency_ms at or above 771.0464070005401 ms refutes the directional prediction against read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298, reduced/p95_latency_ms. Startup or capture failure refutes feasibility but does not establish its underlying cause; nonzero generation_errors refutes error-free execution. Quality below 0.99 would make the setting unacceptable, using the same evaluation represented in read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at task_quality/per_prompt. A gain against baseline alone does not establish five-percent progress against the accepted trial recorded at that read's reduced path.",
+            "reason": "No observed failure is supplied. Read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at status, decision, reduced and task_quality/per_prompt records trial-1 as collected, quality-valid and improved, with generation_errors zero; its root cause remains unestablished. Independently reviewing the memory evidence, sampled_peak_memory_mib is 88687 at baseline, and concurrency_8_cumulative_snapshot_preemptions is zero. These observations do not demonstrate cache pressure or establish that reducing allocation would improve latency. The documented context-capacity technique also cautions that lowering max_model_len at fixed gpu_memory_utilization does not prove a smaller reserved KV cache. Prepared prompts are only 85–109 tokens; load input_tokens is an aggregate, not a context length. I accept the output_quality peer's graph-overhead hypothesis as testable, but not its suggested five-percent gain as established. I deprioritize scheduling's chunked-prefill proposal: short prompts make it plausible, but the supplied cumulative queue snapshots do not demonstrate chunking overhead. Execution overhead is a useful alternative to unsupported memory-pressure explanations. The legal untested enforce_eager=false configuration isolates that question without changing context coverage or allocation fraction. It uses baseline as its actual parent, retains prefix caching disabled, and is not a combination with trial-1. The accepted prefix-caching result informs the performance comparator rather than authorizing an unavailable combined configuration."
+          }
+        },
+        {
+          "investigator": "output_quality",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "refine-output-quality-graph-test",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "evidence_used": [
+              "p95_latency_ms",
+              "trial_1_p95_latency_ms",
+              "generation_errors",
+              "trace_failed_task_count",
+              "sampled_peak_memory_mib",
+              "concurrency_8_cumulative_snapshot_mean_queue_ms",
+              "concurrency_8_cumulative_snapshot_preemptions"
+            ],
+            "predicted_metric_change": "Graph-enabled execution may reduce launch overhead: predict lower p95_latency_ms than baseline's 771.0464070005401 ms, recorded in read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at reduced/p95_latency_ms, with generation_errors remaining 0. Predict measured quality remains at least 0.99 against the reference in read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at task_quality/per_prompt. This is unmeasured; it need not beat trial_1_p95_latency_ms of 624.7854280009051 ms. Graph capture could increase sampled_peak_memory_mib rather than reduce it.",
+            "confidence": 0.65,
+            "expected_trial_cost": 1,
+            "falsification_condition": "Matched-workload p95_latency_ms at or above 771.0464070005401 ms refutes the directional prediction, using read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at reduced/p95_latency_ms as reference. Startup/capture failure or nonzero generation_errors refutes operational compatibility; quality below 0.99 refutes quality preservation, assessed against read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at status, reduced, and task_quality/per_prompt. A directional improvement alone does not establish qualifying progress: that requires at least 5% improvement over the current quality-valid best trial_1_p95_latency_ms.",
+            "reason": "No execution or quality failure is observed: baseline generation_errors and trace_failed_task_count are 0; diagnosis read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at status, decision, reduced, and task_quality/per_prompt records accepted trial-1 with quality mean 1.0 and improved p95 latency. Its causal explanation remains unestablished. Independently reviewing peers, I accept memory_context's graph experiment as useful, not its mechanism as proven. I accept scheduling's short-prompt premise but do not prioritize disabling chunked prefill: prepared prompts are only 85–109 tokens, and measured cumulative queue time is tiny with no preemptions, providing limited evidence of a scheduling bottleneck. These snapshots do not prove launch overhead either. The sourced vLLM graph technique (https://docs.vllm.ai/en/v0.26.0/design/cuda_graphs/) supplies a testable alternative execution mechanism. Baseline load read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at reduced shows latency rising across concurrency despite short requests, making execution overhead worth testing without changing precision or context coverage. Select the legal untested baseline-parent enforce_eager=false configuration, not a combination with trial-1 prefix caching; component_trial_ids is empty. The sampled memory reference in diagnosis path runtime/sampled_peak_memory_mib warrants measuring capture memory, not assuming headroom or a gain. No gates are approved by this proposal."
+          }
+        }
+      ],
+      "arbiter": {
+        "ranked_proposal_ids": [
+          "scheduling:scheduling-refine-graph-execution"
+        ],
+        "reason": "No execution or quality failure is observed: baseline generation_errors is 0 and measured quality mean is 1.0. Baseline load read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 records reduced/p95_latency_ms rising from 572.4233250002726 at concurrency 1 to 771.0464070005401 at concurrency 8; this does not establish an execution-overhead cause. Diagnosis 01a09c16-0bfd-7fd9-b342-3a63620c9baa records trial-1 reduced/p95_latency_ms of 624.7854280009051 with quality mean 1.0, but that tested prefix caching, not graph execution. I accept all three peers' graph-execution suggestion as a testable hypothesis, not as evidence of gain or preserved quality. Select the scheduling proposal as the single experiment, changing only enforce_eager to false on baseline and preserving workload constraints. Its equivalent peer proposals need no separate trials. This uses the one available round slot to isolate execution strategy; compatibility, memory effects, quality and latency remain unmeasured. Improvement over baseline alone would not establish progress beyond the measured best. After execution, deterministic quality and performance gates must determine eligibility; this is not replacement or deployment approval."
+      }
+    },
+    {
+      "round": 3,
+      "confirmation": true,
+      "trial_ids": [
+        "trial-3"
+      ],
+      "reads": [
+        {
+          "investigator": "scheduling",
+          "query": "load_metrics",
+          "matched": 14,
+          "returned": 14
+        },
+        {
+          "investigator": "scheduling",
+          "query": "latency_outliers",
+          "matched": 290,
+          "returned": 4
+        },
+        {
+          "investigator": "memory_context",
+          "query": "load_metrics",
+          "matched": 14,
+          "returned": 14
+        },
+        {
+          "investigator": "memory_context",
+          "query": "latency_outliers",
+          "matched": 290,
+          "returned": 4
+        },
+        {
+          "investigator": "output_quality",
+          "query": "load_metrics",
+          "matched": 14,
+          "returned": 14
+        },
+        {
+          "investigator": "output_quality",
+          "query": "latency_outliers",
+          "matched": 290,
+          "returned": 4
+        }
+      ],
+      "proposals": [
+        {
+          "investigator": "scheduling",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "scheduling-refine-chunking-off",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enable_chunked_prefill",
+            "proposed_value": false,
+            "evidence_used": [
+              "p95_latency_ms",
+              "trial_2_p95_latency_ms",
+              "trial_2_generation_errors",
+              "trial_1_p95_latency_ms",
+              "concurrency_8_cumulative_snapshot_mean_queue_ms",
+              "concurrency_8_cumulative_snapshot_preemptions",
+              "generation_errors",
+              "input_tokens"
+            ],
+            "predicted_metric_change": "Disabling chunked prefill may modestly lower p95_latency_ms relative to baseline 771.0464070005401 without increasing generation_errors. This is an unmeasured scheduling hypothesis, not a claimed 5% gain or improvement over trial-1. Baseline read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at reduced shows the worst p95 at concurrency 8; its input_tokens=2265 is the total over 24 requests, not one prompt. Short prepared prompts make a different prefill/decode scheduling policy worth testing even though the token budget is not evidently binding.",
+            "confidence": 0.3,
+            "expected_trial_cost": 1,
+            "falsification_condition": "The predicted latency benefit is refuted if worst-per-load p95_latency_ms is unchanged or exceeds 771.0464070005401 under the fixed workload, using baseline read 01a09c13-a2f3-7c7b-b24d-3cff9d63f298 at reduced as reference. New generation_errors or quality below 0.99 invalidate the candidate; compare status and task_quality/per_prompt with read 01a09c18-db81-7a4f-8cd0-3a69900a2bf6. Even a baseline improvement does not establish search progress unless it improves sufficiently over trial_1_p95_latency_ms=624.7854280009051, documented by 01a09c16-0bfd-7fd9-b342-3a63620c9baa at reduced and decision.",
+            "reason": "Observed failure: trial-2 missed the performance objective, not execution or quality. Read 01a09c18-db81-7a4f-8cd0-3a69900a2bf6 at status, decision, reduced, and task_quality/per_prompt records trial_2_generation_errors=0, quality mean 1.0, and trial_2_p95_latency_ms=764.0717579997727: only 0.9046% below baseline, short of 5%. Its causal explanation remains unestablished. Independently reviewing peers, I accept the scheduling suggestion as a useful low-confidence experiment: prepared prompts span 85–109 tokens, while tiny cumulative queue time and zero preemptions do not suggest a capacity bottleneck. I reject memory_context's allocation reduction as the next latency experiment because its own prediction is approximately unchanged latency and no measured memory-pressure cause is established. I accept output_quality's combination as legal and unmeasured, but do not prioritize it: graph execution alone produced little observed improvement, and an interaction with prefix reuse remains speculative. Trial-1's accepted improvement is documented in read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at decision and reduced, but applies to warmed repeated prompts. The available chunked-prefill technique, sourced to https://docs.vllm.ai/en/v0.26.0/configuration/optimization/, instead tests a distinct scheduling policy. The complete legal baseline-derived configuration retains max_num_batched_tokens=4096 and max_model_len=4096, satisfying the stated non-chunked coverage requirement. This is a fresh untested setting, not a retry or a claim that chunking caused trial-2's failure."
+          }
+        },
+        {
+          "investigator": "memory_context",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "memory-context-refine-prefix-graphs",
+            "agent_role": "batching",
+            "parent_trial_id": "trial-1",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "evidence_used": [
+              "trial_2_p95_latency_ms",
+              "trial_2_generation_errors",
+              "trial_1_p95_latency_ms",
+              "trial_1_sampled_peak_memory_mib",
+              "trial_1_concurrency_8_cumulative_snapshot_preemptions",
+              "sampled_peak_memory_mib",
+              "generation_errors"
+            ],
+            "predicted_metric_change": "Hypothesis: graph-enabled execution with warmed prefix caching will modestly lower p95_latency_ms below trial_1_p95_latency_ms=624.7854280009051 without generation_errors. The parent reference is read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at reduced and task_quality/per_prompt. Read 01a09c18-db81-7a4f-8cd0-3a69900a2bf6 at reduced supports only a small standalone graph benefit, so a further 5% improvement is uncertain, not measured. No memory reduction is predicted.",
+            "confidence": 0.42,
+            "expected_trial_cost": 1,
+            "falsification_condition": "The latency hypothesis is refuted if the combination's p95_latency_ms is at least 624.7854280009051, compared with read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at reduced. An improvement below 5% fails the progress objective even if directionally favorable. Startup failure, generation_errors, or quality below 0.99 invalidates the usable-benefit hypothesis; compare status and task_quality/per_prompt in that same read. Measure sampled_peak_memory_mib against its runtime/sampled_peak_memory_mib reference rather than assuming allocation remains safe.",
+            "reason": "Observed failure: trial-2 missed the performance objective, not execution or quality. Read 01a09c18-db81-7a4f-8cd0-3a69900a2bf6 at status, decision, reduced and task_quality/per_prompt records trial_2_p95_latency_ms=764.0717579997727, only 0.9046% improvement over baseline, zero trial_2_generation_errors and quality mean 1.0. The causal explanation remains unknown. Independently reviewing peers, I accept output_quality's combination as a useful interaction test, not as evidence of a gain: trial-1 already measured 624.7854280009051 at reduced in read 01a09c16-0bfd-7fd9-b342-3a63620c9baa. The legal configuration has actual parent_trial_id trial-1 and component_trial_ids [trial-1, trial-2], retaining prefix caching while changing enforce_eager. I reject my earlier allocation proposal as the best latency experiment: zero measured preemptions and no memory constraint make reduced allocation less directly relevant, with startup risk. I also deprioritize scheduling's chunked-prefill proposal because its gain is speculative and it discards the measured prefix-cache advantage. The vLLM conserving-memory technique cautions against equating a smaller context cap with reduced reservation at fixed gpu_memory_utilization; runtime/sampled_peak_memory_mib in the parent diagnosis provides no evidence that context capacity is the limiting factor. The fresh choice therefore tests execution interaction on the best measured parent, without claiming causality or approving any gate."
+          }
+        },
+        {
+          "investigator": "output_quality",
+          "status": "accepted",
+          "proposal": {
+            "action": "trial",
+            "proposal_id": "refine-prefix-graph-interaction",
+            "agent_role": "batching",
+            "parent_trial_id": "trial-1",
+            "model_id": "Qwen/Qwen2.5-72B-Instruct",
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "evidence_used": [
+              "trial_1_p95_latency_ms",
+              "trial_2_p95_latency_ms",
+              "p95_latency_ms",
+              "trial_2_generation_errors",
+              "trial_1_generation_errors",
+              "trial_1_concurrency_8_cumulative_snapshot_preemptions"
+            ],
+            "predicted_metric_change": "Predict a modest reduction in p95_latency_ms below trial_1_p95_latency_ms=624.7854280009051 with generation_errors remaining zero. Parent measurements are from read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at reduced and task_quality/per_prompt. Graph-only results from read 01a09c18-db81-7a4f-8cd0-3a69900a2bf6 at reduced temper confidence: any additional benefit on warmed prefix caching is an unmeasured interaction, not an established 5% gain.",
+            "confidence": 0.4,
+            "expected_trial_cost": 1,
+            "falsification_condition": "The latency prediction is refuted if worst-per-load p95_latency_ms is at least 624.7854280009051, compared with read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at reduced. Less than 5% improvement would not establish qualifying progress. New generation_errors or measured quality below 0.99 would invalidate the preservation prediction; compare reduced and task_quality/per_prompt in that read and in 01a09c18-db81-7a4f-8cd0-3a69900a2bf6. Startup failure would also defeat this proposed configuration.",
+            "reason": "Observed failure: trial-2 missed the improvement objective, not execution or quality. Read 01a09c18-db81-7a4f-8cd0-3a69900a2bf6 at status, decision, reduced, and task_quality/per_prompt records trial_2_p95_latency_ms=764.0717579997727 versus baseline p95_latency_ms=771.0464070005401, only 0.9046% improvement, with trial_2_generation_errors=0 and quality mean 1.0. Its underlying cause remains unknown. Independently reviewing peers, I accept scheduling's short-prompt observation but not an established scheduling bottleneck or speedup from disabling chunking. I accept memory_context's allocation experiment as testable but deprioritize it for latency: no measured preemptions or memory constraint requires that change. I accept output_quality's combination as useful only as an interaction test, not as demonstrated additive gains. Trial-1's accepted improvement and quality are recorded by read 01a09c16-0bfd-7fd9-b342-3a63620c9baa at decision, reduced, and task_quality/per_prompt. Those measurements favor retaining prefix caching rather than returning to baseline. Select legal configuration 736781d317b177ccbc10826d14cc04e21a5e9c3015922fd23c746b73e5253c1e, actual parent_trial_id trial-1 and measured component_trial_ids [trial-1, trial-2]. Following https://docs.vllm.ai/en/v0.26.0/design/cuda_graphs/, the hypothesis is that graph execution reduces remaining launch overhead after warmed prefix reuse; the graph-only failure makes this uncertain but does not test that interaction. All other parent settings remain unchanged, and fresh quality/performance measurement is required."
+          }
+        }
+      ],
+      "arbiter": {
+        "ranked_proposal_ids": [
+          "memory_context:memory-context-refine-prefix-graphs"
+        ],
+        "reason": "Observed failure: trial-2 missed the latency objective, not execution or quality. Diagnosis 01a09c18-db81-7a4f-8cd0-3a69900a2bf6 records p95_latency_ms=764.0717579997727 versus baseline 771.0464070005401, improvement_fraction=0.009045692888836068 below 0.05, generation_errors=0, and quality mean=1.0. The underlying cause remains unestablished; completed inspections do not establish a kernel or scheduling bottleneck. Trial-1 instead measured p95_latency_ms=624.7854280009051 with quality mean=1.0 (01a09c16-0bfd-7fd9-b342-3a63620c9baa). I accept memory_context's and output_quality's combination hypothesis as useful to test, not their predicted gain as fact: enabling graph execution on the warmed-prefix parent isolates an untested interaction while retaining the strongest measured configuration. I deprioritize scheduling's chunking-off proposal because its baseline-relative hypothesis is less directly targeted at improving the current best, and no measured scheduling bottleneck supports it. Select only the memory_context proposal for the single available round slot; the output_quality proposal duplicates that experiment. Combination latency and quality remain unknown. Evaluate against trial-1 for qualifying progress under the fixed workload and quality floor; deterministic gates after execution, not this selection, determine replacement eligibility."
+      }
+    }
+  ]
+}

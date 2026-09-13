@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f5f0">
+<title>Sera · Recorded optimization loop</title>
+<style>
+/* The useseraai.com palette, both modes, lifted from output/sera-landing.css.
+   No webfont import on purpose: the README promises this page works offline
+   from a double-click, and Georgia is what the site sets for headings anyway. */
+:root{
+  color-scheme:light;
+  --bg:#f6f5f0;--text:#223a35;--muted:#62716a;--mint:#286555;--lilac:#57775e;
+  --line:#dce2d9;--panel:#fffefb;--soft:#eaf0e6;--on-mint:#fffefb;--bar:#a7b9aa;
+  --shadow:0 15px 45px #263d3505;
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#101a17;--text:#e9f1e9;--muted:#a8b9ac;--mint:#afd9b6;--lilac:#a8c5a0;
+  --line:#34493c;--panel:#1b2921;--soft:#293d2e;--on-mint:#13291c;--bar:#5d7763;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 var(--sans);font-synthesis:none}
+a{color:inherit;text-decoration:none}
+button,select,input{font:inherit}
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--mint);outline-offset:7px;border-radius:3px}
+::selection{background:var(--mint);color:var(--bg)}
+.skip{position:absolute;top:-100px;left:20px;z-index:10;padding:12px;background:var(--mint);color:var(--on-mint)}
+.skip:focus{top:20px}
+.shell{max-width:1280px;margin:auto;padding:0 5.3%}
+
+/* Header — the site's wordmark, nav and theme toggle. */
+.site-header{display:flex;align-items:center;gap:30px;min-height:108px;flex-wrap:wrap}
+.wordmark{font-family:var(--display);font-size:43px;letter-spacing:-3px;font-weight:600;display:flex;align-items:center;gap:7px;line-height:1}
+.wordmark>span{font-size:31px;color:var(--mint);font-weight:400}
+.product-nav{display:flex;gap:44px;margin:auto}
+.product-nav>a{padding:16px 0;color:var(--muted);font-size:17px;white-space:nowrap;transition:color .2s}
+.product-nav>a:hover{color:var(--mint)}
+.header-actions{display:flex;align-items:center;gap:20px;flex-shrink:0}
+/* Kept as a pill, not plain label text: nobody should mistake this for live inference. */
+.edition{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font:11px var(--mono);letter-spacing:1.4px;color:var(--mint);white-space:nowrap}
+.theme-toggle{display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;background:transparent;color:var(--text);font-size:25px;cursor:pointer;border-radius:50%}
+.theme-toggle:hover{background:#2865550c}
+[data-theme=dark] .theme-toggle:hover{background:#afd9b610}
+
+/* Page intro — the site's eyebrow rule, Georgia headline, mint italic. */
+.page-intro{padding:34px 0 8px}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:2px;color:var(--mint);margin:0 0 26px;display:flex;align-items:center;gap:10px}
+.eyebrow>span{width:19px;height:1px;background:var(--mint)}
+h1{font-family:var(--serif);font-size:clamp(38px,4.6vw,64px);font-weight:400;line-height:1.08;letter-spacing:-2.2px;margin:0 0 22px}
+h1 em{font-style:italic;color:var(--mint)}
+.subtitle{max-width:780px;color:var(--muted);font-size:16px;line-height:1.8;margin:0}
+
+/* Transport controls. */
+.controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:34px 0 12px;padding-top:30px;border-top:1px solid var(--line)}
+.controls label{font-size:13px;color:var(--muted)}
+button,select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;padding:11px 16px;cursor:pointer;font-size:14px;transition:background .2s,border-color .2s}
+button:hover,select:hover{border-color:var(--mint)}
+#play{background:var(--mint);border-color:var(--mint);color:var(--on-mint);min-width:112px;font-weight:550}
+#play:hover{background:#1e5244}
+[data-theme=dark] #play:hover{background:#c7e8c9}
+#scrub{flex:1;min-width:170px;accent-color:var(--mint);cursor:pointer}
+#clock{font:13px var(--mono);color:var(--muted)}
+.note{color:var(--muted);font-size:12px;line-height:1.7;margin:0 0 6px}
+.note strong{color:var(--text);font-weight:550}
+.note a{color:var(--mint)}
+.note a:hover{text-decoration:underline;text-underline-offset:3px}
+
+/* Loop steps, as the site's pill row. */
+.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:26px 0 30px}
+.step{border:1px solid var(--line);background:var(--panel);padding:13px 10px;border-radius:8px;color:var(--muted);font-size:12px;transition:background .2s,border-color .2s,color .2s}
+.step b{display:block;font:10px var(--mono);letter-spacing:1px;margin-bottom:7px;color:var(--lilac)}
+.step.done{background:var(--soft);border-color:var(--soft);color:var(--text)}
+.step.done b{color:var(--mint)}
+.step.active{background:var(--mint);border-color:var(--mint);color:var(--on-mint)}
+.step.active b{color:var(--on-mint);opacity:.75}
+
+/* Stage + sidebar. */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:24px;align-items:start}
+.stage-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:16px}
+h2{font-family:var(--serif);font-size:26px;font-weight:400;letter-spacing:-.7px;margin:0;line-height:1.25}
+.round{font:11px var(--mono);letter-spacing:1.2px;color:var(--lilac);white-space:nowrap}
+.agents{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.agent{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;min-height:252px;box-shadow:var(--shadow);transition:border-color .2s,background .2s}
+.agent.active{border-color:#b9cdb9;background:var(--soft)}
+.agent.selected{border-color:var(--mint);box-shadow:inset 0 3px var(--mint)}
+.agent h3{font-family:var(--serif);margin:0 0 4px;font-size:21px;font-weight:400;letter-spacing:-.4px}
+.role{font-size:12px;color:var(--lilac);margin-bottom:20px}
+.label{font:10px var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:15px 0 6px}
+.proposal{font-size:14px;font-weight:500;line-height:1.5}
+.feedback{font-size:12px;color:var(--muted);line-height:1.7;margin:8px 0 0}
+.changed{color:var(--mint)}
+.detail{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--mint);border-radius:12px;padding:20px 22px;margin-top:16px;min-height:132px;font-size:14px;line-height:1.75}
+.detail strong{color:var(--mint);font-weight:550}
+.detail p{margin:8px 0 0;color:var(--muted)}
+aside{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+aside h2{font-size:17px;font-family:var(--sans);font-weight:500;letter-spacing:0}
+.best{font-family:var(--serif);font-size:40px;letter-spacing:-1.6px;margin:16px 0 0;line-height:1}
+.best small{font-size:14px;letter-spacing:0;color:var(--muted);font-family:var(--sans)}
+#gain{color:var(--mint);font-size:13px;margin-top:6px}
+svg{display:block;width:100%;height:auto;margin-top:20px}
+.legend{font-size:11px;color:var(--muted);line-height:1.7;margin:14px 0 0}
+
+/* Footer — the site's rule-topped two column close. */
+.footer{display:grid;grid-template-columns:1fr 1fr;gap:24px;border-top:1px solid var(--line);margin-top:30px;padding:22px 0 34px;font-size:12px;line-height:1.75;color:var(--muted)}
+.footer strong{display:block;color:var(--text);font-weight:550;margin-bottom:6px;font-size:13px}
+.footer a{color:var(--mint)}
+.footer a:hover{text-decoration:underline;text-underline-offset:3px}
+.links{margin-top:10px}
+
+@media(max-width:980px){
+  .layout{grid-template-columns:1fr}
+  .agent{min-height:0}
+  aside{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+  aside svg{grid-column:2;grid-row:1/5}
+  .flow{grid-template-columns:repeat(4,1fr)}
+  .product-nav{gap:26px}
+  .product-nav>a{font-size:15px}
+}
+@media(max-width:760px){
+  .site-header{min-height:0;padding:18px 0;gap:14px}
+  .wordmark{font-size:34px}
+  .wordmark>span{font-size:25px}
+  .product-nav{order:3;width:100%;justify-content:space-between;gap:12px;margin:0}
+  .product-nav>a{font-size:14px;padding:8px 0}
+  .header-actions{margin-left:auto}
+  .agents{grid-template-columns:1fr}
+  .footer{grid-template-columns:1fr}
+  .flow{grid-template-columns:repeat(4,1fr)}
+  aside{display:block}
+  h1{letter-spacing:-1.6px}
+}
+@media(max-width:430px){
+  .shell{padding:0 6%}
+  .edition{font-size:9px;letter-spacing:1px;padding:4px 7px}
+  .controls{gap:10px}
+  .theme-toggle{width:34px;height:34px;font-size:22px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the replay</a>
+<div class="shell">
+<header class="site-header">
+  <a class="wordmark" href="https://useseraai.com/" target="_blank" rel="noopener">sera<span aria-hidden="true">✳</span></a>
+  <nav class="product-nav" aria-label="Sera">
+    <a href="https://useseraai.com/product" target="_blank" rel="noopener">Product</a>
+    <a href="https://useseraai.com/solutions" target="_blank" rel="noopener">Solutions</a>
+    <a href="https://useseraai.com/models" target="_blank" rel="noopener">Models</a>
+    <a href="https://useseraai.com/resources" target="_blank" rel="noopener">Resources</a>
+  </nav>
+  <div class="header-actions">
+    <span class="edition">RECORDED REPLAY · 13 SEP 2026</span>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark colors"><span aria-hidden="true">☾</span></button>
+  </div>
+</header>
+<main id="main">
+<div class="page-intro">
+  <p class="eyebrow"><span aria-hidden="true"></span>THE OPTIMIZATION LOOP</p>
+  <h1>Three agents. One experiment. <em>Learn and repeat.</em></h1>
+  <p class="subtitle">Replay a completed Qwen2.5 72B optimization run. Agents propose and review; the arbiter selects one GPU experiment per round. Measurements shape the next round.</p>
+</div>
+<div class="controls"><button id="play" type="button">▶ Play</button><button id="restart" type="button">Restart</button><label for="speed">Speed</label><select id="speed"><option value="1">1×</option><option value="4">4×</option><option value="8" selected>8×</option><option value="16">16×</option></select><input id="scrub" type="range" min="0" max="838.1639053689978" step="0.1" value="0" aria-label="Replay position in schematic run seconds"><output id="clock"></output></div>
+<p class="note">Measured run: 13:58 · playback: 1:45 at 8× · schematic stage timing. Recorded proposals and results. Press Play to begin.</p>
+<p class="note"><strong>Weave:</strong> investigators read trace evidence; the run records model outputs, measurements, and decisions. <strong>ARIA:</strong> reviewed the completed run through W&B chat and recommended randomized repeat measurements. <a target="_blank" rel="noopener noreferrer" href="https://github.com/vvennela/weavehacks/blob/main/docs/aria-final-run-review.md">Read the ARIA review ↗</a></p>
+<nav class="flow" id="flow" aria-label="Optimization loop"></nav>
+<div class="layout"><section aria-label="Current replay step"><div class="stage-head"><h2 id="headline" aria-live="polite"></h2><span class="round" id="round"></span></div><div class="agents" id="agents"></div><div class="detail" id="detail" aria-live="polite"></div></section><aside><h2>Best measured latency</h2><div class="best" id="best"></div><div id="gain"></div><svg id="chart" viewBox="0 0 270 200" role="img" aria-label="Measured latency by configuration; lower is better"></svg><p class="legend">Worst p95 across loads 1, 2, 4, 8. Each configuration: 96 timed requests and 8/8 strict-JSON quality checks passed.</p></aside></div>
+<footer class="footer"><div><strong>Recorded setup</strong>Qwen/Qwen2.5-72B-Instruct · FP8 weights · BF16 KV cache<br>1 × RTX PRO 6000 Blackwell · investigators: gpt-6-astra<div class="links"><a href="https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09c11-ca49-7d43-94cf-e56c54f98ac4" target="_blank" rel="noopener">Source trace ↗</a> · <a target="_blank" rel="noopener noreferrer" href="https://github.com/vvennela/weavehacks/blob/main/evidence/openai-example-v2/audit-summary.json">Audit JSON</a> · <a target="_blank" rel="noopener noreferrer" href="https://github.com/vvennela/weavehacks/blob/main/evidence/openai-example-v2/replay-timings.json">Proposal history</a></div></div><div><strong>Measured workload</strong>8 tasks · warm cache · repeated prompts.<br>Agent feedback: summaries of recorded reasoning.<br>Offline playback: zero GPU or API calls.</div></footer>
+</main>
+</div><script>
+'use strict';
+const totalSeconds = 838.1639053689978;
+const measurements = [
+  {name:'Baseline', value:771.0464070005401},
+  {name:'Prefix cache', value:624.7854280009051},
+  {name:'Graphs only', value:764.0717579997727},
+  {name:'Cache + graphs', value:618.5879460026626}
+];
+const rounds = [
+  {selected:0, experiment:'Enable prefix caching on baseline', agents:[
+    {initial:'Enable prefix caching', final:'Enable prefix caching', feedback:'Repeated warmed prompts support a reuse test. Memory pressure is not established; defer the graph idea.'},
+    {initial:'GPU memory allocation → 85%', final:'Enable prefix caching', feedback:'Accept A’s reuse hypothesis. Withdraw the allocation change: zero preemptions and no observed memory constraint.'},
+    {initial:'Enable graph execution', final:'Enable graph execution', feedback:'Prefix reuse is plausible. Keep the graph hypothesis for a test; launch overhead is not proven.'}
+  ], decision:'Select Agent A. Agent B now proposes the same cache change; one trial tests it. Defer Agent C’s graph proposal.', result:'624.785 ms · <strong>18.969% lower latency than baseline.</strong> Quality: 8/8. The gain clears the 5% progress threshold. Feed the measured cache result into round 2.'},
+  {selected:0, experiment:'Enable graph execution on baseline (no prefix cache)', agents:[
+    {initial:'Disable chunked prefill', final:'Enable graph execution', feedback:'Accept the peers’ graph test. Small queue time gives little support for a scheduling bottleneck.'},
+    {initial:'Enable graph execution', final:'Enable graph execution', feedback:'Test execution strategy with a single change. Graph compatibility and memory use still need measurement.'},
+    {initial:'Enable graph execution', final:'Enable graph execution', feedback:'Accept the graph experiment, without claiming its mechanism is proven. Test on baseline to isolate the change.'}
+  ], decision:'Select Agent A’s graph-only proposal. All three final proposals describe the same experiment, so they do not need separate GPU trials.', result:'764.072 ms · <strong>Misses the latency target.</strong> Only 0.905% below baseline; slower than the cache result. Quality: 8/8, no generation errors. First round without qualifying progress → run one confirmation round.'},
+  {selected:1, experiment:'Enable graph execution on trial-1 (retain prefix caching)', agents:[
+    {initial:'Disable chunked prefill', final:'Disable chunked prefill', feedback:'Keep a distinct scheduling test. Graphs alone gave little gain; a cache interaction remains unmeasured.'},
+    {initial:'GPU memory allocation → 85%', final:'Combine prefix caching + graphs', feedback:'Accept C’s interaction test on the best parent. Withdraw allocation reduction: no measured memory constraint.'},
+    {initial:'Combine prefix caching + graphs', final:'Combine prefix caching + graphs', feedback:'Keep the measured cache advantage and test the graph interaction. Graph-only results temper the prediction.'}
+  ], decision:'Select Agent B. Agent C proposes the same combination. Retain trial-1 prefix caching and change only graph execution; measure the interaction.', result:'618.588 ms · <strong>19.773% lower latency than baseline.</strong> Quality: 8/8. This is the best measured result, but only 0.992% better than the prior best: below the 5% progress threshold. Confirmation completes the plateau stop.'}
+];
+const steps = ['Inspect','Propose','Peer review','Arbiter','GPU trial','Measure','Stop / return'];
+const stages = [
+  {at:0, phase:'setup', round:-1, step:0, title:'Check provider and measure baseline'},
+  ...rounds.flatMap((round,index) => {
+    const start = 170 + index * 180;
+    return [
+      {at:start, phase:'inspect', step:0, title:'Read evidence together'},
+      {at:start+16, phase:'propose', step:1, title:'Three independent proposals'},
+      {at:start+43, phase:'review', step:2, title:'Review peers and revise'},
+      {at:start+65, phase:'arbiter', step:3, title:'Arbiter selects one experiment'},
+      {at:start+82, phase:'gpu', step:4, title:'Run the selected GPU experiment'},
+      {at:start+149, phase:'result', step:5, title:'Measure, compare, feed back'}
+    ].map(stage => ({...stage, round:index}));
+  }),
+  {at:710, phase:'stop', round:2, step:6, title:'Plateau + one confirmation → stop'},
+  {at:785, phase:'cleanup', round:2, step:6, title:'Return best configuration; verify runner'},
+  {at:totalSeconds, phase:'complete', round:2, step:6, title:'Runner verified. GPU cleanup complete.'}
+];
+let elapsed = 0;
+let speed = 8;
+let playing = false;
+let lastFrame = performance.now();
+let lastStage = -1;
+const element = id => document.getElementById(id);
+function formatTime(seconds) { return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2,'0')}`; }
+function seek(seconds) {
+  elapsed = Math.max(0, Math.min(totalSeconds, seconds));
+  if (elapsed >= totalSeconds) playing = false;
+  render();
+}
+function render() {
+  element('play').textContent = playing ? 'Ⅱ Pause' : '▶ Play';
+  element('scrub').value = elapsed;
+  element('clock').textContent = `${formatTime(elapsed)} / ${formatTime(totalSeconds)}`;
+  const stageIndex = stages.findLastIndex(stage => stage.at <= elapsed);
+  if (stageIndex === lastStage) return;
+  lastStage = stageIndex;
+  const stage = stages[stageIndex];
+  const round = rounds[Math.max(stage.round,0)];
+  const afterReview = ['review','arbiter','gpu','result','stop','cleanup','complete'].includes(stage.phase);
+  const showProposal = !['setup','inspect'].includes(stage.phase);
+  const hasSelection = ['arbiter','gpu','result','stop','cleanup','complete'].includes(stage.phase);
+  element('headline').textContent = stage.title;
+  element('round').textContent = stage.round < 0 ? 'SETUP' : `ROUND ${stage.round + 1} / 3${stage.round === 2 ? ' · CONFIRMATION' : ''}`;
+  element('flow').innerHTML = steps.map((name,index) => `<div class="step ${index===stage.step?'active':index<stage.step?'done':''}" ${index===stage.step?'aria-current="step"':''}><b>0${index+1}</b>${name}</div>`).join('');
+  element('agents').innerHTML = round.agents.map((agent,index) => {
+    const selected = hasSelection && index === round.selected;
+    const active = ['inspect','propose','review'].includes(stage.phase) || selected;
+    const changed = agent.initial !== agent.final;
+    return `<article class="agent ${active?'active':''} ${selected?'selected':''}"><h3>Agent ${'ABC'[index]}</h3><div class="role">${['Scheduling','Memory & context','Output quality'][index]}</div><div class="label">${showProposal?'Initial proposal':'Shared evidence'}</div><div class="proposal">${showProposal?agent.initial:stage.round<0?'Waiting for baseline':'Prior trial metrics + latency outliers'}</div>${afterReview?`<div class="label">${changed?'↳ Revised after peer review':'After peer review'}</div><div class="proposal ${changed?'changed':''}">${agent.final}</div><p class="feedback">${agent.feedback}</p>`:''}${selected?'<div class="label changed">Selected for one GPU trial</div>':''}</article>`;
+  }).join('');
+  let detail;
+  if (stage.phase === 'setup') detail = '<strong>Before the search</strong><p>Provider checks passed 34/34 requests. Measure the unchanged model: FP8 weights, BF16 KV cache, eager execution, prefix caching off. Baseline: 771.046 ms, 8/8 quality checks. The baseline appears on the chart when the first round begins.</p>';
+  else if (stage.phase === 'inspect') detail = `<strong>Same evidence, three views</strong><p>All three investigators read load metrics and latency outliers in parallel. ${stage.round===0?'The baseline is valid; latency rises with load, but the cause is unknown.':stage.round===1?'Prefix caching improved latency. The next proposals can use that measured result.':'Graphs alone missed the target. The cache result remains the best measured parent.'}</p>`;
+  else if (stage.phase === 'propose') detail = '<strong>Parallel proposals are hypotheses</strong><p>Each agent suggests a configuration change and its expected effect. None of these proposals is a GPU result. The agents next see peer proposals and decide what to keep or revise.</p>';
+  else if (stage.phase === 'review') detail = '<strong>Peer feedback changes the next decision</strong><p>The cards show recorded initial and final recommendations. Mint text marks a changed recommendation. Feedback is a short paraphrase of each agent’s recorded peer review.</p>';
+  else if (stage.phase === 'arbiter') detail = `<strong>${round.experiment}</strong><p>${round.decision}</p>`;
+  else if (stage.phase === 'gpu') detail = `<strong>One actual experiment: trial-${stage.round+1}</strong><p>${round.experiment}. The GPU runner loads this configuration, warms the workload, checks quality, and measures the fixed loads. Agents do not run separate GPU trials. The result is revealed next.</p>`;
+  else if (stage.phase === 'result') detail = `<strong>Recorded trial-${stage.round+1} outcome</strong><p>${round.result}</p>`;
+  else if (stage.phase === 'stop') detail = '<strong>Stop: objective-plateau-confirmed</strong><p>Round 2 made no qualifying progress. Round 3 confirmed the plateau: its 0.992% gain over the prior best stayed below the 5% target. Return the best quality-valid result: cache + graphs.</p>';
+  else detail = '<strong>Completed run: cache + graphs selected</strong><p>771.046 → 618.588 ms (19.773% lower latency). The returned runner passed a fresh probe: {"answer": 5}. Cleanup passed; the post-cleanup GPU reading was 0 MiB used. Full invocation, including provider checks: 838.164 seconds.</p>';
+  element('detail').innerHTML = detail;
+  const revealed = stage.round < 0 ? 0 : ['result','stop','cleanup','complete'].includes(stage.phase) ? stage.round+2 : stage.round+1;
+  const best = revealed ? Math.min(...measurements.slice(0,revealed).map(item=>item.value)) : null;
+  element('best').innerHTML = best === null ? '— <small>ms</small>' : `${best.toFixed(3)} <small>ms</small>`;
+  element('gain').textContent = best === null ? 'Awaiting baseline' : `${((1-best/measurements[0].value)*100).toFixed(3)}% below baseline`;
+  element('chart').innerHTML = measurements.map((item,index)=>`<g opacity="${index<revealed?1:0.25}"><text x="0" y="${index*48+12}" fill="var(--muted)" font-size="11">${item.name}</text><rect x="0" y="${index*48+20}" width="${index<revealed?item.value/800*204:8}" height="12" rx="3" fill="${item.value===best?'var(--mint)':'var(--bar)'}"/><text x="265" y="${index*48+30}" text-anchor="end" fill="var(--text)" font-size="11">${index<revealed?item.value.toFixed(1):'—'}</text></g>`).join('');
+}
+element('play').addEventListener('click', () => { if(elapsed>=totalSeconds) seek(0); playing=!playing; lastFrame=performance.now(); render(); });
+element('restart').addEventListener('click', () => { playing=false; seek(0); });
+element('speed').addEventListener('change', event => { speed=Number(event.target.value); });
+element('scrub').addEventListener('input', event => { seek(Number(event.target.value)); lastFrame=performance.now(); });
+function tick(now) { if(playing) seek(elapsed+(now-lastFrame)/1000*speed); lastFrame=now; requestAnimationFrame(tick); }
+render();
+requestAnimationFrame(tick);
+
+// Theme toggle, matching the site's light/dark preference. Every step is guarded:
+// this file is also loaded from file://, where localStorage can be blocked, and by
+// a test harness whose document stub has no documentElement. The replay itself must
+// never fail because the colour switch could not start.
+try {
+  const root = document.documentElement;
+  const toggle = element('theme-toggle');
+  // Same rule as the site's sera-theme.js: light unless a stored choice says dark.
+  // The system preference is deliberately ignored, so this page and useseraai.com
+  // open the same way on the same machine.
+  let theme = 'light';
+  try { theme = localStorage.getItem('sera-theme') === 'dark' ? 'dark' : 'light'; } catch (error) { /* private window, or file:// */ }
+  const writeStored = value => { try { localStorage.setItem('sera-theme', value); } catch (error) { /* as above */ } };
+  const apply = () => {
+    root.setAttribute('data-theme', theme);
+    try {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = theme === 'dark' ? '#101a17' : '#f6f5f0';
+    } catch (error) { /* no querySelector here; the palette still applies */ }
+    toggle.setAttribute('aria-pressed', String(theme === 'dark'));
+    toggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light colors' : 'Switch to dark colors');
+    toggle.innerHTML = theme === 'dark' ? '<span aria-hidden="true">☀</span>' : '<span aria-hidden="true">☾</span>';
+  };
+  apply();
+  toggle.addEventListener('click', () => { theme = theme === 'dark' ? 'light' : 'dark'; writeStored(theme); apply(); });
+} catch (error) {
+  /* No theme switching available; the page stays in its default light palette. */
+}
+</script></body></html>

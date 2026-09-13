@@ -411,6 +411,8 @@ class Handler(SimpleHTTPRequestHandler):
         name = routes.get(path, path.removeprefix('/'))
         allowed = {p.name for p in (ROOT / 'output').iterdir()
                    if p.is_file() and p.suffix in ('.html', '.css', '.js', '.svg', '.png', '.ico')}
+        # Only the audited public demo record is exposed, not arbitrary JSON files.
+        allowed.add('demo-run.json')
         if name not in allowed:
             self.send_error(404)
             return

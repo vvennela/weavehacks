@@ -4,7 +4,7 @@ const num=(v,d=0)=>Number.isFinite(v)?v.toLocaleString(undefined,{maximumFractio
 let trials=[],selected=[],shown=[];
 const page=({'/lab/performance':'performance','/lab/models':'models','/lab/trials':'trials'})[location.pathname.replace(/\/$/,'')]||'overview';
 const pageInfo={overview:['Overview','Metrics overview','A clear view of performance, resources, and the latest recorded decisions.'],performance:['Performance','Performance metrics','Compare p95 latency and trial outcomes across your saved runs.'],models:['Models','Model performance','Inspect the best quality-valid solo configurations and their measured results.'],trials:['Trial ledger','Every decision, recorded','Search trials, investigate rollbacks, and export the evidence.']}[page];
-document.title=pageInfo[0]+' — Sera';document.querySelector('h1').textContent=pageInfo[1];document.querySelector('.subtitle').textContent=pageInfo[2];document.querySelector('.breadcrumb').textContent='/ '+pageInfo[0];
+document.title=pageInfo[0]+' — Sera';document.querySelector('h1').textContent=pageInfo[1];document.querySelector('.subtitle').textContent=pageInfo[2]+' This page reads a saved ledger, not a live demo feed. Use the notebook report or Weave trace for the current run.';document.querySelector('.breadcrumb').textContent='/ '+pageInfo[0];
 document.querySelectorAll('[data-pages]').forEach(section=>section.hidden=!section.dataset.pages.split(' ').includes(page));
 document.querySelectorAll('.sidebar nav a').forEach(link=>{const active=link.getAttribute('href')===(page==='overview'?'/lab':'/lab/'+page);link.classList.toggle('active',active);if(active)link.setAttribute('aria-current','page')});
 let feedbackTimer;
@@ -14,7 +14,7 @@ function feedback(message){clearTimeout(feedbackTimer);$('feedback').className='
    simulator never carry the same label, and nothing in this file averages the two. */
 const LIVE=r=>!!r&&r.substrate==='vllm';
 const srcKey=r=>LIVE(r)?'live':'sim';
-const srcName=r=>LIVE(r)?'Live GPU':'Simulator';
+const srcName=r=>LIVE(r)?'Measured GPU':'Simulator';
 const srcHint=r=>LIVE(r)?'Measured on real GPU hardware through vLLM (substrate: vllm).':'Analytic simulator output (substrate: '+((r&&r.substrate)||'unknown')+'). Not a measured result.';
 const srcTag=r=>`<span class="source-tag ${srcKey(r)}" title="${esc(srcHint(r))}"><i aria-hidden="true"></i>${srcName(r)}</span>`;
 /* Live rows carry no top-level metrics: every number lives inside measurement, which is
@@ -85,7 +85,7 @@ const live=trials.filter(LIVE).length, sim=trials.length-live;
 const parts=[];if(live)parts.push(`${live} live GPU trial${live===1?'':'s'} (vLLM)`);if(sim)parts.push(`${sim} simulator trial${sim===1?'':'s'}`);
 $('source-status').innerHTML=trials.length?parts.join(' · ')+' · '+esc(data.source||'saved ledger'):'No run data yet';
 $('source-status').className=live&&sim?'mixed':live?'live':'';
-$('updated').textContent=data.updated?'Ledger updated '+new Date(data.updated*1000).toLocaleString():'Run an experiment to populate metrics';render();if(manual)feedback('Metrics refreshed successfully.')}catch(e){$('error').textContent='Unable to refresh metrics. '+(e.message||'Please try again.');$('error').hidden=false;$('source-status').textContent='Metrics unavailable'}finally{button.disabled=false;button.textContent='↻  Refresh data'}}
+$('updated').textContent=data.updated?'Saved ledger updated '+new Date(data.updated*1000).toLocaleString():'No saved ledger available';render();if(manual)feedback('Saved ledger reloaded. This does not import demo runs.')}catch(e){$('error').textContent='Unable to refresh metrics. '+(e.message||'Please try again.');$('error').hidden=false;$('source-status').textContent='Metrics unavailable'}finally{button.disabled=false;button.textContent='↻  Refresh data'}}
 document.querySelectorAll('.sidebar nav a').forEach(link=>link.addEventListener('click',()=>{document.querySelectorAll('.sidebar nav a').forEach(a=>a.classList.toggle('active',a===link));}));
 const params=new URLSearchParams(location.search);const outcome=params.get('outcome');if(['accepted','reverted','failed'].includes(outcome))$('verdict-filter').value=outcome;
 const wantSource=params.get('source');if($('source-filter')&&['live','sim'].includes(wantSource))$('source-filter').value=wantSource;

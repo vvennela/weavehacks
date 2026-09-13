@@ -118,12 +118,12 @@
     if (gpu === true) {
       gpuBadge.textContent = 'GPU attached';
       gpuBadge.className = 'badge';
-      line = 'Sera confirmed a GPU on this sandbox, so runs here are measured on real hardware.'
+      line = 'Sera confirmed a GPU on this sandbox. The demo checks the runtime before starting a measured run.'
         + (detail ? ' Reported as: ' + detail + '.' : '');
     } else if (gpu === false) {
       gpuBadge.textContent = 'No GPU attached';
       gpuBadge.className = 'badge danger';
-      line = 'No GPU is attached to this sandbox, so anything Sera runs here is simulated, not measured. '
+      line = 'No GPU is attached. The demo stops before model execution; it does not substitute simulator results. '
         + 'Attach one from molab’s notebook specs menu — molab restarts the sandbox and gives it a new '
         + 'address, so you will need to connect again.'
         + (detail ? ' Sandbox reports: ' + detail + '.' : '');
