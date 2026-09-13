@@ -23,6 +23,18 @@ def load_snapshot_metrics(trial):
     return metrics
 
 
+def trial_trace_scope(trial):
+    """Correlate recorded requests to their original trial and fixed local scores."""
+    from copy import deepcopy
+    runtime = trial.get('runtime', {})
+    quality = trial.get('task_quality', {})
+    return dict(trial_id=trial.get('source_trial_id', trial.get('trial_id')),
+        model_id=runtime.get('model_id', MODEL_ID), revision=runtime.get('revision', MODEL_REVISION),
+        config_hash=trial.get('config_hash'),
+        task_quality={key: deepcopy(quality[key]) for key in
+                      ('version', 'floor', 'passed', 'per_prompt') if key in quality})
+
+
 def agent_evidence(baseline, objective=None, constraints=None, *, prompts=()):
     from .config import SUPPORTED_CHANGES
     from .trace_evidence import request_evidence
@@ -45,6 +57,7 @@ def agent_evidence(baseline, objective=None, constraints=None, *, prompts=()):
             "quality_mode": "verified" if constraints is not None else "token-agreement",
             "task_quality": baseline.get("task_quality"),
             "request_evidence": requests,
+            "trace_scope": [trial_trace_scope(baseline)],
             "configuration": baseline["runtime"]["configuration"],
             "metrics": metrics, "remaining_trials": 1, "supported_changes": supported,
             "baseline_self_check": token_agreement(baseline["quality"], baseline["self_check"]),
@@ -175,7 +188,7 @@ def render_summary(report, output_dir):
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
              objective=None, evaluation=None, evaluation_version=None, constraints=None,
              workload=None, baseline_configuration=None, budget=None, investigation_space=None,
-             automatic_space=False):
+             automatic_space=False, swarm=False, trace_reader=None):
     """One candidate, or an opt-in bounded agent investigation; no joint placement.
 
     Uses at most 32 supplied prompts, declared loads, up to 16 warm-ups, three
@@ -183,6 +196,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     automatic_space derives normal-mode controls after measuring the reference;
     it never expands an explicit investigation space and defaults to disabled.
     """
+    from .swarm import validate_swarm_options
+    validate_swarm_options(swarm, budget, agent, trace_reader)
     if type(automatic_space) is not bool:
         raise ValueError('automatic_space must be a boolean')
     if automatic_space and (investigation_space is not None or candidate is not None
@@ -231,7 +246,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                             evaluation=evaluation, evaluation_version=evaluation_version,
                             constraints=constraints, agent=agent, provider_check=provider_check,
                             workload=workload, budget=budget, investigation_space=investigation_space,
-                            automatic_space=automatic_space)
+                            automatic_space=automatic_space, swarm=swarm, trace_reader=trace_reader)
     baseline_config = RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(baseline_configuration)
     if baseline_configuration is not None:
         if model_id != LARGE_MODEL_ID or baseline_config != RuntimeConfig(quantization="fp8_per_tensor"):
@@ -284,6 +299,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
               "provider_validation": provider_validation,
               "investigation_space": investigation_space,
               "automatic_space": automatic_space,
+              "swarm_enabled": swarm,
               "limits": ["single model", "one candidate", "non-streaming requests",
                          "TTFT and queue percentiles unavailable",
                          "Quality is limited to the supplied evaluator and prompts" if evaluation else "no task-correctness claim"],
@@ -312,7 +328,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             investigation_runner, active = active, None
             return investigate(result=result, active=investigation_runner, agent=agent,
                 history_start=history_start, budget=budget, objective=objective, constraints=constraints,
-                evaluation=evaluation, evaluation_version=evaluation_version, workload=workload)
+                evaluation=evaluation, evaluation_version=evaluation_version, workload=workload,
+                swarm=swarm, trace_reader=trace_reader)
         if agent is not None and baseline["status"] == "collected" and can_compare:
             from .agent import validate_proposal
             evidence = agent_evidence(baseline, objective, constraints, prompts=prompts)

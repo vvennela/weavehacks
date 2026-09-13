@@ -53,13 +53,14 @@ def remaining_candidates(evidence, baseline_config, seen, workload, baseline):
 
 
 def round_evidence(initial, search, trials, remaining, *, prompts=()):
-    from .pipeline import load_snapshot_metrics
+    from .pipeline import load_snapshot_metrics, trial_trace_scope
 
     evidence = deepcopy(initial)
     evidence['remaining_trials'] = remaining
+    evidence.setdefault('trace_scope', []).extend(trial_trace_scope(trial) for trial in trials)
     evidence['history'] = [dict(trial={key: deepcopy(trial[key]) for key in
         ('trial_id', 'status', 'config_hash', 'reduced', 'task_quality', 'decision', 'error',
-         'failure_stage') if key in trial},
+         'failure_stage', 'investigator_id', 'arbiter_proposal_id') if key in trial},
         configuration=deepcopy(trial['runtime']['configuration']),
         request_evidence=request_evidence(trial, prompts),
         proposal=deepcopy(trial.get('proposal')), review=deepcopy(trial.get('review')),
@@ -68,8 +69,13 @@ def round_evidence(initial, search, trials, remaining, *, prompts=()):
         arbiter=deepcopy(record.get('arbiter')), arbiter_error=record.get('arbiter_error'),
         specialist_participation=deepcopy(record.get('specialist_participation', [])),
         specialists=[{key: deepcopy(check[key]) for key in
-                      ('role', 'status', 'proposal', 'error', 'arbiter_proposal_id')
+                      ('role', 'status', 'proposal', 'error', 'arbiter_proposal_id',
+                       'investigator_id', 'initial_proposal', 'degraded', 'inspection_status')
                       if key in check} for check in record['specialists']]) for record in search['rounds']]
+    for previous, record in zip(evidence['previous_rounds'], search['rounds']):
+        if 'shared_findings' in record:
+            previous['shared_findings'] = deepcopy(record['shared_findings'])
+            previous['shared_findings_hash'] = record['swarm']['shared_findings_hash']
     # Exact metric names remain valid citations, including failed-trial measurements.
     for index, trial in enumerate(trials, search.get('initial_trials_used', 0) + 1):
         metrics = dict(trial.get('reduced', {}))
@@ -190,7 +196,8 @@ def choose_experiments(agent, evidence, legal, record, remaining):
 
 
 def investigate(*, result, active, agent, history_start, budget, objective, constraints,
-                evaluation, evaluation_version, workload, initial_trials_used=0):
+                evaluation, evaluation_version, workload, initial_trials_used=0,
+                swarm=False, trace_reader=None):
     from . import pipeline
 
     report, folder = result.report, result.output_dir
@@ -210,6 +217,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 for trial in result.frontier}
 
     try:
+        from .swarm import choose_swarm_experiments, validate_swarm_options
+        validate_swarm_options(swarm, budget, agent, trace_reader)
         # Ownership has already transferred from optimize. Even setup failures
         # must close the running baseline.
         if (type(initial_trials_used) is not int
@@ -219,7 +228,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
         baseline_config = RuntimeConfig.model_validate(report['baseline_configuration'])
         search = dict(budget=budget.model_dump(), initial_trials_used=initial_trials_used,
                       trials_used=initial_trials_used, rounds=[], stop_reason=None)
-        report.update(mode='agent-investigation', search=search, search_trials=[],
+        report.update(mode='agent-investigation', search=search, search_trials=[], swarm_enabled=swarm,
                       limits=['single model', 'already-active single-setting controls',
                               'no combination trials', 'no live search-advantage claim'])
         if report.get('automatic_space'):
@@ -274,7 +283,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                                       prompts=report['prompts'])
             search['rounds'].append(record)
             before_frontier = frontier_points()
-            experiments = choose_experiments(agent, evidence, legal, record, remaining)
+            experiments = (choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_reader)
+                           if swarm else choose_experiments(agent, evidence, legal, record, remaining))
             for check in record['specialists']:
                 if check['status'] == 'rejected':
                     report['rejected'].append(dict(stage='proposal-validation', round=record['round'],
@@ -305,6 +315,11 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                                           model_id=report['model_id'], revision=report['model_revision']),
                              config_hash=candidate.config.config_hash, proposal=proposal.model_dump(),
                              selection_reason=selection_reason)
+                if swarm:
+                    scoped_id = record['arbiter']['ranked_proposal_ids'][0]
+                    selected = record['arbiter_evidence']['proposal_id_map'][scoped_id]
+                    trial.update(arbiter_proposal_id=scoped_id,
+                                 investigator_id=selected['investigator_id'])
                 report['search_trials'].append(trial)
                 save()
                 stage = 'constructor'

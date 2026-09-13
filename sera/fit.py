@@ -38,7 +38,7 @@ def recommend_fit_plan(agent, evidence):
 
 def continue_fit_investigation(result, active, *, agent, history_start, budget,
                               investigation_space, objective, constraints,
-                              evaluation, evaluation_version, workload):
+                              evaluation, evaluation_version, workload, swarm=False, trace_reader=None):
     """Promote a measured, eligible deployment to the search reference without reloading."""
     report = result.report
     try:
@@ -50,7 +50,8 @@ def continue_fit_investigation(result, active, *, agent, history_start, budget,
         # evidence must not share nested mutable objects with the new reference.
         deployment = {"infeasible_baseline": deepcopy(report["baseline"])}
         deployment.update({key: deepcopy(report[key]) for key in keys if key in report})
-        reference = dict(deepcopy(deployment["candidate_trial"]), trial_id="baseline")
+        reference = dict(deepcopy(deployment["candidate_trial"]), trial_id="baseline",
+                         source_trial_id=deployment["candidate_trial"]["trial_id"])
         configuration = active.configuration.model_dump()
         report.update(deployment=deployment, baseline=reference,
             baseline_name="sera-fp8-weight-reference-v1",
@@ -74,7 +75,7 @@ def continue_fit_investigation(result, active, *, agent, history_start, budget,
     return investigate(result=result, active=active, agent=agent,
         history_start=history_start, budget=budget, initial_trials_used=1,
         objective=objective, constraints=constraints, evaluation=evaluation,
-        evaluation_version=evaluation_version, workload=workload)
+        evaluation_version=evaluation_version, workload=workload, swarm=swarm, trace_reader=trace_reader)
 
 
 def plan_fit(*, gpu_memory_mib, workspace_bytes=4 * 1024**3):
@@ -127,9 +128,11 @@ def fit_review_evidence(plan, trial, decision):
 
 def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_version,
                  constraints, agent, provider_check, workload=None, budget=None,
-                 investigation_space=None, automatic_space=False):
+                 investigation_space=None, automatic_space=False, swarm=False, trace_reader=None):
     from .pipeline import SeraResult
     from .provider_check import require_provider_check
+    from .swarm import validate_swarm_options
+    validate_swarm_options(swarm, budget, agent, trace_reader)
     workload = Workload() if workload is None else Workload.model_validate(workload)
 
     if evaluation is None or constraints is None:
@@ -160,6 +163,7 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
               "evaluation": {"version": evaluation_version}, "task_quality_verified": False,
               "provider_validation": provider_validation, "fit_plan": plan, "gpu": gpu,
               "automatic_space": automatic_space,
+              "swarm_enabled": swarm,
               "baseline": {"trial_id": "baseline", "status": "infeasible",
                            "reason": "Estimated BF16 runtime exceeds the service memory budget",
                            "fit_estimate": plan["plans"][0]},
@@ -251,7 +255,7 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
             return continue_fit_investigation(result, runner, agent=agent,
                 history_start=history_start, budget=budget, investigation_space=investigation_space,
                 objective=objective, constraints=constraints, evaluation=evaluation,
-                evaluation_version=evaluation_version, workload=workload)
+                evaluation_version=evaluation_version, workload=workload, swarm=swarm, trace_reader=trace_reader)
         return result
     except BaseException as failure:
         report.update(status="failed", error=f"{type(failure).__name__}: {failure}")
