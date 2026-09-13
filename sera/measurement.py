@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from .storage import save_json
 from .config import Constraints, Objective, Workload
+from .tracing import TraceSinkError, emit_event, event_sink_enabled, recorded_model_request
 
 
 def nearest_rank(values, percentile):
@@ -45,6 +46,42 @@ def reduce_loads(loads):
                   input_tokens_per_second=result["input_tokens"] / elapsed if elapsed > 0 else None,
                   p99_reliable=False, p95_ttft_ms=None, p95_queue_ms=None, p95_time_per_output_token_ms=None)
     return result
+
+
+def export_trial_events(record, prompts):
+    """Log saved requests only after all measured and quality passes finish."""
+    export = record['trace_export']
+    runtime = record['runtime']
+    identity = dict(trial_id=record['trial_id'], model_id=runtime.get('model_id'),
+                    revision=runtime.get('revision'), config_hash=record['config_hash'])
+
+    def publish_requests(responses, phase, concurrency):
+        for response in responses:
+            index = response['prompt_index']
+            recorded_model_request(**identity, phase=phase, concurrency=concurrency,
+                                   prompt_index=index, prompt=prompts[index], response=response)
+            export['emitted_events'] += 1
+
+    try:
+        for load in record['loads']:
+            publish_requests(load['warmup'], 'warmup', load['concurrency'])
+            publish_requests(load['requests'], 'measured', load['concurrency'])
+        for phase in ('quality', 'self_check'):
+            publish_requests(record[phase], phase, 1)
+        emit_event('recorded_trial_metrics', {
+            **identity, 'status': record['status'], 'reduced': record.get('reduced'),
+            'loads': [{'concurrency': load['concurrency'], 'reduced': load.get('reduced')}
+                      for load in record['loads']],
+            'generation_errors': record.get('generation_errors'),
+            'quality_requests': len(record['quality']), 'self_check_requests': len(record['self_check']),
+            'timing_scope': export['timing_scope'],
+        })
+        export['emitted_events'] += 1
+        export['status'] = 'complete'
+    except TraceSinkError as error:
+        # Trace failure is not a generation failure. Preserve measured verdicts
+        # and expose the export error separately for the calling application.
+        export.update(status='failed', error_type=error.error_type, failed_event=error.event_name)
 
 
 def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
@@ -129,6 +166,13 @@ def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
     except Exception as error:
         record.update(status="failed", error=f"{type(error).__name__}: {error}")
     save()
+    if event_sink_enabled():
+        record['trace_export'] = {
+            'status': 'running', 'emitted_events': 0,
+            'timing_scope': 'Events are exported after measurement; span durations measure logging time.'}
+        save()
+        export_trial_events(record, prompts)
+        save()
     return record
 
 
