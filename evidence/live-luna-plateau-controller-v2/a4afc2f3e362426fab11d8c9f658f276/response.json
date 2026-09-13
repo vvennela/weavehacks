@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"proposal-max-model-len-256\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_model_len\",\"proposed_value\":256,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"successful_requests\",\"trial_2_successful_requests\",\"generation_errors\",\"trial_2_generation_errors\"],\"predicted_metric_change\":\"p95_latency_ms may decrease versus 770.9917920001317 ms while quality remains at or above 0.99; no measured gain or reduced reserved KV memory is assumed. This prediction is based on diagnosis call 01a09ad2-a453-7318-a50a-814abddd8e22 and fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.\",\"confidence\":0.42,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute if p95_latency_ms is not at least 5% below baseline p95_latency_ms=770.9917920001317, quality falls below 0.99, generation_errors becomes nonzero, or successful_requests falls below 96. Check diagnosis call 01a09ad2-a453-7318-a50a-814abddd8e22 and fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.\",\"reason\":\"Observed failure: trial-2 was collected with trial_2_successful_requests=96 and trial_2_generation_errors=0, but trial_2_p95_latency_ms=770.2487169999586 improved over p95_latency_ms=770.9917920001317 by only 0.096%, below the required 5%; this is recorded in diagnosis call 01a09ad2-a453-7318-a50a-814abddd8e22 at fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt. The cause is not established, and lower max_model_len does not by itself prove lower reserved KV memory. The untested supported setting max_model_len=256 is therefore a bounded latency experiment. I accept the peers' common proposal because it is independently legal and targets an untested lever, but do not treat their causal hypotheses as measured facts. The trial should proceed only under the fixed quality floor and workload constraints.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18518,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 717,
+    "reasoning_output_tokens": 200
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"memory-context-batched-tokens-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"p50_latency_ms\",\"sampled_peak_memory_mib\",\"generation_errors\",\"successful_requests\",\"concurrency_8_cumulative_snapshot_mean_ttft_ms\"],\"predicted_metric_change\":\"Compared with the baseline p95_latency_ms of 770.9917920001317 and p50_latency_ms of 701.4812399997936, reducing max_num_batched_tokens to 2048 is predicted to reduce tail latency modestly, while preserving successful_requests and generation_errors at 96 and 0; memory impact is uncertain despite sampled_peak_memory_mib being 88687.\",\"confidence\":0.57,\"expected_trial_cost\":1,\"falsification_condition\":\"The prediction is refuted if the measured p95_latency_ms fails to improve by at least 5% versus 770.9917920001317, or if generation_errors increases, successful_requests falls below 96, or quality falls below the fixed 0.99 floor.\",\"reason\":\"The observed prior outcome was an accepted collected candidate with generation_errors 0 and verified quality mean 1.0, not a failure; source call 01a09acf-b9a8-78aa-b625-b20ab8d42887 records status=collected and evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. The load read 01a09acf-b99b-7dab-8fa3-1f1bd1006664 reports successful requests at all tested concurrency levels and p95 latency values, including 770.9917920001317 at concurrency 8; its cumulative baseline snapshots show concurrency_8_cumulative_snapshot_mean_ttft_ms of 191.36246293783188. The cause of any latency difference is unknown, and the inspection explicitly does not establish a causal memory or scheduling explanation. I reject lowering max_model_len as the next test because prepared prompts are only 85\u2013109 tokens but the evidence states that a lower context cap alone does not establish lower reserved KV memory at fixed gpu_memory_utilization. A 2048 max_num_batched_tokens trial is legal, untested, and directly tests batching behavior while preserving the fixed quality gate; source call 01a09acf-b9a8-78aa-b625-b20ab8d42887 also requires preserving fixed quality and workload constraints. The proposed setting should be abandoned if the falsification conditions occur; no unmeasured gain is claimed.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15102,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 776,
+    "reasoning_output_tokens": 195
+  }
+}

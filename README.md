@@ -6,6 +6,14 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 ### Latest swarm recording
 
+The [uncapped Luna run](evidence/live-luna-plateau-v2/README.md) completed **three GPU trial attempts across two swarm rounds**, using three parallel Luna investigators, shared findings, an arbiter, and Weave evidence reads. No total trial-count cap or controller request cap was set. The FP8 deployment passed all eight tasks. A batching change also passed, but improved p95 latency by only **0.096%**, below the 5% target. The automatic confirmation experiment changed the context limit to 256 and failed during vLLM startup. Sera rejected it, returned the working reference, passed another request, and released GPU memory.
+
+For the presentation, say: “The team recommended an experiment, measured it, used the result to choose another experiment, handled its startup failure, and returned a working model without asking us to choose settings.” Open the [live Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09acd-b8f9-7c5f-bbc2-7520c8f64163): it contains 352 completed calls, including 31 typed agent responses. These counts are not GPU trial counts.
+
+The control-flow audit passes. **A measured performance plateau and a useful speedup are not established:** the confirmation attempt produced no latency measurement. The internal stop label `objective-plateau-confirmed` counts failed attempts as no progress; it is not a statistical conclusion. Automatic candidate generation still makes a small pool once from the reference measurements, not an expanding search across arbitrary settings. All three investigators chose the same setting in each round; this run does not prove the swarm beats one agent. The independent audit confirms all 31 Luna responses and both measured quality scores, but finds incorrect diagnosis-call citations in both final trial reviews. See the linked evidence for the exact command and remaining limits.
+
+### Earlier swarm recordings
+
 The [Astra/Luna comparison](evidence/model-reasoning-bounds-v1/README.md)
 completed two saved-evidence decisions per model. Astra predicted little benefit;
 Luna proposed the legal trial, then withdrew its prediction after the measured

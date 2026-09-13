@@ -1,0 +1,26 @@
+{
+  "schema_version": "sera-local-controller-launch-v1",
+  "source_revision": "afcaa926d69aaa99f23d614843b083dcf8f1d49a",
+  "command": [
+    ".venv/bin/python",
+    "-m",
+    "experiments.codex_relay_controller",
+    "--url",
+    "https://sb-4d6d72981b11fb9d.sb.molab.run",
+    "--relay-dir",
+    "/tmp/sera-relay-luna-plateau-v2",
+    "--pair-script",
+    "/Users/vishnuv/Documents/Documents/weavehacks/.agents/skills/marimo-pair/scripts/execute-code.sh",
+    "--output-dir",
+    "evidence/live-luna-plateau-controller-v2",
+    "--max-requests",
+    "none",
+    "--idle-timeout",
+    "600"
+  ],
+  "max_requests": null,
+  "idle_timeout_seconds": 600,
+  "investigator_model": "gpt-5.6-luna",
+  "authentication": "Existing local Codex ChatGPT login; pairing token supplied through environment and omitted here",
+  "provenance": "Saved launch arguments from the controller invocation; no backend billing attestation"
+}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"The observed outcome was an accepted collected candidate diagnosis with zero generation errors and verified quality mean 1.0, while the recorded candidate latency metric was 770.991792 ms; the diagnosis explicitly states that no model, kernel, memory-pressure, or scheduling root cause was established. The prior latency-outliers inspection does not establish causality, so inspecting load metrics is useful to examine scheduling and load behavior. Any causal explanation remains unknown.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12506,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 317,
+    "reasoning_output_tokens": 204
+  }
+}

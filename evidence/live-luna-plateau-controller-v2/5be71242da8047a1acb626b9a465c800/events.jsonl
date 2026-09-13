@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09acf-da1b-7ef2-b35a-5f7f9df8b2c3"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed latency is the active concern: measured p95 latency is 770.9917920001317 ms, while p99 is explicitly unreliable; all 96 requests succeeded and verified quality passed. The cause of the latency distribution is unknown, so inspecting latency outliers is the most useful legal read-only query. No peer claims are supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":11407,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":183,"reasoning_output_tokens":87}}

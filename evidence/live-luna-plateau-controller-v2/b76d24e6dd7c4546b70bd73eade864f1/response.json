@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"The recorded experiment failed to meet the latency objective: p95 latency improved from 770.9917920001317 ms to 770.2487169999586 ms, an improvement fraction of 0.000963791064812003 versus the required 0.05, while quality remained measured and passed at 1.0 with zero generation errors. The persisted diagnosis explicitly states that the root cause is not established; model, kernel, memory-pressure, and scheduling causes remain unknown. Inspecting latency outliers is the most useful legal read-only query to examine the observed tail-latency failure before proposing another setting.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12481,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 228,
+    "reasoning_output_tokens": 75
+  }
+}

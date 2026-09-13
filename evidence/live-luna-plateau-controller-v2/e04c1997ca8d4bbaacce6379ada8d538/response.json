@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"The recorded experiment failed only because the measured p95 latency improvement was 0.000963791064812003, below the required 0.05, while all 96 requests succeeded with zero generation errors and quality passed at mean 1.0. The cause of the insufficient improvement is not established; the diagnosis explicitly rules out inferring a model, kernel, memory-pressure, or scheduling cause from these observations. Inspect latency outliers next to examine the persisted latency diagnosis relevant to the latency objective.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12483,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 231,
+    "reasoning_output_tokens": 103
+  }
+}

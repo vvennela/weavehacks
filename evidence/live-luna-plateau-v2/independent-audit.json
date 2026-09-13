@@ -1,0 +1,33 @@
+{
+  "schema_version": "sera-live-luna-independent-audit-v1",
+  "method": "Read-only independent worker audit of saved local CLI, trial, case, and trace records",
+  "investigator_model": "gpt-5.6-luna",
+  "cli_responses_matched": 31,
+  "cli_responses_recorded": 31,
+  "transport_errors": 0,
+  "fixed_cases_and_profile_match": true,
+  "measured_quality_regraded": {"candidate": "8/8", "trial-2": "8/8"},
+  "deterministic_gates_recomputed": 3,
+  "returned_probe_passed": true,
+  "cleanup_gpu_memory_mib": 0,
+  "round_two_all_three_used_measured_no_gain_feedback": true,
+  "factual_citation_accuracy_passed": false,
+  "citation_issues": [
+    {
+      "review_trial_id": "trial-2",
+      "cited_call_id": "01a09acf-b9a8-78aa-b625-b20ab8d42887",
+      "actual_source": "deployment diagnosis, not trial-2 diagnosis"
+    },
+    {
+      "review_trial_id": "trial-3",
+      "cited_call_id": "01a09ad2-a453-7318-a50a-814abddd8e22",
+      "actual_source": "trial-2 diagnosis, not trial-3 startup-failure diagnosis"
+    }
+  ],
+  "limits": [
+    "Correct outcome explanations do not make incorrect source citations valid.",
+    "CLI model selection is verified, not independently attested backend identity.",
+    "Confirmation was attempted but not successfully measured.",
+    "No search advantage, statistical plateau, or global optimality is established."
+  ]
+}
