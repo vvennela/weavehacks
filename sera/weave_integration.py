@@ -95,6 +95,10 @@ class TracedInvestigationAgent:
     def endpoint_fingerprint(self):
         return getattr(self._agent, 'endpoint_fingerprint', None)
 
+    def wire_schema(self, role, evidence):
+        from .agent import request_schema
+        return getattr(self._agent, 'wire_schema', request_schema)(role, evidence)
+
     @property
     def history(self):
         return self._agent.history

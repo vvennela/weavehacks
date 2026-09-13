@@ -174,8 +174,12 @@ class WandbAgent:
         """Create an investigator with the same provider identity and isolated history."""
         return WandbAgent(project=self.project, model=self.model)
 
+    def wire_schema(self, role, evidence):
+        """The exact provider schema; local validation always retains the full contract."""
+        return request_schema(role, evidence)
+
     def request(self, role, evidence, instruction):
-        wire_schema = request_schema(role, evidence)
+        wire_schema = self.wire_schema(role, evidence)
         schema = SCHEMAS[role]
         prompt_evidence = evidence
         prompt_metadata = {}

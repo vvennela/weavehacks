@@ -176,7 +176,8 @@ def require_provider_check(path, agent):
             raise ValueError("Provider request does not match this provider transport")
         if entry.get("role") != case["role"] or entry.get("evidence") != case["evidence"]:
             raise ValueError("Provider check cases do not match the frozen experiment")
-        expected_schema = request_schema(case["role"], case["evidence"])
+        wire_schema = getattr(agent, 'wire_schema', request_schema)
+        expected_schema = wire_schema(case["role"], case["evidence"])
         if (entry.get("schema_hash") != content_hash(expected_schema)
                 or entry.get("request_schema") != expected_schema):
             raise ValueError("Provider check request schema does not match the frozen evidence")
