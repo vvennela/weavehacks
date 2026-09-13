@@ -490,6 +490,39 @@ def test_absent_provider_reasoning_is_not_invented(cli):
     assert exported['reasoning_source'] == 'not returned'
 
 
+@pytest.mark.parametrize('raw_response', [
+    {'choices': [{'message': 'malformed'}]},
+    {'choices': [{'message': ['malformed']}]},
+    {'choices': ['malformed']},
+    {'choices': 'malformed'},
+    'malformed',
+])
+def test_malformed_attempt_trace_cannot_replace_later_valid_recommendation(cli, raw_response):
+    agent = SimpleNamespace(model='fixture-model', project='test/project', history=[])
+    valid = {'accepted': True}
+
+    def request(*args):
+        agent.history.append({'role': 'arbiter', 'attempts': [
+            {'attempt': 1, 'schema_valid': False, 'raw_response': raw_response},
+            {'attempt': 2, 'schema_valid': True, 'raw_response': {'choices': [{
+                'message': {'content': '{"accepted":true}', 'reasoning': 'Actual provider explanation.'}}]}}]})
+        return valid
+
+    agent.request = request
+    agent.review = lambda evidence: request()
+    weave = recording_weave()
+    traced = cli.TracedInvestigationAgent(agent, weave)
+    assert traced.request('arbiter', {}, 'rank') is valid
+    assert agent.history[0]['attempts'][0]['raw_response'] is raw_response
+    exported = [call['args'][0] for call in weave.calls if call['name'] == 'record_agent_response']
+    assert len(exported) == 2
+    assert exported[0]['response_payload_malformed'] is True
+    assert exported[0]['content'] is None and 'reasoning' not in exported[0]
+    assert exported[0]['schema_valid'] is False
+    assert exported[1]['content'] == '{"accepted":true}'
+    assert exported[1]['reasoning'] == 'Actual provider explanation.'
+
+
 @pytest.mark.parametrize('model,extra', [(MODEL_ID, []), (LARGE_MODEL_ID, ['--fit-first'])])
 def test_automatic_space_is_explicit_without_a_guessed_premeasurement_pool(cli, monkeypatch, tmp_path, model, extra):
     observed = install_boundaries(cli, monkeypatch, tmp_path)

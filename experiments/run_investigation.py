@@ -58,13 +58,21 @@ class TracedInvestigationAgent:
         finally:
             for entry in self.history[start:]:
                 for attempt in entry.get('attempts', []):
-                    choices = (attempt.get('raw_response') or {}).get('choices') or []
-                    choice = choices[0] if choices and isinstance(choices[0], dict) else {}
-                    message = choice.get('message') or {}
+                    body = attempt.get('raw_response')
+                    malformed = body is not None and not isinstance(body, dict)
+                    choices = body.get('choices') if isinstance(body, dict) else None
+                    malformed |= choices is not None and not isinstance(choices, list)
+                    choice = choices[0] if isinstance(choices, list) and choices else None
+                    malformed |= choice is not None and not isinstance(choice, dict)
+                    choice = choice if isinstance(choice, dict) else {}
+                    message = choice.get('message')
+                    malformed |= message is not None and not isinstance(message, dict)
+                    message = message if isinstance(message, dict) else {}
                     record = {'model': entry.get('model', self.model), 'role': entry.get('role'),
                               'attempt': attempt.get('attempt'), 'finish_reason': choice.get('finish_reason'),
                               'content': message.get('content') if isinstance(message.get('content'), str) else None,
                               'latency_ms': attempt.get('latency_ms'), 'schema_valid': attempt.get('schema_valid'),
+                              'response_payload_malformed': malformed,
                               'reasoning_source': 'not returned',
                               'timing_scope': 'Recorded provider output; span measures export, not inference.'}
                     if isinstance(message.get('reasoning'), str):
