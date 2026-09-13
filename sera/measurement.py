@@ -4,7 +4,7 @@ import math
 import time
 
 from .storage import save_json
-from .config import Objective
+from .config import Constraints, Objective
 
 
 def nearest_rank(values, percentile):
@@ -123,16 +123,39 @@ def objective_value(trial, priority):
     return value if type(value) in (int, float) and math.isfinite(value) and value > 0 else None
 
 
-def measured_frontier(baseline, candidate):
+def constraint_failures(trial, constraints):
+    failures = []
+    if trial.get("status") != "collected":
+        failures.append("measurement-failed")
+    gate = trial.get("task_quality", {})
+    score = gate.get("mean")
+    if (not gate.get("valid_outputs") or type(score) not in (int, float)
+            or not math.isfinite(score) or not constraints.quality_floor <= score <= 1):
+        failures.append("task-quality-failed")
+    for priority, limit in (("latency", constraints.p95_latency_ms), ("memory", constraints.max_memory_mib)):
+        if limit is not None:
+            value = objective_value(trial, priority)
+            if value is None or value > limit:
+                failures.append(f"{priority}-requirement-failed")
+    return failures
+
+
+def measured_frontier(baseline, candidate, *, constraints=None):
     """Keep quality-valid trade-offs; missing metrics cannot prove dominance."""
-    if (baseline.get("status") != "collected"
+    if constraints is not None:
+        constraints = Constraints.model_validate(constraints)
+        viable = [trial for trial in [baseline, candidate] if trial and not constraint_failures(trial, constraints)]
+        if candidate and baseline.get("input_token_ids") != candidate.get("input_token_ids"):
+            viable = [trial for trial in viable if trial is baseline]
+    elif (baseline.get("status") != "collected"
             or not token_agreement(baseline.get("quality", []), baseline.get("self_check", []))["passed"]):
         return []
-    viable = [baseline]
-    if (candidate and candidate.get("status") == "collected"
-            and baseline.get("input_token_ids") == candidate.get("input_token_ids")
-            and token_agreement(baseline.get("quality", []), candidate.get("quality", []))["passed"]):
-        viable.append(candidate)
+    else:
+        viable = [baseline]
+        if (candidate and candidate.get("status") == "collected"
+                and baseline.get("input_token_ids") == candidate.get("input_token_ids")
+                and token_agreement(baseline.get("quality", []), candidate.get("quality", []))["passed"]):
+            viable.append(candidate)
 
     def dominates(left, right):
         a = [objective_value(left, p) for p in ("latency", "memory", "throughput")]
@@ -146,7 +169,7 @@ def measured_frontier(baseline, candidate):
     return [trial for trial in viable if not any(dominates(other, trial) for other in viable)]
 
 
-def select_candidate(baseline, candidate, *, objective=None):
+def select_candidate(baseline, candidate, *, objective=None, constraints=None):
     objective = Objective() if objective is None else Objective.model_validate(objective)
     self_check = token_agreement(baseline.get("quality", []), baseline.get("self_check", []))
     quality = token_agreement(baseline.get("quality", []), (candidate or {}).get("quality", []))
@@ -164,15 +187,35 @@ def select_candidate(baseline, candidate, *, objective=None):
     if before is not None and after is not None:
         gain = (after - before) / before if objective.priority == "throughput" else (before - after) / before
         decision["objective_improvement_fraction"] = gain
+    if constraints is not None:
+        constraints = Constraints.model_validate(constraints)
+        failures = {"baseline": constraint_failures(baseline, constraints),
+                    "candidate": constraint_failures(candidate or {}, constraints)}
+        if candidate and baseline.get("input_token_ids") != candidate.get("input_token_ids"):
+            failures["candidate"].append("input-token-mismatch")
+        if after is None:
+            failures["candidate"].append("objective-metric-unavailable")
+        decision.update(constraints=constraints.model_dump(), constraint_failures=failures,
+                        baseline_quality=baseline.get("task_quality"),
+                        candidate_quality=(candidate or {}).get("task_quality"))
+        if failures["baseline"]:
+            if failures["candidate"]:
+                decision.update(selected=None, outcome="no-safe-configuration", reason="no-trial-meets-constraints")
+            else:
+                decision.update(selected="candidate", outcome="feasible", reason="candidate-meets-constraints-baseline-does-not")
+            return decision
+        if failures["candidate"]:
+            decision["reason"] = "candidate-constraints-failed"
+            return decision
     if baseline.get("status") != "collected":
         reason = "baseline-measurement-failed"
-    elif not self_check["passed"]:
+    elif constraints is None and not self_check["passed"]:
         reason = "unstable-reference"
     elif not candidate or candidate.get("status") != "collected":
         reason = "candidate-not-collected"
     elif baseline.get("input_token_ids") != candidate.get("input_token_ids"):
         reason = "input-token-mismatch"
-    elif not quality["passed"]:
+    elif constraints is None and not quality["passed"]:
         reason = "candidate-quality-failed"
     else:
         gain = decision["objective_improvement_fraction"]

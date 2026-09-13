@@ -175,6 +175,10 @@ Verified mode requires:
 - A latency requirement for each model
 - A workload definition
 
+The implemented single-model subset accepts `evaluation(prompt, output_text)` returning a boolean or finite score in [0, 1], a required nonempty `evaluation_version`, and one `Constraints` record (directly or in a one-element list). The quality floor is explicit; p95 latency and sampled-peak-memory limits are optional. It uses the existing serial workload, not yet the target concurrency sweep. The evaluator receives the original prompt and unmodified output; Sera does not repair formatting or execute model-produced code.
+
+In verified mode, task scores replace the token-agreement acceptance proxy. The proxy can remain diagnostic. A baseline with a low task score may still provide measurements for a candidate trial. A baseline evaluator error stops the run. If only the candidate passes the requirements, return it with outcome `feasible`, without claiming improvement over an eligible baseline. If neither passes, close the runtime and return `no-safe-configuration` with no models. Never mark an ineligible fallback runner verified.
+
 ### 6.3 Result types
 
 SeraResult contains:

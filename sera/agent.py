@@ -178,7 +178,9 @@ class WandbAgent:
             "Respect supported_changes and remaining_trials. When an objective is supplied, target "
             "that priority: lower p95 latency, higher output throughput, or lower sampled peak memory. "
             "Quality remains a hard gate. Do not assume lower weight or cache precision lowers total "
-            "reserved GPU memory, and do not invent cost savings.")
+            "reserved GPU memory, and do not invent cost savings. When quality_mode is verified, "
+            "use task_quality and constraints; token similarity is diagnostic, not the acceptance gate. "
+            "A failed task or latency requirement cannot be traded away for the objective.")
 
     def review(self, evidence):
         return self.request("frontier", evidence,

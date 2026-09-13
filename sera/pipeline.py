@@ -5,13 +5,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from .config import BASELINE_NAME, MODEL_ID, MODEL_REVISION, Candidate, Objective, RuntimeConfig, validate_candidate
+from .config import BASELINE_NAME, MODEL_ID, MODEL_REVISION, Candidate, Constraints, Objective, RuntimeConfig, validate_candidate
 from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
+from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
 from .storage import content_hash, save_json
 
 
-def agent_evidence(baseline, objective=None):
+def agent_evidence(baseline, objective=None, constraints=None):
     from .config import SUPPORTED_CHANGES
     metrics = dict(baseline["reduced"])
     snapshot = baseline.get("metrics", {}).get("after-measurement", {})
@@ -21,6 +22,9 @@ def agent_evidence(baseline, objective=None):
                    sampled_peak_memory_mib=baseline["runtime"].get("sampled_peak_memory_mib"))
     return {"trial_id": "baseline", "model_id": MODEL_ID, "revision": MODEL_REVISION,
             "objective": (objective or Objective()).model_dump(),
+            "constraints": constraints.model_dump() if constraints is not None else None,
+            "quality_mode": "verified" if constraints is not None else "token-agreement",
+            "task_quality": baseline.get("task_quality"),
             "configuration": baseline["runtime"]["configuration"],
             "metrics": metrics, "remaining_trials": 1, "supported_changes": SUPPORTED_CHANGES,
             "baseline_self_check": token_agreement(baseline["quality"], baseline["self_check"]),
@@ -58,7 +62,8 @@ class SeraResult:
 
     @property
     def frontier(self):
-        return measured_frontier(self.report.get("baseline", {}), self.report.get("candidate_trial"))
+        return measured_frontier(self.report.get("baseline", {}), self.report.get("candidate_trial"),
+                                 constraints=self.report.get("constraints"))
 
     def _save(self):
         self.report["returned_runtimes"] = [model.record for model in self.models]
@@ -92,7 +97,9 @@ def render_summary(report, output_dir):
              f"Reason: {decision.get('reason', report.get('error', 'not finished'))}", "",
              f"Objective: {report.get('objective', Objective().model_dump())}",
              f"Measured frontier: {report.get('frontier_trial_ids', [])}",
-             "Task quality was not verified. The gate checks token agreement, not correct answers.",
+             ("Task scores use the supplied versioned evaluator; see each trial's gate and constraints."
+              if report.get("evaluation") else
+              "Task quality was not verified. The gate checks token agreement, not correct answers."),
              "This is one comparison, not a statistically established speedup.", ""]
     for key, label in (("baseline", "Baseline"), ("candidate_trial", "Candidate")):
         trial = report.get(key)
@@ -106,7 +113,10 @@ def render_summary(report, output_dir):
                          f"startup={trial.get('runtime', {}).get('startup_seconds', 'unavailable')} s.")
     gate = decision.get("candidate_quality")
     if gate:
-        lines.append(f"Token agreement: {gate['mean']:.4f}; required >= {gate['floor']}; pass={gate['passed']}.")
+        label = "Task score" if report.get("evaluation") else "Token agreement"
+        lines.append(f"{label}: {gate['mean']:.4f}; required >= {gate['floor']}; pass={gate['passed']}.")
+    if report.get("constraints"):
+        lines.append(f"Hard limits: {report['constraints']}; failures: {decision.get('constraint_failures', {})}.")
     lines.extend(["", f"Workload: {report.get('workload')}",
                   f"Generation: {report.get('generation')}",
                   f"Record: {output_dir / 'result.json'}", ""])
@@ -114,13 +124,26 @@ def render_summary(report, output_dir):
 
 
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
-             objective=None):
+             objective=None, evaluation=None, evaluation_version=None, constraints=None):
     """One measured candidate, fixed or agent-proposed; no joint placement or search claim.
 
     Uses at most 32 supplied prompts, serial load, up to 16 warm-ups, three
     measured passes, and separate quality passes. The caller owns result.close().
     """
     objective = Objective() if objective is None else Objective.model_validate(objective)
+    if evaluation is None:
+        if constraints is not None or evaluation_version is not None:
+            raise ValueError("Verified constraints require an evaluation callable and its version")
+    else:
+        if not callable(evaluation) or not isinstance(evaluation_version, str) or not evaluation_version.strip():
+            raise ValueError("Supply evaluation(prompt, output) and a nonempty evaluation_version")
+        if isinstance(constraints, list):
+            if len(constraints) != 1:
+                raise ValueError("This single-model path requires exactly one Constraints record")
+            constraints = constraints[0]
+        if constraints is None:
+            raise ValueError("Verified mode requires an explicit quality floor in Constraints")
+        constraints = Constraints.model_validate(constraints)
     if models != [MODEL_ID]:
         raise ValueError(f"This milestone requires models=[{MODEL_ID!r}]")
     if not isinstance(prompts, list) or not 1 <= len(prompts) <= 32:
@@ -152,11 +175,15 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                            "warmup_requests": min(len(prompts), 16),
                            "measured_requests": 3 * len(prompts), "quality_requests": len(prompts)},
               "task_quality_verified": False,
+              "constraints": constraints.model_dump() if constraints is not None else None,
+              "evaluation": {"version": evaluation_version, "signature": "evaluation(prompt, output) -> score in [0, 1]"}
+                            if evaluation is not None else None,
               "objective": objective.model_dump(),
               "agent_selection": "enabled" if agent is not None else "not-enabled",
               "provider_validation": provider_validation,
               "limits": ["single model", "one candidate", "non-streaming requests",
-                         "TTFT and queue percentiles unavailable", "no task-correctness claim"],
+                         "TTFT and queue percentiles unavailable",
+                         "Quality is limited to the supplied evaluator and prompts" if evaluation else "no task-correctness claim"],
               "rejected": []}
     result = SeraResult(models=[], report=report, output_dir=folder)
     active = None
@@ -165,13 +192,19 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         active = SeraModel(artifact_dir=folder / "baseline")
         active.start()
         report["baseline"] = collect_trial(active, prompts, "baseline", baseline=True)
+        if evaluation is not None:
+            report["baseline"]["task_quality"] = evaluate_quality(report["baseline"], prompts, evaluation,
+                version=evaluation_version, floor=constraints.quality_floor)
         result._save()
         baseline = report["baseline"]
+        if evaluation is not None and not baseline["task_quality"]["valid_outputs"]:
+            raise RuntimeError("Baseline task evaluation failed; inspect saved per-prompt errors")
         stable = token_agreement(baseline["quality"], baseline["self_check"])["passed"]
+        can_compare = evaluation is not None or stable
         trial = None
-        if agent is not None and baseline["status"] == "collected" and stable:
+        if agent is not None and baseline["status"] == "collected" and can_compare:
             from .agent import validate_proposal
-            evidence = agent_evidence(baseline, objective)
+            evidence = agent_evidence(baseline, objective, constraints)
             report["agent_input"] = evidence
             try:
                 proposal = agent.propose(evidence)
@@ -187,7 +220,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                 report["rejected"].append({"reason": f"{type(error).__name__}: {error}"})
             report["agent_calls"] = agent.history[history_start:]
             result._save()
-        if baseline["status"] == "collected" and stable and candidate is not None:
+        if baseline["status"] == "collected" and can_compare and candidate is not None:
             active.close()
             result._save()
             active = SeraModel(artifact_dir=folder / "candidate", configuration=candidate.config)
@@ -200,14 +233,19 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                 trial = {"trial_id": "candidate", "status": "startup-failed",
                          "error": f"{type(error).__name__}: {error}", "runtime": active.record}
             report["candidate_trial"] = trial
+            if evaluation is not None:
+                trial["task_quality"] = evaluate_quality(trial, prompts, evaluation,
+                    version=evaluation_version, floor=constraints.quality_floor)
             result._save()
-        report["decision"] = select_candidate(baseline, trial, objective=objective)
-        if agent is not None and trial is None and stable:
+        report["decision"] = select_candidate(baseline, trial, objective=objective, constraints=constraints)
+        if agent is not None and trial is None and stable and report["decision"]["selected"] == "baseline":
             report["decision"]["reason"] = ("agent-kept-baseline" if report.get("proposal_validation") == "passed"
                                              else "agent-proposal-rejected")
-        if agent is not None and report.get("proposal"):
+        if agent is not None and report.get("proposal") and report["decision"]["selected"] is not None:
             feedback = {"proposal": report["proposal"], "decision": report["decision"],
                         "objective": objective.model_dump(),
+                        "constraints": constraints.model_dump() if constraints is not None else None,
+                        "quality_mode": "verified" if evaluation is not None else "token-agreement",
                         "candidate_tested": trial is not None,
                         "baseline_metrics": baseline.get("reduced"),
                         "candidate_metrics": trial.get("reduced") if trial else None,
@@ -219,11 +257,18 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                 final = agent.review(feedback)
                 if final is None or final.selected_trial_id not in feedback["eligible_trial_ids"]:
                     raise ValueError("Final agent response did not respect the deterministic selection")
+                if (final.prediction_outcome == "not-tested") != (trial is None):
+                    raise ValueError("Final agent response misstated whether the candidate was tested")
                 report["agent_final"] = final.model_dump()
             except Exception as error:
                 report["agent_final_error"] = f"{type(error).__name__}: {error}"
             report["agent_calls"] = agent.history[history_start:]
         result._save()
+        if report["decision"]["selected"] is None:
+            active.close()
+            report.update(status="no-safe-configuration", returned_runner_closed=True)
+            result._save()
+            return result
         if report["decision"]["selected"] == "baseline" and trial is not None:
             active.close()
             active = SeraModel(artifact_dir=folder / "returned-baseline")
@@ -232,6 +277,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             raise RuntimeError("Baseline measurement failed; see the saved trial before retrying")
         active._require_ready()
         result.models = [active]
+        report["task_quality_verified"] = evaluation is not None
         report.update(status="ready", returned_runner_closed=False)
         result._save()
         return result

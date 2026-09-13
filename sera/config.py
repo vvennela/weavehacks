@@ -21,6 +21,16 @@ class Objective(BaseModel):
     min_improvement_fraction: float = Field(default=0.05, ge=0, lt=1)
 
 
+class Constraints(BaseModel):
+    """Hard limits for the measured single-model workload."""
+
+    model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
+
+    quality_floor: float = Field(ge=0, le=1)
+    p95_latency_ms: float | None = Field(default=None, gt=0)
+    max_memory_mib: int | None = Field(default=None, gt=0)
+
+
 class RuntimeConfig(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
 

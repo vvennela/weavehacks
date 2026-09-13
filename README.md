@@ -106,7 +106,31 @@ Pass `objective=sera.Objective(priority="throughput")` to `optimize` to maximize
 
 The agent receives the priority, and the deterministic selector applies it. `result.frontier` retains quality-valid latency/throughput/memory trade-offs; it is no longer only the fastest trial. Missing metrics remain missing and cannot prove that one trial dominates another. The report includes the objective, frontier IDs, latency, throughput, and peak memory. No dollar-cost model is implemented.
 
-This wiring passes local synthetic checks, including different recommendations from the same measurements when the priority changes. It has not yet passed a new live objective-guided run. The saved FP8 candidate remains rejected under every priority because quality failed. This change does not enable arbitrary models, weight quantization, multi-GPU placement, or loading without a feasible baseline.
+This wiring passes local synthetic checks, including different recommendations from the same measurements when the priority changes. It has not yet passed a new live objective-guided run. The saved FP8 candidate remains rejected under every priority in quick mode because token agreement failed. This change does not enable arbitrary models, weight quantization, multi-GPU placement, or loading without a feasible baseline.
+
+## Verified task requirements
+
+For known-answer tasks, supply a versioned evaluator and explicit limits:
+
+```python
+with sera.optimize(
+    models=["Qwen/Qwen3-0.6B"],
+    prompts=prompts,
+    evaluation=evaluate_answer,  # (prompt, output_text) -> bool or numeric score in [0, 1]
+    evaluation_version="my-task-evaluator-v1",
+    constraints=sera.Constraints(quality_floor=0.99, p95_latency_ms=500),
+    objective=sera.Objective(priority="throughput"),
+) as result:
+    result.print_summary()
+    if result.models:
+        print(result.models[0].generate("Your next prompt").text)
+```
+
+The latency limit above is an example requirement, not a measured guarantee. `max_memory_mib` optionally limits sampled peak GPU memory. Constraints can also be supplied as a one-element list, matching the multi-model target API.
+
+Verified mode uses task scores instead of token agreement for acceptance. It applies the same evaluator to the separate baseline and candidate quality passes, saves per-prompt scores and evaluator errors, and keeps the declared floor fixed. Empty output, invalid scores, evaluator errors, or unmet limits cannot pass. A baseline evaluator error stops the experiment before a candidate is loaded. A wrong but successfully graded baseline does not prevent testing a candidate.
+
+If only the candidate meets requirements, Sera can select it without claiming a speedup. If neither meets requirements, it closes the runtime and returns `no-safe-configuration` with `models=[]`; it never returns a failed-quality baseline as verified. Scoring uses only the supplied prompts and evaluator and is not a general quality guarantee. The workload remains the current serial quick-check workload; concurrency sweeps and fit-first loading are not implemented.
 
 ## Cache-pressure pilot
 
