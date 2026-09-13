@@ -1,0 +1,23 @@
+{
+  "action": "keep-baseline",
+  "proposal_id": "memory-context-baseline-retain-01",
+  "agent_role": "batching",
+  "parent_trial_id": "baseline",
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "changed_lever": null,
+  "proposed_value": null,
+  "evidence_used": [
+    "p95_latency_ms",
+    "generation_errors",
+    "successful_requests",
+    "request_count",
+    "sampled_peak_memory_mib",
+    "concurrency_8_cumulative_snapshot_mean_queue_ms",
+    "concurrency_8_cumulative_snapshot_preemptions"
+  ],
+  "predicted_metric_change": "Neither supported change has evidence supporting a 5% p95_latency_ms improvement. Call 01a09adb-f237-7329-a107-f666d0c72696, reduced, records concurrency-8 p95_latency_ms of 771.2070260004111. Prepared lengths at measured_facts.baseline.prepared_prompt_tokens are 85–109 tokens; a 2048-token batch budget appears unlikely to bind this eight-sequence workload. Lowering max_model_len to 256 does not establish reduced allocation at fixed gpu_memory_utilization; call 01a09adb-f244-7205-9635-c57562b736ec, runtime/sampled_peak_memory_mib, supplies only the current memory measurement.",
+  "confidence": 0.82,
+  "expected_trial_cost": 0,
+  "falsification_condition": "A controlled measurement of either supported setting yielding p95_latency_ms at or below 732.6466747003905 while preserving quality >= 0.99 would refute the prediction. Compare against call 01a09adb-f237-7329-a107-f666d0c72696 at reduced and call 01a09adb-f244-7205-9635-c57562b736ec at task_quality/per_prompt. A context-memory hypothesis additionally requires comparative allocation evidence at runtime/sampled_peak_memory_mib, rather than inference from the context cap.",
+  "reason": "No failure is observed: call 01a09adb-f244-7205-9635-c57562b736ec at status, decision, reduced, and task_quality/per_prompt reports an accepted, collected result with zero generation_errors and quality 1.0. No causal bottleneck is established. All 96 requests succeeded; concurrency-8 cumulative queue time is 0.007519640639941372 ms with zero preemptions, providing no positive evidence of scheduling or cache pressure. Prepared prompts have a maximum of 109 tokens, so reducing max_num_batched_tokens from 4096 to 2048 lacks a demonstrated mechanism for this workload. Reducing max_model_len to 256 likewise has no comparative allocation evidence: runtime/sampled_peak_memory_mib in call 01a09adb-f244-7205-9635-c57562b736ec reports only 88687 MiB. These observations support retaining the baseline rather than spending a trial on either weakly motivated change. No peer claims were supplied."
+}

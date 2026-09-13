@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"candidate\",\"prediction_outcome\":\"confirmed\",\"reason\":\"Deployment feasibility was confirmed: 96/96 requests succeeded with zero generation errors, task quality was 1.0 against the 0.99 floor, and the deterministic decision recorded no candidate constraint failures (status, reduced, decision, task_quality/per_prompt). Peak memory was 88687 MiB (runtime/sampled_peak_memory_mib). The baseline was not measured and failed estimated memory fit, so no speedup or underlying hardware cause is established. Retain the selected candidate and abstain from another proposal absent measurement-based justification; do not retry this configuration, and preserve quality and workload constraints.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14044,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 146,
+    "reasoning_output_tokens": 0
+  }
+}

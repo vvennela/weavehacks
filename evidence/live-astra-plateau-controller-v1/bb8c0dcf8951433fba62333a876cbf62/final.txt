@@ -1,0 +1,22 @@
+{
+  "action": "keep-baseline",
+  "proposal_id": "scheduling-baseline-retain-01",
+  "agent_role": "batching",
+  "parent_trial_id": "baseline",
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "changed_lever": null,
+  "proposed_value": null,
+  "evidence_used": [
+    "p95_latency_ms",
+    "generation_errors",
+    "successful_requests",
+    "concurrency_8_cumulative_snapshot_mean_queue_ms",
+    "concurrency_8_cumulative_snapshot_preemptions",
+    "sampled_peak_memory_mib"
+  ],
+  "predicted_metric_change": "Neither supported change is expected to reduce p95_latency_ms by 5%, although neither has been measured. Call 01a09adb-f237-7329-a107-f666d0c72696, reduced/p95_latency_ms, records 771.2070260004111 ms at concurrency 8. Prepared lengths at measured_facts/baseline/prepared_prompt_tokens suggest the 2048-token budget would remain nonbinding; call 01a09adb-f244-7205-9635-c57562b736ec, runtime/sampled_peak_memory_mib, supplies no comparative allocation evidence supporting a benefit from max_model_len=256.",
+  "confidence": 0.8,
+  "expected_trial_cost": 0,
+  "falsification_condition": "A controlled measurement of either supported setting achieving p95_latency_ms at or below 732.6466747003905 ms while preserving the 0.99 quality floor and workload constraints would refute this prediction. Compare against call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms and call 01a09adb-f244-7205-9635-c57562b736ec at task_quality/per_prompt; a memory-based explanation additionally requires comparative runtime/sampled_peak_memory_mib and allocation evidence.",
+  "reason": "No failure was observed: call 01a09adb-f244-7205-9635-c57562b736ec records accepted collection at status and decision, zero generation_errors at reduced, and passing quality at task_quality/per_prompt. The latency cause remains unknown. Prepared prompts span 85–109 tokens at measured_facts/baseline/prepared_prompt_tokens; eight maximum-length prompts total only 872 tokens, below both batching budgets. Thus max_num_batched_tokens=2048 has little demonstrated opportunity to change scheduling. The concurrency_8_cumulative_snapshot_mean_queue_ms is 0.007519640639941372 and concurrency_8_cumulative_snapshot_preemptions is zero; these cumulative snapshots do not establish causality. Lowering max_model_len to 256 does not establish smaller reserved KV allocation at fixed gpu_memory_utilization, and runtime/sampled_peak_memory_mib from the diagnosis call provides no comparative evidence. These observations support retaining baseline rather than spending a trial on a weakly motivated change. No peer claims were supplied."
+}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09adc-1eec-7d92-9f95-697700e9b24c"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"quality_outputs\"],\"reason\":\"No failure is observed: baseline quality.mean is 1.0, quality.passed is true, and generation_errors is 0. Inspect quality_outputs for output lengths and completion evidence relevant to the supported max_model_len=256 change; prepared_prompt_tokens.maximum=109 alone does not establish sufficient generation headroom. No peer claims or source call IDs were supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":13859,"cached_input_tokens":8448,"cache_write_input_tokens":0,"output_tokens":147,"reasoning_output_tokens":49}}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No failure is observed: source call 01a09adb-f244-7205-9635-c57562b736ec reports failure_kind=accepted, generation_errors=0, and quality.mean=1.0. p95_latency_ms is 771.2070260004111; its scheduling cause is unknown. The concurrency_8_cumulative_snapshot_mean_queue_ms of 0.007519640639941372 and concurrency_8_cumulative_snapshot_preemptions of 0.0 do not establish a scheduling bottleneck because these snapshots include prior activity. Inspect load_metrics as the second distinct query to assess available load-specific latency evidence before considering an experiment; this inspection cannot establish a causal performance gain.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14987,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 167,
+    "reasoning_output_tokens": 0
+  }
+}

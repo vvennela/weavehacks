@@ -1,0 +1,23 @@
+{
+  "action": "keep-baseline",
+  "proposal_id": "scheduling-refine-baseline-01",
+  "agent_role": "batching",
+  "parent_trial_id": "baseline",
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "changed_lever": null,
+  "proposed_value": null,
+  "evidence_used": [
+    "p95_latency_ms",
+    "generation_errors",
+    "successful_requests",
+    "request_count",
+    "concurrency_8_cumulative_snapshot_mean_queue_ms",
+    "concurrency_8_cumulative_snapshot_preemptions",
+    "sampled_peak_memory_mib"
+  ],
+  "predicted_metric_change": "Retaining baseline predicts no configuration-driven change. Neither supported reduction is expected to improve p95_latency_ms by 5%; this is an untested prediction. Reference call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms reports 771.2070260004111 ms at concurrency 8. Call 01a09adb-f244-7205-9635-c57562b736ec at runtime/sampled_peak_memory_mib provides no comparative allocation evidence supporting a context-cap benefit.",
+  "confidence": 0.8,
+  "expected_trial_cost": 0,
+  "falsification_condition": "A controlled supported trial achieving p95_latency_ms <= 732.6466747003905 ms with unchanged workload and measured quality >= 0.99 would refute the performance premise for abstention. Compare against call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms and call 01a09adb-f244-7205-9635-c57562b736ec at task_quality/per_prompt.",
+  "reason": "No failure is observed: call 01a09adb-f244-7205-9635-c57562b736ec at status, decision, reduced, and task_quality/per_prompt records accepted collection, zero generation_errors, and measured quality 1.0. No scheduling or memory cause is established. Independently, measured_facts.baseline.prepared_prompt_tokens gives a maximum of 109 tokens; eight such prompts total at most 872 prompt tokens, below both the current 4096 and proposed 2048 batch budgets. The cumulative concurrency-8 queue snapshot is 0.007519640639941372 ms with zero preemptions; these observations do not establish causality but provide little motivation for reducing the batch budget. Reducing max_model_len to 256 has no demonstrated allocation benefit: gpu_memory_utilization remains 0.9, and call 01a09adb-f244-7205-9635-c57562b736ec at runtime/sampled_peak_memory_mib supplies only a peak measurement, not a comparative KV allocation. I accept the peers' claim that neither reduction has measured support for a 5% gain, based on these independent checks; their agreement is not evidence that improvement is impossible. These findings support retaining baseline."
+}

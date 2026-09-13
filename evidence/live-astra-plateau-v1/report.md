@@ -1,0 +1,149 @@
+# Sera single-model result
+
+Status: closed
+Selection: baseline
+Reason: specialists-abstained
+
+Objective: {'priority': 'latency', 'min_improvement_fraction': 0.05}
+Measured frontier: ['baseline']
+Task scores use the supplied versioned evaluator; see each trial's gate and constraints.
+This bounded search is not a statistically established advantage over other search methods.
+
+Baseline: collected; requests=96; p95=771.2070260004111 ms; throughput=26.26041816529197 output tokens/s; peak memory=88687 MiB; output tokens=660; startup=66.06930439400003 s.
+  concurrency=1; requests=24; p95=572.5658569999723 ms; throughput=13.697235168253675 output tokens/s.
+  concurrency=2; requests=24; p95=648.4464459999799 ms; throughput=23.744459693346894 output tokens/s.
+  concurrency=4; requests=24; p95=726.0650500002157 ms; throughput=41.612522039726294 output tokens/s.
+  concurrency=8; requests=24; p95=771.2070260004111 ms; throughput=75.94889209779588 output tokens/s.
+
+Selection latency is the worst per-load p95; percentiles are not pooled. Aggregate throughput divides all output tokens by the sum of measured load durations.
+Hard limits: {'quality_floor': 0.99, 'p95_latency_ms': None, 'max_memory_mib': None}; failures: {}.
+
+Investigation trials: 1; no total trial cap; stop: specialists-abstained.
+Each round records proposals, arbitration, measurements, gates, and prediction review.
+This investigation is not proof of a search advantage.
+
+Workload: {'prompt_count': 8, 'concurrency': [1, 2, 4, 8], 'warmup_requests_per_load': 8, 'measured_requests_per_load': 24, 'quality_requests': 8}
+Generation: {'temperature': 0, 'top_p': 1, 'top_k': -1, 'seed': 0, 'max_tokens': 64, 'enable_thinking': False}
+Record: /marimo/sera-evidence/live-astra-plateau-v1/result.json
+
+## Agent investigation
+
+Agents propose experiments. Deterministic checks decide which results are eligible.
+Trial order and access to history do not prove a causal search advantage.
+Independent investigators inspect traces and exchange findings before arbitration.
+
+### Deployment stage
+
+Original BF16 baseline: infeasible (estimate only; not a measured BF16 run).
+Fit reason: Estimated BF16 runtime exceeds the service memory budget.
+Estimated BF16 runtime bytes: 160444792832.
+Quantization specialist status: accepted.
+Quantization specialist recommends: weight-fp8. Reason: Recommend weight-fp8 for deployment feasibility: estimated weights of 75,216,535,552 bytes, BF16 KV of 10,737,418,240 bytes and workspace of 4,294,967,296 bytes total 90,248,921,088 bytes, leaving 2,128,841,932 bytes within the service budget. BF16 baseline exceeds the budget. FP8 linear weights reduce memory at potential precision cost while retaining selected parameters and KV at BF16. Headroom is limited and workspace is unmeasured. No latency improvement or quality-floor compliance is established; the independent arbiter and deterministic gates must decide deployment.
+Deployment arbiter chose: weight-fp8. Reason: Recommend a trial for deployment feasibility: estimated peak memory is 90,248,921,088 bytes, leaving only 2,128,841,932 bytes within the service budget. FP8 weights save memory at potential precision cost while selected parameters and KV remain BF16. The trial is useful to measure actual memory, latency, and quality because workspace and fit are estimates. The 0.99 quality floor is unverified. BF16 cannot run within budget, so speedup and the 5% improvement objective cannot be established against that baseline.
+Trial candidate: collected.
+Scheduled by: not recorded.
+Quality gate: passed; score=1.0; floor=0.99.
+p95: 771.2070260004111 ms; throughput: 26.26041816529197 output tokens/s; peak memory: 88687 MiB.
+Gate selection: candidate; reason: candidate-meets-constraints-baseline-does-not.
+Constraint failures: {'baseline': ['estimated-memory-does-not-fit'], 'candidate': []}.
+Prediction review: confirmed. Deployment feasibility was confirmed: 96/96 requests succeeded with zero generation errors, task quality was 1.0 against the 0.99 floor, and the deterministic decision recorded no candidate constraint failures (status, reduced, decision, task_quality/per_prompt). Peak memory was 88687 MiB (runtime/sampled_peak_memory_mib). The baseline was not measured and failed estimated memory fit, so no speedup or underlying hardware cause is established. Retain the selected candidate and abstain from another proposal absent measurement-based justification; do not retry this configuration, and preserve quality and workload constraints.
+Observed experiment result: accepted.
+latency: baseline=not recorded; candidate=771.2070260004111; gain=not recorded; required=0.05. Gain and required gain are fractions, not percentages.
+Root cause: not-established. The observed outcome does not establish a model, kernel, memory-pressure, or scheduling cause. A startup error category is not the underlying server-log cause.
+Saved evidence: status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.
+Next proposal constraint: Do not retry the same tested configuration in this bounded search.
+Next proposal constraint: Preserve the fixed quality floor and all workload constraints.
+Next proposal constraint: Use the recorded constraints and measurements to justify the next action, or abstain.
+Deployment outcome: feasible; selected=candidate.
+Deployment prediction review: confirmed. Deployment feasibility was confirmed: 96/96 requests succeeded with zero generation errors, task quality was 1.0 against the 0.99 floor, and the deterministic decision recorded no candidate constraint failures (status, reduced, decision, task_quality/per_prompt). Peak memory was 88687 MiB (runtime/sampled_peak_memory_mib). The baseline was not measured and failed estimated memory fit, so no speedup or underlying hardware cause is established. Retain the selected candidate and abstain from another proposal absent measurement-based justification; do not retry this configuration, and preserve quality and workload constraints.
+Deployment trials included in budget: 1.
+No BF16 speedup comparison is available: the BF16 baseline was not measured.
+The measured deployment becomes the reference for later investigation. Deployment advice is a separate stage; see the round records for proposal competition.
+
+### Round 1
+
+Swarm investigators: scheduling, memory_context, output_quality.
+Initial investigation overlap: recorded.
+Peer-review overlap: recorded.
+Shared findings board: 7d7b4027733d55f32d569c1d5ac29bcc7299c9cdbef88c844a99ae58b4087130; entries=3.
+Investigator roles are analysis perspectives, not additional hardware capabilities. GPU trials remain sequential.
+
+Investigator scheduling: abstained.
+Inspection latency_outliers: complete; source=weave; calls=01a09adb-f244-7205-9635-c57562b736ec, 01a09adb-f22a-7e1f-8c47-e3f5e7d9ce22, 01a09adb-f229-7f92-8360-5dca31b2c537.
+Inspection load_metrics: complete; source=weave; calls=01a09adb-f244-7205-9635-c57562b736ec, 01a09adb-f237-7329-a107-f666d0c72696, 01a09adb-f237-7329-a107-f666d0c72696, 01a09adb-f237-7329-a107-f666d0c72696, 01a09adb-f237-7329-a107-f666d0c72696.
+Initial proposal: keep-baseline. No failure was observed: call 01a09adb-f244-7205-9635-c57562b736ec records accepted collection at status and decision, zero generation_errors at reduced, and passing quality at task_quality/per_prompt. The latency cause remains unknown. Prepared prompts span 85–109 tokens at measured_facts/baseline/prepared_prompt_tokens; eight maximum-length prompts total only 872 tokens, below both batching budgets. Thus max_num_batched_tokens=2048 has little demonstrated opportunity to change scheduling. The concurrency_8_cumulative_snapshot_mean_queue_ms is 0.007519640639941372 and concurrency_8_cumulative_snapshot_preemptions is zero; these cumulative snapshots do not establish causality. Lowering max_model_len to 256 does not establish smaller reserved KV allocation at fixed gpu_memory_utilization, and runtime/sampled_peak_memory_mib from the diagnosis call provides no comparative evidence. These observations support retaining baseline rather than spending a trial on a weakly motivated change. No peer claims were supplied.
+
+Investigator memory_context: abstained.
+Inspection load_metrics: complete; source=weave; calls=01a09adb-f244-7205-9635-c57562b736ec, 01a09adb-f237-7329-a107-f666d0c72696, 01a09adb-f237-7329-a107-f666d0c72696, 01a09adb-f237-7329-a107-f666d0c72696, 01a09adb-f237-7329-a107-f666d0c72696.
+Inspection latency_outliers: complete; source=weave; calls=01a09adb-f244-7205-9635-c57562b736ec, 01a09adb-f22a-7e1f-8c47-e3f5e7d9ce22, 01a09adb-f229-7f92-8360-5dca31b2c537.
+Initial proposal: keep-baseline. No failure is observed: call 01a09adb-f244-7205-9635-c57562b736ec at status, decision, reduced, and task_quality/per_prompt reports an accepted, collected result with zero generation_errors and quality 1.0. No causal bottleneck is established. All 96 requests succeeded; concurrency-8 cumulative queue time is 0.007519640639941372 ms with zero preemptions, providing no positive evidence of scheduling or cache pressure. Prepared prompts have a maximum of 109 tokens, so reducing max_num_batched_tokens from 4096 to 2048 lacks a demonstrated mechanism for this workload. Reducing max_model_len to 256 likewise has no comparative allocation evidence: runtime/sampled_peak_memory_mib in call 01a09adb-f244-7205-9635-c57562b736ec reports only 88687 MiB. These observations support retaining the baseline rather than spending a trial on either weakly motivated change. No peer claims were supplied.
+
+Investigator output_quality: abstained.
+Inspection quality_outputs: complete; source=weave; calls=01a09adb-f244-7205-9635-c57562b736ec, 01a09adb-f22f-788b-aad1-1297e6bed097, 01a09adb-f230-7d4c-bd4f-c70f2259df0b, 01a09adb-f231-7e6c-8d07-05bea728a752, 01a09adb-f232-7bb2-a078-cc14057c9c6b.
+Inspection not recorded: declined; source=not recorded; calls=not recorded.
+Initial proposal: keep-baseline. No observed failure requires correction: call 01a09adb-f244-7205-9635-c57562b736ec reports accepted status, no constraint failures, and measured quality 1.0 at status, decision, and task_quality/per_prompt. Baseline completed 96/96 requests with generation_errors=0; a causal bottleneck remains unestablished. Prepared prompts contain 85–109 tokens, so eight such prompts total at most 872 tokens, already below either batching budget. Reducing max_num_batched_tokens to 2048 therefore lacks a demonstrated useful mechanism for this workload. Reducing max_model_len to 256 does not establish smaller reserved KV allocation at fixed gpu_memory_utilization=0.9. Zero recorded preemptions and very small cumulative queue time provide no positive evidence of pressure, although cumulative snapshots cannot establish causality. These observations support retaining the quality-verified baseline rather than spending a trial on either unsupported performance hypothesis. No peer opinions were supplied.
+
+Participation investigator: active; legal candidates=2; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=2; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=2; Read-only investigation of the same legal candidate pool..
+Inactive roles were not called. Active means a legal untested setting was available.
+
+Specialist batching: abstained.
+History supplied: none.
+Proposal scheduling-refine-baseline-01: keep-baseline; no setting change.
+Parent trial: baseline.
+Reason: No failure is observed: call 01a09adb-f244-7205-9635-c57562b736ec at status, decision, reduced, and task_quality/per_prompt records accepted collection, zero generation_errors, and measured quality 1.0. No scheduling or memory cause is established. Independently, measured_facts.baseline.prepared_prompt_tokens gives a maximum of 109 tokens; eight such prompts total at most 872 prompt tokens, below both the current 4096 and proposed 2048 batch budgets. The cumulative concurrency-8 queue snapshot is 0.007519640639941372 ms with zero preemptions; these observations do not establish causality but provide little motivation for reducing the batch budget. Reducing max_model_len to 256 has no demonstrated allocation benefit: gpu_memory_utilization remains 0.9, and call 01a09adb-f244-7205-9635-c57562b736ec at runtime/sampled_peak_memory_mib supplies only a peak measurement, not a comparative KV allocation. I accept the peers' claim that neither reduction has measured support for a 5% gain, based on these independent checks; their agreement is not evidence that improvement is impossible. These findings support retaining baseline.
+Prediction: Retaining baseline predicts no configuration-driven change. Neither supported reduction is expected to improve p95_latency_ms by 5%; this is an untested prediction. Reference call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms reports 771.2070260004111 ms at concurrency 8. Call 01a09adb-f244-7205-9635-c57562b736ec at runtime/sampled_peak_memory_mib provides no comparative allocation evidence supporting a context-cap benefit.
+Would refute it: A controlled supported trial achieving p95_latency_ms <= 732.6466747003905 ms with unchanged workload and measured quality >= 0.99 would refute the performance premise for abstention. Compare against call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms and call 01a09adb-f244-7205-9635-c57562b736ec at task_quality/per_prompt.
+Cited metrics: p95_latency_ms, generation_errors, successful_requests, request_count, concurrency_8_cumulative_snapshot_mean_queue_ms, concurrency_8_cumulative_snapshot_preemptions, sampled_peak_memory_mib.
+Cited value: p95_latency_ms=771.2070260004111.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Cited value: request_count=96.
+Cited value: concurrency_8_cumulative_snapshot_mean_queue_ms=0.007519640639941372.
+Cited value: concurrency_8_cumulative_snapshot_preemptions=0.0.
+Cited value: sampled_peak_memory_mib=88687.
+
+Specialist batching: abstained.
+History supplied: none.
+Proposal memory-context-refine-abstain-1: keep-baseline; no setting change.
+Parent trial: baseline.
+Reason: No failure was observed: call 01a09adb-f244-7205-9635-c57562b736ec at status, decision, reduced, and task_quality/per_prompt records accepted collection, zero generation_errors, and measured quality 1.0. The supplied baseline has 96 successful_requests out of 96 request_count. No causal memory or scheduling bottleneck is established. Independently evaluating the supported changes, measured_facts.baseline.prepared_prompt_tokens reports a maximum of 109 tokens; eight such prompts total at most 872 prefill tokens, already below either batch-token budget. This weakens the case for reducing max_num_batched_tokens to 2048. Reducing max_model_len to 256 does not establish smaller reserved KV allocation with gpu_memory_utilization fixed at 0.9; the 88687 MiB sampled peak at runtime/sampled_peak_memory_mib supplies no allocation comparison. Near-zero cumulative queue time and zero preemptions further weaken, without causally excluding, a pressure hypothesis. I accept the scheduling peer's limited claim that neither change has measured support for a 5% gain, but not any implication that improvement is impossible. These independent checks support abstention.
+Prediction: Retaining baseline predicts no configuration-driven change. Neither supported reduction is expected to deliver a 5% p95_latency_ms improvement; this is an untested prediction. Reference call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms measures 771.2070260004111 ms at concurrency 8. Call 01a09adb-f244-7205-9635-c57562b736ec at runtime/sampled_peak_memory_mib provides no comparative allocation evidence supporting a context-cap benefit.
+Would refute it: A controlled trial of max_num_batched_tokens=2048 or max_model_len=256 achieving p95_latency_ms <= 732.6466747003905 ms with measured quality >= 0.99 and preserved workload constraints would refute the performance prediction. Compare with call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms and call 01a09adb-f244-7205-9635-c57562b736ec at task_quality/per_prompt.
+Cited metrics: p95_latency_ms, generation_errors, successful_requests, request_count, sampled_peak_memory_mib, concurrency_8_cumulative_snapshot_mean_queue_ms, concurrency_8_cumulative_snapshot_preemptions.
+Cited value: p95_latency_ms=771.2070260004111.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Cited value: request_count=96.
+Cited value: sampled_peak_memory_mib=88687.
+Cited value: concurrency_8_cumulative_snapshot_mean_queue_ms=0.007519640639941372.
+Cited value: concurrency_8_cumulative_snapshot_preemptions=0.0.
+
+Specialist batching: abstained.
+History supplied: none.
+Proposal output-quality-refine-abstain-1: keep-baseline; no setting change.
+Parent trial: baseline.
+Reason: No failure was observed: call 01a09adb-f244-7205-9635-c57562b736ec at status, decision, reduced, and task_quality/per_prompt records accepted collection, no constraint failures, zero generation_errors, and measured quality 1.0. No underlying performance cause is established. Independently examining the output-quality evidence, calls 01a09adb-f22f-788b-aad1-1297e6bed097 and 01a09adb-f230-7d4c-bd4f-c70f2259df0b at fixed_task_diagnostics and output_truncated show correct, valid, untruncated examples; there is no observed quality defect to repair. Prepared prompts span 85–109 tokens at measured_facts.baseline.prepared_prompt_tokens, so eight maximum-length prompts total only 872 tokens, already below either batch-token cap. Thus reducing max_num_batched_tokens to 2048 has little evident opportunity to change this workload's scheduling. Reducing max_model_len to 256 does not establish reduced reserved KV memory at fixed gpu_memory_utilization=0.9; runtime/sampled_peak_memory_mib in call 01a09adb-f244-7205-9635-c57562b736ec provides no allocation comparison. I accept the scheduling and memory_context peers' abstention rationale on these measured grounds, but not any implication that improvement is impossible. Cumulative queue and preemption snapshots are supporting observations, not causal proof. Neither remaining setting offers a sufficiently grounded experiment for this quality-focused investigation.
+Prediction: Keeping baseline predicts no configuration-driven change. Neither supported reduction appears likely to improve p95_latency_ms by 5% from 771.2070260004111 ms (call 01a09adb-f237-7329-a107-f666d0c72696, reduced/p95_latency_ms). This is a hypothesis, not a measured comparison. Call 01a09adb-f244-7205-9635-c57562b736ec at runtime/sampled_peak_memory_mib supplies no comparative allocation evidence establishing a benefit from max_model_len=256.
+Would refute it: A controlled trial of max_num_batched_tokens=2048 or max_model_len=256 achieving p95_latency_ms <= 732.6466747003905 while preserving measured quality >= 0.99 and all workload constraints would refute the performance premise for abstention. Compare latency with call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms and quality with call 01a09adb-f244-7205-9635-c57562b736ec at task_quality/per_prompt.
+Cited metrics: generation_errors, successful_requests, request_count, p95_latency_ms, concurrency_8_cumulative_snapshot_mean_queue_ms, concurrency_8_cumulative_snapshot_preemptions, sampled_peak_memory_mib.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Cited value: request_count=96.
+Cited value: p95_latency_ms=771.2070260004111.
+Cited value: concurrency_8_cumulative_snapshot_mean_queue_ms=0.007519640639941372.
+Cited value: concurrency_8_cumulative_snapshot_preemptions=0.0.
+Cited value: sampled_peak_memory_mib=88687.
+
+Arbiter choice: not recorded.
+Trials executed in this round: none.
+
+Stopping policy: objective plateau plus one confirmation round.
+Pending confirmation round: False; consecutive rounds without qualifying progress: 0. 
+Final selection: baseline.
+Stop reason: specialists-abstained.
+Trials used: 1; no total trial cap.
+Runner status: closed; closed=True.
+Raw evidence: result.json — search.rounds, search_trials, and agent_calls.
+

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No failure is observed: successful_requests=96, generation_errors=0, and baseline quality mean=1.0 passed floor=0.99. Baseline p95_latency_ms=771.2070260004111; its causes are unknown. Cumulative queue/TTFT snapshots and zero reported preemptions do not establish a scheduling bottleneck. Inspect latency_outliers to examine request-level evidence behind tail latency and assess whether a scheduling experiment is warranted. No source call IDs or peer claims were supplied.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13863,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 128,
+    "reasoning_output_tokens": 0
+  }
+}
