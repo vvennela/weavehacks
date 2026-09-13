@@ -153,7 +153,10 @@ def _question(evidence):
                 else 'Make a fresh read-only inspection decision: choose one legal query or an empty ranking if no read is useful.')
     if phase == 'arbitrate':
         return ('No candidate budget remains. Return an empty ranking.' if evidence.get('remaining_trials') == 0
-                else 'Make a fresh decision: rank at most one currently legal candidate ID from peer_opinions, or return an empty ranking. Opinions are not measured results.')
+                else 'Select at most one legal untested experiment from peer_opinions, not a deployment winner. '
+                     'Candidate measurements are not required before testing. Choose a useful testable hypothesis '
+                     'within budget, or return an empty ranking if none is useful. Opinions are not measured results; '
+                     'quality and performance gates apply after execution.')
     if evidence.get('remaining_trials') == 0 or not evidence.get('supported_changes'):
         return 'No legal trial budget or setting remains. Make your own keep-baseline decision and explain it from the measured facts; do not copy an old response.'
     return ('Make a fresh proposal: choose one legal untested setting or keep-baseline. Explain the observed '
@@ -167,7 +170,7 @@ def build_investigation_prompt(evidence):
     result = _pick(evidence, ('swarm_phase', 'investigator_id', 'trial_id', 'model_id', 'revision',
         'configuration', 'objective', 'constraints', 'remaining_trials', 'supported_changes',
         'frozen_candidate_hashes', 'legal_proposal_ids', 'required_inspection', 'failure_inspection_required',
-        'degraded', 'inspection_status', 'quality_mode'))
+        'degraded', 'inspection_status', 'quality_mode', 'decision_scope'))
     result['metrics'] = {key: deepcopy(value) for key, value in evidence.get('metrics', {}).items() if value is not None}
     summaries, records, sources = projection.inspections(evidence)
     diagnosed = {row['trial_id']: row['source_call_id'] for row in records if row['record_type'] == 'trial_diagnosis'}

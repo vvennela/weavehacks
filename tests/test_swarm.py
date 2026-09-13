@@ -111,6 +111,24 @@ def test_parallel_inspections_and_refinement_share_findings_without_history_race
         assert item['evidence']['shared_findings_hash'] == record['swarm']['shared_findings_hash']
 
 
+def test_arbiter_selects_an_unmeasured_experiment_without_approving_deployment():
+    from sera.agent import request_schema
+    from sera.investigation_prompt import build_investigation_prompt
+
+    chosen, record = run(Agent())
+    supplied = record['arbiter_evidence']
+    expected_scope = dict(purpose='select-next-experiment',
+                          candidate_measurements_required=False, deployment_approval=False)
+    assert supplied['decision_scope'] == expected_scope
+    transmitted = build_investigation_prompt(supplied)
+    assert transmitted['decision_scope'] == expected_scope
+    assert supplied['history'] == []  # None of these candidate settings has been measured.
+    assert len(chosen) == 1
+    assert chosen[0][1].config.max_num_batched_tokens == 2048
+    assert record['trial_ids'] == []  # Selection itself is neither execution nor deployment.
+    assert request_schema('arbiter', supplied) == request_schema('arbiter', {})
+
+
 @pytest.mark.parametrize('failure', ['invalid', 'decline', 'abstain'])
 def test_invalid_citations_abstention_and_empty_arbiter_never_force_trial(failure):
     chosen, record = run(Agent(**{failure: True}))
