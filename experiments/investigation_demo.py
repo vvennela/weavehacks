@@ -14,6 +14,8 @@ def _gate(value):
 def _measurements(trial):
     if trial is None:
         return 'not run'
+    if trial.get('status') == 'startup-failed':
+        return 'startup-failed; no quality or latency measurement'
     metrics = trial.get('reduced') or {}
     quality = trial.get('task_quality') or {}
     latency = metrics.get('p95_latency_ms')
@@ -82,6 +84,8 @@ def _rows(report):
             if specialist.get('investigator_id'):
                 inspections = specialist.get('inspections', [])
                 rows[-1].update({'Control role': specialist.get('role', MISSING),
+                    'Proposal status': specialist.get('status', MISSING),
+                    'Inspection status': specialist.get('inspection_status', MISSING),
                     'Initial proposal': _change(specialist.get('initial_proposal')),
                     'Inspections': ', '.join(f"{item.get('query_id', MISSING)} ({item.get('status', MISSING)})"
                                              for item in inspections) or MISSING,

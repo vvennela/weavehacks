@@ -64,6 +64,19 @@ def test_real_team_record_is_the_fallback_with_honest_staged_roles(tmp_path):
     assert 'closed after the recorded run' in view['runner']
 
 
+def test_current_swarm_view_does_not_call_a_failed_start_a_quality_failure():
+    view = load(ROOT)
+    assert view['source'] == 'evidence/live-swarm-investigation-v1/result.json'
+    assert view['budget'] == '2/2'
+    assert len(view['rows']) == 6
+    attempted = [row for row in view['rows'] if row['Measured gates'] != 'not run']
+    assert len(attempted) == 2
+    assert attempted[0]['Measured gates'] == 'startup-failed; no quality or latency measurement'
+    assert '0.054%' in attempted[1]['Measured gates']
+    assert any(row['Proposal status'] == 'rejected' for row in view['rows'])
+    assert 'baseline' in view['runner'] and 'closed' in view['runner']
+
+
 def test_preferred_team_record_shows_deployment_then_rounds(tmp_path):
     old = saved_report()
     write_record(tmp_path, 'live-investigation-v1', old)
