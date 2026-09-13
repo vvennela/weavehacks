@@ -9,6 +9,11 @@ import pytest
 from experiments.weave_evidence import WeaveEvidenceReader, WeaveEvidenceError
 
 
+@pytest.fixture(autouse=True)
+def no_visibility_delay(monkeypatch):
+    monkeypatch.setattr('experiments.weave_evidence.sleep', lambda seconds: None, raising=False)
+
+
 IDENTITY = dict(trial_id='candidate', model_id='fixture-model', revision='pinned', config_hash='config-1')
 
 
@@ -45,7 +50,7 @@ class Client:
         self.events = []
 
     def flush(self):
-        self.events.append('flush')
+        raise AssertionError('Global flush must never run inside an active traced inspection')
 
     def get_calls(self, **kwargs):
         self.events.append(kwargs)
@@ -56,8 +61,7 @@ def test_remote_reads_are_filtered_cited_bounded_and_cache_is_detached():
     client = Client()
     reader = WeaveEvidenceReader(client, 'this-run')
     quality = reader('quality_outputs', evidence())
-    assert client.events[0] == 'flush'
-    query = client.events[1]
+    query = client.events[0]
     assert query['filter'] == {'trace_ids': ['this-run'], 'op_names': [
         'weave:///entity/project/op/recorded_model_request:*',
         'weave:///entity/project/op/recorded_trial_metrics:*',
@@ -74,7 +78,7 @@ def test_remote_reads_are_filtered_cited_bounded_and_cache_is_detached():
     quality['records'][0]['output'] = 'changed by caller'
     repeated = reader('quality_outputs', evidence())
     assert repeated['cache_status'] == 'hit' and repeated['records'][0]['output'] == 'answer-0'
-    assert len(client.events) == 2
+    assert len(client.events) == 1
     slow = reader('latency_outliers', evidence())
     assert [item['call_id'] for item in slow['records']] == ['measured-1', 'measured-0']
     loads = reader('load_metrics', evidence())
@@ -133,14 +137,14 @@ def test_new_scope_or_score_snapshot_invalidates_cache_and_threads_share_only_fe
     with ThreadPoolExecutor(max_workers=3) as workers:
         results = list(workers.map(lambda _: reader('quality_outputs', evidence()), range(3)))
     assert sum(result['cache_status'] == 'miss' for result in results) == 1
-    assert len(client.events) == 2
+    assert len(client.events) == 1
     changed = evidence()
     changed['trace_scope'][0]['task_quality']['per_prompt'][0]['score'] = 1
     assert reader('quality_outputs', changed)['cache_status'] == 'miss'
     changed['trace_scope'][0]['config_hash'] = 'new-config'
     with pytest.raises(WeaveEvidenceError):
         reader('quality_outputs', changed)
-    assert len(client.events) == 6
+    assert len(client.events) == 5  # Two successful snapshots, then three bounded visibility attempts.
 
 
 @pytest.mark.parametrize('query,scope', [('invented', evidence()), ('quality_outputs', {}),
@@ -176,7 +180,7 @@ def test_new_trial_invalidates_cache_and_scores_join_on_configuration_and_prompt
     scope['trace_scope'].append(dict(IDENTITY, trial_id='trial-2', config_hash='config-2',
         task_quality={'version': 'same-evaluator', 'per_prompt': [{'prompt_index': 1, 'score': 0}]}))
     result = reader('quality_outputs', scope)
-    assert result['cache_status'] == 'miss' and len(client.events) == 4
+    assert result['cache_status'] == 'miss' and len(client.events) == 2
     by_call = {item['call_id']: item for item in result['records']}
     assert by_call['quality-1']['task_score'] == 1
     assert by_call['later-quality-1']['task_score'] == 0
@@ -315,3 +319,50 @@ def test_weave_boxed_numbers_and_nonsliceable_lists_are_normalized_before_valida
     assert type(result['records'][0]['latency_ms']) is float
     assert result['records'][0]['input'] == [{'role': 'user', 'content': 'question'}]
     assert isinstance(records[0].output['input'], WeaveList)
+
+
+def test_completed_records_can_become_visible_without_flushing_open_parent(monkeypatch):
+    client = Client()
+    snapshots = iter([[], calls()[:-1], calls()])
+    delays = []
+
+    def query(**kwargs):
+        client.events.append(kwargs)
+        return iter(next(snapshots))
+
+    client.get_calls = query
+    monkeypatch.setattr('experiments.weave_evidence.sleep', delays.append)
+    reader = WeaveEvidenceReader(client, 'this-run')
+    result = reader('quality_outputs', evidence())
+    assert len(client.events) == 3 and delays == [1.0, 1.0]
+    assert result['records'][0]['call_id'] == 'quality-0'
+    assert reader('load_metrics', evidence())['cache_status'] == 'hit'
+    assert len(client.events) == 3
+
+
+def test_visibility_retries_stop_after_three_reads_without_caching_partial_data(monkeypatch):
+    client = Client([])
+    delays = []
+    monkeypatch.setattr('experiments.weave_evidence.sleep', delays.append)
+    reader = WeaveEvidenceReader(client, 'this-run')
+    with pytest.raises(WeaveEvidenceError) as error:
+        reader('quality_outputs', evidence())
+    assert error.value.reason_code == 'incomplete-metrics'
+    assert len(client.events) == 3 and delays == [1.0, 1.0]
+    client.records = calls()
+    assert reader('quality_outputs', evidence())['cache_status'] == 'miss'
+
+
+def test_transport_errors_are_not_visibility_retried(monkeypatch):
+    client = Client()
+    attempts = []
+
+    def query(**kwargs):
+        attempts.append(kwargs)
+        raise RuntimeError('sensitive service message')
+
+    client.get_calls = query
+    monkeypatch.setattr('experiments.weave_evidence.sleep', lambda _: pytest.fail('Unexpected retry'))
+    with pytest.raises(WeaveEvidenceError) as error:
+        WeaveEvidenceReader(client, 'this-run')('quality_outputs', evidence())
+    assert error.value.reason_code == 'query-failed' and len(attempts) == 1

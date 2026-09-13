@@ -7,6 +7,7 @@ from itertools import islice
 import math
 import json
 from threading import Lock
+from time import sleep
 
 from benchmarks.grade import dataset_hash, grade_case
 from sera.storage import content_hash
@@ -145,6 +146,19 @@ class WeaveEvidenceReader:
                 fixed_task_diagnostics=grade_case(case, payload.get('output')))
 
     def _fetch(self, scope):
+        # Completed child calls upload in the SDK's background batch thread.
+        # A global flush inside an open trace waits for that same trace to end.
+        # Allow only bounded visibility retries; never wait for open parent calls.
+        for attempt in range(3):
+            try:
+                return self._query(scope)
+            except WeaveEvidenceError as error:
+                if attempt == 2 or error.reason_code not in {
+                        'incomplete-metrics', 'incomplete-requests', 'incomplete-diagnosis'}:
+                    raise
+                sleep(1.0)
+
+    def _query(self, scope):
         # Documented get_calls projection/filter API:
         # https://docs.wandb.ai/weave/reference/python-sdk/trace/weave_client
         # Version wildcard handling: weave/trace_server/calls_query_builder/calls_query_builder.py
@@ -158,7 +172,6 @@ class WeaveEvidenceReader:
             {'$not': [{'$eq': [{'$getField': 'ended_at'}, {'$literal': None}]}]},
             {'$eq': [{'$getField': 'exception'}, {'$literal': None}]}]}}
         try:
-            self._client.flush()
             calls = list(islice(self._client.get_calls(filter=filters, query=query, limit=MAX_CALLS + 1,
                 columns=['id', 'trace_id', 'op_name', 'ended_at', 'exception', 'output']), MAX_CALLS + 1))
         except Exception:
