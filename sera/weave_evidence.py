@@ -233,7 +233,7 @@ class WeaveEvidenceReader:
             metrics = [record['output'] for record in matching if record['op_name'] == 'recorded_trial_metrics']
             if (not metrics and diagnoses and isinstance(diagnoses[0], Mapping)
                     and (diagnoses[0].get('observed') or {}).get('status') in
-                    ('startup-failed', 'measurement-failed')):
+                    ('startup-failed', 'measurement-failed', 'interrupted')):
                 continue
             if len(metrics) != 1:
                 raise WeaveEvidenceError('incomplete-metrics')

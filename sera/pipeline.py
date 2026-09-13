@@ -1,9 +1,10 @@
 """One baseline, one controlled candidate, a deterministic gate, and a live return."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 import uuid
+import threading
 
 from .config import BASELINE_NAME, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, Budget, Candidate, Constraints, Objective, RuntimeConfig, Workload, resolve_investigation_space, validate_candidate
 from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
@@ -80,6 +81,8 @@ class SeraResult:
     models: list[SeraModel]
     report: dict
     output_dir: Path
+    _ledger: object = field(default=None, repr=False, compare=False)
+    _save_lock: object = field(default_factory=threading.RLock, repr=False, compare=False)
 
     @property
     def recommended(self):
@@ -113,10 +116,19 @@ class SeraResult:
                                  constraints=self.report.get("constraints"))
 
     def _save(self):
-        self.report["returned_runtimes"] = [model.record for model in self.models]
-        self.report["frontier_trial_ids"] = [trial["trial_id"] for trial in self.frontier]
-        save_json(self.output_dir / "result.json", self.report)
-        (self.output_dir / "report.md").write_text(render_summary(self.report, self.output_dir))
+        from .ledger import Ledger
+        with self._save_lock:
+            self.report["returned_runtimes"] = [model.record for model in self.models]
+            self.report["frontier_trial_ids"] = [trial["trial_id"] for trial in self.frontier]
+            if self._ledger is None or self._ledger.closed:
+                self._ledger = Ledger(self.output_dir)
+            self._ledger.save(self.report)
+            save_json(self.output_dir / "result.json", self.report)
+            (self.output_dir / "report.md").write_text(render_summary(self.report, self.output_dir))
+
+    def _release_ledger(self):
+        if self._ledger is not None:
+            self._ledger.close()
 
     def print_summary(self):
         print(render_summary(self.report, self.output_dir))
@@ -128,7 +140,10 @@ class SeraResult:
             self.report["returned_runner_closed"] = True
             self.report["status"] = "closed"
         finally:
-            self._save()
+            try:
+                self._save()
+            finally:
+                self._release_ledger()
 
     def __enter__(self):
         return self
@@ -454,4 +469,6 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                 result._save()
             except BaseException as save_error:
                 report['save_error'] = type(save_error).__name__
+            finally:
+                result._release_ledger()
         raise

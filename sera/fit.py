@@ -290,4 +290,6 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
                 result._save()
             except BaseException as save_error:
                 report["save_error"] = type(save_error).__name__
+            finally:
+                result._release_ledger()
         raise

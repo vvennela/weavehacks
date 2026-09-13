@@ -271,6 +271,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
     try:
         from .swarm import choose_swarm_experiments, validate_swarm_options
         validate_swarm_options(swarm, budget, agent, trace_reader)
+        from .ledger import JournalAgent
+        agent = JournalAgent(agent, result._ledger)
         # Ownership has already transferred from optimize. Even setup failures
         # must close the running baseline.
         until_plateau = budget.max_candidate_trials is None
@@ -279,13 +281,17 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             raise ValueError('Initial trials used must be an integer within the candidate budget')
         baseline = report['baseline']
         baseline_config = RuntimeConfig.model_validate(report['baseline_configuration'])
-        search = dict(budget=budget.model_dump(), initial_trials_used=initial_trials_used,
-                      trials_used=initial_trials_used, rounds=[], stop_reason=None)
-        report.update(mode='agent-investigation', search=search, search_trials=[], swarm_enabled=swarm,
-                      limits=['single model', 'already-active single-setting controls',
-                              'no combination trials', 'no live search-advantage claim'])
+        resuming = report.pop('_resume_investigation', False)
+        if resuming:
+            search = report['search']
+        else:
+            search = dict(budget=budget.model_dump(), initial_trials_used=initial_trials_used,
+                          trials_used=initial_trials_used, rounds=[], stop_reason=None)
+            report.update(mode='agent-investigation', search=search, search_trials=[], swarm_enabled=swarm,
+                          limits=['single model', 'already-active single-setting controls',
+                                  'no combination trials', 'no live search-advantage claim'])
         if report.get('automatic_space'):
-            report['candidate_ledger'] = {}
+            report.setdefault('candidate_ledger', {})
             report['limits'][1:3] = ['Evidence-generated settings refreshed each round.',
                                      'Pairwise combinations require independently quality-passing components.']
         initial = pipeline.agent_evidence(baseline, objective, constraints, prompts=report['prompts'])
@@ -328,21 +334,26 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             else:
                 report['candidate_policy'] = dict(status='not-generated', space=None,
                                                   reason='Baseline measurement did not complete')
-        seen = {baseline_config.config_hash}
+        seen = {baseline_config.config_hash} | {trial['config_hash'] for trial in report['search_trials']}
         best = baseline if select_candidate(baseline, None, objective=objective, constraints=constraints)['selected'] else None
-        if until_plateau:
+        if resuming:
+            from .recovery import recovered_best
+            best = recovered_best(report, objective, constraints)
+        if until_plateau and not resuming:
             eligible = measured_frontier(baseline, None, constraints=constraints)
             search['plateau'] = dict(priority=objective.priority,
                 min_improvement_fraction=objective.min_improvement_fraction,
                 best_quality_valid_value=objective_value(baseline, objective.priority) if eligible else None,
                 consecutive_no_progress_rounds=0, confirmation_round_pending=False, history=[])
-        stagnant_rounds = 0
-        active_trial_id = 'baseline'
+        stagnant_rounds = search.get('stagnant_rounds', 0)
+        active_trial_id = 'baseline' if active is not None else None
         if baseline['status'] != 'collected':
             search['stop_reason'] = 'baseline-measurement-failed'
         elif evaluation is None and not token_agreement(baseline['quality'], baseline['self_check'])['passed']:
             search['stop_reason'] = 'unstable-reference'
             best = None
+        report['recovery_checkpoint'] = dict(phase='round-boundary', round=len(search['rounds']))
+        save()
         while search['stop_reason'] is None:
             remaining = 1 if until_plateau else budget.max_candidate_trials - search['trials_used']
             if not remaining:
@@ -362,6 +373,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             evidence = round_evidence(initial, search, report['search_trials'], remaining,
                                       prompts=report['prompts'])
             search['rounds'].append(record)
+            report['recovery_checkpoint'] = dict(phase='investigating', round=record['round'])
+            save()
             before_frontier = frontier_points()
             experiments = (choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_reader)
                            if swarm else choose_experiments(agent, evidence, legal, record, remaining))
@@ -408,6 +421,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                     trial.update(arbiter_proposal_id=scoped_id,
                                  investigator_id=selected['investigator_id'])
                 report['search_trials'].append(trial)
+                report['recovery_checkpoint'] = dict(phase='trial-running', round=record['round'], trial_id=trial_id)
                 save()
                 stage = 'constructor'
                 try:
@@ -483,8 +497,12 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             else:
                 after_frontier = frontier_points()
                 stagnant_rounds = stagnant_rounds + 1 if after_frontier == before_frontier else 0
+                search['stagnant_rounds'] = stagnant_rounds
                 if stagnant_rounds >= 2:
                     search['stop_reason'] = 'two-rounds-without-frontier-improvement'
+            record['completed'] = True
+            report['recovery_checkpoint'] = dict(phase='round-boundary', round=record['round'])
+            save()
         if best is None:
             close_active()
             report.update(status='no-safe-configuration', returned_runner_closed=True,
@@ -494,7 +512,11 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             if active_trial_id != selected_id:
                 close_active()
                 config = RuntimeConfig.model_validate(best['runtime']['configuration'])
-                active = runtime_factory(artifact_dir=folder / 'returned-best', configuration=config,
+                restore_name = ('returned-best' if not resuming else
+                                f"resumed-runner-{len(report.get('recovery_events', []))}")
+                report['recovery_checkpoint'] = dict(phase='runner-restoring', selected_trial_id=selected_id)
+                save()
+                active = runtime_factory(artifact_dir=folder / restore_name, configuration=config,
                                             model_id=report['model_id'], revision=report['model_revision'])
                 active.start()
             active._require_ready()
@@ -504,6 +526,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 task_quality_verified=evaluation is not None,
                 decision=dict(selected=selected_id, outcome=outcome, reason=search['stop_reason']))
         save()
+        if not result.models:
+            result._release_ledger()
         return result
     except BaseException as error:
         report.update(status='failed', error=type(error).__name__)
@@ -521,4 +545,6 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 # Cleanup must run even when persistence fails. Keep the original
                 # controller/cleanup exception instead of replacing it with this one.
                 report['save_error'] = type(save_error).__name__
+            finally:
+                result._release_ledger()
         raise

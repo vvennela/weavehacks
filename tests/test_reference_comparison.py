@@ -39,7 +39,7 @@ def test_large_comparison_preserves_model_precision_loads_and_returned_runner(tm
     def collect(model, prompts, trial_id, *, workload, baseline=False):
         measured_loads.append(workload.concurrency)
         trial = deepcopy(reference)
-        trial.update(trial_id=trial_id, runtime=model.record)
+        trial.update(trial_id=trial_id, runtime=model.record, config_hash=model.configuration.config_hash)
         trial['self_check'] = deepcopy(trial['quality'])
         trial['reduced']['p95_latency_ms'] = 100.0 if baseline else candidate_latency
         return trial

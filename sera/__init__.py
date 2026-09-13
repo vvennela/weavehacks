@@ -3,6 +3,7 @@
 from .config import Budget, Candidate, Constraints, InvestigationSpace, Objective, RuntimeConfig, Workload
 from .pipeline import SeraResult
 from .api import optimize
+from .recovery import inspect_recovery, resume
 from .runtime import SeraModel, SeraResponse
 from .agent import WandbAgent
 from .hardware import HardwareAssignment, ModelDescriptor
@@ -12,5 +13,6 @@ from .placement_config import PlacementPlan, PlacementService, PlacementConstrai
 
 __all__ = ["Budget", "Candidate", "Constraints", "InvestigationSpace", "Objective", "RuntimeConfig", "Workload", "SeraModel", "SeraResponse", "SeraResult", "WandbAgent", "optimize"]
 __all__ += ["HardwareAssignment", "ModelDescriptor", "PortableSeraModel", "optimize_on_hardware"]
+__all__ += ["inspect_recovery", "resume"]
 __all__ += ["place", "PlacementResult", "PlacementWorkload", "PlacementMemoryEstimate",
             "PlacementPlan", "PlacementService", "PlacementConstraints", "measure_placement_references"]
