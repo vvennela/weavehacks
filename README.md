@@ -13,25 +13,26 @@ Our long-term goal is like choosing a route home: the best plan depends on wheth
 ### What we have proven
 
 - The original Qwen72B model needs about 135 GiB just for its saved weights. Those weights cannot fit in our GPU's roughly 96 GB of memory.
-- The recommendation agent chose FP8 weight quantization. In plain English, this stores most model weights using fewer bits. That saves memory, but can change answers, so it needs a quality check.
+- A quantization advisor recommended FP8 weights, and an independent arbiter chose to test that plan. In plain English, this stores most model weights using fewer bits. That saves memory, but can change answers, so it needs a quality check.
 - Sera loaded the original weights and applied that change during loading. We did not substitute a separately downloaded, already-compressed model.
-- The running model passed all eight easy questions, including the required answer format. Sera then returned a usable model, and an additional request also passed. That check was not a held-out question.
-- All 24 timed requests completed. The measured p95 response time was 573 milliseconds: at least 95% of those requests finished within that time. Peak GPU memory was 86.38 GiB.
-- Sera saved the evidence and released the GPU after the test. The agent's final-review wording needed a fix; a separate review of the saved evidence then passed. Both records remain available.
+- The deployed model passed all eight strict tasks. Sera then generated two possible settings from the measured workload: context limit 256 and batch-token limit 2048. The batching advisor chose the batch-token change; context 256 was not tested.
+- Both measured configurations passed all eight tasks. Worst-load p95 changed from 773.803563 to 773.496087 milliseconds: only **0.0397357%** better, below the required **5%**. Sera rejected the improvement claim, not the model's answer quality.
+- The next-round specialist used the earlier result and abstained. Sera kept the reference, passed an additional returned-runner request, and closed cleanly with GPU memory back at zero. The request repeated a known question; it was not a held-out test.
+- The verified Weave trace contains separate advisor, arbiter, reviewer, provider-response, and recorded-model-output calls. Its stored outputs, measurements, and supplied evidence match the local records.
 
-These are small, specific checks, not proof that the model answers every question correctly. We have not demonstrated a speedup over the original model, because the original model could not fit. A later comparison tested two batching settings and correctly kept the reference because neither offered the required improvement. We have not yet demonstrated best-plan search or two models sharing the GPU.
+These are small, specific checks, not proof that the model answers every question correctly. We have not demonstrated a speedup over the original model, because that model could not fit. We have demonstrated a staged multi-agent workflow that measures a recommendation and stops when the evidence does not justify another trial. We have not demonstrated the best possible plan, three competing specialists, or two models sharing the GPU.
 
-### New: show the real investigation loop
+### Show the completed multi-agent investigation
 
-Open the [live investigation report](evidence/live-investigation-v1/report.md) and [Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a099cb-eb93-7ae1-aa16-b453793a3058). Say:
+Open the [team investigation report](evidence/live-team-investigation-v1/report.md) and [verified Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a0f-065b-7fcd-b076-d419fd5ae02d). Say:
 
-“The agent suggested a setting. Sera tested it, but response time improved by only 0.013%, below our 5% rule. Both settings still passed all eight questions. In the next round, the decision agent used that failed prediction to decline another trial. Sera gave back the working model and checked a new request.”
+“One advisor found a way to load the model. Sera checked its answers, then generated settings to investigate from the actual workload. A second advisor proposed a change. It passed the answer checks, but improved response time by only 0.040%, below our 5% rule. The reviewer rejected that prediction. In the next round, the specialist stopped instead of spending the remaining trial. Sera returned the working reference and checked another request.”
 
-This was two decision rounds and one candidate GPU trial, not two trials or a search win. The new request repeated a known question; it was not a held-out test. The run is now closed, and the notebook displays saved real evidence. Only batching was active; two-model placement is still unfinished.
+The run used **2 of 3 total trials**: one FP8 deployment and one batching trial. There were two search decision rounds; round two ran no trial. Quantization and batching acted in separate stages, not as three competing specialists. The runner is now closed, and the notebook displays saved real evidence. The [earlier batching-only investigation](evidence/live-investigation-v1/README.md) remains preserved separately.
 
-### Next rehearsal: let Sera choose the settings
+### Repeat the rehearsal: let Sera choose the settings
 
-**Live proof pending for this exact path.** A rehearsal has started from commit `27f877d`; its result is not yet established. Local checks cover the connected code, not a completed GPU rehearsal with automatic settings and detailed child traces. The older recording above remains the proven fallback.
+**Live rehearsal passed** from commit `27f877d`. The saved [team-run evidence](evidence/live-team-investigation-v1/README.md) covers automatic settings, measured feedback, the returned runner, and cleanup. The Weave API verified **297 trace calls**, including **273 recorded model requests** and **7 provider responses** with their exact stored reasoning and content; it reported no call errors. These are trace records, not 297 agent API requests.
 
 For a nontechnical partner: “One advisor recommends how to make the model fit. Sera loads it and checks the answers. Then Sera uses the actual input lengths, request load, and available measurements to choose a small set of settings to investigate. A second advisor recommends an experiment. The decision agent can approve it or stop, and every tested change must pass the same answer checks.”
 
@@ -61,15 +62,15 @@ Request-log child spans record saved results: their span duration is logging tim
 
 The agents receive a bounded view of local saved request records—the same records exported to Weave. They do **not** query the remote Weave service or use Weave MCP to investigate. Weave makes their inputs, outputs, and decisions visible; it is not a separate evidence-retrieval step in this run.
 
-Only mark this rehearsal passed after the saved run confirms the fit-to-search handoff, automatic-space audit, actual provider decisions, trace child outputs, usable returned runner, and cleanup. If the arbiter declines every tuning proposal, report that outcome honestly: it proves the connected workflow, not a measured tuning comparison. `demo.py` displays named saved evidence; its existing batching-only recording does not become proof of this new path.
+For a repeat run, check all five items above before claiming success. A different agent choice, abstention, or rejected change is a result to report, not a reason to invent another trial. `demo.py` prefers the named team-run record when available and labels its output as recorded, not live. The older batching-only recording is not evidence of the newer features.
 
 ### Three-minute walkthrough
 
 1. **Explain the problem:** “I want to run this large model, but its original weights are too large for my GPU.” Show the BF16 plan marked as not fitting. BF16 is the original weight format.
-2. **Show the recommendation:** “Sera's agent recommended using fewer bits for the weights. Sera checks the plan before trying it.” Show the selected FP8 plan and its reason.
-3. **Show the proof:** “The model loaded, all eight questions passed, and we measured response time and memory.” Open the saved answers and the Weave trace, which records the run and the agent's messages.
-4. **Show a usable result:** If the live runner is ready, enter a new question. Explain that this answer is a fresh request, not a saved answer. An open-ended new question is not automatically scored by our eight-question test.
-5. **Close with the limit:** “We have proven that Sera can make this large model fit, verify it on a supplied task, and give back a working model. Next we will compare more plans and choose according to the user's priority.”
+2. **Show the recommendation:** “The quantization advisor recommended fewer bits. The arbiter chose to test it, and all eight answers passed.” Show the deployment plan and gate.
+3. **Show the investigation:** “Sera generated a small set of settings from this workload. The batching advisor recommended one; Sera measured it.” Show the automatic-space rationale and the tested batch-token setting. Context 256 remained untested.
+4. **Show the correction:** “The change worked, but was not 5% better. The reviewer rejected the prediction, and the next specialist stopped.” Show the second-round abstention and the budget: two total trials used, not three.
+5. **Show the return and limits:** Show the saved returned-runner response, successful cleanup, and matching Weave child outputs. Say: “This is a saved real run. It proves a measured, self-correcting workflow on these eight questions, not a speedup or the best possible plan.”
 
 ### Before presenting
 
@@ -79,7 +80,7 @@ Only mark this rehearsal passed after the saved run confirms the fit-to-search h
 - Rehearse one fresh prompt, then confirm how to stop: blank input closes the interactive runner. Do not close it just before the live part.
 - If the live service fails, use the recorded demo and say: “This is a saved real GPU run, not live inference.” Do not present saved output as a fresh answer.
 
-Current rehearsal status: **passed**. The exact interactive command started the model, passed all eight tasks, accepted a fresh prompt through its input, answered `7 + 8` as `15`, and closed cleanly on blank input. Startup was 60 seconds with the weights cached. The recorded notebook also executes and its Molab view has been inspected. See [rehearsal evidence](evidence/demo-rehearsal-v1/README.md).
+The earlier interactive rehearsal also **passed**. Its separate command started the model, passed all eight tasks, accepted a fresh prompt through its input, answered `7 + 8` as `15`, and closed cleanly on blank input. Startup was 60 seconds with the weights cached. See [interactive rehearsal evidence](evidence/demo-rehearsal-v1/README.md). The automatic team command above instead checks its returned runner and closes automatically.
 
 ## Current implementation
 
@@ -89,7 +90,7 @@ The smaller Qwen3-0.6B path also completed a live agent-guided rejection and bas
 
 The returned baseline runner answered `1` for `1 + 1`. Its runtime worked, but its answer was wrong. Do not treat runtime success or token agreement as model correctness.
 
-The initial live checks used eight easy prompts and 24 measured requests per configuration. Later four-load comparisons used 96 measured requests per configuration, still on eight questions rather than the full 32-prompt acceptance workload. The large-model run proves feasible deployment through weight quantization, not a measured speedup or search advantage. The real two-round investigation also passed its returned-runner check. Joint placement and the search benchmark remain unfinished. Those earlier Weave runs used the experiment wrapper. The new child-trace and output-evidence path needs its own live check; it does not change historical traces.
+The initial live checks used eight easy prompts and 24 measured requests per configuration. Later four-load comparisons used 96 measured requests per configuration, still on eight questions rather than the full 32-prompt acceptance workload. The large-model run proves feasible deployment through weight quantization, not a measured speedup or search advantage. The current team run also proves the connected automatic-space, output-evidence, child-trace, and returned-runner path. Joint placement and the search benchmark remain unfinished. Earlier traces remain unchanged; the new evidence is a separate run.
 
 The W&B client, typed proposal/ranking/final-selection schemas, and bounded provider check are implemented. The client reads `WANDB_API_KEY` from the process environment; it never saves the key or request headers. Agent-controlled GPU execution stays disabled until the provider check passes.
 
@@ -189,15 +190,15 @@ After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `
 
 The production controller accepts `budget=sera.Budget(max_candidate_trials=2)` with an agent and a matching passed provider record. Omitting `budget` preserves the one-candidate path. It completed a [real two-round investigation](evidence/live-investigation-v1/README.md): one measured batch-token candidate, prediction review, later arbitration using that history, reference restoration, a new request, and cleanup.
 
-Each round gives the active quantization and batching specialists the baseline measurements and a short history of previous trials. An arbiter selects an experiment. Sera validates it, measures it with the existing runner, applies the unchanged quality and performance gates, and asks the agent to review its prediction. The next round receives the result, including failures. The new implementation also supplies bounded examples of actual inputs and outputs, prioritizing task failures and slow requests. Complete raw records remain saved; examples are selected evidence, not representative averages or instructions from model output. Live proof of this richer path is pending.
+Each round gives the active quantization and batching specialists the baseline measurements and a short history of previous trials. An arbiter selects an experiment. Sera validates it, measures it with the existing runner, applies the unchanged quality and performance gates, and asks the agent to review its prediction. The next round receives the result, including failures. The current implementation also supplies bounded examples of actual inputs and outputs, prioritizing task failures and slow requests. Complete raw records remain saved; examples are selected evidence, not representative averages or instructions from model output. The team rehearsal verified this richer evidence in the actual provider calls and matching Weave records.
 
-A post-run fix now forwards queue/first-token/preemption snapshots for every load and previous trial. Their names state that they are cumulative since startup, including warmup and earlier loads; they are not load-window averages. The first live investigation omitted these fields. An offline check against its unchanged saved data verifies the fix, but no new live-agent result is claimed for that richer input.
+A post-run fix forwards queue/first-token/preemption snapshots for every load and previous trial. Their names state that they are cumulative since startup, including warmup and earlier loads; they are not load-window averages. The first live investigation omitted these fields. The later team run used the corrected evidence path; the older record was not rewritten.
 
 The controller counts failed starts against the budget, excludes tested configurations, stops after two rounds without a frontier change, and stops immediately on cleanup failure. With at least three trials left, it can also select one untested specialist proposal for exploration. It returns the best eligible measured runner; a failed-quality baseline is not a safe fallback. All trials, proposals, reviews, and the measured frontier are saved.
 
 Default values remain narrow: FP8 KV and batch tokens 2,048 for small Qwen; batch tokens 2,048 only for the proven Qwen72B FP8 reference. A caller can now supply `investigation_space=sera.InvestigationSpace(supported_changes={...})` with an explicit budget. This declares up to 32 single-setting candidates using the supported batching/context controls. Sera freezes their full configuration hashes before loading. An optional `candidate_hashes` list restricts the pool further. It rejects no-ops, invalid coupled settings, incompatible sequence limits, and unverified combined FP8 weights/KV. After baseline tokenization, it excludes candidates whose context cannot cover the same input and output limit. It does not silently activate the expanded ranges or execute a full grid.
 
-Normal-mode automatic value generation is now opt-in through `automatic_space=True` on `optimize`, with an agent and budget. It runs after baseline measurement and records its full rationale. It proposes bounded single-setting context, sequence, or batch-token changes; it does not generate precision changes or combinations. Explicit/frozen spaces cannot be combined with this mode. Missing essential evidence produces no candidates, not guesses or fallback defaults. This wiring passed local checks; the live automatic-space rehearsal is pending.
+Normal-mode automatic value generation is opt-in through `automatic_space=True` on `optimize`, with an agent and budget. It runs after baseline measurement and records its full rationale. It proposes bounded single-setting context, sequence, or batch-token changes; it does not generate precision changes or combinations. Explicit/frozen spaces cannot be combined with this mode. Missing essential evidence produces no candidates, not guesses or fallback defaults. The live team rehearsal generated context 256 and batch tokens 2048; only the batch-token change was tested.
 
 Combination trials, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The citation fix constrains the provider to exact available metric names and verifies the same request schema locally. The [current hosted check passed 30/30 on the first attempt](evidence/provider-v5/README.md), including every evidence-reference check. The provider gate no longer blocks the current wire schemas; it does not certify useful reasoning about new evidence.
 
@@ -221,7 +222,7 @@ This example uses GPU time and requires the large model files. It declares two b
 
 Add `--fit-first` for Qwen72B to start from the model that does not fit. A quantization advisor recommends a legal memory plan, an independent arbiter decides whether to test it, and the measured deployment must pass the task gate. That same running model then becomes the reference for the batching investigation. There is no reload between those stages.
 
-The budget includes the deployment trial: `--fit-first --budget 3` allows one deployment and at most two tuning trials, not three additional trials. The rest of the command and its task requirements stay the same. This connected path passes local tests; its live rehearsal is pending. An explicit FP8 reference without `--fit-first` retains the previous behavior.
+The budget includes the deployment trial: `--fit-first --budget 3` allows one deployment and at most two tuning trials, not three additional trials. The connected live rehearsal with `--auto-space` used one deployment and one tuning trial, then stopped after the next specialist abstained. An explicit FP8 reference without `--fit-first` retains the previous behavior.
 
 The command also accepts explicit `--sequence-values`, `--context-values`, and `--fp8-kv` controls. Values are checked before execution, and unsupported combinations remain rejected. FP8 KV is not enabled on the Qwen72B FP8-weight reference. The report shows which specialists had legal work and why others were inactive. Parallelism is inactive on this single-GPU runtime.
 
