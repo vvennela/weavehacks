@@ -152,3 +152,71 @@ def test_ready_service_without_attributed_gpu_memory_cannot_pass(owned):
     with pytest.raises(RuntimeError):
         owner.check()
     assert 'ready-service-accounting-missing:' + MODEL_ID in owner.record['errors']
+
+
+def test_gpu_pid_resolving_to_container_init_is_not_usable_accounting(monkeypatch):
+    import sera.placement_runtime as runtime
+    monkeypatch.setattr(runtime.subprocess, 'run', lambda *args, **kwargs:
+                        SimpleNamespace(stdout='test-gpu, 1, 2746\n'))
+    monkeypatch.setattr(runtime.os, 'getpgid', lambda pid: 1)
+    with pytest.raises(runtime.GPUProcessIdentityError) as failure:
+        runtime.gpu_processes()
+    assert failure.value.diagnostic == {
+        'reported_pid': 1, 'local_process_group': 1,
+        'reason': 'reported-pid-is-namespace-init',
+        'namespace_mismatch': 'possible-not-proven',
+    }
+
+
+def test_missing_gpu_pid_reports_unresolved_identity_not_assumed_process_exit(monkeypatch):
+    import sera.placement_runtime as runtime
+    monkeypatch.setattr(runtime.subprocess, 'run', lambda *args, **kwargs:
+                        SimpleNamespace(stdout='test-gpu, 12345, 2746\n'))
+    def missing(pid):
+        raise ProcessLookupError(pid)
+    monkeypatch.setattr(runtime.os, 'getpgid', missing)
+    with pytest.raises(runtime.GPUProcessIdentityError) as failure:
+        runtime.gpu_processes()
+    assert failure.value.diagnostic['reason'] == 'reported-pid-not-visible'
+
+
+def test_normal_gpu_child_identity_retains_exact_memory(monkeypatch):
+    import sera.placement_runtime as runtime
+    monkeypatch.setattr(runtime.subprocess, 'run', lambda *args, **kwargs:
+                        SimpleNamespace(stdout='test-gpu, 12345, 2746\n'))
+    monkeypatch.setattr(runtime.os, 'getpgid', lambda pid: 12300)
+    assert runtime.gpu_processes() == [dict(uuid='test-gpu', pid=12345,
+                                          process_group=12300, used_mib=2746)]
+
+
+def test_identity_failure_is_saved_and_cannot_certify_service_cleanup(owned, monkeypatch):
+    runtime, owner, _, _ = owned
+    def unresolved():
+        raise runtime.GPUProcessIdentityError(1, 1, 'reported-pid-is-namespace-init')
+    monkeypatch.setattr(runtime, 'gpu_processes', unresolved)
+    with pytest.raises(RuntimeError):
+        owner.check()
+    assert 'gpu-process-identity-unresolved' in owner.record['errors']
+    assert owner.record['process_identity_errors'][0]['reported_pid'] == 1
+    first = owner.models[0]
+    with pytest.raises(CleanupError, match='identity'):
+        owner.verify_service_cleanup(first)
+    assert first.record['cleanup_pass'] is False
+
+
+def test_unresolved_gpu_identity_still_attempts_both_closes(owned, monkeypatch):
+    runtime, owner, _, _ = owned
+    calls = []
+    def unresolved():
+        raise runtime.GPUProcessIdentityError(1, 1, 'reported-pid-is-namespace-init')
+    monkeypatch.setattr(runtime, 'gpu_processes', unresolved)
+    def close(model):
+        calls.append(model.model_id)
+        owner.verify_service_cleanup(model)
+    for model in owner.models:
+        model.close = lambda model=model: close(model)
+    with pytest.raises(CleanupError):
+        owner.close()
+    assert set(calls) == {MODEL_ID, GLM_MODEL_ID}
+    assert owner.record['cleanup_pass'] is False
+    assert 'cleanup-accounting-GPUProcessIdentityError' in owner.record['cleanup_errors']

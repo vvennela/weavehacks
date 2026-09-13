@@ -93,6 +93,26 @@ joint gate. Sampling is once per second and can miss short peaks. This is not
 hardware partitioning or a continuous memory cap. NVIDIA queries do not run
 inside each request's latency timer.
 
+GPU process IDs must identify real local worker groups. If NVIDIA reports PID 1
+or a PID that is not visible locally, Sera records
+`gpu-process-identity-unresolved`. PID 1 is the namespace init, not a Sera-launched
+worker. The diagnostic marks a namespace mismatch as possible, not proven;
+an absent PID can also mean a process exited during sampling. Joint validation
+and service cleanup cannot pass while GPU ownership remains unresolved.
+
+The Molab gVisor observation is a real limit: both `nvidia-smi` and direct NVML
+reported PID 1 while the vLLM server and engine had different local IDs. Its
+`/proc` exposed no `NSpid` or `NSpgid` mapping. Switching to an NVML wrapper does
+not add ownership information: NVIDIA states that
+[NVML underlies nvidia-smi](https://docs.nvidia.com/deploy/nvml-api/latest/).
+The [gVisor architecture](https://github.com/google/gvisor/blob/master/g3doc/architecture_guide/intro_to_gvisor.md)
+also explains that sandbox processes are not one-to-one host processes.
+A supported per-service accounting source, or an execution environment that
+exposes owned GPU process identities, is required. Neither is supplied by this
+runner. Do not divide aggregate memory by service, subtract an isolated memory
+measurement during joint execution, or treat framework allocator totals as
+total process memory. These methods do not establish the hard service caps.
+
 With per-prompt decoding enabled, a returned runner remembers the schema for each
 measured prompt. A new prompt requires `model.generate(new_prompt,
 response_format=your_schema)`; Sera does not guess its task type. A caller cannot

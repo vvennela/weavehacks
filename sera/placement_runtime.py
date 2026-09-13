@@ -14,6 +14,15 @@ from .placement_config import validate_placement_plan
 from .runtime import CleanupError, gpu_snapshot
 
 
+class GPUProcessIdentityError(RuntimeError):
+    """Driver process identity cannot safely identify a local owned worker."""
+
+    def __init__(self, pid, group, reason):
+        self.diagnostic = dict(reported_pid=pid, local_process_group=group,
+            reason=reason, namespace_mismatch='possible-not-proven')
+        super().__init__('GPU process identity is unresolved; per-service memory cannot be verified')
+
+
 def gpu_processes():
     output = subprocess.run(['nvidia-smi',
         '--query-compute-apps=gpu_uuid,pid,used_gpu_memory', '--format=csv,noheader,nounits'],
@@ -27,8 +36,13 @@ def gpu_processes():
         try:
             group = os.getpgid(pid)
         except ProcessLookupError:
-            # A process exiting during a query requires a fresh sample, not invented accounting.
-            raise RuntimeError('GPU process exited during ownership accounting') from None
+            # Either exit during sampling or an inaccessible driver PID namespace.
+            raise GPUProcessIdentityError(pid, None, 'reported-pid-not-visible') from None
+        if pid == 1:
+            # A Sera-launched worker cannot be the init of our PID namespace.
+            # Some sandboxes expose aggregated GPU usage under that identity.
+            # Never assign it by launch order or assume it belongs to a service.
+            raise GPUProcessIdentityError(pid, group, 'reported-pid-is-namespace-init')
         processes.append(dict(uuid=uuid, pid=pid, process_group=group, used_mib=memory))
     return processes
 
@@ -120,6 +134,11 @@ class SharedGPUOwner:
             except Exception as error:
                 self.record['telemetry_errors'] += 1
                 self._error('memory-accounting-unavailable:' + type(error).__name__)
+                if isinstance(error, GPUProcessIdentityError):
+                    self._error('gpu-process-identity-unresolved')
+                    diagnostics = self.record.setdefault('process_identity_errors', [])
+                    if error.diagnostic not in diagnostics:
+                        diagnostics.append(error.diagnostic)
             return self.record
 
     def check(self):
@@ -141,9 +160,15 @@ class SharedGPUOwner:
 
     def verify_service_cleanup(self, model):
         deadline = time.monotonic() + 15
-        while not self.service_released(model) and time.monotonic() < deadline:
-            time.sleep(1)
-        released = self.service_released(model)
+        try:
+            while not self.service_released(model) and time.monotonic() < deadline:
+                time.sleep(1)
+            released = self.service_released(model)
+        except GPUProcessIdentityError as error:
+            model.record.update(cleanup_pass=False,
+                cleanup_error='gpu-process-identity-unresolved',
+                cleanup_identity_error=error.diagnostic)
+            raise CleanupError('GPU process identity prevents service cleanup verification') from error
         model.record.update(cleanup_pass=released, memory_after_mib=gpu_snapshot()['used_mib'],
                             cleanup_scope='owned GPU process group; registered peers can remain live')
         if not released:
