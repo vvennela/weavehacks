@@ -13,7 +13,7 @@ from experiments.verify_swarm import verify_swarm, main
 ROLES = ('scheduling', 'memory_context', 'output_quality')
 
 
-def fixture(with_diagnosis=False, query='load_metrics', task_diagnostics=False):
+def fixture(with_diagnosis=False, query='load_metrics', task_diagnostics=False, failed_startup=False):
     calls = []
 
     def call(name, inputs, output, parent='root', start=0, end=100):
@@ -38,14 +38,21 @@ def fixture(with_diagnosis=False, query='load_metrics', task_diagnostics=False):
             decision={'selected': 'baseline', 'outcome': 'no-safe-improvement'},
             review={'prediction_outcome': 'refuted', 'selected_trial_id': 'baseline'})
         trials.append(trial)
+        if index and failed_startup:
+            trial.update(status='startup-failed', failure_stage='startup', error='RuntimeError',
+                review=None, review_error='ValueError',
+                review_response=dict(selected_trial_id='baseline', prediction_outcome='not-tested'))
+            trial.pop('reduced')
         identity = {key: trial.get(key, trial['runtime'].get(key))
                     for key in ('trial_id', 'model_id', 'revision', 'config_hash')}
-        metric = identity | dict(reduced=trial['reduced'], loads=[dict(concurrency=1,
-            reduced=trial['reduced'])], quality_requests=1, self_check_requests=0)
+        metric = identity | dict(reduced=trial.get('reduced'), loads=[dict(concurrency=1,
+            reduced=trial.get('reduced'))], quality_requests=1, self_check_requests=0)
         for name, payload in [('recorded_trial_metrics', metric), ('recorded_model_request',
                 identity | dict(phase='measured', latency_ms=100, output='answer')),
                 ('recorded_model_request', identity | dict(phase='quality', prompt_index=0,
                     input='question', output='answer', latency_ms=100))]:
+            if index and failed_startup:
+                continue
             cid = call(name, {'record': payload}, payload)
             records.append(dict(call_id=cid, op_name=name, output=payload,
                                 output_sha256=content_hash(payload)))
@@ -58,6 +65,8 @@ def fixture(with_diagnosis=False, query='load_metrics', task_diagnostics=False):
             cid = call('recorded_trial_diagnosis', {}, payload)
             records.append(dict(call_id=cid, op_name='recorded_trial_diagnosis', output=payload,
                                 output_sha256=content_hash(payload)))
+            call('frontier_reviewer', dict(evidence=trial['review_evidence']),
+                 trial.get('review_response') or trial['review'])
     report = dict(status='closed', provenance='live', swarm_enabled=True, baseline=trials[0],
         search_trials=[trials[1]], prompts=['question'], objective=dict(priority='latency',
         min_improvement_fraction=.05), constraints=dict(quality_floor=.99),
@@ -75,8 +84,10 @@ def fixture(with_diagnosis=False, query='load_metrics', task_diagnostics=False):
                       config_hash=t['config_hash'], task_quality=t['task_quality'])
                  for t in trials[:round_index + 1]]
         history = [] if round_index == 0 else [dict(trial={key: deepcopy(trials[1][key]) for key in
-            ('trial_id', 'status', 'config_hash', 'reduced', 'task_quality', 'decision')},
+            ('trial_id', 'status', 'config_hash', 'reduced', 'task_quality', 'decision', 'failure_stage', 'error')
+            if key in trials[1]},
             configuration=trials[1]['runtime']['configuration'], review=trials[1]['review'],
+            review_error=trials[1].get('review_error'),
             request_evidence=request_evidence(trials[1], report['prompts']))]
         if with_diagnosis and history:
             history[0]['diagnosis'] = deepcopy(trials[1]['diagnosis'])
@@ -207,6 +218,63 @@ def test_typed_weave_metadata_is_not_a_response_mismatch():
     for call in dump['calls']:
         if '/op/swarm_' in call['op_name']:
             call['output'].update(_type='Proposal', _class_name='Proposal')
+    result = verify_swarm(report, dump)
+    assert result['execution_passed'], result['issues']
+
+
+def test_serialized_callref_ids_resolve_only_to_the_same_project_and_trace():
+    report, dump = fixture()
+    def wrap(value, project):
+        if isinstance(value, dict):
+            return {k: (f"CallRef(entity='entity', project='{project}', id='{v}', _extra=('attr', 'id'))"
+                        if k == 'call_id' else wrap(v, project)) for k, v in value.items()}
+        return [wrap(v, project) for v in value] if isinstance(value, list) else value
+    valid = verify_swarm(report, wrap(dump, 'project'))
+    assert valid['execution_passed'], valid['issues']
+    assert valid['normalized_call_references'] > 0
+    invalid = verify_swarm(report, wrap(dump, 'different-project'))
+    assert invalid['execution_passed'] is False
+    assert any(i['check'] == 'call-reference' for i in invalid['issues'])
+
+
+def test_failed_startup_feedback_is_valid_but_not_measured_candidate_feedback():
+    report, dump = fixture(with_diagnosis=True, failed_startup=True)
+    result = verify_swarm(report, dump)
+    assert result['execution_passed'], result['issues']
+    assert result['feedback']['startup_failure_feedback'] is True
+    assert result['feedback']['measured_candidate_feedback'] is False
+    assert result['feedback']['rejected_raw_reviews'] == ['trial-1']
+    assert result['failure_diagnosis']['established'] is True
+
+
+def test_old_projection_and_diagnosis_do_not_need_later_optional_fields():
+    report, dump = fixture(with_diagnosis=True, query='latency_outliers')
+    def previous(value):
+        if isinstance(value, dict):
+            return {k: previous(v) for k,v in value.items()
+                    if k not in ('prompt_tokens', 'runtime_failure')}
+        return [previous(v) for v in value] if isinstance(value, list) else value
+    # Removing a new nullable diagnosis field changes its persisted source hash.
+    report, dump = previous(report), previous(dump)
+    for c in dump['calls']:
+        if '/op/recorded_trial_diagnosis:' in c['op_name']:
+            new_hash = content_hash(c['output'])
+            def update(value):
+                if isinstance(value, dict):
+                    if value.get('call_id') == c['id']:
+                        value['output_sha256'] = new_hash
+                    for v in value.values(): update(v)
+                elif isinstance(value, list):
+                    for v in value: update(v)
+            update(report)
+            update(dump)
+    for row in report['search']['rounds']:
+        row['swarm']['shared_findings_hash'] = content_hash(row['shared_findings'])
+        for check in row['specialists']:
+            check['evidence']['shared_findings_hash'] = row['swarm']['shared_findings_hash']
+            for call in dump['calls']:
+                if '_peer_review:' in call['op_name'] and call['inputs']['evidence']['history'] == check['evidence']['history']:
+                    call['inputs']['evidence']['shared_findings_hash'] = row['swarm']['shared_findings_hash']
     result = verify_swarm(report, dump)
     assert result['execution_passed'], result['issues']
 

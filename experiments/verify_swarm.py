@@ -10,6 +10,7 @@ from datetime import datetime
 import json
 import math
 from pathlib import Path
+import re
 
 from sera.storage import content_hash
 from sera.trace_evidence import request_evidence
@@ -57,6 +58,20 @@ def _typed_response_matches(actual, expected):
         key in actual and actual[key] == value for key, value in expected.items())
 
 
+def _historical_record_matches(actual, expected):
+    """Allow only known additive fields absent from older saved projections."""
+    if isinstance(actual, dict) and isinstance(expected, dict):
+        optional = {'prompt_tokens'}
+        if expected.get('runtime_failure') is None:
+            optional.add('runtime_failure')
+        return (not actual.keys() - expected.keys() and not expected.keys() - actual.keys() - optional
+                and all(_historical_record_matches(value, expected[key]) for key, value in actual.items()))
+    if isinstance(actual, list) and isinstance(expected, list):
+        return len(actual) == len(expected) and all(_historical_record_matches(a, b)
+                                                   for a, b in zip(actual, expected))
+    return actual == expected
+
+
 class Audit:
     def __init__(self, report, dump):
         self.report = report
@@ -69,10 +84,33 @@ class Audit:
         self.by_id = {call.get('id'): call for call in self.calls if isinstance(call.get('id'), str)}
         self.trace_id = (self.by_id.get(self.root_id) or {}).get('trace_id')
         self.declared_trace_id = dump.get('trace_id', self.trace_id) if isinstance(dump, dict) else self.trace_id
+        self.normalized_call_references = 0
+        self.calls = self.normalize_references(self.calls)
+        self.by_id = {call.get('id'): call for call in self.calls if isinstance(call.get('id'), str)}
         self.records = [dict(call_id=call.get('id'), op_name=_op(call), output=call['output'],
                              output_sha256=content_hash(call['output'])) for call in self.calls
                         if _op(call) in ('recorded_model_request', 'recorded_trial_metrics', 'recorded_trial_diagnosis')
                         and isinstance(call.get('output'), dict)]
+
+    def normalize_references(self, value):
+        """Resolve only serialized references to known call IDs, never arbitrary text."""
+        if isinstance(value, list):
+            return [self.normalize_references(item) for item in value]
+        if not isinstance(value, dict):
+            return value
+        result = {}
+        for key, item in value.items():
+            if key == 'call_id' and isinstance(item, str) and item.startswith('CallRef('):
+                match = re.fullmatch(r"CallRef\(entity='([^']+)', project='([^']+)', id='([^']+)', "
+                                     r"_extra=\('attr', 'id'\)\)", item)
+                source = self.by_id.get(match[3], {}) if match else {}
+                valid = (bool(match) and bool(source) and source.get('trace_id') == self.trace_id
+                         and str(source.get('op_name', '')).startswith(f'weave:///{match[1]}/{match[2]}/op/'))
+                if self.require(valid, 'call-reference', 'Serialized call references must resolve inside this project and trace.'):
+                    item = match[3]
+                    self.normalized_call_references += 1
+            result[key] = self.normalize_references(item)
+        return result
 
     def require(self, condition, check, detail, round_number=None):
         if not condition:
@@ -144,7 +182,7 @@ class Audit:
                         # Projection only: this object has no client and cannot issue a query.
                         WeaveEvidenceReader(None, self.trace_id,
                             evaluation_cases=self.report['evaluation_cases'])._attach_task_diagnostics(projected, [source])
-                    valid &= selected in projected
+                    valid &= any(_historical_record_matches(selected, projection) for projection in projected)
             except (ValueError, TypeError, KeyError, RuntimeError, AttributeError):
                 valid = False
             reads = [call for call in self.calls if _op(call) == f'weave_inspect_{query}'
@@ -225,6 +263,9 @@ class Audit:
 
     def feedback(self, rounds, trials):
         actual_feedback = False
+        measured_feedback = False
+        startup_feedback = False
+        rejected_reviews = set()
         previous_ids = []
         for record in rounds:
             for check in record.get('specialists', []):
@@ -237,17 +278,32 @@ class Audit:
                             continue
                         entry = next((h for h in history if (h.get('trial') or {}).get('trial_id') == trial_id), {})
                         copied = entry.get('trial') or {}
-                        valid = bool(trial.get('reduced')) and bool(trial.get('review')) and all(copied.get(field) == trial.get(field)
-                            for field in ('status', 'config_hash', 'reduced', 'task_quality', 'decision'))
+                        failed_startup = trial.get('status') == 'startup-failed' and not trial.get('reduced')
+                        raw_review = trial.get('review_response')
+                        rejected_review = bool(trial.get('review_error') and raw_review and
+                            self.matching_calls('frontier_reviewer', trial.get('review_evidence'), raw_review))
+                        review_present = bool(trial.get('review')) or rejected_review
+                        observed = bool(trial.get('reduced')) or (failed_startup and bool(trial.get('diagnosis')))
+                        valid = observed and review_present and all(copied.get(field) == trial.get(field)
+                            for field in ('status', 'config_hash', 'reduced', 'task_quality', 'decision', 'failure_stage', 'error'))
                         valid &= (entry.get('configuration') == trial.get('runtime', {}).get('configuration')
                                   and entry.get('review') == trial.get('review')
+                                  and entry.get('review_error') == trial.get('review_error')
                                   and entry.get('request_evidence') == request_evidence(trial, self.report.get('prompts', [])))
                         self.require(valid, 'measured-feedback',
-                                     f'{trial_id} measurements, gate, review and outputs must reach every next-round investigator.',
+                                     f'{trial_id} actual outcome, available metrics, gate and review disposition must reach every next-round investigator.',
                                      record.get('round'))
                         actual_feedback |= bool(valid)
+                        measured_feedback |= bool(valid and trial.get('reduced'))
+                        startup_feedback |= bool(valid and failed_startup)
+                        if rejected_review:
+                            rejected_reviews.add(trial_id)
             previous_ids.extend(record.get('trial_ids', []))
-        self.require(actual_feedback, 'measured-feedback', 'A real measured trial must feed a later decision round.')
+        self.require(actual_feedback, 'measured-feedback', 'An actual trial outcome must feed a later decision round.')
+        return dict(observed_trial_feedback=actual_feedback, measured_candidate_feedback=measured_feedback,
+                    startup_failure_feedback=startup_feedback, rejected_raw_reviews=sorted(rejected_reviews),
+                    limitation='A recorded startup failure is feedback, not a measured quality or performance result. '
+                               'Rejected raw reviews are preserved, not relabeled as validated or delivered to later agents.')
 
     def trials(self, rounds, trials):
         ids = [identifier for row in rounds for identifier in row.get('trial_ids', [])]
@@ -280,8 +336,16 @@ class Audit:
                 metrics = [r for r in self.records if r['op_name'] == 'recorded_trial_metrics'
                     and r['output'].get('trial_id') == identifier and
                     r['output'].get('config_hash') == trial.get('config_hash')]
-                self.require(len(metrics) == 1 and metrics[0]['output'].get('reduced') == trial.get('reduced'),
-                             'measured-trial', f'{identifier} needs matching persisted trial metrics.')
+                if trial.get('status') == 'startup-failed' and not trial.get('reduced'):
+                    diagnoses = [r for r in self.records if r['op_name'] == 'recorded_trial_diagnosis'
+                        and r['output'].get('trial_id') == identifier and
+                        r['output'].get('config_hash') == trial.get('config_hash')]
+                    self.require(not metrics and len(diagnoses) == 1 and
+                                 diagnoses[0]['output'].get('diagnosis') == trial.get('diagnosis'),
+                                 'startup-trial', f'{identifier} needs a persisted startup diagnosis, not invented metrics.')
+                else:
+                    self.require(len(metrics) == 1 and metrics[0]['output'].get('reduced') == trial.get('reduced'),
+                                 'measured-trial', f'{identifier} needs matching persisted trial metrics.')
 
     def returned(self):
         report = self.report
@@ -310,7 +374,7 @@ class Audit:
                         trial.get('runtime', {}).get('revision'), trial.get('config_hash'))
             records = [r for r in self.records if r['op_name'] == 'recorded_trial_diagnosis'
                        and _identity(r['output']) == identity]
-            valid = (diagnosis == expected and len(records) == 1 and
+            valid = (_historical_record_matches(diagnosis, expected) and len(records) == 1 and
                      records[0]['output'].get('diagnosis') == diagnosis and
                      trial.get('review_evidence', {}).get('diagnosis') == diagnosis and
                      trial.get('diagnosis_trace_export', {}).get('status') == 'complete')
@@ -330,7 +394,8 @@ class Audit:
                          f'{identifier}: deterministic verdict, persisted event, review or later diagnosis evidence differs.')
         return dict(established=bool(trials) and not missing and len(self.issues) == before,
                     missing_trial_ids=missing, root_cause_established=False,
-                    scope='Observed failures and consequences only; no model or hardware cause is inferred.')
+                    scope='Observed failures and consequences only; no model or hardware cause is inferred. '
+                          'Matching diagnosis records do not prove the agents understood or used them.')
 
 
 def verify_swarm(report, calls_dump):
@@ -354,7 +419,7 @@ def verify_swarm(report, calls_dump):
         audit.round(row, expected_scope)
         scoped_trials.extend(trials[identifier] for identifier in row.get('trial_ids', []) if identifier in trials)
     audit.trials(rounds, trials)
-    audit.feedback(rounds, trials)
+    feedback = audit.feedback(rounds, trials)
     audit.returned()
     diagnosis = audit.diagnoses(rounds, trials)
     priority = (report.get('objective') or {}).get('priority')
@@ -384,6 +449,8 @@ def verify_swarm(report, calls_dump):
                 'runtime', {}).get('configuration')),
         source_hashes=dict(result=content_hash(report), calls=content_hash(calls_dump)),
         root_call_id=audit.root_id, trace_id=audit.trace_id,
+        normalized_call_references=audit.normalized_call_references,
+        feedback=feedback,
         failure_diagnosis=diagnosis,
         proposal_diversity=dict(initial_distinct_candidates=initial, refined_distinct_candidates=refined,
             initial_alternatives_observed=any(n > 1 for n in initial),
