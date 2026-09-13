@@ -6,11 +6,12 @@ import os
 from pydantic import SecretStr
 
 from .agent import ProviderTransportError, WandbAgent, request_schema
+from .config import CONTROL_ROLES
 from .storage import content_hash
 
 
 OPENAI_BASE_URL = 'https://api.openai.com/v1'
-TRANSPORT_PROFILE = 'sera-litellm-openai-low-2048-flat-root-v1'
+TRANSPORT_PROFILE = 'sera-litellm-openai-low-2048-flat-root-role-rules-v2'
 
 
 class LiteLLMAgent(WandbAgent):
@@ -42,6 +43,15 @@ class LiteLLMAgent(WandbAgent):
             # OpenAI structured outputs prohibit root anyOf. Proposal validators
             # still enforce each action/role/value/cost combination after generation.
             schema.pop('anyOf', None)
+            role_rules = '; '.join(f'{lever} -> {specialist}'
+                                   for lever, specialist in CONTROL_ROLES.items())
+            schema['properties']['agent_role']['description'] = (
+                'For action=trial, select the role required by changed_lever: '
+                f'{role_rules}. For action=keep-baseline, either permitted role is valid; '
+                'changed_lever and proposed_value must be null and expected_trial_cost must be 0. '
+                'For action=trial, expected_trial_cost must be 1. '
+                'These rules are checked after generation; a wrong role rejects the proposal.'
+            )
         return schema
 
     def _complete(self, payload):

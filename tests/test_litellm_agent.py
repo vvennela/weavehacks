@@ -7,8 +7,10 @@ from types import SimpleNamespace
 import pytest
 
 from sera.agent import request_schema, schema_hash
+from sera.config import CONTROL_ROLES
 from sera.litellm_agent import LiteLLMAgent
 from sera.provider_check import check_provider, provider_cases, require_provider_check
+from sera.storage import content_hash
 from test_provider_check import valid_response
 
 
@@ -74,14 +76,49 @@ def test_wire_schema_removes_only_root_anyof_and_keeps_local_validation(monkeypa
     original = request_schema('proposal', case['evidence'])
     expected = dict(original)
     expected.pop('anyOf')
-    assert current.wire_schema('proposal', case['evidence']) == expected
+    wire_schema = current.wire_schema('proposal', case['evidence'])
+    without_description = json.loads(json.dumps(wire_schema))
+    without_description['properties']['agent_role'].pop('description', None)
+    assert without_description == expected
     assert 'anyOf' in request_schema('proposal', case['evidence'])
     invalid = valid_response(case) | {'expected_trial_cost': 0}
     install_transport(monkeypatch, lambda **kwargs: {'choices': [{'finish_reason': 'stop',
         'message': {'content': json.dumps(invalid)}}]})
     assert current.request('proposal', case['evidence'], 'Inspect') is None
     assert all(not row['schema_valid'] for row in current.history[0]['attempts'])
-    assert current.history[0]['request_schema'] == expected
+    assert current.history[0]['request_schema'] == wire_schema
+
+
+def test_every_control_role_rule_reaches_model_and_wire_schema(monkeypatch):
+    case = provider_cases()[0]
+    calls = []
+    def complete(**kwargs):
+        calls.append(kwargs)
+        return body(case)
+    install_transport(monkeypatch, complete)
+    current = agent()
+    assert current.request('proposal', case['evidence'], 'Inspect') is not None
+    sent_schema = calls[0]['response_format']['json_schema']['schema']
+    description = sent_schema['properties']['agent_role']['description']
+    for lever, specialist in CONTROL_ROLES.items():
+        assert f'{lever} -> {specialist}' in description
+    assert 'trial' in description and 'keep-baseline' in description
+    assert description in calls[0]['messages'][0]['content']
+    assert current.history[0]['request_schema'] == sent_schema
+    assert 'description' not in request_schema('proposal', case['evidence'])['properties']['agent_role']
+
+
+@pytest.mark.parametrize('lever, specialist', list(CONTROL_ROLES.items()))
+def test_flat_schema_still_rejects_wrong_specialist_for_every_control(monkeypatch, lever, specialist):
+    case = next(case for case in provider_cases() if case['role'] == 'proposal'
+                and list(case['evidence']['supported_changes']) == [lever])
+    invalid = valid_response(case) | {
+        'agent_role': 'batching' if specialist == 'quantization' else 'quantization'}
+    install_transport(monkeypatch, lambda **kwargs: {'choices': [{'finish_reason': 'stop',
+        'message': {'content': json.dumps(invalid)}}]})
+    current = agent()
+    assert current.request('proposal', case['evidence'], 'Inspect') is None
+    assert all(not row['schema_valid'] for row in current.history[0]['attempts'])
 
 
 @pytest.mark.parametrize('status, count', [(401, 1), (403, 1), (429, 2), (500, 2), (None, 2)])
@@ -122,6 +159,14 @@ def test_certificate_binds_actual_wire_schema_and_wrapper(monkeypatch, tmp_path)
     assert wrapped.fork().wire_schema('proposal', provider_cases()[0]['evidence']) == (
         current.wire_schema('proposal', provider_cases()[0]['evidence']))
     assert require_provider_check(path, wrapped)['valid_with_one_retry'] == 34
+    record['endpoint_fingerprint'] = content_hash({
+        'base_url': 'https://api.openai.com/v1', 'provider': 'litellm-openai',
+        'transport_profile': 'sera-litellm-openai-low-2048-flat-root-v1',
+    })
+    path.write_text(json.dumps(record))
+    with pytest.raises(ValueError, match='endpoint'):
+        require_provider_check(path, agent())
+    record['endpoint_fingerprint'] = current.endpoint_fingerprint
     record['requests'][0]['request_schema'] = request_schema('proposal', provider_cases()[0]['evidence'])
     path.write_text(json.dumps(record))
     with pytest.raises(ValueError, match='schema'):
