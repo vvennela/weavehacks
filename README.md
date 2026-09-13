@@ -205,6 +205,8 @@ In plain English: the programs run, but these two smaller models do not yet meet
 
 A separate `experiments.run_structured_quality_pilot` command now tests native JSON decoding for one specified BF16 model at a time. It keeps the eight questions, exact answers, generation limits, and 99% floor. Its schema does not contain the answers. It saves raw responses and diagnostic request latency without repairing output. A passing pilot would establish only this new decoding profile; joint scheduling, a declared smaller-card budget, and a measured concurrent trial would still be needed.
 
+The [Qwen structured-output pilot completed at 7/8](evidence/qwen-structured-quality-v3/README.md): all answers were valid JSON, but filtering was still wrong. Median request latency was 112.60 ms, with a retained 59.21-second filtering outlier. Cleanup passed. This is a quality rejection, not a verified baseline or speedup. The [placement plan](docs/placement-plan.md) separates this quality gate from the remaining shared-runtime work and required budget/latency decisions.
+
 The [saved-results audit](evidence/release-benchmark-audit/README.md) reproduced all 64 saved task grades and the four-load Qwen72B comparison. It found no complete frozen small-model search universe, so a measured grid/random comparison remains unavailable.
 
 ## Verified task requirements
