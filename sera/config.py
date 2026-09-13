@@ -12,6 +12,15 @@ MODEL_REVISION = "c1899de289a04d12100db370d81485cdf75e47ca"
 BASELINE_NAME = "sera-baseline-v1"
 
 
+class Objective(BaseModel):
+    """User priority; quality remains a hard gate, not part of the score."""
+
+    model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
+
+    priority: Literal["latency", "throughput", "memory"] = "latency"
+    min_improvement_fraction: float = Field(default=0.05, ge=0, lt=1)
+
+
 class RuntimeConfig(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
 

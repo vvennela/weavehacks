@@ -5,25 +5,28 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from .config import BASELINE_NAME, MODEL_ID, MODEL_REVISION, Candidate, RuntimeConfig, validate_candidate
-from .measurement import collect_trial, select_candidate, token_agreement
+from .config import BASELINE_NAME, MODEL_ID, MODEL_REVISION, Candidate, Objective, RuntimeConfig, validate_candidate
+from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
 from .runtime import CleanupError, GENERATION, SeraModel
 from .storage import content_hash, save_json
 
 
-def agent_evidence(baseline):
+def agent_evidence(baseline, objective=None):
     from .config import SUPPORTED_CHANGES
     metrics = dict(baseline["reduced"])
     snapshot = baseline.get("metrics", {}).get("after-measurement", {})
     metrics.update(mean_queue_ms=snapshot.get("mean_queue_ms"),
                    mean_ttft_ms=snapshot.get("mean_ttft_ms"),
-                   preemptions=snapshot.get("preemptions"))
+                   preemptions=snapshot.get("preemptions"),
+                   sampled_peak_memory_mib=baseline["runtime"].get("sampled_peak_memory_mib"))
     return {"trial_id": "baseline", "model_id": MODEL_ID, "revision": MODEL_REVISION,
+            "objective": (objective or Objective()).model_dump(),
             "configuration": baseline["runtime"]["configuration"],
             "metrics": metrics, "remaining_trials": 1, "supported_changes": SUPPORTED_CHANGES,
             "baseline_self_check": token_agreement(baseline["quality"], baseline["self_check"]),
             "limitations": ["No measured KV peak in this serial run; idle KV use is not pressure evidence.",
                             "Token agreement does not establish task correctness.",
+                            "Sampled peak memory includes runtime reservation, not just model weights.",
                             "This small sample cannot establish statistical significance."]}
 
 
@@ -55,16 +58,11 @@ class SeraResult:
 
     @property
     def frontier(self):
-        viable = []
-        for trial in self.trials:
-            if trial["trial_id"] == "baseline" or self.report["decision"]["selected"] == "candidate":
-                if trial["status"] == "collected":
-                    viable.append(trial)
-        # The first milestone selects on latency only; full Pareto search is deferred.
-        return sorted(viable, key=lambda trial: trial["reduced"]["p95_latency_ms"])[:1]
+        return measured_frontier(self.report.get("baseline", {}), self.report.get("candidate_trial"))
 
     def _save(self):
         self.report["returned_runtimes"] = [model.record for model in self.models]
+        self.report["frontier_trial_ids"] = [trial["trial_id"] for trial in self.frontier]
         save_json(self.output_dir / "result.json", self.report)
         (self.output_dir / "report.md").write_text(render_summary(self.report, self.output_dir))
 
@@ -92,6 +90,8 @@ def render_summary(report, output_dir):
     lines = ["# Sera single-model result", "", f"Status: {report['status']}",
              f"Selection: {decision.get('selected', 'none')}",
              f"Reason: {decision.get('reason', report.get('error', 'not finished'))}", "",
+             f"Objective: {report.get('objective', Objective().model_dump())}",
+             f"Measured frontier: {report.get('frontier_trial_ids', [])}",
              "Task quality was not verified. The gate checks token agreement, not correct answers.",
              "This is one comparison, not a statistically established speedup.", ""]
     for key, label in (("baseline", "Baseline"), ("candidate_trial", "Candidate")):
@@ -100,6 +100,8 @@ def render_summary(report, output_dir):
             reduced = trial.get("reduced", {})
             lines.append(f"{label}: {trial['status']}; requests={reduced.get('request_count', 'unavailable')}; "
                          f"p95={reduced.get('p95_latency_ms', 'unavailable')} ms; "
+                         f"throughput={reduced.get('output_tokens_per_second', 'unavailable')} output tokens/s; "
+                         f"peak memory={trial.get('runtime', {}).get('sampled_peak_memory_mib', 'unavailable')} MiB; "
                          f"output tokens={reduced.get('output_tokens', 'unavailable')}; "
                          f"startup={trial.get('runtime', {}).get('startup_seconds', 'unavailable')} s.")
     gate = decision.get("candidate_quality")
@@ -111,12 +113,14 @@ def render_summary(report, output_dir):
     return "\n".join(lines)
 
 
-def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None):
+def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
+             objective=None):
     """One measured candidate, fixed or agent-proposed; no joint placement or search claim.
 
     Uses at most 32 supplied prompts, serial load, up to 16 warm-ups, three
     measured passes, and separate quality passes. The caller owns result.close().
     """
+    objective = Objective() if objective is None else Objective.model_validate(objective)
     if models != [MODEL_ID]:
         raise ValueError(f"This milestone requires models=[{MODEL_ID!r}]")
     if not isinstance(prompts, list) or not 1 <= len(prompts) <= 32:
@@ -148,6 +152,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                            "warmup_requests": min(len(prompts), 16),
                            "measured_requests": 3 * len(prompts), "quality_requests": len(prompts)},
               "task_quality_verified": False,
+              "objective": objective.model_dump(),
               "agent_selection": "enabled" if agent is not None else "not-enabled",
               "provider_validation": provider_validation,
               "limits": ["single model", "one candidate", "non-streaming requests",
@@ -166,7 +171,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         trial = None
         if agent is not None and baseline["status"] == "collected" and stable:
             from .agent import validate_proposal
-            evidence = agent_evidence(baseline)
+            evidence = agent_evidence(baseline, objective)
             report["agent_input"] = evidence
             try:
                 proposal = agent.propose(evidence)
@@ -196,16 +201,18 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                          "error": f"{type(error).__name__}: {error}", "runtime": active.record}
             report["candidate_trial"] = trial
             result._save()
-        report["decision"] = select_candidate(baseline, trial)
+        report["decision"] = select_candidate(baseline, trial, objective=objective)
         if agent is not None and trial is None and stable:
             report["decision"]["reason"] = ("agent-kept-baseline" if report.get("proposal_validation") == "passed"
                                              else "agent-proposal-rejected")
         if agent is not None and report.get("proposal"):
             feedback = {"proposal": report["proposal"], "decision": report["decision"],
+                        "objective": objective.model_dump(),
                         "candidate_tested": trial is not None,
                         "baseline_metrics": baseline.get("reduced"),
                         "candidate_metrics": trial.get("reduced") if trial else None,
                         "candidate_status": trial.get("status") if trial else "not-tested",
+                        "frontier_trial_ids": [item["trial_id"] for item in result.frontier],
                         "eligible_trial_ids": [report["decision"]["selected"]]}
             report["agent_feedback"] = feedback
             try:

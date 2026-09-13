@@ -100,6 +100,14 @@ This makes 30 requests using the actual three schemas and synthetic evidence. Ea
 
 After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `provider_check=".../result.json"` to `optimize`. Sera gives the agent the measured baseline, validates one proposal, measures it if legal, applies the unchanged gate, and returns the outcome for a final recommendation. A keep-baseline or invalid proposal consumes no candidate GPU trial. The final agent response cannot change the deterministic selection.
 
+## User priorities
+
+Pass `objective=sera.Objective(priority="throughput")` to `optimize` to maximize measured output tokens per second. Other choices are `"latency"` (default: minimize p95) and `"memory"` (minimize sampled peak total GPU memory, including runtime reservation). The default required relative improvement is 5%; `min_improvement_fraction` can be declared before the run. The 99% token-agreement gate is unchanged for every priority.
+
+The agent receives the priority, and the deterministic selector applies it. `result.frontier` retains quality-valid latency/throughput/memory trade-offs; it is no longer only the fastest trial. Missing metrics remain missing and cannot prove that one trial dominates another. The report includes the objective, frontier IDs, latency, throughput, and peak memory. No dollar-cost model is implemented.
+
+This wiring passes local synthetic checks, including different recommendations from the same measurements when the priority changes. It has not yet passed a new live objective-guided run. The saved FP8 candidate remains rejected under every priority because quality failed. This change does not enable arbitrary models, weight quantization, multi-GPU placement, or loading without a feasible baseline.
+
 ## Cache-pressure pilot
 
 `sera.pressure_pilot.run_pressure_pilot` runs the approved BF16-only profile: GPU memory fraction 0.025, eight concurrent 2,048-token inputs, context limit 4,096, and at most eight sequences. It uses synthetic padding, two warm-ups, and three waves. The predeclared scenario criterion is sampled KV use at least 80% plus at least one measured preemption, with zero request errors and successful cleanup. Otherwise it reports `not-established`. This pilot is separate from answer quality and candidate performance; there is no FP8 trial or automatic tuning.

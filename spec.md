@@ -1,6 +1,6 @@
 # Sera Technical Specification
 
-Status: Hackathon specification; Qwen BF16 and FP8 KV runtime checks passed; task-quality acceptance is under review after the pilot; FP8 weights, GLM, and agent-provider checks are unverified
+Status: Hackathon specification; the eight-prompt live agent rejection/fallback path and provider schema check passed. User-priority selection is locally validated. Full workload acceptance, task-quality acceptance, FP8 weights, GLM, fit-first loading, and broader search remain unfinished.
 
 ## 1. Purpose
 
@@ -151,6 +151,8 @@ Quick mode supplies:
 - A latency-first selection policy
 
 Quick mode must state that task quality was not verified.
+
+The caller can supply `objective=sera.Objective(priority="latency" | "throughput" | "memory", min_improvement_fraction=0.05)`. Latency is the unchanged default. The priority is part of the agent evidence, deterministic decision, and saved report. Throughput means measured output tokens per second; memory means sampled peak total GPU memory during the trial, including runtime reservation. The current priority selector does not implement cost accounting or additional hardware support.
 
 ### 6.2 Verified mode
 
@@ -589,10 +591,14 @@ The recommendation is selected from the frontier in this order:
 
 1. Pass the quality gate.
 2. Pass the latency requirement when supplied.
-3. Minimize p95 end-to-end latency.
+3. Apply the declared objective: minimize p95 end-to-end latency by default, maximize output throughput, or minimize sampled peak GPU memory.
 4. Minimize peak GPU memory as a tie-breaker.
 
 Phase two re-scores the frontier for the smallest configurations that still satisfy the model requirements.
+
+For the implemented one-candidate path, the default required relative improvement remains five percent, now against the declared objective. Callers can declare another nonnegative threshold below one before a run; an exact tie retains the baseline. Missing or invalid objective measurements cannot approve a candidate. Quality and reliability gates apply before selection under every objective. Report measured latency changes even for rejected candidates; reporting a change is not approval. Keep nondominated quality-valid trials as alternatives, including candidates that do not beat the selected objective's threshold. Incomplete measurements cannot establish dominance and must stay visibly unavailable.
+
+The section 19 benchmark and the original first-milestone acceptance remain latency-first with their existing thresholds. Changing a benchmark objective requires a separately declared benchmark; do not reinterpret saved runs as a new passing result.
 
 ## 17. Joint placement
 

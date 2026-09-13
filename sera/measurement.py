@@ -4,6 +4,7 @@ import math
 import time
 
 from .storage import save_json
+from .config import Objective
 
 
 def nearest_rank(values, percentile):
@@ -113,12 +114,56 @@ def token_agreement(reference, candidate):
             "task_quality_verified": False}
 
 
-def select_candidate(baseline, candidate):
+def objective_value(trial, priority):
+    if priority == "memory":
+        value = trial.get("runtime", {}).get("sampled_peak_memory_mib")
+    else:
+        key = "p95_latency_ms" if priority == "latency" else "output_tokens_per_second"
+        value = trial.get("reduced", {}).get(key)
+    return value if type(value) in (int, float) and math.isfinite(value) and value > 0 else None
+
+
+def measured_frontier(baseline, candidate):
+    """Keep quality-valid trade-offs; missing metrics cannot prove dominance."""
+    if (baseline.get("status") != "collected"
+            or not token_agreement(baseline.get("quality", []), baseline.get("self_check", []))["passed"]):
+        return []
+    viable = [baseline]
+    if (candidate and candidate.get("status") == "collected"
+            and baseline.get("input_token_ids") == candidate.get("input_token_ids")
+            and token_agreement(baseline.get("quality", []), candidate.get("quality", []))["passed"]):
+        viable.append(candidate)
+
+    def dominates(left, right):
+        a = [objective_value(left, p) for p in ("latency", "memory", "throughput")]
+        b = [objective_value(right, p) for p in ("latency", "memory", "throughput")]
+        if None in a or None in b:
+            return False
+        no_worse = a[0] <= b[0] and a[1] <= b[1] and a[2] >= b[2]
+        better = a[0] < b[0] or a[1] < b[1] or a[2] > b[2]
+        return no_worse and better
+
+    return [trial for trial in viable if not any(dominates(other, trial) for other in viable)]
+
+
+def select_candidate(baseline, candidate, *, objective=None):
+    objective = Objective() if objective is None else Objective.model_validate(objective)
     self_check = token_agreement(baseline.get("quality", []), baseline.get("self_check", []))
     quality = token_agreement(baseline.get("quality", []), (candidate or {}).get("quality", []))
     decision = {"selected": "baseline", "outcome": "no-safe-improvement",
                 "baseline_self_check": self_check, "candidate_quality": quality,
-                "p95_improvement_fraction": None}
+                "p95_improvement_fraction": None, "objective": objective.model_dump(),
+                "objective_improvement_fraction": None}
+    # Report performance even when quality rejects it; measurement is not approval.
+    baseline_p95 = objective_value(baseline, "latency")
+    candidate_p95 = objective_value(candidate or {}, "latency")
+    if baseline_p95 is not None and candidate_p95 is not None:
+        decision["p95_improvement_fraction"] = 1 - candidate_p95 / baseline_p95
+    before = objective_value(baseline, objective.priority)
+    after = objective_value(candidate or {}, objective.priority)
+    if before is not None and after is not None:
+        gain = (after - before) / before if objective.priority == "throughput" else (before - after) / before
+        decision["objective_improvement_fraction"] = gain
     if baseline.get("status") != "collected":
         reason = "baseline-measurement-failed"
     elif not self_check["passed"]:
@@ -130,17 +175,17 @@ def select_candidate(baseline, candidate):
     elif not quality["passed"]:
         reason = "candidate-quality-failed"
     else:
-        baseline_p95 = baseline["reduced"]["p95_latency_ms"]
-        candidate_p95 = candidate["reduced"]["p95_latency_ms"]
-        if (baseline_p95 is None or candidate_p95 is None or baseline_p95 <= 0
-                or not math.isfinite(baseline_p95) or not math.isfinite(candidate_p95)):
-            reason = "latency-unavailable"
+        gain = decision["objective_improvement_fraction"]
+        if gain is None:
+            reason = "latency-unavailable" if objective.priority == "latency" else "objective-metric-unavailable"
         else:
-            decision["p95_improvement_fraction"] = 1 - candidate_p95 / baseline_p95
-            if candidate_p95 <= baseline_p95 * 0.95:
+            if gain > 0 and (gain >= objective.min_improvement_fraction
+                             or math.isclose(gain, objective.min_improvement_fraction, rel_tol=1e-12)):
                 decision.update(selected="candidate", outcome="improved")
-                reason = "quality-passed-and-p95-improved-at-least-five-percent"
+                reason = ("quality-passed-and-p95-improved-at-least-five-percent"
+                          if objective == Objective() else "quality-passed-and-objective-improved")
             else:
-                reason = "p95-improvement-below-five-percent"
+                reason = ("p95-improvement-below-five-percent" if objective == Objective()
+                          else "objective-improvement-below-threshold")
     decision["reason"] = reason
     return decision

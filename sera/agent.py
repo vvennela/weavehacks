@@ -175,7 +175,10 @@ class WandbAgent:
             "Propose one supported single-setting experiment, or keep-baseline with null setting/value "
             "and cost zero. Use a quantization or batching role. Cite exact available metric names in "
             "evidence_used. State a prediction and how measured evidence would refute it. "
-            "Respect supported_changes and remaining_trials.")
+            "Respect supported_changes and remaining_trials. When an objective is supplied, target "
+            "that priority: lower p95 latency, higher output throughput, or lower sampled peak memory. "
+            "Quality remains a hard gate. Do not assume lower weight or cache precision lowers total "
+            "reserved GPU memory, and do not invent cost savings.")
 
     def review(self, evidence):
         return self.request("frontier", evidence,

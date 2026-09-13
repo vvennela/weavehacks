@@ -6,7 +6,7 @@ Sera is a Python library that gives any developer fast model inference without r
 
 ## Central pitch
 
-Give Sera your models and representative prompts. Sera finds a fast, memory-efficient configuration on the available hardware and returns a model that is ready to use.
+Give Sera your models, representative prompts, and priorities. Sera tests ways to run the workload on the available hardware and returns usable models with the best measured configuration for those priorities. Latency, throughput, and memory can favor different plans; quality remains a hard constraint.
 
 Behind one simple call, a team of inference specialists chooses useful experiments, learns from failed trials, and avoids wasting GPU time on a full grid search. Sera does not guess that an optimization works. It runs the model and proves what changed.
 
@@ -33,6 +33,7 @@ import sera
 result = sera.optimize(
     models=["org/model-a", "org/model-b"],
     prompts=prompts,
+    objective=sera.Objective(priority="latency"),
 )
 
 result.print_summary()
@@ -56,6 +57,10 @@ Sera establishes a baseline for each model. It then measures the run and gives a
 An arbiter ranks the proposals and spends the experiment budget on the strongest candidates. A deterministic validator rejects illegal settings and configurations that cannot fit before they consume GPU time.
 
 Each surviving candidate is loaded, warmed up, tested with representative work, and checked for quality. Sera records successful trials, failed trials, and reverts. It keeps a frontier of useful configurations instead of selecting only the fastest result.
+
+The user can prioritize latency, throughput, or memory. Latency remains the default. The selected priority reaches the agents and the deterministic selector, and is saved with the evidence. Cost optimization requires explicit resource prices and accounting; Sera must not infer a dollar cost from memory use alone.
+
+A model that cannot fit before optimization needs a separate fit-first path: reject impossible loading plans before execution, propose supported weight quantization and placement, then verify a feasible plan against the user's task requirements. An unavailable unquantized baseline cannot supply local latency or token-agreement evidence. This path is not yet implemented; the working prototype still requires the pinned Qwen baseline to start.
 
 ### Phase 2: optimize the models together
 
