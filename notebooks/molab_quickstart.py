@@ -2,7 +2,7 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "marimo==0.24.2",
-#     "sera-inference[swarm,litellm] @ git+https://github.com/vvennela/weavehacks.git@main",
+#     "sera-inference[swarm,litellm] @ git+https://github.com/vvennela/weavehacks.git@f6e0ffdda2be7cb90fb3458688e4b5ffdeea9138",
 # ]
 # ///
 """Two small real Sera examples. Keys start blank; paid work requires a click."""
