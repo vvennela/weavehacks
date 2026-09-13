@@ -2,6 +2,43 @@
 
 Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
 
+## Demo rehearsal: plain-English guide
+
+### What we are building
+
+Sera helps someone run an AI model on the GPU they have. A GPU is the hardware that runs the model, and its memory limits how large a model it can hold. Sera checks possible settings, asks an AI agent to recommend a plan, tests that plan, and returns a model the user can actually use. It must reject a plan when the answers fail the user's checks.
+
+Our long-term goal is like choosing a route home: the best plan depends on whether the user cares most about response time, how much work gets done, or memory use. Today we have proven one important part: making a model fit and checking that it works. We have not yet proven that Sera finds the best route among many choices.
+
+### What we have proven
+
+- The original Qwen72B model needs about 135 GiB just for its saved weights. Those weights cannot fit in our GPU's roughly 96 GB of memory.
+- The recommendation agent chose FP8 weight quantization. In plain English, this stores most model weights using fewer bits. That saves memory, but can change answers, so it needs a quality check.
+- Sera loaded the original weights and applied that change during loading. We did not substitute a separately downloaded, already-compressed model.
+- The running model passed all eight easy questions, including the required answer format. Sera then returned a usable model, and a fresh question also passed.
+- All 24 timed requests completed. The measured p95 response time was 573 milliseconds: at least 95% of those requests finished within that time. Peak GPU memory was 86.38 GiB.
+- Sera saved the evidence and released the GPU after the test. The agent's final-review wording needed a fix; a separate review of the saved evidence then passed. Both records remain available.
+
+These are small, specific checks, not proof that the model answers every question correctly. We have not demonstrated a speedup over the original model, because the original model could not fit. We have not yet demonstrated best-plan search or two models sharing the GPU.
+
+### Three-minute walkthrough
+
+1. **Explain the problem:** “I want to run this large model, but its original weights are too large for my GPU.” Show the BF16 plan marked as not fitting. BF16 is the original weight format.
+2. **Show the recommendation:** “Sera's agent recommended using fewer bits for the weights. Sera checks the plan before trying it.” Show the selected FP8 plan and its reason.
+3. **Show the proof:** “The model loaded, all eight questions passed, and we measured response time and memory.” Open the saved answers and the Weave trace, which records the run and the agent's messages.
+4. **Show a usable result:** If the live runner is ready, enter a new question. Explain that this answer is a fresh request, not a saved answer. An open-ended new question is not automatically scored by our eight-question test.
+5. **Close with the limit:** “We have proven that Sera can make this large model fit, verify it on a supplied task, and give back a working model. Next we will compare more plans and choose according to the user's priority.”
+
+### Before presenting
+
+- Open the recorded demo first. From the repository root, run `uvx marimo@0.24.0 edit demo.py --sandbox`. This uses saved real results and needs no GPU or API key. The Molab notebook also shows this summary near the top.
+- For live inference, ask the technical partner to use the live command under “Large-model fit-first path” with `--interactive`. Use the supplied Linux GPU environment, not a laptop without that GPU. Keep the W&B API key in the environment; never put it on a slide or in a recording.
+- Prepare the model download before the talk. In the completed run, server startup took 71 seconds after download. That startup cost is separate from the 573 ms request measurement. Start early and leave the returned runner open.
+- Rehearse one fresh prompt, then confirm how to stop: blank input closes the interactive runner. Do not close it just before the live part.
+- If the live service fails, use the recorded demo and say: “This is a saved real GPU run, not live inference.” Do not present saved output as a fresh answer.
+
+Current rehearsal status: the recorded notebook executes and its Molab view has been inspected. The underlying live pipeline and fresh returned-runner request passed. The separate interactive demo command still needs an end-to-end rehearsal; do not describe that rehearsal as complete yet.
+
 ## Current implementation
 
 The large-model deployment path passed on the supplied RTX PRO 6000: reject the non-fitting BF16 plan → agent selects FP8 weights → load original Qwen2.5-72B weights with online quantization → pass all eight strict tasks → return a runner → pass a fresh request → save report and Weave trace → clean up. Measured p95 was 573 ms and peak total GPU memory was 86.38 GiB. See [the result and limits](evidence/large-fit-v1/README.md). The original final-agent review exposed an ambiguous prediction contract; that record is preserved and the review question has been corrected.
