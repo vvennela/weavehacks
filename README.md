@@ -2,17 +2,27 @@
 
 Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
 
-The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. Expanded Luna/Astra live validation is pending; earlier evidence below used the old menu.
+The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The expanded search has measured a caching improvement; complete Luna/Astra stopping-sequence validation is in progress.
 
 ## Demo rehearsal: plain-English guide
 
-### Latest swarm recording
+### Current expanded loop
+
+The implementation and connection-retry fix pass 849 local tests. [Luna](evidence/provider-luna-expanded-v1/README.md) and [Astra](evidence/provider-astra-expanded-v1/README.md) each passed all 34 current schema cases without a retry.
+
+The [first expanded Luna run](evidence/live-luna-expanded-v1/README.md) found **18.85% lower p95 latency** by enabling prefix caching, with all eight tasks still passing. A second experiment reduced the batch-token budget and did not improve latency. The generator then offered a combination, but a controller connection failure interrupted the confirmation round. Sera returned the measured caching winner and passed a fresh request. The result and failure are preserved; Astra and a fresh Luna run are checking the complete sequence.
+
+For a nontechnical partner: “Three specialists inspect the measurements and model answers. Each gets up to eight legal options. They share findings, then a decision agent chooses one experiment. Sera runs it, checks answer quality and speed, and gives the result back to the specialists. The menu changes as results arrive. Two changes that passed separately can be combined, but the combination must be tested too. The loop can keep running while it makes useful progress; after no progress, it permits one confirmation before stopping.”
+
+There is one three-investigator Luna swarm and a separate three-investigator Astra swarm. Their GPU measurements run one after another on the same card. Eight is an option-list limit, not a total trial budget. The measured traffic repeats eight questions after warmup; prefix-cache gains apply to that reuse pattern, not all possible traffic. A startup failure is not a measured performance plateau.
+
+### Earlier uncapped Luna recording
 
 The [uncapped Luna run](evidence/live-luna-plateau-v2/README.md) completed **three GPU trial attempts across two swarm rounds**, using three parallel Luna investigators, shared findings, an arbiter, and Weave evidence reads. No total trial-count cap or controller request cap was set. The FP8 deployment passed all eight tasks. A batching change also passed, but improved p95 latency by only **0.096%**, below the 5% target. The automatic confirmation experiment changed the context limit to 256 and failed during vLLM startup. Sera rejected it, returned the working reference, passed another request, and released GPU memory.
 
 For the presentation, say: “The team recommended an experiment, measured it, used the result to choose another experiment, handled its startup failure, and returned a working model without asking us to choose settings.” Open the [live Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09acd-b8f9-7c5f-bbc2-7520c8f64163): it contains 352 completed calls, including 31 typed agent responses. These counts are not GPU trial counts.
 
-The control-flow audit passes. **A measured performance plateau and a useful speedup are not established:** the confirmation attempt produced no latency measurement. The internal stop label `objective-plateau-confirmed` counts failed attempts as no progress; it is not a statistical conclusion. Automatic candidate generation still makes a small pool once from the reference measurements, not an expanding search across arbitrary settings. All three investigators chose the same setting in each round; this run does not prove the swarm beats one agent. The independent audit confirms all 31 Luna responses and both measured quality scores, but finds incorrect diagnosis-call citations in both final trial reviews. See the linked evidence for the exact command and remaining limits.
+The control-flow audit passes. **A measured performance plateau and a useful speedup are not established:** the confirmation attempt produced no latency measurement. The internal stop label `objective-plateau-confirmed` counts failed attempts as no progress; it is not a statistical conclusion. That saved release generated a small pool once from the reference measurements; it did not use the new expanding search. All three investigators chose the same setting in each round; this run does not prove the swarm beats one agent. The independent audit confirms all 31 Luna responses and both measured quality scores, but finds incorrect diagnosis-call citations in both final trial reviews. See the linked evidence for the exact command and remaining limits.
 
 ### Earlier swarm recordings
 
