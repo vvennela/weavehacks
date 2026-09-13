@@ -235,6 +235,7 @@ def test_controller_services_distinct_requests_once_and_bounds_concurrency(tmp_p
         items.append(item)
     class Relay:
         def connect(self): pass
+        def status(self, request_id, **response): return 'pending'
         def pending(self, limit): return items[:limit]
         def publish(self, request_id, **response): published.append((request_id, response))
     published = []
@@ -257,6 +258,7 @@ def test_controller_publishes_safe_error_without_exception_details(tmp_path, mon
     published = []
     class Relay:
         def connect(self): pass
+        def status(self, request_id, **response): return 'pending'
         def pending(self, limit): return [request()]
         def publish(self, request_id, **response): published.append(response)
     def fail(*args):
@@ -270,12 +272,233 @@ def test_uncapped_controller_exceeds_hundred_requests_and_stops_when_idle(tmp_pa
     published = []
     class Relay:
         def connect(self): pass
+        def status(self, request_id, **response): return 'pending'
         def pending(self, limit):
             if len(published) >= 102:
                 return []
             return [request() | {'request_id': f'{len(published):032x}'}]
         def publish(self, request_id, **response): published.append(request_id)
     monkeypatch.setattr(controller, 'run_request', lambda item, output_dir: {'model': item['model']})
-    tick = iter(range(10000))
-    monkeypatch.setattr(controller.time, 'monotonic', lambda: next(tick))
+    fake_time(monkeypatch)
     assert controller.serve(Relay(), tmp_path, max_requests=None, idle_timeout=.1) == 102
+
+
+class FakeClock:
+    now = 1000.0
+    def time(self): return self.now
+    def sleep(self, seconds): self.now += seconds
+
+
+def fake_time(monkeypatch):
+    clock = FakeClock()
+    monkeypatch.setattr(controller.time, 'time', clock.time)
+    monkeypatch.setattr(controller.time, 'monotonic', clock.time)
+    monkeypatch.setattr(controller.time, 'sleep', clock.sleep)
+    return clock
+
+
+def test_controller_recovers_after_more_than_three_transport_failures(tmp_path, monkeypatch, capsys):
+    fake_time(monkeypatch)
+    calls = []
+    def run(command, **kwargs):
+        calls.append(kwargs['input'])
+        if len(calls) <= 5:
+            return subprocess.CompletedProcess(command, 1, '', 'PRIVATE_TOKEN')
+        output = 'help' if 'help(cm)' in kwargs['input'] else 'SERA_RELAY_DATA []\n'
+        return subprocess.CompletedProcess(command, 0, output, '')
+    monkeypatch.setattr(controller, 'run_process', run)
+    relay = controller.MarimoRelay('https://example.test/', '/pair.sh', '/relay')
+    assert controller.serve(relay, tmp_path, idle_timeout=30) == 0
+    assert len(calls) > 5
+    events = [json.loads(line) for line in (tmp_path / 'recovery.jsonl').read_text().splitlines()]
+    assert any(event['event'] == 'transport-recovered' for event in events)
+    assert 'PRIVATE_TOKEN' not in capsys.readouterr().out + json.dumps(events)
+
+
+def test_publish_ack_loss_is_reconciled_without_duplicate_write_or_lm(tmp_path, monkeypatch):
+    fake_time(monkeypatch)
+    writes = []
+    lm = []
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit): return [request()]
+        def status(self, request_id, **response):
+            return 'published' if writes else 'pending'
+        def publish(self, request_id, **response):
+            writes.append(response)
+            raise controller.RelayTransportError('PRIVATE_TOKEN')
+    monkeypatch.setattr(controller, 'run_request', lambda *args: lm.append(1) or {'model': 'gpt-5.6-luna'})
+    assert controller.serve(Relay(), tmp_path, max_requests=1) == 1
+    assert len(writes) == len(lm) == 1
+
+
+def test_outage_stops_at_idle_deadline(tmp_path, monkeypatch):
+    clock = fake_time(monkeypatch)
+    class Relay:
+        def connect(self): raise controller.RelayTransportError('PRIVATE_TOKEN')
+    with pytest.raises(controller.RecoveryTimeout):
+        controller.serve(Relay(), tmp_path, idle_timeout=7)
+    assert clock.now == 1007
+
+
+def test_expiry_during_publish_outage_does_not_write_late(tmp_path, monkeypatch):
+    clock = fake_time(monkeypatch)
+    writes = []
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit): return [request() | {'expires_at': 1003}]
+        def status(self, request_id, **response): raise controller.RelayTransportError('secret')
+        def publish(self, *args, **kwargs): writes.append(1)
+    monkeypatch.setattr(controller, 'run_request', lambda *args: {'model': 'gpt-5.6-luna'})
+    assert controller.serve(Relay(), tmp_path, max_requests=1) == 1
+    assert not writes
+    assert clock.now == 1003
+
+
+def test_restart_reuses_saved_delivery_without_second_lm_call(tmp_path, monkeypatch):
+    fake_time(monkeypatch)
+    responses = []
+    calls = []
+    class Relay:
+        broken = True
+        def connect(self): pass
+        def pending(self, limit): return [request()]
+        def status(self, request_id, **response):
+            if self.broken:
+                raise controller.RelayTransportError('secret')
+            return 'pending'
+        def publish(self, request_id, **response): responses.append(response)
+    relay = Relay()
+    body = controller.response_envelope('gpt-5.6-luna', '{}', [{'type': 'turn.completed'}])
+    monkeypatch.setattr(controller, 'run_request', lambda *args: calls.append(1) or body)
+    with pytest.raises(controller.RecoveryTimeout):
+        controller.serve(relay, tmp_path, max_requests=1, idle_timeout=3)
+    relay.broken = False
+    assert controller.serve(relay, tmp_path, max_requests=1) == 1
+    assert len(calls) == len(responses) == 1
+
+
+def test_existing_incomplete_request_is_not_reissued(tmp_path, monkeypatch):
+    directory = tmp_path / request()['request_id']
+    directory.mkdir()
+    (directory / 'request.json').write_text(json.dumps(request()))
+    monkeypatch.setattr(controller, 'run_process', lambda *a, **k: pytest.fail('second LM invocation'))
+    with pytest.raises(RuntimeError, match='incomplete'):
+        controller.run_request(request(), tmp_path)
+
+
+def test_restart_recovers_completed_cli_artifacts_and_checks_request_identity(tmp_path, monkeypatch):
+    directory = tmp_path / request()['request_id']
+    directory.mkdir()
+    (directory / 'request.json').write_text(json.dumps(request()))
+    (directory / 'final.txt').write_text('{"action":"trial"}')
+    (directory / 'events.jsonl').write_text('{"type":"turn.completed"}\n')
+    (directory / 'completion.json').write_text('{"returncode":0}')
+    monkeypatch.setattr(controller, 'run_process', lambda *a, **k: pytest.fail('second LM invocation'))
+    assert controller.run_request(request(), tmp_path)['choices'][0]['message']['content'] == '{"action":"trial"}'
+    changed = deepcopy(request())
+    changed['payload']['messages'][0]['content'] = 'different prompt'
+    with pytest.raises(ValueError, match='identity'):
+        controller.run_request(changed, tmp_path)
+
+
+def test_idle_poll_timeout_is_a_clean_stop(tmp_path, monkeypatch):
+    clock = fake_time(monkeypatch)
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit):
+            clock.sleep(4)
+            raise controller.RecoveryTimeout('deadline')
+    assert controller.serve(Relay(), tmp_path, idle_timeout=4) == 0
+
+
+def test_ack_lost_at_expiry_can_be_confirmed_without_second_write(tmp_path, monkeypatch):
+    clock = fake_time(monkeypatch)
+    writes = []
+    reads = []
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit): return [request() | {'expires_at': 1003}]
+        def status(self, request_id, **response):
+            reads.append(clock.now)
+            return 'published' if writes else 'pending'
+        def publish(self, request_id, **response):
+            writes.append(response)
+            clock.sleep(3)
+            raise controller.RelayTransportError('lost ACK')
+    monkeypatch.setattr(controller, 'run_request', lambda *args: {'model': 'gpt-5.6-luna'})
+    assert controller.serve(Relay(), tmp_path, max_requests=1) == 1
+    assert len(writes) == 1 and reads == [1000, 1003]
+    assert 'response-delivered' in (tmp_path / 'recovery.jsonl').read_text()
+
+
+def test_publish_not_committed_is_retried_only_after_missing_response_read(tmp_path, monkeypatch):
+    fake_time(monkeypatch)
+    operations = []
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit): return [request()]
+        def status(self, *args, **kwargs):
+            operations.append('read-missing')
+            return 'pending'
+        def publish(self, *args, **kwargs):
+            operations.append('publish')
+            if operations.count('publish') == 1:
+                raise controller.RelayTransportError('outage')
+    monkeypatch.setattr(controller, 'run_request', lambda *args: {'model': 'gpt-5.6-luna'})
+    controller.serve(Relay(), tmp_path, max_requests=1)
+    assert operations == ['read-missing', 'publish', 'read-missing', 'publish']
+
+
+@pytest.mark.parametrize('saved', ['{', '{}', '{"request":{},"response":{"error":"secret"}}'])
+def test_corrupt_saved_delivery_fails_closed_without_any_lm_or_publish(tmp_path, monkeypatch, saved):
+    directory = tmp_path / request()['request_id']
+    directory.mkdir()
+    (directory / 'delivery.json').write_text(saved)
+    monkeypatch.setattr(controller, 'run_request', lambda *a: pytest.fail('LM invocation'))
+    with pytest.raises(ValueError):
+        controller.prepare_response(request(), tmp_path)
+
+
+def test_remote_conflict_stops_without_overwrite(tmp_path, monkeypatch):
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit): return [request()]
+        def status(self, *args, **kwargs): return 'conflict'
+        def publish(self, *args, **kwargs): pytest.fail('overwritten')
+    monkeypatch.setattr(controller, 'run_request', lambda *args: {'model': 'gpt-5.6-luna'})
+    with pytest.raises(ValueError, match='conflicts'):
+        controller.serve(Relay(), tmp_path, max_requests=1)
+
+
+def test_second_controller_cannot_share_output_directory(tmp_path):
+    with (tmp_path / '.controller.lock').open('a') as lock:
+        controller.fcntl.flock(lock, controller.fcntl.LOCK_EX | controller.fcntl.LOCK_NB)
+        with pytest.raises(RuntimeError, match='another controller'):
+            controller.serve(object(), tmp_path)
+
+
+@pytest.mark.parametrize('response', [{}, {'error': 'PRIVATE_TOKEN'}, {'body': {}},
+                                     {'body': {}, 'error': 'timeout'}, None])
+def test_invalid_saved_response_fails_closed(tmp_path, monkeypatch, response):
+    directory = tmp_path / request()['request_id']
+    directory.mkdir()
+    (directory / 'delivery.json').write_text(json.dumps(dict(request=request(), response=response)))
+    monkeypatch.setattr(controller, 'run_request', lambda *a: pytest.fail('LM invocation'))
+    with pytest.raises(ValueError):
+        controller.prepare_response(request(), tmp_path)
+
+
+def test_expired_request_in_batch_does_not_block_live_request(tmp_path, monkeypatch):
+    fake_time(monkeypatch)
+    invoked = []
+    expired = request() | {'expires_at': 999}
+    live = request() | {'request_id': 'b' * 32, 'expires_at': 1100}
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit): return [expired, live][:limit]
+        def status(self, *args, **kwargs): return 'pending'
+        def publish(self, *args, **kwargs): pass
+    monkeypatch.setattr(controller, 'run_request', lambda item, _: invoked.append(item['request_id']) or {})
+    assert controller.serve(Relay(), tmp_path, max_requests=2, idle_timeout=1) == 1
+    assert invoked == ['b' * 32]

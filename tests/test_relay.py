@@ -8,7 +8,33 @@ from types import SimpleNamespace
 import pytest
 
 from sera.agent import WandbAgent
-from sera.relay import RelayAgent, pending_requests, publish_response
+from sera.relay import RelayAgent, pending_requests, publish_response, response_status
+
+
+def test_response_reconciliation_distinguishes_missing_matching_and_conflicting(tmp_path):
+    request_id = 'a' * 32
+    record = dict(request_id=request_id, provider='codex-relay', model='gpt-5.6-luna',
+                  project='test/project', payload=payload(), expires_at=time.time() + 60)
+    path = tmp_path / f'{request_id}.request.json'
+    path.write_text(json.dumps(record))
+    assert response_status(tmp_path, request_id, body=envelope()) == 'pending'
+    publish_response(tmp_path, request_id, body=envelope())
+    before = (tmp_path / f'{request_id}.response.json').read_bytes()
+    assert response_status(tmp_path, request_id, body=envelope()) == 'published'
+    assert response_status(tmp_path, request_id, error='timeout') == 'conflict'
+    record['expires_at'] = 1
+    path.write_text(json.dumps(record))
+    assert response_status(tmp_path, request_id, body=envelope()) == 'published'
+    assert (tmp_path / f'{request_id}.response.json').read_bytes() == before
+
+
+def test_reconciliation_never_creates_expired_or_missing_response(tmp_path):
+    request_id = 'a' * 32
+    record = dict(request_id=request_id, provider='codex-relay', model='gpt-5.6-luna',
+                  project='test/project', payload=payload(), expires_at=1)
+    (tmp_path / f'{request_id}.request.json').write_text(json.dumps(record))
+    assert response_status(tmp_path, request_id, error='timeout') == 'expired'
+    assert not list(tmp_path.glob('*.response.json'))
 
 
 def payload(model='gpt-5.6-luna'):

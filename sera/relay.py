@@ -64,7 +64,7 @@ def _publish(path, record):
             temporary.unlink()
 
 
-def _validate_request(record, request_id):
+def _validate_request(record, request_id, *, allow_expired=False):
     if record.get('request_id') != _request_id(request_id):
         raise ValueError('Relay request ID does not match file')
     if record.get('provider') != 'codex-relay' or record.get('model') not in MODELS:
@@ -75,7 +75,7 @@ def _validate_request(record, request_id):
     if (not isinstance(deadline, (int, float)) or isinstance(deadline, bool)
             or not math.isfinite(deadline)):
         raise ValueError('Relay deadline must be finite')
-    if deadline <= time.time():
+    if not allow_expired and deadline <= time.time():
         raise ValueError('Relay request expired')
     payload = record.get('payload')
     if not isinstance(payload, dict) or payload.get('model') != record['model']:
@@ -130,16 +130,35 @@ def publish_response(relay_dir, request_id, body=None, error=None):
     request_id = _request_id(request_id)
     directory = _directory(relay_dir)
     request = _validate_request(_read(directory / f'{request_id}.request.json'), request_id)
+    response = _response_record(request, body, error)
+    _publish(directory / f'{request_id}.response.json', response)
+    return {'request_id': request_id, 'published': True}
+
+
+def _response_record(request, body, error):
     if (body is None) == (error is None):
         raise ValueError('Supply exactly one response body or safe error code')
     if error is not None:
         if not isinstance(error, str) or error not in ERROR_CODES:
             raise ValueError('Unknown relay error code')
-        response = {'request_id': request_id, 'error': error}
+        response = {'request_id': request['request_id'], 'error': error}
     else:
-        response = {'request_id': request_id, 'body': _validate_body(body, request['model'])}
-    _publish(directory / f'{request_id}.response.json', response)
-    return {'request_id': request_id, 'published': True}
+        response = {'request_id': request['request_id'], 'body': _validate_body(body, request['model'])}
+    return response
+
+
+def response_status(relay_dir, request_id, body=None, error=None):
+    """Reconcile a lost publish acknowledgement without changing any record."""
+    request_id = _request_id(request_id)
+    directory = _directory(relay_dir)
+    request = _validate_request(_read(directory / f'{request_id}.request.json'),
+                                request_id, allow_expired=True)
+    expected = _response_record(request, body, error)
+    try:
+        actual = _read(directory / f'{request_id}.response.json')
+    except FileNotFoundError:
+        return 'expired' if request['expires_at'] <= time.time() else 'pending'
+    return 'published' if actual == expected else 'conflict'
 
 
 class RelayAgent(WandbAgent):
