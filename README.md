@@ -6,6 +6,8 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 ### Latest swarm recording
 
+The [corrected-evidence replay](evidence/failure-replay-v2/README.md) still fails reasoning acceptance. All three investigators read evidence in both rounds. Their inputs now include the actual 85–109-token prompt lengths and 94.375-token average, but they still claim 2,265 tokens per request. Round one selected a legal batching proposal; round two proposed unavailable FP8 KV with no trial budget, and validation rejected every proposal. No GPU trial ran. Clearer data did not solve the peer-copying problem. The [readiness audit](docs/demo-readiness.md) keeps the full goal open.
+
 The [two-iteration GPU run](evidence/live-swarm-investigation-v1/README.md) is saved with its [Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a31-ec01-7c30-86cd-c51337b414a9). Three investigators compared findings. The context candidate crashed at startup; the batch candidate passed quality but gained only 0.054%, below 5%. Sera returned the working baseline and released the GPU.
 
 The run exposed a real gap: round two skipped fresh failure inspections and repeated incorrect token-count explanations. The updated code requires a successful failure inspection and exposes the specific startup-error record, with source hashes. A startup crash is not a measured quality failure; an observed kernel error is not proof of its underlying cause.

@@ -2,6 +2,8 @@
 
 Read-only audit of main `17255ae`, the product/specification, implementation, and saved evidence. No new tests, provider requests, or GPU trials were run for this note.
 
+Later checkpoint: source `679cfa4` exposes the missing prompt-length summary and per-load averages. The [offline arithmetic check](../evidence/token-evidence-audit-v1.json), 691 local tests, and [isolated wheel check](../evidence/local-wheel-check-v1.json) passed. The [corrected hosted replay](../evidence/failure-replay-v2/README.md) still failed factual reasoning and correct stopping despite receiving those fields. All six phases read evidence; round two proposed unavailable FP8 KV and validation rejected it. No new GPU trial ran. This resolves the evidence-unit omission, not the swarm-acceptance or full-release gaps below.
+
 **The available fallback is a recorded demonstration of working single-model deployment and guarded experiments. The requested autonomous swarm is not yet accepted. The full product is not complete.** A successful earlier milestone does not close the renewed goal.
 
 The latest user priority is the single-model investigative swarm before joint placement. This sets work order; it does not silently remove the broader product requirements. [Product](../product.md), [specification sections 23.1a–23.3](../spec.md), and the latest user direction govern acceptance. The older checkpoints in [plan.md](../plan.md) and [vishnu.md](../vishnu.md) are historical, not proof that the current goal is complete.
