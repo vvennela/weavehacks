@@ -85,6 +85,8 @@ class TracedInvestigationAgent:
                     malformed |= message is not None and not isinstance(message, dict)
                     message = message if isinstance(message, dict) else {}
                     record = {'model': entry.get('model', self.model), 'role': entry.get('role'),
+                              'provider': entry.get('provider', self.provider),
+                              'response_envelope_synthetic': bool(body.get('synthetic')) if isinstance(body, dict) else False,
                               'attempt': attempt.get('attempt'), 'finish_reason': choice.get('finish_reason'),
                               'content': message.get('content') if isinstance(message.get('content'), str) else None,
                               'latency_ms': attempt.get('latency_ms'), 'schema_valid': attempt.get('schema_valid'),
@@ -106,6 +108,10 @@ class TracedInvestigationAgent:
     @property
     def project(self):
         return self._agent.project
+
+    @property
+    def provider(self):
+        return getattr(self._agent, 'provider', 'wandb')
 
     @property
     def history(self):
@@ -193,6 +199,8 @@ def main(argv=None):
     parser.add_argument('--project', required=True)
     parser.add_argument('--agent-model', default=AGENT_MODEL,
                         help='Hosted investigator model; must match the provider certificate')
+    parser.add_argument('--agent-provider', choices=['wandb', 'codex-relay'], default='wandb')
+    parser.add_argument('--relay-dir', help='Shared request directory for the local Codex controller')
     parser.add_argument('--provider-check', required=True, help='Current passing 30-case certificate')
     parser.add_argument('--output-dir', required=True, help='A new evidence directory')
     parser.add_argument('--priority', choices=['latency', 'throughput', 'memory'], default='latency')
@@ -207,6 +215,8 @@ def main(argv=None):
             raise ValueError('output-dir must be a new directory')
         if not args.project.strip():
             raise ValueError('project must be nonempty')
+        if (args.agent_provider == 'codex-relay') != bool(args.relay_dir):
+            raise ValueError('--relay-dir is required only with --agent-provider codex-relay')
         if args.swarm and args.no_weave:
             raise ValueError('--swarm requires Weave; remove --no-weave')
         if args.fit_first and args.model != LARGE_MODEL_ID:
@@ -228,7 +238,11 @@ def main(argv=None):
         frozen_space = (None if args.auto_space else resolve_investigation_space(
             space, baseline=reference, model_id=args.model, workload=workload))
         cases = load_cases(CASES_PATH)
-        agent = sera.WandbAgent(project=args.project, model=args.agent_model)
+        if args.agent_provider == 'codex-relay':
+            from sera.relay import RelayAgent
+            agent = RelayAgent(project=args.project, model=args.agent_model, relay_dir=args.relay_dir)
+        else:
+            agent = sera.WandbAgent(project=args.project, model=args.agent_model)
         certificate = require_provider_check(args.provider_check, agent)
         if not os.environ.get('WANDB_API_KEY'):
             raise ValueError('WANDB_API_KEY must be set in this process')
@@ -243,6 +257,7 @@ def main(argv=None):
         return grade_case(by_prompt[prompt[-1]['content']], output)['passed']
 
     invocation = {'schema_version': 'sera-live-investigation-invocation-v1', 'passed': False,
+                  'agent_provider': args.agent_provider, 'agent_model': args.agent_model,
                   'model_id': args.model, 'budget': budget.model_dump(),
                   'fit_first': args.fit_first,
                   'automatic_space': args.auto_space,

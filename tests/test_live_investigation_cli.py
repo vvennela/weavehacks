@@ -170,6 +170,41 @@ def test_no_weave_is_explicit_and_keeps_local_evidence(cli, monkeypatch, tmp_pat
     assert type(observed['kwargs']['agent']) is cli.sera.WandbAgent
 
 
+def test_codex_relay_reaches_fit_first_without_changing_constraints(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+
+    class RelayAgent(cli.sera.WandbAgent):
+        provider = 'codex-relay'
+
+        def __init__(self, *, project, model, relay_dir):
+            super().__init__(project=project, model=model)
+            self.relay_dir = relay_dir
+
+    monkeypatch.setitem(sys.modules, 'sera.relay', SimpleNamespace(RelayAgent=RelayAgent))
+    args = arguments(tmp_path, LARGE_MODEL_ID) + [
+        '--fit-first', '--agent-provider', 'codex-relay', '--agent-model', 'gpt-6-astra',
+        '--relay-dir', str(tmp_path / 'relay')]
+    assert cli.main(args) == 0
+    agent = observed['kwargs']['agent']
+    assert agent.model == 'gpt-6-astra' and agent.provider == 'codex-relay'
+    assert observed['kwargs']['baseline_configuration'] is None
+    assert observed['kwargs']['constraints'].quality_floor == .99
+    assert observed['kwargs']['budget'].max_candidate_trials == 2
+    saved = json.loads((tmp_path / 'run/invocation.json').read_text())
+    assert saved['agent_provider'] == 'codex-relay'
+    assert saved['agent_model'] == 'gpt-6-astra'
+
+
+@pytest.mark.parametrize('extra', [
+    ['--agent-provider', 'codex-relay'], ['--relay-dir', '/unused/relay'],
+])
+def test_relay_options_are_validated_before_provider_calls(cli, monkeypatch, tmp_path, extra):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit):
+        cli.main(arguments(tmp_path) + extra)
+    assert observed['calls'] == []
+
+
 def test_existing_output_is_not_overwritten(cli, monkeypatch, tmp_path):
     observed = install_boundaries(cli, monkeypatch, tmp_path)
     folder = tmp_path/'run'

@@ -230,3 +230,52 @@ def test_certificate_retries_invalid_metric_but_does_not_count_it_as_first_valid
     record['requests'][3]['attempts'].insert(0, deepcopy(failed))
     with pytest.raises(ValueError, match='29 first-pass'):
         verify(tmp_path, record)
+
+
+def test_provider_certificate_cannot_cross_transports(tmp_path):
+    record = certificate()
+    path = tmp_path / 'result.json'
+    path.write_text(json.dumps(record))
+    relay = SimpleNamespace(model=AGENT_MODEL, project='test/project', provider='codex-relay')
+    with pytest.raises(ValueError, match='provider'):
+        require_provider_check(path, relay)
+    record['provider'] = 'codex-relay'
+    for entry in record['requests']:
+        entry['provider'] = 'codex-relay'
+    path.write_text(json.dumps(record))
+    assert require_provider_check(path, relay)['provider'] == 'codex-relay'
+    record['requests'][0]['provider'] = 'wandb'
+    path.write_text(json.dumps(record))
+    with pytest.raises(ValueError, match='provider'):
+        require_provider_check(path, relay)
+
+
+def test_format_check_accepts_explicit_agent_and_preserves_all_thirty_cases(tmp_path):
+    from sera.agent import parse_response
+    from sera.provider_check import check_provider
+    rows = certificate()['requests']
+
+    class Agent:
+        provider = 'codex-relay'
+        model = AGENT_MODEL
+        project = 'test/project'
+
+        def __init__(self):
+            self.history = []
+
+        def request(self, role, evidence, instruction):
+            row = deepcopy(rows[len(self.history)])
+            row['provider'] = self.provider
+            row['attempts'][0]['schema_valid'] = True
+            self.history.append(row)
+            return parse_response(role, row['attempts'][0]['raw_response']['choices'][0]['message']['content'], evidence)
+
+        def review(self, evidence):
+            return self.request('frontier', evidence, '')
+
+    agent = Agent()
+    record = check_provider(project=agent.project, model=agent.model,
+                            output_dir=tmp_path / 'check', agent=agent)
+    assert record['passed'] and record['completed_requests'] == 30
+    assert record['provider'] == 'codex-relay'
+    assert require_provider_check(tmp_path / 'check/result.json', agent)['first_pass_valid'] == 30

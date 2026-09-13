@@ -79,12 +79,15 @@ def validate_context(role, parsed, evidence):
         raise ValueError("Frontier reader selected an ineligible trial")
 
 
-def check_provider(*, project, output_dir, model=AGENT_MODEL):
+def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None):
+    agent = WandbAgent(project=project, model=model) if agent is None else agent
+    if agent.project != project or agent.model != model or agent.history:
+        raise ValueError("Format check requires a fresh agent matching model and project")
     folder = Path(output_dir).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     cases = provider_cases()
-    agent = WandbAgent(project=project, model=model)
     record = {"schema_version": "sera-provider-check-v1", "model": model, "project": project,
+              "provider": getattr(agent, "provider", "wandb"),
               "created_at": datetime.now(timezone.utc).isoformat(), "status": "running",
               "schema_hash": schema_hash(), "cases_hash": content_hash(cases), "cases": cases,
               "request_schema_protocol": REQUEST_SCHEMA_PROTOCOL,
@@ -140,6 +143,9 @@ def require_provider_check(path, agent):
     """Recompute acceptance, including case/schema identity; do not trust a pass flag."""
     import json
     record = json.loads(Path(path).read_text())
+    provider = getattr(agent, "provider", "wandb")
+    if record.get("provider", "wandb") != provider:
+        raise ValueError("Provider check does not match this provider transport")
     if (record.get("schema_version") != "sera-provider-check-v1"
             or record.get("model") != agent.model or record.get("project") != agent.project
             or record.get("schema_hash") != schema_hash()
@@ -150,6 +156,8 @@ def require_provider_check(path, agent):
         raise ValueError("A complete 30-request provider check is required")
     first = 0
     for case, entry in zip(provider_cases(), requests):
+        if entry.get("provider", "wandb") != provider:
+            raise ValueError("Provider request does not match this provider transport")
         if entry.get("role") != case["role"] or entry.get("evidence") != case["evidence"]:
             raise ValueError("Provider check cases do not match the frozen experiment")
         expected_schema = request_schema(case["role"], case["evidence"])
@@ -180,7 +188,8 @@ def require_provider_check(path, agent):
     if first < 29:
         raise ValueError("Provider check needs at least 29 first-pass valid responses")
     return {"path": str(Path(path).resolve()), "schema_hash": schema_hash(),
-            "model": agent.model, "first_pass_valid": first, "valid_with_one_retry": 30}
+            "model": agent.model, "provider": provider,
+            "first_pass_valid": first, "valid_with_one_retry": 30}
 
 
 def main(argv=None):
@@ -189,8 +198,16 @@ def main(argv=None):
     parser.add_argument("--project", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--model", default=AGENT_MODEL, help="Hosted investigator model to certify")
+    parser.add_argument("--provider", choices=['wandb', 'codex-relay'], default='wandb')
+    parser.add_argument("--relay-dir", help="Shared request directory for the local Codex controller")
     args = parser.parse_args(argv)
-    report = check_provider(project=args.project, output_dir=args.output_dir, model=args.model)
+    if (args.provider == 'codex-relay') != bool(args.relay_dir):
+        parser.error('--relay-dir is required only with --provider codex-relay')
+    agent = None
+    if args.provider == 'codex-relay':
+        from .relay import RelayAgent
+        agent = RelayAgent(project=args.project, model=args.model, relay_dir=args.relay_dir)
+    report = check_provider(project=args.project, output_dir=args.output_dir, model=args.model, agent=agent)
     print({key: report[key] for key in ("passed", "first_pass_valid", "valid_with_one_retry")})
 
 
