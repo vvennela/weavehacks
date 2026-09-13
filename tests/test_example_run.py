@@ -1,6 +1,7 @@
 """The recording notebook starts blank and never starts GPU work implicitly."""
 
 import json
+from contextlib import nullcontext
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -80,6 +81,55 @@ def test_failed_baseline_stops_and_closes_runner(monkeypatch, tmp_path):
         demo.baseline()
     assert events == ['start', 'close']
     assert len(list(tmp_path.glob('baseline-*/result.json'))) == 1
+
+
+def test_preview_baseline_reaches_real_start_without_artifact_directory_collision(monkeypatch, tmp_path):
+    from sera import runtime
+
+    demo = ExampleRun(output_root=tmp_path)
+    monkeypatch.setattr(demo, '_ready', lambda: None)
+    monkeypatch.setattr(demo, '_tasks', lambda: (['question'], lambda prompt, output: True))
+    monkeypatch.setattr(runtime.sys, 'platform', 'unsupported-test-platform')
+    monkeypatch.setattr(runtime, 'gpu_snapshot', lambda: pytest.fail('No GPU access'))
+    monkeypatch.setattr(runtime.subprocess, 'Popen', lambda *args, **kwargs: pytest.fail('No child process'))
+    with pytest.raises(RuntimeError, match='requires Linux'):
+        demo.baseline()
+    records = list(tmp_path.glob('baseline-*/runtime/runtime.json'))
+    assert len(records) == 1
+    assert json.loads(records[0].read_text())['cleanup_pass'] is True
+
+
+@pytest.mark.parametrize('save_error', [OSError, KeyboardInterrupt])
+@pytest.mark.parametrize('cleanup_fails', [False, True])
+def test_post_return_save_failure_closes_runner_and_preserves_cleanup_failure(
+        monkeypatch, tmp_path, save_error, cleanup_fails):
+    import sera
+
+    demo = ExampleRun(output_root=tmp_path)
+    monkeypatch.setattr(demo, '_ready', lambda: None)
+    monkeypatch.setattr(demo, '_tasks', lambda: (['question'], lambda prompt, output: True))
+    monkeypatch.setattr(demo, '_credentials', nullcontext)
+    demo.agent = SimpleNamespace(fork=lambda: object())
+    close_calls = []
+
+    def fail_save():
+        raise save_error('synthetic save failure')
+
+    def close():
+        close_calls.append(True)
+        if cleanup_fails:
+            raise RuntimeError('synthetic cleanup failure')
+
+    result = SimpleNamespace(report={}, _save=fail_save, close=close)
+    monkeypatch.setattr(sera, 'optimize', lambda **kwargs: result)
+    with pytest.raises(save_error, match='synthetic save failure') as raised:
+        demo.optimize()
+    assert close_calls == [True]
+    if cleanup_fails:
+        assert demo.result is result, 'Keep the owner for an explicit cleanup retry'
+        assert any('cleanup' in note.lower() for note in raised.value.__notes__)
+    else:
+        assert demo.result is None
 
 
 def test_comparison_uses_same_run_baseline_not_the_earlier_display(tmp_path):

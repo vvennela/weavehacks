@@ -173,7 +173,7 @@ class ExampleRun:
         folder = self._folder('baseline')
         folder.mkdir(parents=True)
         runner = sera.SeraModel(model_id=self.model_id, revision=LARGE_MODEL_REVISION,
-                                configuration=self.reference, artifact_dir=folder)
+                                configuration=self.reference, artifact_dir=folder/'runtime')
         trial = None
         try:
             runner.start()
@@ -202,8 +202,17 @@ class ExampleRun:
                 objective=sera.Objective(priority='latency', min_improvement_fraction=.05),
                 workload=sera.Workload(concurrency=[1, 2, 4, 8]),
                 output_dir=self._folder('swarm'))
-        self.result.report['example_elapsed_seconds'] = time.monotonic() - started
-        self.result._save()
+        try:
+            self.result.report['example_elapsed_seconds'] = time.monotonic() - started
+            self.result._save()
+        except BaseException as error:
+            try:
+                self.result.close()
+            except BaseException as cleanup_error:  # noqa: BLE001 -- preserve the original error and cleanup owner
+                error.add_note('Returned-runner cleanup failed: ' + type(cleanup_error).__name__)
+            else:
+                self.result = None
+            raise
         return self.result
 
     @staticmethod
