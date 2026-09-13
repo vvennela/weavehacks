@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No failure was observed: trial-2 was collected with 96 successful requests, zero generation errors, quality mean 1.0, and p95 latency 625.344263 ms versus the baseline 770.600633 ms, a measured 18.85% improvement. The cause of the improvement remains unknown because the diagnosis explicitly says no model, kernel, memory-pressure, or scheduling cause was established. Inspecting latency outliers is useful to examine the measured tail behavior underlying the latency objective before any later experiment decision.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15521,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 303,
+    "reasoning_output_tokens": 170
+  }
+}

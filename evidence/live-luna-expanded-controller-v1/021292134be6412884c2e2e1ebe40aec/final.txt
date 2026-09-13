@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The deterministic selection chose baseline, and candidate_tested is false. Therefore the proposal’s prediction of at least 5% lower p95 while preserving quality was not tested; no speedup or quality conclusion is supported."}

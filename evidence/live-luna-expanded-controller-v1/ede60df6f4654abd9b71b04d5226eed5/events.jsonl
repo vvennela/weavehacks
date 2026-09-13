@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09af2-e48a-7b43-a084-6a71d775d12b"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed baseline quality passed with mean 1.0 and no generation errors; latency is measured at p95 770.6006329999582 ms, but no p95 limit or causal tail breakdown is supplied. The cause of latency outliers is unknown, and cumulative queue/TTFT snapshots do not establish causality. Inspect latency outliers to characterize the observed tail before proposing an experiment.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":14586,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":272,"reasoning_output_tokens":165}}

@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested, so its predicted p95 improvement and quality preservation were not measured. The deterministic selection was baseline; no read call ID or saved evidence path was supplied."}

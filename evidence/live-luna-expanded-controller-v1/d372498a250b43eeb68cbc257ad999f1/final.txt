@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested, so the proposed lower-p95 prediction while preserving quality was not evaluated. Retain the baseline and abstain from claiming improvement; a future proposal must include an eligible candidate trial with measured latency and quality."}

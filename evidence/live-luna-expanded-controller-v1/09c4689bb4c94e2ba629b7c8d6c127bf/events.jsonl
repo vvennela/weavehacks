@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aec-cc9f-7b70-848d-1f5d686d1edc"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so the predicted p95 improvement and quality preservation were not measured. The active-batching placement is unsupported in this single-model milestone; abstain from confirming the proposal and require an eligible candidate trial before proceeding.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10141,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":161,"reasoning_output_tokens":85}}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aef-3300-7c11-bf72-4f8d1d3da1f5"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[],\"reason\":\"No legal proposals are eligible for the remaining budget.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":9947,"cached_input_tokens":8960,"cache_write_input_tokens":0,"output_tokens":48,"reasoning_output_tokens":15}}

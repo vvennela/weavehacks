@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"proposal-scheduling-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"concurrency_8_cumulative_snapshot_mean_ttft_ms\",\"trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms\",\"generation_errors\",\"successful_requests\"],\"predicted_metric_change\":\"max_num_batched_tokens=2048 may change p95_latency_ms and high-concurrency TTFT relative to the accepted trial-2 configuration; direction and magnitude are unmeasured.\",\"confidence\":0.62,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute the prediction if measured p95_latency_ms does not improve by at least 5% from the accepted trial_2_p95_latency_ms of 625.3442630004429 ms, or if generation_errors becomes nonzero, quality falls below the fixed 0.99 floor, or concurrency_8_cumulative_snapshot_mean_ttft_ms worsens materially. Check read call 01a09af5-b367-7553-8f98-aa52386d72f0 and fixed evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt.\",\"reason\":\"Observed outcome: no model trial failure occurred; baseline and trial-2 each had 96 successful_requests and zero generation_errors, and trial-2 was accepted with trial_2_p95_latency_ms=625.3442630004429 versus baseline p95_latency_ms=770.6006329999582. The scheduling inspection was declined, so its read did not succeed and no scheduling cause is established; this is distinct from the collected trial outcome. Read call 01a09af5-b367-7553-8f98-aa52386d72f0 records the accepted result at fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. Independently of peer suggestions, max_num_batched_tokens=2048 is an available-for-trial, untested candidate that probes token-wave scheduling while preserving the quality and workload constraints. The measured concurrency_8_cumulative_snapshot_mean_ttft_ms and trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms provide load-specific observations, but do not establish causality; the trial is useful because the next setting remains empirically unresolved.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 21548,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 717,
+    "reasoning_output_tokens": 179
+  }
+}

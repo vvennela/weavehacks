@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection chose baseline, and the candidate was not tested, so the proposed at-least-5% p95 reduction while preserving quality was not measured. No read call IDs or saved evidence paths are available. The next proposal should require an eligible candidate trial; otherwise abstain from claiming an improvement.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10142,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 133,
+    "reasoning_output_tokens": 43
+  }
+}

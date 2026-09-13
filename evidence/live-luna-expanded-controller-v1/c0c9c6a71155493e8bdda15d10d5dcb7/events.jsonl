@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aec-7b6f-7f71-81fa-bc51fea98216"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so its predicted p95 improvement and quality preservation were not measured. The deterministic selection was baseline; no read call ID or saved evidence path was supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10140,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":119,"reasoning_output_tokens":54}}

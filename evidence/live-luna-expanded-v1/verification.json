@@ -1,0 +1,152 @@
+{
+  "schema_version": "sera-swarm-evidence-verification-v1",
+  "execution_passed": false,
+  "issues": [
+    {
+      "check": "inspection-provenance",
+      "detail": "scheduling has no completed remote inspection.",
+      "round": 2
+    },
+    {
+      "check": "inspection-provenance",
+      "detail": "output_quality has no completed remote inspection.",
+      "round": 2
+    },
+    {
+      "check": "provider-evidence",
+      "detail": "scheduling initial needs one exact traced request.",
+      "round": 3
+    },
+    {
+      "check": "provider-evidence",
+      "detail": "memory_context initial needs one exact traced request.",
+      "round": 3
+    },
+    {
+      "check": "provider-evidence",
+      "detail": "output_quality initial needs one exact traced request.",
+      "round": 3
+    },
+    {
+      "check": "provider-evidence",
+      "detail": "scheduling refine needs one exact traced request.",
+      "round": 3
+    },
+    {
+      "check": "provider-evidence",
+      "detail": "memory_context refine needs one exact traced request.",
+      "round": 3
+    },
+    {
+      "check": "provider-evidence",
+      "detail": "output_quality refine needs one exact traced request.",
+      "round": 3
+    },
+    {
+      "check": "refine-trace-overlap",
+      "detail": "The actual traced peer-review calls must overlap.",
+      "round": 3
+    },
+    {
+      "check": "plateau-stop",
+      "detail": "A different legitimate stop must remain distinct from a confirmed plateau.",
+      "round": null
+    },
+    {
+      "check": "plateau-confirmation",
+      "detail": "An actual new-candidate confirmation trial must follow the first plateau.",
+      "round": null
+    }
+  ],
+  "decision_rounds": 3,
+  "candidate_trials": 2,
+  "saved_profile": {
+    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+    "model_revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+    "evaluation_cases_sha256": "2f3c6687cf2a19bde4c3f5b60ab56cb24ac67c6755e999ad98227b04e42d95a7",
+    "task_count": 8,
+    "constraints": {
+      "quality_floor": 0.99,
+      "p95_latency_ms": null,
+      "max_memory_mib": null
+    },
+    "workload": {
+      "prompt_count": 8,
+      "concurrency": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "warmup_requests_per_load": 8,
+      "measured_requests_per_load": 24,
+      "quality_requests": 8
+    },
+    "baseline_configuration": {
+      "dtype": "bfloat16",
+      "quantization": "fp8_per_tensor",
+      "kv_cache_dtype": "auto",
+      "tensor_parallel_size": 1,
+      "max_model_len": 4096,
+      "max_num_seqs": 8,
+      "max_num_batched_tokens": 4096,
+      "gpu_memory_utilization": 0.9,
+      "enable_prefix_caching": false,
+      "enable_chunked_prefill": true,
+      "enforce_eager": true
+    }
+  },
+  "source_hashes": {
+    "result": "c8bb22262b3c0b79a8dc3fb9a22d848ddc793e86761eee585dbb02a1536b02d9",
+    "calls": "9219c75ef80ba6f7306cad63328c162816af473d4b995245d93287ff3b93240e",
+    "launch": "4398182487cffef4362d645537ef66f6d68c06778d1f87e2cf5738ee87491af4"
+  },
+  "root_call_id": "01a09af0-cf43-7bcf-899c-0fb6c230e46d",
+  "trace_id": "01a09af0-cf42-7c4f-b021-9bdf483aeb9f",
+  "normalized_call_references": 0,
+  "feedback": {
+    "observed_trial_feedback": true,
+    "measured_candidate_feedback": true,
+    "startup_failure_feedback": false,
+    "rejected_raw_reviews": [],
+    "limitation": "A recorded startup failure is feedback, not a measured quality or performance result. Rejected raw reviews are preserved, not relabeled as validated or delivered to later agents."
+  },
+  "search_policy": {
+    "mode": "until-plateau",
+    "confirmation_trial_executed": false,
+    "objective_plateau_confirmed": false,
+    "stop_reason": "no-valid-selected-proposal"
+  },
+  "failure_diagnosis": {
+    "established": true,
+    "missing_trial_ids": [],
+    "root_cause_established": false,
+    "scope": "Observed failures and consequences only; no model or hardware cause is inferred. Matching diagnosis records do not prove the agents understood or used them."
+  },
+  "proposal_diversity": {
+    "initial_distinct_candidates": [
+      2,
+      2,
+      0
+    ],
+    "refined_distinct_candidates": [
+      1,
+      1,
+      0
+    ],
+    "initial_alternatives_observed": true,
+    "refined_alternatives_observed": false
+  },
+  "improvement": {
+    "priority": "latency",
+    "required_gain_fraction": 0.05,
+    "best_observed_gain_fraction": 0.18849760015642653,
+    "established": false
+  },
+  "limitations": [
+    "Consistency audit of supplied artifacts, not cryptographic proof of origin.",
+    "The saved profile is reported, not certification against an external benchmark or hardware profile.",
+    "No search-superiority or failure-cause claim follows from execution or proposal diversity.",
+    "Cached inspections retain remote source provenance; they are not fresh network requests."
+  ]
+}

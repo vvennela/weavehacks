@@ -1,0 +1,320 @@
+# Sera single-model result
+
+Status: closed
+Selection: trial-2
+Reason: no-valid-selected-proposal
+
+Objective: {'priority': 'latency', 'min_improvement_fraction': 0.05}
+Measured frontier: ['trial-2']
+Task scores use the supplied versioned evaluator; see each trial's gate and constraints.
+This bounded search is not a statistically established advantage over other search methods.
+
+Baseline: collected; requests=96; p95=770.6006329999582 ms; throughput=26.258831752689392 output tokens/s; peak memory=88687 MiB; output tokens=660; startup=65.06903809100004 s.
+  concurrency=1; requests=24; p95=571.6035260002172 ms; throughput=13.693677090213365 output tokens/s.
+  concurrency=2; requests=24; p95=648.3435870004541 ms; throughput=23.747265251260195 output tokens/s.
+  concurrency=4; requests=24; p95=724.694728999566 ms; throughput=41.652397133915805 output tokens/s.
+  concurrency=8; requests=24; p95=770.6006329999582 ms; throughput=75.84397482484998 output tokens/s.
+trial-2: collected; requests=96; p95=625.3442630004429 ms; throughput=28.16512161301076 output tokens/s; peak memory=88431 MiB; output tokens=660; startup=66.06884616099978 s.
+  concurrency=1; requests=24; p95=558.1049370002802 ms; throughput=14.09557240228453 output tokens/s.
+  concurrency=2; requests=24; p95=618.6786629996277 ms; throughput=25.262669478615216 output tokens/s.
+  concurrency=4; requests=24; p95=625.3442630004429 ms; throughput=47.264667441221455 output tokens/s.
+  concurrency=8; requests=24; p95=617.976042999544 ms; throughput=96.76973612435677 output tokens/s.
+trial-3: collected; requests=96; p95=773.4014930001649 ms; throughput=26.25167036126847 output tokens/s; peak memory=88561 MiB; output tokens=660; startup=65.06320093199975 s.
+  concurrency=1; requests=24; p95=572.1517860001768 ms; throughput=13.693514826468494 output tokens/s.
+  concurrency=2; requests=24; p95=648.8678759997129 ms; throughput=23.742050361861786 output tokens/s.
+  concurrency=4; requests=24; p95=725.2000369999223 ms; throughput=41.617941358315655 output tokens/s.
+  concurrency=8; requests=24; p95=773.4014930001649 ms; throughput=75.77751418541678 output tokens/s.
+
+Selection latency is the worst per-load p95; percentiles are not pooled. Aggregate throughput divides all output tokens by the sum of measured load durations.
+Hard limits: {'quality_floor': 0.99, 'p95_latency_ms': None, 'max_memory_mib': None}; failures: {}.
+
+Investigation trials: 3; no total trial cap; stop: no-valid-selected-proposal.
+Each round records proposals, arbitration, measurements, gates, and prediction review.
+This investigation is not proof of a search advantage.
+
+Workload: {'prompt_count': 8, 'concurrency': [1, 2, 4, 8], 'warmup_requests_per_load': 8, 'measured_requests_per_load': 24, 'quality_requests': 8}
+Generation: {'temperature': 0, 'top_p': 1, 'top_k': -1, 'seed': 0, 'max_tokens': 64, 'enable_thinking': False}
+Record: /marimo/sera-evidence/live-luna-expanded-v1/result.json
+
+## Agent investigation
+
+Agents propose experiments. Deterministic checks decide which results are eligible.
+Trial order and access to history do not prove a causal search advantage.
+Independent investigators inspect traces and exchange findings before arbitration.
+
+### Deployment stage
+
+Original BF16 baseline: infeasible (estimate only; not a measured BF16 run).
+Fit reason: Estimated BF16 runtime exceeds the service memory budget.
+Estimated BF16 runtime bytes: 160444792832.
+Quantization specialist status: accepted.
+Quantization specialist recommends: weight-fp8. Reason: Weight-only FP8 reduces estimated weights from 145.4 GB to 75.2 GB and estimated peak memory to 90.2 GB, fitting the 92.4 GB service budget while retaining BF16 KV cache and other components. This is a deployment-feasibility recommendation only; latency and quality impact are unmeasured.
+Deployment arbiter chose: weight-fp8. Reason: Weight-only FP8 is the only legal and estimated-feasible plan: it reduces estimated peak memory to 90.2 GB within the 92.4 GB service budget while retaining BF16 KV cache, but latency and quality are unmeasured. A real trial is useful to assess the latency objective and verify the 0.99 quality floor; no speedup can be claimed because the BF16 baseline will not run.
+Trial candidate: collected.
+Scheduled by: not recorded.
+Quality gate: passed; score=1.0; floor=0.99.
+p95: 770.6006329999582 ms; throughput: 26.258831752689392 output tokens/s; peak memory: 88687 MiB.
+Gate selection: candidate; reason: candidate-meets-constraints-baseline-does-not.
+Constraint failures: {'baseline': ['estimated-memory-does-not-fit'], 'candidate': []}.
+Prediction review: confirmed. The candidate deployment was collected successfully with 96/96 successful requests and no generation errors; task quality passed at mean 1.0 against the 0.99 floor, and no candidate constraint failures were recorded. Evidence: status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt. This confirms deployment feasibility only; baseline was not measured, so no latency improvement is claimed.
+Observed experiment result: accepted.
+latency: baseline=not recorded; candidate=770.6006329999582; gain=not recorded; required=0.05. Gain and required gain are fractions, not percentages.
+Root cause: not-established. The observed outcome does not establish a model, kernel, memory-pressure, or scheduling cause. A startup error category is not the underlying server-log cause.
+Saved evidence: status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.
+Next proposal constraint: Do not retry the same tested configuration in this bounded search.
+Next proposal constraint: Preserve the fixed quality floor and all workload constraints.
+Next proposal constraint: Use the recorded constraints and measurements to justify the next action, or abstain.
+Deployment outcome: feasible; selected=candidate.
+Deployment prediction review: confirmed. The candidate deployment was collected successfully with 96/96 successful requests and no generation errors; task quality passed at mean 1.0 against the 0.99 floor, and no candidate constraint failures were recorded. Evidence: status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt. This confirms deployment feasibility only; baseline was not measured, so no latency improvement is claimed.
+Deployment trials included in budget: 1.
+No BF16 speedup comparison is available: the BF16 baseline was not measured.
+The measured deployment becomes the reference for later investigation. Deployment advice is a separate stage; see the round records for proposal competition.
+
+### Round 1
+
+Swarm investigators: scheduling, memory_context, output_quality.
+Initial investigation overlap: recorded.
+Peer-review overlap: recorded.
+Shared findings board: 26edd85bb033272f13796d9c1a3d7517e78bd2053393fee6be8ac25016b65af7; entries=3.
+Investigator roles are analysis perspectives, not additional hardware capabilities. GPU trials remain sequential.
+
+Investigator scheduling: accepted.
+Inspection latency_outliers: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af2-b7b2-7e8a-b2eb-7515daddc97c, 01a09af2-b7b3-791d-a746-57d617f60675.
+Inspection not recorded: declined; source=not recorded; calls=not recorded.
+Initial proposal: enable_prefix_caching=True. No execution failure was observed: the recorded candidate outcome was collected and accepted, with generation_errors=0, successful_requests=96, and verified quality mean 1.0, as documented by source call 01a09af2-b7cd-7592-bb62-086f453314a0 at fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. The underlying performance cause is unknown; cumulative queue/TTFT snapshots do not establish causality. Because the workload explicitly evaluates repeated prompts after warmup and prefix caching is available-for-trial, test enable_prefix_caching=true to measure whether shared-prefix reuse lowers TTFT and p95_latency_ms without violating quality.
+
+Investigator memory_context: accepted.
+Inspection latency_outliers: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af2-b7b2-7e8a-b2eb-7515daddc97c, 01a09af2-b7b3-791d-a746-57d617f60675.
+Inspection load_metrics: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f.
+Initial proposal: enable_prefix_caching=True. Observed outcome: the supplied diagnosis recorded no failure: status collected, generation_errors 0, and quality passed in call 01a09af2-b7cd-7592-bb62-086f453314a0, with evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. The baseline measured p95_latency_ms is 770.6006329999582 with sampled_peak_memory_mib 88687 and no preemptions in the available concurrency snapshots. The cause of remaining latency is therefore unknown; the measurements do not establish memory pressure or a context-capacity benefit. I propose the legal untested prefix-caching setting because the workload explicitly evaluates repeated prompts after per-load warmup (cold_cache_measurement false), making cache reuse a testable latency hypothesis while preserving max_model_len and allocation. The load inspection call 01a09af2-b7c0-7751-9d95-58b2825c282f confirms 24 successful requests at each concurrency, and call 01a09af2-b7c0-7751-9d95-58b2825c282f records the load_metrics evidence path. If the cited p95_latency_ms and success/error conditions fail, retain baseline and reject this hypothesis.
+
+Investigator output_quality: accepted.
+Inspection latency_outliers: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af2-b7b2-7e8a-b2eb-7515daddc97c, 01a09af2-b7b3-791d-a746-57d617f60675.
+Inspection load_metrics: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f.
+Initial proposal: enforce_eager=False. No execution failure was observed: inspection call 01a09af2-b7c0-7592-bb62-086f453314a0 records status=collected, generation_errors=0, quality passed, and failure_kind=accepted; its fixed paths are status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. The cause of the observed latency is therefore unknown, and the diagnosis explicitly says root cause was not established. I reject abstention because enforce_eager=false is an available-for-trial, untested candidate with fixed quality constraints. The hypothesis is that CUDA graph execution reduces launch overhead and improves latency, especially at concurrency 8; the trial will test that without claiming a measured gain in advance.
+
+Participation investigator: active; legal candidates=10; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=10; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=10; Read-only investigation of the same legal candidate pool..
+Inactive roles were not called. Active means a legal untested setting was available.
+
+Specialist batching: accepted.
+History supplied: none.
+Proposal sera-scheduling-prefix-001: trial; enable_prefix_caching = True.
+Parent trial: baseline.
+Reason: No execution failure was observed: source call 01a09af2-b7cd-7592-bb62-086f453314a0 records status=collected, generation_errors=0, and verified quality mean 1.0 at fixed paths status, decision, and task_quality/per_prompt. The cause of the baseline latency is therefore unknown, not established as scheduling or memory pressure. Because the workload explicitly measures repeated prompts after warmup and baseline p95_latency_ms is 770.6006329999582 with concurrency_1_cumulative_snapshot_mean_ttft_ms 136.02256029844284 and concurrency_8_cumulative_snapshot_mean_ttft_ms 191.13211147487164, enabling prefix caching is a legal, untested experiment targeting repeated-prefill latency. Its result should be compared to the same baseline call and paths; no gain is claimed in advance.
+Prediction: For repeated prompts after per-load warmup, p95_latency_ms and mean TTFT at concurrency 1 and 8 are predicted to decrease; generation_errors should remain 0 and successful_requests should remain 96. This is a hypothesis, not a measured gain.
+Would refute it: Refute if p95_latency_ms and either concurrency_1_cumulative_snapshot_mean_ttft_ms or concurrency_8_cumulative_snapshot_mean_ttft_ms do not improve versus baseline, or if generation_errors becomes nonzero or successful_requests falls below 96. Compare with source call 01a09af2-b7cd-7592-bb62-086f453314a0 and fixed paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt.
+Cited metrics: p95_latency_ms, concurrency_1_cumulative_snapshot_mean_ttft_ms, concurrency_8_cumulative_snapshot_mean_ttft_ms, generation_errors, successful_requests.
+Cited value: p95_latency_ms=770.6006329999582.
+Cited value: concurrency_1_cumulative_snapshot_mean_ttft_ms=136.02256029844284.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=191.13211147487164.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Arbitration ID: scheduling:sera-scheduling-prefix-001.
+
+Specialist batching: accepted.
+History supplied: none.
+Proposal sera-memory-context-prefix-caching-001: trial; enable_prefix_caching = True.
+Parent trial: baseline.
+Reason: Observed outcome: source call 01a09af2-b7cd-7592-bb62-086f453314a0 records status=collected, generation_errors=0, successful_requests=96, and verified quality passed; no execution failure was observed. The underlying cause of the recorded latency remains unknown, and the fixed paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt do not establish a memory or scheduling cause. Independently, the workload explicitly measures repeated prompts after warmup, making enable_prefix_caching=true a useful untested experiment. Baseline p95_latency_ms is 770.6006329999582, with concurrency_1 and concurrency_8 TTFT snapshots available for comparison. This setting tests reuse directly while preserving the quality and workload constraints; the cited metrics and source call determine whether to continue or reject the hypothesis.
+Prediction: Enabling prefix caching may reduce p95_latency_ms and mean TTFT for the repeated-prompts-after-per-load-warmup workload; generation_errors should remain 0 and successful_requests should remain 96. No gain is claimed before measurement.
+Would refute it: Refute if the trial shows no reduction in p95_latency_ms and no reduction in concurrency_1_cumulative_snapshot_mean_ttft_ms or concurrency_8_cumulative_snapshot_mean_ttft_ms versus baseline, while quality remains valid; also refute if generation_errors becomes nonzero or successful_requests falls below 96. Compare with source call 01a09af2-b7cd-7592-bb62-086f453314a0 and fixed evidence paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt.
+Cited metrics: p95_latency_ms, concurrency_1_cumulative_snapshot_mean_ttft_ms, concurrency_8_cumulative_snapshot_mean_ttft_ms, generation_errors, successful_requests.
+Cited value: p95_latency_ms=770.6006329999582.
+Cited value: concurrency_1_cumulative_snapshot_mean_ttft_ms=136.02256029844284.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=191.13211147487164.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Arbitration ID: memory_context:sera-memory-context-prefix-caching-001.
+
+Specialist batching: accepted.
+History supplied: none.
+Proposal refine-prefix-caching-001: trial; enable_prefix_caching = True.
+Parent trial: baseline.
+Reason: No execution failure was observed: source call 01a09af2-b7cd-7592-bb62-086f453314a0 records status=collected, generation_errors=0, and verified quality passed; the fixed paths status, decision, and task_quality/per_prompt support those observations. The diagnosis explicitly leaves root cause not established, so it does not justify attributing latency to a specific kernel or memory cause. The baseline has p95_latency_ms 770.6006329999582 and repeated-prompts-after-per-load-warmup are in scope; prefix caching is therefore a legal, untested batching experiment that directly tests a plausible cache-reuse mechanism. I accept the scheduling and memory_context peer suggestion because it matches the workload, but do not treat peer claims as measured gains; the output_quality suggestion is also legal but less directly tied to repeated-prefix behavior. The result will determine whether this setting merits further consideration under the fixed quality floor and latency objective.
+Prediction: Enabling prefix caching is predicted to reduce p95_latency_ms and mean TTFT for repeated prompts after warmup; generation_errors should remain 0 and successful_requests should remain 96. No gain is yet measured.
+Would refute it: Refute if p95_latency_ms fails to improve from the baseline 770.6006329999582 ms, or if concurrency_1_cumulative_snapshot_mean_ttft_ms and concurrency_8_cumulative_snapshot_mean_ttft_ms do not decrease while quality remains valid, or if generation_errors becomes nonzero or successful_requests falls below 96. Compare with source call 01a09af2-b7cd-7592-bb62-086f453314a0 and fixed paths status, decision, and task_quality/per_prompt.
+Cited metrics: p95_latency_ms, concurrency_1_cumulative_snapshot_mean_ttft_ms, concurrency_8_cumulative_snapshot_mean_ttft_ms, generation_errors, successful_requests.
+Cited value: p95_latency_ms=770.6006329999582.
+Cited value: concurrency_1_cumulative_snapshot_mean_ttft_ms=136.02256029844284.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=191.13211147487164.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Arbitration ID: output_quality:refine-prefix-caching-001.
+
+Arbiter chose: scheduling:sera-scheduling-prefix-001. Reason: The observed issue is the baseline latency result: p95_latency_ms was 770.6006329999582 with verified quality mean 1.0; no execution failure or generation error was observed. The cause of latency is unknown, and peer opinions are not measured gains. I accept the peers' shared, workload-specific hypothesis that prefix caching may reduce latency for repeated prompts after warmup, while rejecting any claim that improvement is established before testing. This is a legal untested experiment within the available round capacity; quality and performance gates must be applied after execution.
+Trials executed in this round: trial-2.
+
+Trial trial-2: collected.
+Scheduled by: arbiter.
+Quality gate: passed; score=1.0; floor=0.99.
+p95: 625.3442630004429 ms; throughput: 28.16512161301076 output tokens/s; peak memory: 88431 MiB.
+Gate selection: candidate; reason: quality-passed-and-p95-improved-at-least-five-percent.
+Constraint failures: {'baseline': [], 'candidate': []}.
+Prediction review: refuted. The candidate was collected and passed quality with 96 successful requests and 0 generation errors, and p95 latency improved from 770.6006329999582 ms to 625.3442630004429 ms (18.85%), as recorded by source call 01a09af2-b7cd-7592-bb62-086f453314a0 and paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. However, the predicted TTFT decreases were not measured (the TTFT metrics are null), so the full performance prediction cannot be confirmed. Preserve the quality floor and workload constraints; do not retry this tested configuration.
+Observed experiment result: accepted.
+latency: baseline=770.6006329999582; candidate=625.3442630004429; gain=0.18849760015642653; required=0.05. Gain and required gain are fractions, not percentages.
+Root cause: not-established. The observed outcome does not establish a model, kernel, memory-pressure, or scheduling cause. A startup error category is not the underlying server-log cause.
+Saved evidence: status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.
+Next proposal constraint: Do not retry the same tested configuration in this bounded search.
+Next proposal constraint: Preserve the fixed quality floor and all workload constraints.
+Next proposal constraint: Use the recorded constraints and measurements to justify the next action, or abstain.
+
+### Round 2
+
+Swarm investigators: scheduling, memory_context, output_quality.
+Initial investigation overlap: recorded.
+Peer-review overlap: recorded.
+Shared findings board: 06698a36d9bcbb1309fc583e655e6e614f6707eef0f95ae6b545f3ee9f18edbe; entries=3.
+Investigator roles are analysis perspectives, not additional hardware capabilities. GPU trials remain sequential.
+
+Investigator scheduling: accepted.
+Inspection not recorded: declined; source=not recorded; calls=not recorded.
+Initial proposal: max_num_batched_tokens=2048. No model trial failure was observed: baseline and trial-2 both completed with 96 successful requests and zero generation errors, while the scheduling inspection was declined and therefore supplies no causal read. The measured baseline p95_latency_ms was 770.6006329999582 ms and concurrency_8_cumulative_snapshot_mean_ttft_ms was 191.13211147487164 ms; trial-2 with prefix caching reached 625.3442630004429 ms and 147.22696878015995 ms, but its accepted gain does not establish a batch-budget cause. Since the 2048 token budget is an available, untested candidate and queue snapshots remain near zero, test whether smaller token waves improve latency without relying on an unmeasured memory or context-cap assumption. The declined inspection record and fixed evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt provide no additional causal evidence; a failed or non-qualifying 2048 trial should shift away from this setting rather than be attributed to an established root cause.
+
+Investigator memory_context: accepted.
+Inspection latency_outliers: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af5-b367-7553-8f98-aa52386d72f0, 01a09af2-b7b2-7e8a-b2eb-7515daddc97c, 01a09af2-b7b3-791d-a746-57d617f60675.
+Inspection load_metrics: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af5-b367-7553-8f98-aa52386d72f0, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb.
+Initial proposal: max_num_batched_tokens=2048. No execution failure was observed: the candidate and trial-2 were collected with zero generation errors, and the trial-2 diagnosis was accepted in read call 01a09af5-b367-7553-8f98-aa52386d72f0; its evidence paths are status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. The diagnosis explicitly leaves the cause unestablished, so I do not attribute the latency change causally. Measured trial-2 p95_latency_ms was 625.3442630004429 versus baseline p95_latency_ms 770.6006329999582, while trial_2_sampled_peak_memory_mib was 88431 and trial_2_generation_errors was 0. The prepared prompts were only 85–109 tokens, so the legal 2048 token-wave setting is a bounded batching experiment rather than an assumption that context reduction lowers reserved KV memory. It is untested, available-for-trial, and may clarify whether batching limits affect latency under the fixed quality and workload constraints. The prediction remains provisional and should be rejected under the stated p95, error, or quality conditions using read call 01a09af5-b367-7553-8f98-aa52386d72f0 and the fixed evidence paths.
+
+Investigator output_quality: accepted.
+Inspection not recorded: declined; source=not recorded; calls=not recorded.
+Initial proposal: enforce_eager=False. Observed outcome: trial-2 was collected with 96 successful_requests, zero generation_errors, quality mean 1.0, and trial_2_p95_latency_ms of 625.3442630004429 versus baseline p95_latency_ms of 770.6006329999582; its diagnosis explicitly says root cause was not established, with evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. Separately, the inspection_log records the inspection as declined, so no inspection read succeeded and no causal diagnosis is available; no inspection call ID was supplied. I reject abstention because enforce_eager=false is an available-for-trial, untested candidate and the round has capacity. This tests execution strategy while preserving the verified quality floor and workload; the prediction remains a hypothesis rather than a claimed gain.
+
+Participation investigator: active; legal candidates=9; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=9; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=9; Read-only investigation of the same legal candidate pool..
+Inactive roles were not called. Active means a legal untested setting was available.
+
+Specialist batching: accepted.
+History supplied: trial-2.
+Proposal proposal-scheduling-2048: trial; max_num_batched_tokens = 2048.
+Parent trial: baseline.
+Reason: Observed outcome: no model trial failure occurred; baseline and trial-2 each had 96 successful_requests and zero generation_errors, and trial-2 was accepted with trial_2_p95_latency_ms=625.3442630004429 versus baseline p95_latency_ms=770.6006329999582. The scheduling inspection was declined, so its read did not succeed and no scheduling cause is established; this is distinct from the collected trial outcome. Read call 01a09af5-b367-7553-8f98-aa52386d72f0 records the accepted result at fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. Independently of peer suggestions, max_num_batched_tokens=2048 is an available-for-trial, untested candidate that probes token-wave scheduling while preserving the quality and workload constraints. The measured concurrency_8_cumulative_snapshot_mean_ttft_ms and trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms provide load-specific observations, but do not establish causality; the trial is useful because the next setting remains empirically unresolved.
+Prediction: max_num_batched_tokens=2048 may change p95_latency_ms and high-concurrency TTFT relative to the accepted trial-2 configuration; direction and magnitude are unmeasured.
+Would refute it: Refute the prediction if measured p95_latency_ms does not improve by at least 5% from the accepted trial_2_p95_latency_ms of 625.3442630004429 ms, or if generation_errors becomes nonzero, quality falls below the fixed 0.99 floor, or concurrency_8_cumulative_snapshot_mean_ttft_ms worsens materially. Check read call 01a09af5-b367-7553-8f98-aa52386d72f0 and fixed evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt.
+Cited metrics: p95_latency_ms, trial_2_p95_latency_ms, concurrency_8_cumulative_snapshot_mean_ttft_ms, trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms, generation_errors, successful_requests.
+Cited value: p95_latency_ms=770.6006329999582.
+Cited value: trial_2_p95_latency_ms=625.3442630004429.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=191.13211147487164.
+Cited value: trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms=147.22696878015995.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Prior feedback: trial-2: quality=passed; prediction=refuted.
+Arbitration ID: scheduling:proposal-scheduling-2048.
+
+Specialist batching: accepted.
+History supplied: trial-2.
+Proposal sera-memory-context-2048: trial; max_num_batched_tokens = 2048.
+Parent trial: baseline.
+Reason: Observed outcome: no model execution failure occurred; read call 01a09af5-b367-7553-8f98-aa52386d72f0 records trial-2 as collected with 96 successful_requests, zero generation_errors, quality passed, and trial_2_p95_latency_ms=625.3442630004429. The diagnosis at evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt explicitly leaves root cause not established. Baseline and trial-2 sampled memory were 88687 and 88431 MiB, respectively, with no measured preemptions, so memory pressure or scheduling causality is unknown. I reject copying the peer conclusion as proof, but independently select the legal untested max_num_batched_tokens=2048 candidate because it directly tests batching behavior while preserving quality and model context. The next setting should be changed only if its measured p95 latency and concurrency-8 TTFT satisfy the fixed gates.
+Prediction: No execution failure was observed in read call 01a09af5-b367-7553-8f98-aa52386d72f0: trial-2 had 96 successful_requests and zero generation_errors. Testing max_num_batched_tokens=2048 may alter tail latency and concurrency-8 TTFT relative to p95_latency_ms=625.3442630004429 and trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms=147.22696878015995; direction and magnitude remain unmeasured.
+Would refute it: Refute the prediction if the trial has generation_errors greater than zero, fails the fixed quality floor, or p95_latency_ms does not improve by at least 5% versus trial_2_p95_latency_ms=625.3442630004429. Also evaluate the scheduling hypothesis using concurrency_8_cumulative_snapshot_mean_ttft_ms; evidence paths are status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt from read call 01a09af5-b367-7553-8f98-aa52386d72f0.
+Cited metrics: p95_latency_ms, trial_2_p95_latency_ms, sampled_peak_memory_mib, trial_2_sampled_peak_memory_mib, generation_errors, successful_requests, concurrency_8_cumulative_snapshot_mean_ttft_ms, trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms.
+Cited value: p95_latency_ms=770.6006329999582.
+Cited value: trial_2_p95_latency_ms=625.3442630004429.
+Cited value: sampled_peak_memory_mib=88687.
+Cited value: trial_2_sampled_peak_memory_mib=88431.
+Cited value: generation_errors=0.
+Cited value: successful_requests=96.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=191.13211147487164.
+Cited value: trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms=147.22696878015995.
+Prior feedback: trial-2: quality=passed; prediction=refuted.
+Arbitration ID: memory_context:sera-memory-context-2048.
+
+Specialist batching: accepted.
+History supplied: trial-2.
+Proposal sera-refine-2048: trial; max_num_batched_tokens = 2048.
+Parent trial: baseline.
+Reason: No execution failure was observed: baseline and trial-2 completed with 96 successful_requests and zero generation_errors; diagnosis call 01a09af5-b367-7553-8f98-aa52386d72f0 records status collected and acceptance, with evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt. The declined scheduling inspection provides no causal result. Independently, trial-2 improved p95_latency_ms from 770.6006329999582 to 625.3442630004429 while quality remained verified, but causality is not established. A lower max_num_batched_tokens is an available, untested batching control that can test whether token-wave scheduling affects the remaining latency objective; the load evidence is in call 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb and the relevant fixed paths remain status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.
+Prediction: At the fixed quality floor, max_num_batched_tokens=2048 may reduce tail latency and concurrency-8 TTFT relative to the accepted trial-2 configuration; direction and magnitude are unmeasured.
+Would refute it: Refute if p95_latency_ms fails to improve by at least 5% from the accepted trial-2 value of 625.3442630004429 ms, or if generation_errors becomes nonzero, successful_requests falls below 96, or quality falls below 0.99. Check diagnosis call 01a09af5-b367-7553-8f98-aa52386d72f0 and fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.
+Cited metrics: p95_latency_ms, trial_2_p95_latency_ms, concurrency_8_cumulative_snapshot_mean_ttft_ms, trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms, successful_requests, trial_2_successful_requests, generation_errors, trial_2_generation_errors, sampled_peak_memory_mib, trial_2_sampled_peak_memory_mib.
+Cited value: p95_latency_ms=770.6006329999582.
+Cited value: trial_2_p95_latency_ms=625.3442630004429.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=191.13211147487164.
+Cited value: trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms=147.22696878015995.
+Cited value: successful_requests=96.
+Cited value: trial_2_successful_requests=96.
+Cited value: generation_errors=0.
+Cited value: trial_2_generation_errors=0.
+Cited value: sampled_peak_memory_mib=88687.
+Cited value: trial_2_sampled_peak_memory_mib=88431.
+Prior feedback: trial-2: quality=passed; prediction=refuted.
+Arbitration ID: output_quality:sera-refine-2048.
+
+Arbiter chose: scheduling:proposal-scheduling-2048. Reason: No execution failure was observed: baseline and trial-2 each completed 96 requests with zero generation_errors, and trial-2 passed the 0.99 quality floor while improving p95 latency to 625.344263 ms. The cause of that improvement is not established; the recorded evidence does not prove a scheduling or batching cause. All three peer investigators independently propose testing max_num_batched_tokens=2048, but their predicted latency or TTFT effect remains unmeasured. This is a legal, bounded experiment that does not repeat the tested configuration; quality and performance gates must be applied after measurement.
+Trials executed in this round: trial-3.
+
+Trial trial-3: collected.
+Scheduled by: arbiter.
+Quality gate: passed; score=1.0; floor=0.99.
+p95: 773.4014930001649 ms; throughput: 26.25167036126847 output tokens/s; peak memory: 88561 MiB.
+Gate selection: baseline; reason: p95-improvement-below-five-percent.
+Constraint failures: {'baseline': [], 'candidate': []}.
+Prediction review: refuted. The tested max_num_batched_tokens=2048 candidate (trial-3) was collected with zero generation errors and quality 1.0, but p95 latency worsened from 770.6006329999582 ms to 773.4014930001649 ms, an improvement fraction of -0.003634645340613017 versus the required 0.05. The deterministic selection result was no-safe-improvement due to p95-improvement-below-five-percent. The observed objective failure does not establish a scheduling or hardware cause; read call 01a09af5-b367-7553-8f98-aa52386d72f0 and the saved evidence paths record the result. Do not retry this tested configuration; use a different measured setting or abstain.
+Observed experiment result: objective-not-improved.
+latency: baseline=770.6006329999582; candidate=773.4014930001649; gain=-0.003634645340613017; required=0.05. Gain and required gain are fractions, not percentages.
+Root cause: not-established. The observed outcome does not establish a model, kernel, memory-pressure, or scheduling cause. A startup error category is not the underlying server-log cause.
+Saved evidence: status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt.
+Next proposal constraint: Do not retry the same tested configuration in this bounded search.
+Next proposal constraint: Preserve the fixed quality floor and all workload constraints.
+Next proposal constraint: Use the measured gain and required gain to justify a different setting, or abstain.
+
+### Round 3
+
+Swarm investigators: scheduling, memory_context, output_quality.
+Initial investigation overlap: recorded.
+Peer-review overlap: recorded.
+Shared findings board: 445b58c4a0c62cdfd92eea3f24b6646e8ec17498a93b7de0cb647d677b9c4e23; entries=3.
+Investigator roles are analysis perspectives, not additional hardware capabilities. GPU trials remain sequential.
+
+Investigator scheduling: rejected.
+Inspection latency_outliers: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af5-b367-7553-8f98-aa52386d72f0, 01a09af8-fce4-7015-a77e-ef2acd7cbfb0, 01a09af8-fc5f-7942-925a-d9c5282e8ae4, 01a09af2-b7b2-7e8a-b2eb-7515daddc97c.
+Inspection not recorded: failed; source=not recorded; calls=not recorded.
+Inspection error: ValueError.
+
+Investigator memory_context: rejected.
+Inspection latency_outliers: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af5-b367-7553-8f98-aa52386d72f0, 01a09af8-fce4-7015-a77e-ef2acd7cbfb0, 01a09af8-fc5f-7942-925a-d9c5282e8ae4, 01a09af2-b7b2-7e8a-b2eb-7515daddc97c.
+Inspection not recorded: failed; source=not recorded; calls=not recorded.
+Inspection error: ValueError.
+
+Investigator output_quality: rejected.
+Inspection latency_outliers: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af5-b367-7553-8f98-aa52386d72f0, 01a09af8-fce4-7015-a77e-ef2acd7cbfb0, 01a09af8-fc5f-7942-925a-d9c5282e8ae4, 01a09af2-b7b2-7e8a-b2eb-7515daddc97c.
+Inspection load_metrics: complete; source=weave; calls=01a09af2-b7cd-7592-bb62-086f453314a0, 01a09af5-b367-7553-8f98-aa52386d72f0, 01a09af8-fce4-7015-a77e-ef2acd7cbfb0, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af2-b7c0-7751-9d95-58b2825c282f, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb, 01a09af5-b334-7d9d-b8c5-4f72f77eb0eb, 01a09af8-fc6d-79e9-8555-d433bf7fd05c, 01a09af8-fc6d-79e9-8555-d433bf7fd05c, 01a09af8-fc6d-79e9-8555-d433bf7fd05c, 01a09af8-fc6d-79e9-8555-d433bf7fd05c.
+
+Participation investigator: active; legal candidates=10; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=10; Read-only investigation of the same legal candidate pool..
+Participation investigator: active; legal candidates=10; Read-only investigation of the same legal candidate pool..
+Inactive roles were not called. Active means a legal untested setting was available.
+
+Specialist None: rejected.
+History supplied: trial-2, trial-3.
+Prior feedback: trial-2: quality=passed; prediction=refuted.
+Prior feedback: trial-3: quality=passed; prediction=refuted.
+Validation error: ValueError.
+
+Specialist None: rejected.
+History supplied: trial-2, trial-3.
+Prior feedback: trial-2: quality=passed; prediction=refuted.
+Prior feedback: trial-3: quality=passed; prediction=refuted.
+Validation error: ValueError.
+
+Specialist None: rejected.
+History supplied: trial-2, trial-3.
+Prior feedback: trial-2: quality=passed; prediction=refuted.
+Prior feedback: trial-3: quality=passed; prediction=refuted.
+Validation error: ValueError.
+
+Arbiter choice: not recorded.
+Trials executed in this round: none.
+
+Stopping policy: objective plateau plus one confirmation round.
+Pending confirmation round: True; consecutive rounds without qualifying progress: 1. 
+Final selection: trial-2.
+Stop reason: no-valid-selected-proposal.
+Trials used: 3; no total trial cap.
+Runner status: closed; closed=True.
+Raw evidence: result.json — search.rounds, search_trials, and agent_calls.
+

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"candidate\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The candidate passed quality and achieved 80 ms p95 versus the 100 ms baseline, a 20% reduction, exceeding the predicted 5% improvement. Placement is not supported in a single-model milestone.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10142,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 162,
+    "reasoning_output_tokens": 92
+  }
+}

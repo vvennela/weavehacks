@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The candidate showed lower p95 (80 ms vs 100 ms), but failed quality, so the joint prediction of at least 5% lower p95 while preserving quality was refuted. The observed result is a quality failure; no causal hardware inference is supported. Candidate placement is not supported for this single-model milestone.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10144,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 170,
+    "reasoning_output_tokens": 77
+  }
+}

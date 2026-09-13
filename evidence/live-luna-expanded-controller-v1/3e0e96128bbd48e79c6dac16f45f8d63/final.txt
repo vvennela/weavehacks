@@ -1,0 +1,1 @@
+{"selected_trial_id":"candidate","prediction_outcome":"confirmed","reason":"The candidate passed quality and achieved 80 ms p95 versus the 100 ms baseline, a 20% reduction, exceeding the predicted 5% improvement. Placement is not supported in a single-model milestone."}

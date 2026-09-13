@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-baseline-max-batched-tokens-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"mean_queue_ms\",\"kv_cache_percent\"],\"predicted_metric_change\":\"p95_latency_ms and mean_queue_ms decrease while kv_cache_percent remains near baseline.\",\"confidence\":0.7,\"expected_trial_cost\":1,\"falsification_condition\":\"The trial does not reduce p95_latency_ms or mean_queue_ms, or kv_cache_percent increases materially from 40.\",\"reason\":\"The supplied supported change is max_num_batched_tokens=2048; baseline p95_latency_ms is 101, mean_queue_ms is 40, and kv_cache_percent is 40.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11529,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 248,
+    "reasoning_output_tokens": 51
+  }
+}

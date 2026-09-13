@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed baseline latency is p95 770.6006329999582 ms and p99 is unreliable, while quality passed with mean 1.0 and no generation errors. The cause of the tail latency is unknown; the near-zero cumulative queue snapshots do not establish causality. Inspect latency outliers to identify which requests or concurrency conditions drive the worst percentile.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14375,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 228,
+    "reasoning_output_tokens": 128
+  }
+}
