@@ -39,6 +39,9 @@ def _metrics(record):
     return {
         'p95_latency_ms': record['p95_latency_ms'],
         'peak_memory_mib': record['peak_memory_mib'],
+        **{f'concurrency_{key}_p95_latency_ms': value
+           for key, value in record.get('per_load_p95_latency_ms', {}).items()},
+        **{key: record[key] for key in ('quality_score', 'generation_errors') if key in record},
         **{f'telemetry.{key}': value for key, value in record.get('telemetry', {}).items()},
     }
 
@@ -244,4 +247,116 @@ class WandbSearchPolicy:
                 raise StopSearch()
             selected = valid[ranked.ranked_proposal_ids[0]]['candidate_id']
         decision.update(status='selected', selected_candidate_id=selected)
+        return selected
+
+
+class FrozenSwarmPolicy:
+    """Production three-investigator/peer-review/arbiter selection over cached metrics.
+
+    This adapter cannot access outcome files or Weave. Its reader only receives
+    this replay's selected records. Model-output trace inspection is unavailable.
+    """
+
+    def __init__(self, manifest, client, *, provider_check, variant='full-evidence'):
+        from sera.swarm import INVESTIGATORS
+        if variant not in {'full-evidence', 'no-history', 'round-robin'}:
+            raise UnsupportedPolicy('Exact telemetry removal cannot satisfy metric citations')
+        # Reuse exact manifest/schema/provider preflight, without making provider calls.
+        checked = WandbSearchPolicy(manifest, client, provider_check=provider_check)
+        if not callable(getattr(client, 'fork', None)) or client.history:
+            raise ValueError('Swarm replay requires a fresh forkable client')
+        self.manifest = deepcopy(manifest)
+        self.client, self.variant = client, variant
+        self.representable = checked.representable
+        self.schema_hash = checked.schema_hash
+        settings = {
+            'adapter_version': 'sera-frozen-swarm-v1', 'variant': variant,
+            'manifest_hash': manifest['manifest_hash'], 'schema_hash': self.schema_hash,
+            'provider': getattr(client, 'provider', 'wandb'), 'model': client.model,
+            'project': client.project, 'investigators': list(INVESTIGATORS),
+            'inspection_source': 'selected-cached-metrics-only',
+            'max_requests_per_decision': 4 if variant == 'round-robin' else 13,
+            'max_decisions': manifest['max_proposals'],
+        }
+        self.audit = {'settings': settings, 'policy_hash': content_hash(settings),
+                      'provider_validation': checked.provider_validation, 'rounds': [],
+                      'benchmark_claim': 'not-assessed',
+                      'limitations': ['Frozen single-setting candidates only; no online expansion.',
+                                      'Inspection reads cached metrics, not Weave or raw model outputs.',
+                                      'No-history retains baseline and remaining-candidate mask.']}
+
+    def export_audit(self):
+        return deepcopy(self.audit)
+
+    def __call__(self, view):
+        from sera.swarm import INVESTIGATORS, _initial, _refine, _specialist_evidence, choose_swarm_experiments
+        if (view['manifest_hash'] != self.manifest['manifest_hash']
+                or view['identity'] != self.manifest['identity']
+                or view['candidates'] != self.manifest['candidates']
+                or schema_hash() != self.schema_hash):
+            raise ValueError('Swarm view differs from frozen settings')
+        if len(self.audit['rounds']) >= self.manifest['max_proposals']:
+            raise StopSearch()
+        supplied = project_evidence(view, self.variant)
+        supplied['limitations'] = deepcopy(self.audit['limitations'])
+        legal, options = [], []
+        for entry in view['candidates']:
+            if entry['candidate_id'] not in view['remaining_candidate_ids']:
+                continue
+            proposal = self.representable[entry['candidate_id']]
+            candidate = proposal.to_candidate(view['baseline']['configuration'])
+            legal.append((entry['candidate_id'], proposal.changed_lever, proposal.proposed_value, candidate))
+            options.append({**deepcopy(entry), 'parent_trial_id': view['baseline']['candidate_id'],
+                            'changed': {proposal.changed_lever: proposal.proposed_value},
+                            'component_trial_ids': []})
+        if not legal:
+            raise StopSearch()
+        supplied['candidate_options'] = options
+        supplied['supported_changes'] = {}
+        for _, lever, value, _ in legal:
+            supplied['supported_changes'].setdefault(lever, []).append(value)
+        supplied['frozen_candidate_hashes'] = [entry[3].config.config_hash for entry in legal]
+        # The closure captures this projected view only, never the full outcome table.
+        projected = deepcopy(supplied)
+
+        def read_metrics(query, _):
+            return {'query_id': query, 'source': 'selected-cached-metrics-only',
+                    'baseline': {'candidate_id': projected['trial_id'],
+                                 'metrics': deepcopy(_metrics(view['baseline']))},
+                    'observed': deepcopy(projected.get('history', [])),
+                    'limitations': ['Raw outputs and request outliers were not imported.',
+                                    'No unselected candidate measurements are available.']}
+
+        record = {'specialists': [], 'candidate_options': deepcopy(options)}
+        self.audit['rounds'].append(record)
+        if self.variant == 'round-robin':
+            investigator = INVESTIGATORS[(len(self.audit['rounds']) - 1) % len(INVESTIGATORS)]
+            evidence = _specialist_evidence(supplied, investigator)
+            child = self.client.fork()
+            if child is self.client or child.history or child.history is self.client.history:
+                raise ValueError('Round-robin investigator needs independent history')
+            check = {'investigator_id': investigator, 'inspections': [], 'phase_timings': {}}
+            record['specialists'].append(check)
+            try:
+                _initial(child, evidence, check, read_metrics)
+                proposal, candidate = _refine(child, evidence, check, [], content_hash([]))
+            finally:
+                record['agent_calls'] = deepcopy(child.history)
+            choices = [(proposal, candidate, 'round-robin')] if candidate is not None else []
+        else:
+            before = len(self.client.history)
+            try:
+                choices = choose_swarm_experiments(self.client, supplied, legal, record,
+                                                   view['remaining_trials'], read_metrics)
+            finally:
+                record['agent_calls'] = deepcopy(self.client.history[before:])
+        if not choices:
+            if (any(row.get('status') == 'rejected' for row in record['specialists'])
+                    or record.get('arbiter_error') or record.get('swarm', {}).get('error')):
+                return None
+            raise StopSearch()
+        selected = choices[0][1].config.config_hash
+        if selected not in view['remaining_candidate_ids']:
+            raise ValueError('Swarm selected outside the remaining frozen universe')
+        record['selected_candidate_id'] = selected
         return selected

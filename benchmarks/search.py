@@ -78,7 +78,8 @@ def freeze_manifest(identity, baseline, candidates, *, budget, evidence_kind='me
         seen.add(candidate['config_hash'])
         values = candidate['configuration']
         changed = {key for key, value in values.items() if value != baseline.model_dump()[key]}
-        if not changed <= {'quantization', 'kv_cache_dtype', 'max_num_seqs', 'max_num_batched_tokens'}:
+        if not changed <= {'quantization', 'kv_cache_dtype', 'max_num_seqs', 'max_num_batched_tokens',
+                           'enable_prefix_caching', 'enable_chunked_prefill', 'enforce_eager'}:
             raise ValueError('Candidate changes fixed workload or hardware settings')
         for mode, enabled in [('weights-fp8', values['quantization'] is not None),
                               ('kv-fp8', values['kv_cache_dtype'] == 'fp8'),
@@ -106,7 +107,7 @@ def _valid(record):
         'feasibility_passed', 'reliability_passed', 'quality_passed'))
 
 
-def _validate(manifest, artifacts):
+def _validate(manifest, artifacts, *, require_complete=True):
     expected = freeze_manifest(
         manifest['identity'], manifest['baseline']['configuration'],
         [entry['configuration'] for entry in manifest['candidates']],
@@ -130,7 +131,8 @@ def _validate(manifest, artifacts):
         record = artifact['record']
         if content_hash(record) != artifact['artifact_hash'] or not required <= set(record):
             raise ValueError('Outcome artifact hash or fields do not match')
-        if set(record) - required - {'telemetry'}:
+        if set(record) - required - {'telemetry', 'per_load_p95_latency_ms', 'quality_score',
+                                    'generation_errors', 'error_type'}:
             raise ValueError('Unknown outcome fields')
         candidate_id = record['candidate_id']
         if candidate_id not in entries or candidate_id in outcomes:
@@ -158,10 +160,23 @@ def _validate(manifest, artifacts):
                 not isinstance(key, str) or (value is not None and not _finite(value, zero=True))
                 for key, value in telemetry.items()):
             raise ValueError('Telemetry must contain only finite nonnegative numbers or null')
+        loads = record.get('per_load_p95_latency_ms', {})
+        if not isinstance(loads, dict) or any(
+                key not in {'1', '2', '4', '8'} or (value is not None and not _finite(value))
+                for key, value in loads.items()):
+            raise ValueError('Invalid per-load latency measurements')
+        score = record.get('quality_score')
+        if score is not None and (not _finite(score, zero=True) or score > 1):
+            raise ValueError('Invalid quality score')
+        errors = record.get('generation_errors')
+        if errors is not None and (type(errors) is not int or errors < 0):
+            raise ValueError('Invalid generation error count')
+        if record.get('error_type') is not None and not isinstance(record['error_type'], str):
+            raise ValueError('Invalid error type')
         outcomes[candidate_id] = deepcopy(record)
-    if outcomes.keys() != entries.keys():
+    if require_complete and outcomes.keys() != entries.keys():
         raise ValueError('Incomplete outcome universe: no oracle or comparison is permitted')
-    if not _valid(outcomes[BASELINE_NAME]):
+    if require_complete and not _valid(outcomes[BASELINE_NAME]):
         raise ValueError('Initial baseline must be measured and pass the frozen gates')
     return outcomes
 

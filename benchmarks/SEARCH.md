@@ -2,13 +2,15 @@
 
 `benchmarks.search` implements the replay mechanics in spec sections 19–20. It is a benchmark control, not Sera's public optimizer. It performs no GPU trials, network requests, model calls, or file writes. It does not change task cases, prompts, thresholds, or production selection.
 
+The executable collector and current three-investigator replay adapter are now described in [benchmark collection](../docs/benchmark-collection.md). Use `python -m benchmarks.run_search --help`. The older two-control-role adapter below remains available as a bounded subset, not the current full swarm. No real collection has been performed by the new command.
+
 ## Freeze before collecting outcomes
 
 Call `freeze_manifest(identity, baseline, candidates, budget=...)`, then save its returned JSON before measuring candidates. The manifest contains its own canonical SHA256 hash.
 
 - Model: Qwen/Qwen3-0.6B only, with recorded model and tokenizer revision SHAs.
 - Baseline: `sera-baseline-v1`. Only its memory fraction can change for a named workload profile.
-- Universe: two to twelve distinct nonbaseline `RuntimeConfig` configurations. Changes are limited to supported precision fields and batching fields. Full configurations are sorted lexicographically by canonical JSON, not by scores or favorable names. Configuration hashes are candidate IDs.
+- Universe: two to twelve distinct nonbaseline `RuntimeConfig` configurations. Changes are limited to supported precision, batch tokens, sequence count, prefix caching, chunked prefill, and eager/graph execution. Full configurations are sorted lexicographically by canonical JSON, not by scores or favorable names. Configuration hashes are candidate IDs.
 - Budget: one to eight candidate trials, strictly smaller than the nonbaseline universe. The baseline costs zero search trials.
 - All candidates keep the baseline's memory fraction and context limit. Illegal runtime configurations fail schema validation.
 - Precision candidates require a `compatibility` map containing `kv-fp8` and/or `weights-fp8` with the hash of the passed hardware-check record. A combined candidate also requires `weights-and-kv-fp8`: separate successes do not establish that both settings work together. Verify each check actually passed on the same pinned runtime and GPU before supplying its hash.
@@ -52,7 +54,7 @@ An optional `telemetry` object accepts finite nonnegative numbers or null, for e
 
 Exactly one artifact is required for the baseline and every frozen candidate, including failures. Missing or duplicate outcomes, hash mismatches, inconsistent workload/runtime identity, malformed gates, and absent valid metrics fail closed before a policy starts. This initial implementation also requires a quality-valid baseline. An invalid reference needs a separately specified protocol; it is not silently accepted.
 
-Existing single-candidate result files are not automatically treated as complete search evidence. A collection adapter still needs to assemble and verify these envelopes from real trial records; do not invent missing values to make an import pass.
+Existing single-candidate result files are not automatically treated as complete search evidence. `benchmarks.collection` now assembles and verifies these envelopes from its saved trial records. It adds optional per-load p95, task score, generation-error count, and error type; these remain bound to the source artifact hash. Do not invent missing values to make an import pass.
 
 ## Run policies
 
@@ -121,7 +123,7 @@ Available variants:
 
 The exact telemetry ablation is blocked because `Proposal.evidence_used` requires at least one citation, while `validate_proposal` only accepts names present in the supplied metrics. Removing every reduced metric leaves no valid citation. Keeping p95 or memory metrics and calling that “no reduced telemetry” would hide a contract change. A narrower “no auxiliary telemetry” comparison or a schema supporting nonmetric evidence needs an explicit, frozen definition first.
 
-The expanded proposal schema supports FP8 KV plus bounded integer controls: `max_num_batched_tokens` (1–65,536), `max_num_seqs` (1–256), and `max_model_len` (65–4,096). Validation checks the actual parent configuration, the explicit per-run allowed values, and the frozen candidate hashes; booleans, no-op changes, and invalid combined settings are rejected. Live defaults remain limited to FP8 KV and batch tokens 2048: schema capability does not activate new GPU trials. Expanded live agent execution remains blocked: provider-v3 passed schema validation on 28/30 first responses and 29/30 within one retry; provider-v4 added explicit output-schema instructions and produced 30/30 schema-valid first responses with zero retries, but only 26/30 evidence-citation checks passed. The complete provider check failed. No additional provider tests are approved. See the [provider-v4 evidence](../evidence/provider-v4/README.md). Multi-value batching universes can now support more than one trial and a structural history ablation. The replay manifest still fixes context length across candidates, so context-varying universes remain blocked. The exact no-reduced-telemetry ablation also remains blocked by the metric-only citation contract described above. No real search win has been established. These adapters are not a substitute for the full section 19 Sera policy, its combination proposals, exploration rule, or a validated intelligence claim.
+The current proposal schema also supports strict boolean prefix/chunked-prefill/eager controls and a bounded memory fraction, in addition to FP8 KV and integer batching/context controls. Validation checks the actual parent configuration, explicit per-run values, and frozen hashes; no-ops and invalid coupled settings are rejected. The benchmark keeps context and memory fraction fixed even though normal search can vary them. Use the current 34-case provider certificate for the chosen transport/model/project; the historical provider-v4 failure is not the current Astra/Luna certificate. No real frozen-universe search win has been established. The older two-role adapter is not a substitute for the three-investigator adapter, combination proposals, or a validated intelligence claim.
 
 Before any live policy calls:
 
