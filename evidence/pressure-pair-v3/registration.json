@@ -1,0 +1,40 @@
+{
+  "profiles": {
+    "cache-v2": {
+      "name": "qwen-kv-pressure-pilot-v2",
+      "gpu_memory_utilization": 0.025,
+      "max_model_len": 4096,
+      "max_num_seqs": 8,
+      "concurrency": 8,
+      "input_tokens_per_request": 2304,
+      "max_output_tokens": 64,
+      "warmup_requests": 2,
+      "measured_waves": 3,
+      "metrics_poll_seconds": 0.02,
+      "high_kv_percent": 80,
+      "minimum_preemptions": 1,
+      "disclosure": "Memory budget constrained to represent a smaller card; execution uses an RTX Pro 6000 with 96 GB."
+    },
+    "queue-v1": {
+      "name": "qwen-queue-pressure-pilot-v1",
+      "gpu_memory_utilization": 0.1,
+      "max_model_len": 4096,
+      "max_num_seqs": 8,
+      "concurrency": 8,
+      "input_tokens_per_request": 2304,
+      "max_output_tokens": 64,
+      "warmup_requests": 2,
+      "measured_waves": 3,
+      "metrics_poll_seconds": 0.02,
+      "high_kv_percent": 80,
+      "minimum_preemptions": 1,
+      "disclosure": "Memory budget constrained to represent a smaller card; execution uses an RTX Pro 6000 with 96 GB.",
+      "maximum_kv_percent_exclusive": 50,
+      "minimum_measured_queue_ms": 10
+    }
+  },
+  "source_revision": "dd824e0",
+  "source_prompts_hash": "0d72e6a0f482c444b2aa4161322d5b55a61c42b26ec8c38a104f1ec7066b002b",
+  "scope": "Two predeclared diagnostic pilots, no retuning and no task-quality claim",
+  "registration_hash": "89eca8c95e58226fe5810de581726aa002bc575ef2da436149593c9d3540e352"
+}

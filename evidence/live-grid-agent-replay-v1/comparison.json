@@ -1,0 +1,1850 @@
+{
+  "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+  "grid": {
+    "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+    "policy": "fixed-grid",
+    "seed": null,
+    "evidence_kind": "measured",
+    "performance_claim_allowed": true,
+    "benchmark_claim": "not-assessed",
+    "budget": 3,
+    "trials_used": 3,
+    "stop_reason": "budget-exhausted",
+    "curve": [
+      {
+        "trials": 0,
+        "candidate_id": "sera-fp8-weight-reference-v1",
+        "p95_latency_ms": 770.6823209991853,
+        "peak_memory_mib": 88687,
+        "latency_regret_ms": 144.9545939976815
+      },
+      {
+        "trials": 1,
+        "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+        "p95_latency_ms": 765.6131900002947,
+        "peak_memory_mib": 88347,
+        "latency_regret_ms": 139.8854629987909
+      },
+      {
+        "trials": 2,
+        "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+        "p95_latency_ms": 765.6131900002947,
+        "peak_memory_mib": 88347,
+        "latency_regret_ms": 139.8854629987909
+      },
+      {
+        "trials": 3,
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431,
+        "latency_regret_ms": 0.0
+      }
+    ],
+    "oracle": {
+      "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+      "p95_latency_ms": 625.7277270015038,
+      "peak_memory_mib": 88431
+    },
+    "trials_to_near_oracle": 3,
+    "proposals": [
+      {
+        "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+        "status": "selected",
+        "policy_seconds": 1.0219991963822395e-06
+      },
+      {
+        "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+        "status": "selected",
+        "policy_seconds": 5.369984137360007e-07
+      },
+      {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "status": "selected",
+        "policy_seconds": 2.6999987312592566e-07
+      }
+    ],
+    "invalid_trials": 0,
+    "quality_failures": 0,
+    "repeated_proposals": 0,
+    "candidate_count": 3,
+    "gpu_trials_during_replay": 0,
+    "gpu_collection_seconds": 754.3144357009987,
+    "startup_seconds": 284.30069084700517,
+    "policy_seconds": 1.8289974832441658e-06
+  },
+  "random": [
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 0,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "p95_latency_ms": 770.4568759982067,
+          "peak_memory_mib": 88561,
+          "latency_regret_ms": 144.72914899670286
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 4.392997652757913e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 2.2040003386791795e-06
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 9.0500179794617e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 7.501999789383262e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 1,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 3,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.2300006346777081e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 1.0209987522102892e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 6.100017344579101e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.8610011213459074e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 2,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 3,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.2919990695081651e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 5.76997990719974e-07
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 4.4599801185540855e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.3149950720835477e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 3,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 3,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.0449984984006733e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 7.660019036848098e-07
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 8.440001693088561e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.655000571394339e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 4,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.28199826576747e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 7.109993021003902e-07
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 5.399997462518513e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.5329973141197115e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 5,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 1.0469993867445737e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 6.76998752169311e-07
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 6.059999577701092e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.329998096683994e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 6,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 1.0980002116411924e-06
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 6.270020094234496e-07
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 4.710018401965499e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.196004061261192e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 7,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "p95_latency_ms": 770.4568759982067,
+          "peak_memory_mib": 88561,
+          "latency_regret_ms": 144.72914899670286
+        },
+        {
+          "trials": 2,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 3,
+      "proposals": [
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 1.0349976946599782e-06
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 7.609996828250587e-07
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 4.819994501303881e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.277996827615425e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 8,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.0390031093265861e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 6.000009307172149e-07
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 7.689995982218534e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.4080036382656544e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 9,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "p95_latency_ms": 770.4568759982067,
+          "peak_memory_mib": 88561,
+          "latency_regret_ms": 144.72914899670286
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 1.0520016076043248e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 7.039998308755457e-07
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 4.76997229270637e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.2329986677505076e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 10,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 1.0229996405541897e-06
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 5.660003807861358e-07
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 4.2399915400892496e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.0129991753492504e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 11,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "p95_latency_ms": 770.4568759982067,
+          "peak_memory_mib": 88561,
+          "latency_regret_ms": 144.72914899670286
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 1.1660013115033507e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 1.0509975254535675e-06
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 4.0899976738728583e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.625998604344204e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 12,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "p95_latency_ms": 770.4568759982067,
+          "peak_memory_mib": 88561,
+          "latency_regret_ms": 144.72914899670286
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 1.0939984349533916e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 5.740002961829305e-07
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 5.750007403548807e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.2429994714912027e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 13,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "p95_latency_ms": 770.4568759982067,
+          "peak_memory_mib": 88561,
+          "latency_regret_ms": 144.72914899670286
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 1.0160001693293452e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 5.700021574739367e-07
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 7.320013537537307e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.3180036805570126e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 14,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 3,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.0700023267418146e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 8.160022844094783e-07
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 3.8599682739004493e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.272001438541338e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 15,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 3,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.115000486606732e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 5.460024112835526e-07
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 5.490001058205962e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.210003003710881e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 16,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "p95_latency_ms": 770.4568759982067,
+          "peak_memory_mib": 88561,
+          "latency_regret_ms": 144.72914899670286
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 2,
+      "proposals": [
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 1.1599986464716494e-06
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 6.869995559100062e-07
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 5.170004442334175e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.363998646615073e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 17,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 1.1049996828660369e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 7.029993867035955e-07
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 5.340007191989571e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.3419997887685895e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 18,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 2,
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "p95_latency_ms": 765.6131900002947,
+          "peak_memory_mib": 88347,
+          "latency_regret_ms": 139.8854629987909
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 3,
+      "proposals": [
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 1.0609983291942626e-06
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 6.139998731669039e-07
+        },
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 4.819994501303881e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.1569976524915546e-06
+    },
+    {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "uniform-random",
+      "seed": 19,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 1.45800004247576e-06
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 7.210001058410853e-07
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 6.629998097196221e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 2.8419999580364674e-06
+    }
+  ],
+  "policies": {
+    "recorded-live-sera": {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "recorded-live-sera",
+      "seed": null,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 9.220020729117095e-07
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 5.570000212173909e-07
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 2.8800059226341546e-07
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 1.767002686392516e-06
+    },
+    "full-evidence": {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "full-evidence",
+      "seed": null,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 80.1334463839994
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 96.79162791300041
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 94.78811137499724
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 271.71318567199705
+    },
+    "no-history": {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "no-history",
+      "seed": null,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 74.91195765299926
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 77.71633929100062
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 68.82480898399808
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 221.45310592799797
+    },
+    "round-robin": {
+      "manifest_hash": "4445eeec1c809e2a4fd113fcf0f02f766ae0d8c6b41f03ed088016b0c60d0368",
+      "policy": "round-robin",
+      "seed": null,
+      "evidence_kind": "measured",
+      "performance_claim_allowed": true,
+      "benchmark_claim": "not-assessed",
+      "budget": 3,
+      "trials_used": 3,
+      "stop_reason": "budget-exhausted",
+      "curve": [
+        {
+          "trials": 0,
+          "candidate_id": "sera-fp8-weight-reference-v1",
+          "p95_latency_ms": 770.6823209991853,
+          "peak_memory_mib": 88687,
+          "latency_regret_ms": 144.9545939976815
+        },
+        {
+          "trials": 1,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 2,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        },
+        {
+          "trials": 3,
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "p95_latency_ms": 625.7277270015038,
+          "peak_memory_mib": 88431,
+          "latency_regret_ms": 0.0
+        }
+      ],
+      "oracle": {
+        "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "p95_latency_ms": 625.7277270015038,
+        "peak_memory_mib": 88431
+      },
+      "trials_to_near_oracle": 1,
+      "proposals": [
+        {
+          "candidate_id": "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+          "status": "selected",
+          "policy_seconds": 58.58583276199715
+        },
+        {
+          "candidate_id": "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+          "status": "selected",
+          "policy_seconds": 70.25207325000156
+        },
+        {
+          "candidate_id": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+          "status": "selected",
+          "policy_seconds": 62.41551372899994
+        }
+      ],
+      "invalid_trials": 0,
+      "quality_failures": 0,
+      "repeated_proposals": 0,
+      "candidate_count": 3,
+      "gpu_trials_during_replay": 0,
+      "gpu_collection_seconds": 754.3144357009987,
+      "startup_seconds": 284.30069084700517,
+      "policy_seconds": 191.25341974099865
+    }
+  },
+  "benchmark_claim": "not-assessed",
+  "random_median_final_p95_ms": 625.7277270015038,
+  "random_near_oracle_hits": [
+    2,
+    3,
+    3,
+    3,
+    2,
+    1,
+    1,
+    3,
+    2,
+    2,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    2,
+    1,
+    3,
+    1
+  ],
+  "random_near_oracle_hit_fraction": 1.0,
+  "live_source": {
+    "registration_hash": "2843eee593b706529bd178369ef91a529900ee6cb8412ce27ffa553e019c1eb5",
+    "live_result_hash": "1c4d5b7c80386fdce73c5f28c1efc057f056522d8c05d4636cc0d917184117d3",
+    "selected_candidate_ids": [
+      "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+      "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+      "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f"
+    ],
+    "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09b97-cb9a-701a-a608-ea20decf8416",
+    "limitations": [
+      "Prior 72B demo results informed this small control selection; this is not blind discovery.",
+      "One repeated-prompt profile; not a statistical, global-optimality, or pressure-reversal claim.",
+      "User-approved exception to the Qwen0.6B-only section19 model/baseline.",
+      "The live loop has no total trial cap; the fixed universe has three unique configurations.",
+      "Full grid is scored after live choices close, using identical cached outcomes."
+    ]
+  },
+  "strict_section_19_4_claim": false
+}
