@@ -1,0 +1,594 @@
+{
+  "schema_version": "sera-placement-v1",
+  "status": "rejected",
+  "plan": {
+    "physical_gpu_bytes": 102641958912,
+    "declared_budget_bytes": 25769803776,
+    "services": [
+      {
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "gpu_index": 0,
+        "allocation_bytes": 3221225472,
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.02092208362703934,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_p95_slowdown_fraction": 0.1,
+          "max_generation_errors": 0
+        }
+      },
+      {
+        "model_id": "zai-org/glm-4-9b-chat-hf",
+        "revision": "8599336fc6c125203efb2360bfaf4c80eef1d1bf",
+        "gpu_index": 0,
+        "allocation_bytes": 18253611008,
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.16737666901631473,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_p95_slowdown_fraction": 0.1,
+          "max_generation_errors": 0
+        }
+      }
+    ]
+  },
+  "plan_hash": "e793a1faed3bbf8b90c17064ff5839e1ec257aa51aff667ead72dfd6de4a2c56",
+  "workloads": {
+    "Qwen/Qwen3-0.6B": {
+      "prompts": [
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "Read this record: {\"name\":\"job\",\"count\":4}. What is count? Return its integer value in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "Records: [{\"id\":\"a\",\"ok\":true},{\"id\":\"b\",\"ok\":false}]. Return the IDs with ok equal to true, in order. Put the array in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, what does 'cat'.upper() return? Return the string in a JSON object with one key named answer."
+          }
+        ]
+      ],
+      "evaluator_version": "sera-task-v1",
+      "workload": {
+        "concurrency": [
+          1,
+          2,
+          4,
+          8
+        ]
+      },
+      "generation": {
+        "temperature": 0,
+        "top_p": 1,
+        "top_k": -1,
+        "seed": 0,
+        "max_tokens": 64
+      },
+      "response_formats": [
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "response_format_version": "sera-easy-requested-types-v1"
+    },
+    "zai-org/glm-4-9b-chat-hf": {
+      "prompts": [
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "Read this record: {\"name\":\"job\",\"count\":4}. What is count? Return its integer value in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "Records: [{\"id\":\"a\",\"ok\":true},{\"id\":\"b\",\"ok\":false}]. Return the IDs with ok equal to true, in order. Put the array in a JSON object with one key named answer."
+          }
+        ],
+        [
+          {
+            "role": "system",
+            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+          },
+          {
+            "role": "user",
+            "content": "In Python, what does 'cat'.upper() return? Return the string in a JSON object with one key named answer."
+          }
+        ]
+      ],
+      "evaluator_version": "sera-task-v1",
+      "workload": {
+        "concurrency": [
+          1,
+          2,
+          4,
+          8
+        ]
+      },
+      "generation": {
+        "temperature": 0,
+        "top_p": 1,
+        "top_k": -1,
+        "seed": 0,
+        "max_tokens": 64
+      },
+      "response_formats": [
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "sera-easy-requested-types-v1",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "response_format_version": "sera-easy-requested-types-v1"
+    }
+  },
+  "workload_hash": "a708ff95ce839715db79ef4426b9bb6a879cc92f183b8c90e6fba9b9b4f39065",
+  "memory_estimates": {
+    "Qwen/Qwen3-0.6B": {
+      "weights_bytes": 1213328262,
+      "kv_bytes": 469762048,
+      "workspace_bytes": 128849019,
+      "process_overhead_bytes": 1073741824,
+      "fragmentation_bytes": 53687092
+    },
+    "zai-org/glm-4-9b-chat-hf": {
+      "weights_bytes": 18865643848,
+      "kv_bytes": 167772160,
+      "workspace_bytes": 450971567,
+      "process_overhead_bytes": 1073741824,
+      "fragmentation_bytes": 53687092
+    }
+  },
+  "memory_estimate_scope": "caller-supplied estimates; not a measured fit guarantee",
+  "isolated": {},
+  "isolated_gates": {},
+  "isolated_runtimes": [],
+  "decision": {
+    "outcome": "not-attempted",
+    "reason": "estimated-memory-does-not-fit"
+  },
+  "quantization_enabled_placement": false,
+  "returned_runner_closed": true,
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09bc5-7e3e-7d1c-b8f4-324372769635",
+  "trace_status": "enabled",
+  "trace_export_failures": [],
+  "returned_runtimes": []
+}

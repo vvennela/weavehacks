@@ -1,0 +1,37 @@
+{
+  "observed_at": "2026-09-13T17:16:25.615879+00:00",
+  "kernel": "4.19.0-gvisor",
+  "api_pid": 58350,
+  "engine_pid": 58452,
+  "nvidia_process_query": "1, python, 17020\n",
+  "process_status": {
+    "1": [
+      "Name:\tpython",
+      "Pid:\t1",
+      "PPid:\t0"
+    ],
+    "58350": [
+      "Name:\tpython",
+      "Pid:\t58350",
+      "PPid:\t56936"
+    ],
+    "58452": [
+      "Name:\tVLLM::EngineCor",
+      "Pid:\t58452",
+      "PPid:\t58350"
+    ]
+  },
+  "pid_namespaces": {
+    "/proc/self/ns/pid": "pid:[8]",
+    "/proc/1/ns/pid": "pid:[8]"
+  },
+  "proc_mounts": [
+    "none /proc proc rw,noexec,nosuid,dentry_cache_limit=1000 0 0"
+  ],
+  "nvml_processes": [
+    {
+      "pid": 1,
+      "usedGpuMemory": 17846763520
+    }
+  ]
+}

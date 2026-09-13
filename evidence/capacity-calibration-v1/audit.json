@@ -1,0 +1,103 @@
+{
+  "audit_passed": true,
+  "plans": [
+    {
+      "plan_hash": "ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23",
+      "status": "isolated-references-pass",
+      "services": {
+        "Qwen/Qwen3-0.6B": {
+          "task_passes": 8,
+          "timed_passes": 96,
+          "p95_latency_ms": 136.49446699855616,
+          "joint_p95_limit_ms": 150.14391369841178,
+          "peak_mib": 2803,
+          "allocation_bytes": 3221225472,
+          "cleanup_memory_mib": 0,
+          "startup_seconds": 46.05353806700077
+        },
+        "zai-org/glm-4-9b-chat-hf": {
+          "task_passes": 8,
+          "timed_passes": 96,
+          "p95_latency_ms": 170.84933600199292,
+          "joint_p95_limit_ms": 187.93426960219224,
+          "peak_mib": 17105,
+          "allocation_bytes": 18253611008,
+          "cleanup_memory_mib": 0,
+          "startup_seconds": 65.07024229300077
+        }
+      },
+      "trace_request_outputs_matched": 272
+    },
+    {
+      "plan_hash": "e793a1faed3bbf8b90c17064ff5839e1ec257aa51aff667ead72dfd6de4a2c56",
+      "status": "estimate-rejected-not-measured",
+      "fits": {
+        "Qwen/Qwen3-0.6B": true,
+        "zai-org/glm-4-9b-chat-hf": false
+      }
+    },
+    {
+      "plan_hash": "91da5d1691d9716d9aa97ab2f8919d2f7438d1dd57c0119c19334066163c093a",
+      "status": "estimate-rejected-not-measured",
+      "fits": {
+        "Qwen/Qwen3-0.6B": false,
+        "zai-org/glm-4-9b-chat-hf": true
+      }
+    },
+    {
+      "plan_hash": "e19c71b75aca03ac71237489f3301aeb08178963245714163b09d43cc26ec4da",
+      "status": "estimate-rejected-not-measured",
+      "fits": {
+        "Qwen/Qwen3-0.6B": false,
+        "zai-org/glm-4-9b-chat-hf": false
+      }
+    }
+  ],
+  "weave_calls": 284,
+  "source_sha256": {
+    "audit.py": "3e8986c9aeff211c9c1cb1a9a7b3a39dd5c1c7933e679c124942a2a49d7d1a53",
+    "launch-cell.py": "10567cb5e3e87f993c4a38114f489ec2382d94f096a9c3f04c5b0b815033a140",
+    "manifest.json": "bc08c30f5f2f545419658bf3d5686f8e1989a4d1ef98fa927069874ed9610e1c",
+    "preparation.json": "218a4b60dca6a3f7c09399d6fef0de6a25c223fb450095694b8ca51bb0dc8f2d",
+    "prepare.py": "04c8a213794903d857eb9a4e6eb53ac491083f32dbd72ee9ad7260f47b7ab12e",
+    "process-accounting.json": "08a426559b8dd74ffb8c7324471456580dd491ee1e3ab0950e9645de7c2cd8d2",
+    "references/91da5d1691d9716d9aa97ab2f8919d2f7438d1dd57c0119c19334066163c093a/report.md": "4043e9a75a6cd1608d8a1339693f1195177ef9bb1886e1f13a3a21a7364c6faa",
+    "references/91da5d1691d9716d9aa97ab2f8919d2f7438d1dd57c0119c19334066163c093a/result.json": "95785695c5cebc39f30074f587e68f01fac1f0f9c831fee07c38f14a93e40fd2",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-1-after-measurement.prom": "e59c9720388fa665c81d6a0be222c189fd9000f23dec74e7ef1326b930e1c03e",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-1-before-measurement.prom": "6880a99b794d715b5a0dd00ed94885f9e3eada039d66502d08e13ca6da7f9464",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-2-after-measurement.prom": "c6cf26bae4222df22c7694140abc6c049f513aa7d138a976b39c47b365084ea9",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-2-before-measurement.prom": "3e2d83f9d418ac08f1e8cf8cd24a3f3bb118c81b625ae6960779658b4450a075",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-4-after-measurement.prom": "076195bbab0ff182d1beb3ec594e2be1b5e78cb9c1d2532ce14054447dc10d7d",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-4-before-measurement.prom": "10175ebf627badccb3e804dca90383f06348825028b87c98e051f364d8842c45",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-8-after-measurement.prom": "1c92d6427d4c493be6a6ab846c20e38eca835dbcdbcc2cf6550fd5d87d4e56df",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/metrics-concurrency-8-before-measurement.prom": "c9495a9151080df3cf53e47afcd5935210a390e99aebd99071092b49fc9d4689",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/runtime.json": "729b8b6b4bec511778359d9d51701ed82e99599680ee3c98b4a49afd722ecb16",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/server.log": "998ddadb4e410b1155b3bf2610cbd90e5bee63852f66ceb86dd68592e6501fe9",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-0/trial.json": "e630c9ff76e3c3f83ba86da4158067e76b7d002c384479aa4b7e2512115416a8",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-1-after-measurement.prom": "7f2a73b88d153bcca6f12c290c154643f795dba692b3b38042366476bfde4513",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-1-before-measurement.prom": "fcbfe873e171fc77bd88b651c3c65fd0942f2ab40afb61a8d6611f778bbfa794",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-2-after-measurement.prom": "c3fe5cfcd9bc85b8f2a47a425660c425099163ed784d3db0b487c087741b3c42",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-2-before-measurement.prom": "d58e09806131d5ff33168263d72d869d0f66100643fe44f38dd11e2f1c2a18a3",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-4-after-measurement.prom": "3660277f171b41701825722eed5b61592bc89a28e7d5f0dbd167be5414e9dae0",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-4-before-measurement.prom": "dc3244307b4b828297783379420bbaa172ac7d7f379aa160c03e64406308879b",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-8-after-measurement.prom": "262528838288affd7a8d6496b5cf53b6f72231007f1f25e3431a961fc180c144",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/metrics-concurrency-8-before-measurement.prom": "c441912045b81019c1a627ac904ab4d3577d620a0d4f64e8038cf2fc59d0b7c0",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/runtime.json": "a911e51752fc5af3e62baa23a8015f2ce0d33490a783712918317a7f90dfab7f",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/server.log": "484f9549fa867708c9bc6cebd3600ac7a51a8baf1e9f4c5bb09e9b8859c91901",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/isolated-1/trial.json": "bb7eb1171c84e4605b6582de4e69b419750f6bc75fe0c1fdbb5a526e1274d204",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/report.md": "a6c28b532ca6d49ff691f6788b5e9d9f0661d6bac39227759938a08de8043334",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23/result.json": "0d65fa4d843215c36056e7daa09e24977d8836fda60c9948ad46200711729f36",
+    "references/e19c71b75aca03ac71237489f3301aeb08178963245714163b09d43cc26ec4da/report.md": "1132aa03f8bcc67cf6d2392df9cada8112553538b9452774c5e04d424ad4c058",
+    "references/e19c71b75aca03ac71237489f3301aeb08178963245714163b09d43cc26ec4da/result.json": "98f24ace63c48d36eb8d50dce88164573447f5cd5c8018ebb484121062c2b840",
+    "references/e793a1faed3bbf8b90c17064ff5839e1ec257aa51aff667ead72dfd6de4a2c56/report.md": "e003bc9f6a8240f9b2b001060e44fa3c3ef7be15d6f7fab4ed53a561a7bfb93f",
+    "references/e793a1faed3bbf8b90c17064ff5839e1ec257aa51aff667ead72dfd6de4a2c56/result.json": "aac9a77de884a1b290ba65816d3c7d252044e8b8c5f46d28672b25dea41f2521",
+    "references/result.json": "063efb734bf6e7797db39e98f0ad72380016995dc6f667870dce60f00fa1c71c",
+    "registration.json": "34ed16fb360d6d4194b8940902fc8b8e2b1eb665adaab5116ce175e5ded40948",
+    "weave-calls.json": "92a741f6dd9d9d71c957dd778dc57dc955db8e7a118ee15f6a5b44e766f9cd80"
+  },
+  "joint_status": "not-run-process-identity-unresolved",
+  "joint_acceptance": false,
+  "quantization_enabled_placement": false,
+  "gpu_trials_during_audit": 0,
+  "provider_calls_during_audit": 0
+}

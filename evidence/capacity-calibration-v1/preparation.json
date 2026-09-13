@@ -1,0 +1,8 @@
+{
+  "model_id": "zai-org/glm-4-9b-chat-hf",
+  "revision": "8599336fc6c125203efb2360bfaf4c80eef1d1bf",
+  "exit_code": 0,
+  "elapsed_seconds": 54.12703887600219,
+  "source_commit": "4f47448",
+  "sera_import": "/marimo/sera-capacity-v1/sera/__init__.py"
+}
