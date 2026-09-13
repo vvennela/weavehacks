@@ -1,0 +1,16 @@
+{
+  "source_path": "/marimo/sera-evidence/qwen-structured-quality-v2/runtime/server.log",
+  "source_sha256": "15e626f644edd736e60db38d01c1f835f5af78d5bd1a49c76265043ba6501d7b",
+  "source_bytes": 4557127,
+  "first_line_1_based": 171,
+  "excerpt_lines": [
+    "(EngineCore pid=4046) ERROR 09-13 07:55:03 [core.py:1330] /tmp/tmpxft_00001061_00000000-6_renorm.cudafe1.stub.c:93:206: error: macro \"__cudaLaunch\" passed 2 arguments, but takes just 1",
+    "(EngineCore pid=4046) ERROR 09-13 07:55:03 [core.py:1330]    93 | static void __device_stub__ZN3cub17_V_300302_SM_12006detail11EmptyKernelIvEEvv(void){__cudaLaunchPrologue(1);__cudaLaunch(((char *)((void ( *)(void))cub::_V_300302_SM_1200::detail::EmptyKernel<void> )), 0U);}namespace cub{",
+    "(EngineCore pid=4046) ERROR 09-13 07:55:03 [core.py:1330]       |                                                                                                                                                                                                              ^",
+    "(EngineCore pid=4046) ERROR 09-13 07:55:03 [core.py:1330] In file included from /tmp/tmpxft_00001061_00000000-6_renorm.cudafe1.stub.c:8:",
+    "(EngineCore pid=4046) ERROR 09-13 07:55:03 [core.py:1330] /usr/local/lib/python3.13/site-packages/nvidia/cu13/include/crt/host_runtime.h:130:9: note: macro \"__cudaLaunch\" defined here",
+    "(EngineCore pid=4046) ERROR 09-13 07:55:03 [core.py:1330]   130 | #define __cudaLaunch(fun) \\",
+    "(EngineCore pid=4046) ERROR 09-13 07:55:03 [core.py:1330]       |         ^~~~~~~~~~~~"
+  ],
+  "note": "Exact excerpt; full repetitive compiler log retained on Molab, not copied into Git."
+}
