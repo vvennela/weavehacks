@@ -153,7 +153,23 @@ The controller counts failed starts against the budget, excludes tested configur
 
 Default values remain narrow: FP8 KV and batch tokens 2,048 for small Qwen; batch tokens 2,048 only for the proven Qwen72B FP8 reference. A caller can now supply `investigation_space=sera.InvestigationSpace(supported_changes={...})` with an explicit budget. This declares up to 32 single-setting candidates using the supported batching/context controls. Sera freezes their full configuration hashes before loading. An optional `candidate_hashes` list restricts the pool further. It rejects no-ops, invalid coupled settings, incompatible sequence limits, and unverified combined FP8 weights/KV. After baseline tokenization, it excludes candidates whose context cannot cover the same input and output limit. It does not silently activate the expanded ranges or execute a full grid.
 
-Combination trials, automatic value generation, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The citation fix now constrains the provider to exact available metric names and verifies the same request schema locally. No new hosted provider check has run, so the current provider gate still prevents agent-controlled GPU trials in this build.
+Combination trials, automatic value generation, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The citation fix constrains the provider to exact available metric names and verifies the same request schema locally. The [current hosted check passed 30/30 on the first attempt](evidence/provider-v5/README.md), including every evidence-reference check. The provider gate no longer blocks live trials for this build.
+
+### Run a bounded live investigation
+
+Run from the repository root on the supported GPU, with `WANDB_API_KEY` in the environment:
+
+```sh
+python -m experiments.run_investigation \
+  --model Qwen/Qwen2.5-72B-Instruct \
+  --budget 2 --batching-values 2048 1024 \
+  --priority latency --concurrency 1 \
+  --project vvennela-n-a/wandb_agent_default_project \
+  --provider-check evidence/provider-v5/result.json \
+  --output-dir sera-runs/live-investigation
+```
+
+This example uses GPU time and requires the large model files. It declares two batch-token alternatives against the proven FP8-weight reference with BF16 KV. It is not a recorded run or a speedup claim. The command checks the provider certificate before loading, keeps the eight strict tasks and 99% quality floor, saves the investigation and trace link, tests the returned runner, and closes it. An agent can decline a trial. Read the recorded trial count before claiming a full round ran. Use a new output directory.
 
 ### Rehearse the decision loop without a GPU
 
@@ -186,6 +202,10 @@ The delegated [search replay harness](benchmarks/SEARCH.md) implements a frozen 
 The specified Qwen0.6B + GLM-4-9B pair is not ready for verified placement. GLM loaded in BF16 and FP8, but passed 0/8 strict-format tasks. Qwen FP8 passed 1/8; it had both format errors and a wrong filtering answer. The earlier Qwen BF16 result was 2/8. We stopped before running them together. See [the preserved prerequisite results](evidence/placement-prerequisites-v1/README.md).
 
 In plain English: the programs run, but these two smaller models do not yet meet the promised answer contract. More GPU memory does not fix that. Changing the task rules or model pair needs an explicit decision. This does not invalidate the successful Qwen72B deployment and rehearsal. No joint-placement or smaller-card benefit is claimed.
+
+A separate `experiments.run_structured_quality_pilot` command now tests native JSON decoding for one specified BF16 model at a time. It keeps the eight questions, exact answers, generation limits, and 99% floor. Its schema does not contain the answers. It saves raw responses and diagnostic request latency without repairing output. A passing pilot would establish only this new decoding profile; joint scheduling, a declared smaller-card budget, and a measured concurrent trial would still be needed.
+
+The [saved-results audit](evidence/release-benchmark-audit/README.md) reproduced all 64 saved task grades and the four-load Qwen72B comparison. It found no complete frozen small-model search universe, so a measured grid/random comparison remains unavailable.
 
 ## Verified task requirements
 
