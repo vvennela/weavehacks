@@ -251,7 +251,9 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
             report["agent_feedback"] = feedback
             try:
                 final = agent.review(feedback)
-                if final is None or final.selected_trial_id != selected or final.prediction_outcome == "not-tested":
+                expected_prediction = 'confirmed' if report['decision']['selected'] == 'candidate' else 'refuted'
+                if (final is None or final.selected_trial_id != selected
+                        or final.prediction_outcome != expected_prediction):
                     raise ValueError("Agent final response did not respect measured selection")
                 report["agent_final"] = final.model_dump()
             except Exception as failure:

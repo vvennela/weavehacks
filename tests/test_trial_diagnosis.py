@@ -60,6 +60,26 @@ def test_startup_failure_does_not_mislabel_unrun_quality_as_quality_degradation(
     assert 'secret detail' not in str(diagnosis)
 
 
+def test_structured_runtime_failure_keeps_hashed_source_not_raw_log_or_inferred_oom():
+    baseline, trial, decision = records()
+    source = dict(path='server.log', sha256='a' * 64,
+                  line_numbers=[62], matched_line_sha256=['b' * 64])
+    trial.update(status='startup-failed', failure_stage='startup', runtime={'startup_failure': {
+        'category': 'cutlass-internal-error', 'stage': 'startup',
+        'known_message': 'secret raw log must not be trusted', 'callsite': 'cutlass_gemm_caller',
+        'kernel_source': 'cutlass_gemm_caller.cuh', 'kernel_line': 62, 'source': source,
+        'root_cause_status': 'proved-out-of-memory', 'environment': {'key': 'secret'}}})
+    diagnosis = trial_diagnosis(baseline, trial, decision)
+    failure = diagnosis['observed']['runtime_failure']
+    assert failure['category'] == 'cutlass-internal-error'
+    assert failure['source'] == source
+    assert failure['kernel_line'] == 62
+    assert failure['root_cause_status'] == 'not-established'
+    assert 'runtime/startup_failure' in diagnosis['evidence_paths']
+    assert 'secret' not in str(diagnosis)
+    assert 'proved-out-of-memory' not in str(diagnosis)
+
+
 def test_request_errors_report_observed_count_and_preserve_unknown_underlying_cause():
     baseline, trial, decision = records()
     trial.update(status='request-errors', generation_errors=2)

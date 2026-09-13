@@ -69,8 +69,8 @@ class Agent:
         return proposal(supplied, lever, invalid=self.invalid, abstain=self.abstain)
 
 
-def run(agent, reader=None):
-    supplied = evidence()
+def run(agent, reader=None, supplied=None):
+    supplied = evidence() if supplied is None else supplied
     legal = remaining_candidates(supplied, RuntimeConfig(), {RuntimeConfig().config_hash},
                                  Workload(), {'input_token_ids': [[1]]})
     record = dict(round=1, specialists=[], trial_ids=[])
@@ -196,3 +196,62 @@ def test_reader_failure_uses_allowlisted_explanation_not_exception_text():
         assert error['safe_message'] == InspectionReadError.messages['incomplete-requests']
     assert 'secret error text' not in str(record)
     assert 'unsafe overwritten' not in str(record)
+
+
+@pytest.mark.parametrize('missing', ['declined', 'failed'])
+def test_previous_failed_trial_requires_successful_read_before_any_proposal(missing):
+    supplied = evidence() | {'failure_diagnoses': [{'trial_id': 'trial-1',
+        'diagnosis': {'failure_kind': 'startup-failed'}}]}
+    agent = Agent()
+    original_fork = agent.fork
+    def fork():
+        child = original_fork()
+        request = child.request
+        def choose(role, evidence, instruction):
+            if missing == 'declined' and evidence.get('swarm_phase') == 'inspect':
+                child.history.append(dict(role=role, evidence=deepcopy(evidence)))
+                return ArbiterDecision(ranked_proposal_ids=[], reason='No read')
+            return request(role, evidence, instruction)
+        child.request = choose
+        return child
+    agent.fork = fork
+    def reader(*_):
+        raise InspectionReadError('incomplete-diagnosis')
+    chosen, record = run(agent, reader, supplied)
+    assert chosen == []
+    assert all(item['status'] == 'rejected' and item['initial_status'] == 'rejected'
+               for item in record['specialists'])
+    assert all(len(child.history) == 1 and child.history[0]['evidence']['required_inspection']
+               for child in agent.children)
+    assert 'arbiter' not in record
+
+
+def test_required_first_read_does_not_force_second_read_or_gpu_choice():
+    supplied = evidence() | {'failure_diagnoses': [{'trial_id': 'trial-1',
+        'diagnosis': {'failure_kind': 'objective-not-improved'}}]}
+    agent = Agent(decline=True)
+    original_fork = agent.fork
+    def fork():
+        child = original_fork()
+        request = child.request
+        def choose(role, supplied, instruction):
+            if supplied.get('swarm_phase') == 'inspect' and len(child.history) == 1:
+                child.history.append(dict(role=role, evidence=deepcopy(supplied)))
+                return ArbiterDecision(ranked_proposal_ids=[], reason='One read was enough')
+            return request(role, supplied, instruction)
+        child.request = choose
+        return child
+    agent.fork = fork
+    chosen, record = run(agent, supplied=supplied)
+    assert chosen == []  # Final arbiter may still decline a GPU trial.
+    for child in agent.children:
+        assert child.history[0]['evidence']['required_inspection'] is True
+        assert child.history[1]['evidence']['required_inspection'] is False
+    assert all(item['successful_inspections'] == 1 and item['status'] == 'accepted'
+               for item in record['specialists'])
+    assert not record['arbiter_evidence'].get('required_inspection')
+
+
+def test_required_inspection_does_not_change_provider_schema_or_protocol():
+    from sera.agent import request_schema
+    assert request_schema('arbiter', {'swarm_phase': 'inspect', 'required_inspection': True}) == request_schema('arbiter', {})

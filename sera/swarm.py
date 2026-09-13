@@ -25,6 +25,9 @@ def validate_swarm_options(swarm, budget, agent, trace_reader):
 
 
 def _proposal(agent, evidence, check, key):
+    if evidence.get('failure_inspection_required') and not any(
+            item.get('status') == 'complete' for item in evidence.get('inspections', [])):
+        raise ValueError('A previous failed experiment requires a successful trace inspection before proposing')
     response = agent.request('proposal', deepcopy(evidence),
         'Investigate as investigator_id, which is an analysis focus, not a hardware role. '
         'Use the saved measurements, read-only inspections, and any shared findings. '
@@ -36,6 +39,9 @@ def _proposal(agent, evidence, check, key):
         'For a previous failed trial, explain the observed failure separately from any causal hypothesis. '
         'Cite the relevant read call IDs and fixed evidence paths in reason, prediction, and falsification prose. '
         'State how that evidence changes the next proposed setting or supports abstention. '
+        'Load input_tokens is the total across requests, not the length of one request. '
+        'Lowering the context limit alone does not establish a smaller reserved KV cache when '
+        'gpu_memory_utilization stays fixed. Use measured allocation evidence, not that assumption. '
         'During refinement, examine peers independently; do not copy their choice by default.')
     if response is None:
         raise ValueError('Investigator returned no proposal')
@@ -55,17 +61,23 @@ def _initial(agent, evidence, check, trace_reader):
             inspection = {'status': 'rejected'}
             check['inspections'].append(inspection)
             supplied = deepcopy(evidence) | dict(swarm_phase='inspect',
-                legal_proposal_ids=remaining_queries[:], inspections=deepcopy(check['inspections'][:-1]))
+                legal_proposal_ids=remaining_queries[:], inspections=deepcopy(check['inspections'][:-1]),
+                required_inspection=bool(evidence.get('failure_inspection_required') and not any(
+                    item.get('status') == 'complete' for item in check['inspections'][:-1])))
             try:
                 response = agent.request('arbiter', deepcopy(supplied),
                     'Act as investigator_id. Choose one legal read-only inspection query, '
                     'or return an empty ranking when no further inspection is useful. '
+                    'If required_inspection is true, a previous experiment failed: you MUST choose '
+                    'one legal query to inspect its persisted diagnosis. Empty is invalid in that phase. '
                     'You can inspect at most two distinct queries. This is not permission for a GPU trial.')
                 if response is None:
                     raise ValueError('No inspection decision')
                 inspection['response'] = response.model_dump()
                 response = ArbiterDecision.model_validate(inspection['response'])
                 if not response.ranked_proposal_ids:
+                    if supplied['required_inspection']:
+                        raise ValueError('The required failure inspection cannot be declined')
                     inspection['status'] = 'declined'
                     break
                 query_id = response.ranked_proposal_ids[0]
@@ -86,6 +98,7 @@ def _initial(agent, evidence, check, trace_reader):
                         safe_message=InspectionReadError.messages[error.reason_code])
                 break
         check['successful_inspections'] = sum(item['status'] == 'complete' for item in check['inspections'])
+        check['failure_inspection_required'] = bool(evidence.get('failure_inspection_required'))
         check['degraded'] = any(item['status'] == 'failed' for item in check['inspections'])
         check['inspection_status'] = ('degraded' if check['degraded'] else
                                       'complete' if check['successful_inspections'] else 'not-requested')
@@ -156,7 +169,7 @@ def choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_re
             changes[lever].append(value)
     common = deepcopy(evidence) | dict(supported_changes=changes,
         frozen_candidate_hashes=[entry[3].config.config_hash for entry in legal],
-        remaining_trials=remaining)
+        remaining_trials=remaining, failure_inspection_required=bool(evidence.get('failure_diagnoses')))
     evidences = [deepcopy(common) | {'investigator_id': name} for name in INVESTIGATORS]
     checks = [dict(investigator_id=name, role=None, status='rejected', inspections=[], phase_timings={})
               for name in INVESTIGATORS]
@@ -170,6 +183,7 @@ def choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_re
             inspections=deepcopy(check['inspections']), status=check['initial_status'],
             degraded=check['degraded'], inspection_status=check['inspection_status'],
             successful_inspections=check['successful_inspections'],
+            failure_inspection_required=check['failure_inspection_required'],
             proposal=deepcopy(check.get('initial_proposal')), error=check.get('initial_error'))
             for check in checks]
         record['shared_findings'] = deepcopy(board)

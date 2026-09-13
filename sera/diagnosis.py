@@ -7,6 +7,42 @@ from .measurement import objective_value
 from .tracing import TraceSinkError, emit_event, event_sink_enabled
 
 
+def runtime_failure_evidence(value):
+    """Project only the classifier's known signatures and hashed log references."""
+    if not isinstance(value, dict):
+        return None
+    from .runtime import STARTUP_FAILURE_MESSAGES
+
+    category = value.get('category')
+    if category not in STARTUP_FAILURE_MESSAGES:
+        category = 'unclassified'
+    raw_source = value.get('source')
+    source = None
+    if isinstance(raw_source, dict) and raw_source.get('path') == 'server.log':
+        digest = raw_source.get('sha256')
+        numbers = raw_source.get('line_numbers')
+        hashes = raw_source.get('matched_line_sha256')
+        if (isinstance(digest, str) and re.fullmatch(r'[0-9a-f]{64}', digest)
+                and isinstance(numbers, list) and isinstance(hashes, list)
+                and len(numbers) == len(hashes) <= 8
+                and all(type(number) is int and number > 0 for number in numbers)
+                and all(isinstance(item, str) and re.fullmatch(r'[0-9a-f]{64}', item) for item in hashes)):
+            source = dict(path='server.log', sha256=digest, line_numbers=numbers[:],
+                          matched_line_sha256=hashes[:])
+    if category != 'unclassified' and (source is None or not source['line_numbers']):
+        category = 'unclassified'
+    result = dict(category=category, stage='startup', known_message=STARTUP_FAILURE_MESSAGES[category],
+                  source=source, root_cause_status='not-established', callsite=None)
+    if category == 'cutlass-internal-error':
+        if value.get('callsite') == 'cutlass_gemm_caller':
+            result['callsite'] = 'cutlass_gemm_caller'
+        if value.get('kernel_source') == 'cutlass_gemm_caller.cuh':
+            result['kernel_source'] = 'cutlass_gemm_caller.cuh'
+        if type(value.get('kernel_line')) is int and value['kernel_line'] > 0:
+            result['kernel_line'] = value['kernel_line']
+    return result
+
+
 def trial_diagnosis(baseline, trial, decision):
     status = trial.get('status')
     failures = decision.get('constraint_failures', {}).get('candidate', [])
@@ -35,6 +71,7 @@ def trial_diagnosis(baseline, trial, decision):
     objective = decision.get('objective') or {}
     priority = objective.get('priority', 'latency')
     observed = dict(status=status, failure_stage=trial.get('failure_stage'), error_type=error_type,
+        runtime_failure=runtime_failure_evidence(trial.get('runtime', {}).get('startup_failure')),
         generation_errors=trial.get('generation_errors', trial.get('reduced', {}).get('generation_errors')),
         selection_reason=reason, constraint_failures=list(failures), quality=quality,
         objective=dict(priority=priority, baseline_value=objective_value(baseline, priority),
@@ -55,6 +92,8 @@ def trial_diagnosis(baseline, trial, decision):
     paths.extend(key for key in ('failure_stage', 'error', 'reduced') if key in trial)
     if 'sampled_peak_memory_mib' in trial.get('runtime', {}):
         paths.append('runtime/sampled_peak_memory_mib')
+    if observed['runtime_failure'] is not None:
+        paths.append('runtime/startup_failure')
     if 'per_prompt' in trial.get('task_quality', {}):
         paths.append('task_quality/per_prompt')
     elif quality is not None:

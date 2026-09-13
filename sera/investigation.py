@@ -360,9 +360,14 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                                   and (old_memory is None or new_memory < old_memory))
                     if improves_objective or breaks_tie:
                         best = trial
+                measured = (trial['status'] == 'collected'
+                            and objective_value(baseline, objective.priority) is not None
+                            and objective_value(trial, objective.priority) is not None)
                 feedback = dict(proposal=proposal.model_dump(), decision=decision,
                     diagnosis=deepcopy(trial['diagnosis']),
-                    objective=objective.model_dump(), candidate_tested=True,
+                    objective=objective.model_dump(), candidate_attempted=True,
+                    candidate_measured=measured, candidate_tested=measured,
+                    allowed_prediction_outcomes=['confirmed', 'refuted'] if measured else ['refuted', 'not-tested'],
                     candidate_status=trial['status'], baseline_metrics=baseline.get('reduced'),
                     candidate_metrics=trial.get('reduced'),
                     baseline_request_evidence=request_evidence(baseline, report['prompts']),
@@ -374,7 +379,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                     review = agent.review(feedback)
                     trial['review_response'] = review.model_dump() if review is not None else None
                     if (review is None or review.selected_trial_id not in feedback['eligible_trial_ids']
-                            or review.prediction_outcome == 'not-tested'):
+                            or review.prediction_outcome not in feedback['allowed_prediction_outcomes']):
                         raise ValueError('Review contradicts the executed trial or deterministic gate')
                     trial['review'] = review.model_dump()
                 except Exception as error:
