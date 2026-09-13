@@ -46,12 +46,12 @@ class ModelOutcome:
     reverted: list[TrialRecord] = field(default_factory=list)
 
     @property
-    def p99_improvement_pct(self) -> float:
-        if self.baseline.p99_latency_ms == 0:
+    def p95_improvement_pct(self) -> float:
+        if self.baseline.p95_latency_ms == 0:
             return 0.0
         return (
-            (self.baseline.p99_latency_ms - self.best_measurement.p99_latency_ms)
-            / self.baseline.p99_latency_ms
+            (self.baseline.p95_latency_ms - self.best_measurement.p95_latency_ms)
+            / self.baseline.p95_latency_ms
             * 100.0
         )
 
@@ -150,7 +150,7 @@ class Phase1:
         meas = outcome.measurements[model.name]
         slo = self.spec.slo(model.name)
 
-        slo_ok = meas.p99_latency_ms <= slo.p99_latency_ms
+        slo_ok = meas.p95_latency_ms <= slo.p95_latency_ms
         if slo.min_throughput_rps is not None:
             slo_ok = slo_ok and meas.throughput_rps >= slo.min_throughput_rps
 
@@ -158,7 +158,7 @@ class Phase1:
 
         if not slo_ok:
             verdict, reason = Verdict.REVERTED_SLO, (
-                f"p99 {meas.p99_latency_ms:.0f}ms vs SLO {slo.p99_latency_ms:.0f}ms, "
+                f"p95 {meas.p95_latency_ms:.0f}ms vs SLO {slo.p95_latency_ms:.0f}ms, "
                 f"throughput {meas.throughput_rps:.2f} rps"
             )
         elif not quality.passed:
@@ -180,7 +180,7 @@ class Phase1:
             Verdict.REVERTED_QUALITY: "REVERTED (quality)",
         }.get(verdict, verdict.value)
         self.log(
-            f"      {mark:20} p99={meas.p99_latency_ms:8.0f}ms  "
+            f"      {mark:20} p95={meas.p95_latency_ms:8.0f}ms  "
             f"tput={meas.throughput_rps:5.2f}  fp={meas.footprint_gb:5.2f}GB  "
             f"q={quality.score:.3f}"
             + (f"  prediction {'HELD' if held else 'MISSED'}" if held is not None else "")
@@ -205,33 +205,60 @@ class Phase1:
     # -- one model -----------------------------------------------------------
 
     @tracing.op
-    def tune_model(self, model: ModelSpec) -> ModelOutcome:
+    def tune_model(
+        self,
+        model: ModelSpec,
+        seed_from: tuple[InferenceConfig, Measurement] | None = None,
+        label: str = "",
+        trial_allowance: int | None = None,
+    ) -> ModelOutcome:
+        """Tune one model.
+
+        Normally this starts by measuring a stock baseline. `seed_from` replaces that
+        with a configuration and a measurement taken elsewhere — specifically, Phase 2
+        passes the measurement a model produced while sharing a GPU. The specialists
+        then reduce over what the model actually experienced under contention rather
+        than over its solo numbers, which is the only way their proposals can respond
+        to a neighbour they cannot see.
+        """
         gpu = self.spec.gpus[0]
         budget = self.spec.budget
+        allowance = trial_allowance if trial_allowance is not None else budget.phase1_trials
 
-        self.log(f"\n{'=' * 74}\n  {model.name}  ({model.hf_id})\n{'=' * 74}")
+        header = f"{model.name}  ({model.hf_id})"
+        if label:
+            header += f"  — {label}"
+        self.log(f"\n{'=' * 74}\n  {header}\n{'=' * 74}")
 
-        base_cfg = baseline_config(model)
-        self.log("\n  [baseline]")
-        base_rec = self._run_trial(model, base_cfg, 0, None, None)
-        if base_rec.measurement is None:
-            raise RuntimeError(f"baseline failed for {model.name}: {base_rec.reason}")
-        base_meas = base_rec.measurement
+        if seed_from is not None:
+            base_cfg, base_meas = seed_from
+            self.log(
+                f"\n  [seeded] starting from measured state "
+                f"p95={base_meas.p95_latency_ms:.0f}ms, no fresh baseline trial"
+            )
+            base_rec = None
+        else:
+            base_cfg = baseline_config(model)
+            self.log("\n  [baseline]")
+            base_rec = self._run_trial(model, base_cfg, 0, None, None)
+            if base_rec.measurement is None:
+                raise RuntimeError(f"baseline failed for {model.name}: {base_rec.reason}")
+            base_meas = base_rec.measurement
 
         best_cfg, best_meas = base_cfg, base_meas
         outcome = ModelOutcome(
             model=model.name, baseline=base_meas,
             best_config=base_cfg, best_measurement=base_meas,
         )
-        if base_rec.verdict.viable:
+        if base_rec is not None and base_rec.verdict.viable:
             outcome.accepted.append(base_rec)
 
         tried: set[str] = {base_cfg.label()}
         round_winners: list[Proposal] = []
 
         for rnd in range(1, budget.max_rounds + 1):
-            if self.trials_spent >= budget.phase1_trials:
-                self.log(f"\n  [budget] phase-1 allowance spent ({self.trials_spent} trials)")
+            if self.trials_spent >= allowance:
+                self.log(f"\n  [budget] trial allowance spent ({self.trials_spent}/{allowance})")
                 break
 
             self.log(f"\n  [round {rnd}]")
@@ -278,7 +305,7 @@ class Phase1:
             round_best_cfg, round_best_meas = best_cfg, best_meas
 
             for prop in arb.selected:
-                if self.trials_spent >= budget.phase1_trials:
+                if self.trials_spent >= allowance:
                     break
                 cand = prop.apply_to(round_base)
                 tried.add(cand.label())
@@ -291,7 +318,7 @@ class Phase1:
                     outcome.reverted.append(rec)
 
                 # Clearing every gate and being the best place to tune from are
-                # different things. A config that cut p99 by 60% but is still over
+                # different things. A config that cut p95 by 60% but is still over
                 # SLO has not earned the frontier, yet abandoning it would strand the
                 # loop at a baseline it already knows how to beat — and the next
                 # round would recompute an identical digest and propose nothing.
@@ -300,17 +327,17 @@ class Phase1:
                 if (
                     rec.measurement is not None
                     and rec.verdict is not Verdict.REVERTED_QUALITY
-                    and rec.measurement.p99_latency_ms < round_best_meas.p99_latency_ms
+                    and rec.measurement.p95_latency_ms < round_best_meas.p95_latency_ms
                 ):
                     round_best_cfg, round_best_meas = cand, rec.measurement
                     if not rec.verdict.viable:
                         self.log(
-                            f"        kept as working point: {round_base_meas.p99_latency_ms:.0f}"
-                            f" -> {rec.measurement.p99_latency_ms:.0f}ms, still over SLO"
+                            f"        kept as working point: {round_base_meas.p95_latency_ms:.0f}"
+                            f" -> {rec.measurement.p95_latency_ms:.0f}ms, still over SLO"
                         )
 
             # Single-lever effects are known now, so a combination becomes readable.
-            if len(round_winners) >= 2 and self.trials_spent < budget.phase1_trials:
+            if len(round_winners) >= 2 and self.trials_spent < allowance:
                 combo = self.arbiter.propose_combination(round_winners, round_base)
                 if combo is not None:
                     cand = combo.apply_to(round_base)
@@ -326,7 +353,7 @@ class Phase1:
                         if (
                             rec.measurement is not None
                             and rec.verdict is not Verdict.REVERTED_QUALITY
-                            and rec.measurement.p99_latency_ms < round_best_meas.p99_latency_ms
+                            and rec.measurement.p95_latency_ms < round_best_meas.p95_latency_ms
                         ):
                             round_best_cfg, round_best_meas = cand, rec.measurement
 
@@ -338,8 +365,8 @@ class Phase1:
         outcome.trials_run = self.trials_spent
 
         self.log(
-            f"\n  [result] {model.name}: p99 {base_meas.p99_latency_ms:.0f}ms -> "
-            f"{best_meas.p99_latency_ms:.0f}ms ({outcome.p99_improvement_pct:+.1f}%), "
+            f"\n  [result] {model.name}: p95 {base_meas.p95_latency_ms:.0f}ms -> "
+            f"{best_meas.p95_latency_ms:.0f}ms ({outcome.p95_improvement_pct:+.1f}%), "
             f"footprint {base_meas.footprint_gb:.2f} -> {best_meas.footprint_gb:.2f}GB"
         )
         self.log(f"           best config: {best_cfg.label()}")

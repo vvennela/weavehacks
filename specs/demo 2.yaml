@@ -6,7 +6,7 @@
 # interesting rather than obvious.
 
 meta:
-  name: demo-tight
+  name: demo
   note: >-
     Architecture numbers are read from each model's published config. Change the
     models and these must change with them; nothing downstream infers them.
@@ -71,10 +71,10 @@ workloads:
 
 slos:
   - model: model_a
-    p95_latency_ms: 700.0
+    p99_latency_ms: 4000.0
     min_throughput_rps: 4.0
   - model: model_b
-    p95_latency_ms: 500.0
+    p99_latency_ms: 3000.0
     min_throughput_rps: 6.0
 
 quality_floors:

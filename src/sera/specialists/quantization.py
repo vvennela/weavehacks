@@ -54,7 +54,7 @@ class QuantizationSpecialist(Specialist):
         # proposing int4 for a compute-bound model and watching nothing happen.
         compute_bound = d.prefill_token_share >= COMPUTE_BOUND_PREFILL_SHARE
         tensor_core_gain = next_dtype in TENSOR_CORE_FORMATS
-        compute_live = compute_bound and tensor_core_gain and d.p99_slo_ratio > 1.0
+        compute_live = compute_bound and tensor_core_gain and d.p95_slo_ratio > 1.0
 
         if not bandwidth_bound and not kv_pressured and not compute_live:
             why = (
@@ -67,7 +67,7 @@ class QuantizationSpecialist(Specialist):
                     f"({next_dtype}) dequantizes to bf16 for the matmul, so it would buy "
                     "bytes and no arithmetic"
                 )
-            elif compute_bound and d.p99_slo_ratio <= 1.0:
+            elif compute_bound and d.p95_slo_ratio <= 1.0:
                 why += "; prefill dominates but latency is already inside SLO"
             return Dead(self.name, self.lever, why + " — shrinking tensors buys little here")
 
@@ -129,8 +129,8 @@ class QuantizationSpecialist(Specialist):
             expected, confidence = 45.0, 0.75
         else:
             mechanism = (
-                f"Prefill is {d.prefill_token_share:.0%} of tokens and p99 is "
-                f"{d.p99_slo_ratio:.2f}x SLO, so this is compute bound rather than "
+                f"Prefill is {d.prefill_token_share:.0%} of tokens and p95 is "
+                f"{d.p95_slo_ratio:.2f}x SLO, so this is compute bound rather than "
                 f"bandwidth bound — utilization is only {d.mem_bandwidth_util:.1%}. "
                 f"{nxt} runs on native tensor cores at materially higher throughput, so "
                 "the win here is arithmetic, not bytes."
@@ -142,7 +142,7 @@ class QuantizationSpecialist(Specialist):
             lever=self.lever,
             delta=delta,
             prediction=Prediction(
-                metric="p99_latency_ms",
+                metric="p95_latency_ms",
                 direction="decrease",
                 magnitude_pct=expected,
                 confidence=confidence,
@@ -153,7 +153,7 @@ class QuantizationSpecialist(Specialist):
             ),
             rationale=(
                 mechanism
-                + f" Expect roughly {expected:.0f}% off p99, and expect the eval to decide "
+                + f" Expect roughly {expected:.0f}% off p95, and expect the eval to decide "
                 "whether it is keepable."
             ),
         )

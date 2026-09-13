@@ -39,7 +39,7 @@ class Digest:
     seq_slot_utilization: float       # 0-1, concurrency vs max_num_seqs
 
     # How far from the requirements?
-    p99_slo_ratio: float              # measured p99 / SLO. >1 means breaching.
+    p95_slo_ratio: float              # measured p95 / SLO. >1 means breaching.
     throughput_deficit_rps: float     # demanded rps minus served rps. >0 means falling behind.
 
     # What shape is the work?
@@ -66,8 +66,8 @@ class Digest:
             f"Memory bandwidth utilization is {self.mem_bandwidth_util:.1%}.",
             f"Sequence slot utilization is {self.seq_slot_utilization:.1%} of max_num_seqs.",
             f"Preemptions per request: {self.preemption_rate:.3f}.",
-            f"Measured p99 is {self.p99_slo_ratio:.2f}x the SLO"
-            + (" (BREACHING)." if self.p99_slo_ratio > 1.0 else " (within budget)."),
+            f"Measured p95 is {self.p95_slo_ratio:.2f}x the SLO"
+            + (" (BREACHING)." if self.p95_slo_ratio > 1.0 else " (within budget)."),
             f"Prefill accounts for {self.prefill_token_share:.1%} of tokens processed; "
             f"each request decodes {self.decode_steps_per_request:.0f} steps.",
             f"Weights are {self.weights_share_of_footprint:.1%} of the memory footprint "
@@ -123,7 +123,7 @@ def reduce_metrics(
         mem_bandwidth_util=measurement.mem_bandwidth_util,
         preemption_rate=measurement.preemptions / completed,
         seq_slot_utilization=seq_slot_util,
-        p99_slo_ratio=measurement.p99_latency_ms / max(slo.p99_latency_ms, 1e-9),
+        p95_slo_ratio=measurement.p95_latency_ms / max(slo.p95_latency_ms, 1e-9),
         throughput_deficit_rps=max(
             0.0, workload.request_rate_rps - measurement.throughput_rps
         ),

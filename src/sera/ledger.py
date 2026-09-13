@@ -55,7 +55,7 @@ class Measurement:
     """What the trial actually did."""
 
     p50_latency_ms: float
-    p99_latency_ms: float
+    p95_latency_ms: float
     throughput_rps: float
     footprint_gb: float
     kv_occupancy: float = 0.0
@@ -74,7 +74,7 @@ class Prediction:
     than asserted. An agent that cannot be wrong on the record cannot improve.
     """
 
-    metric: str                # e.g. "p99_latency_ms", "footprint_gb"
+    metric: str                # e.g. "p95_latency_ms", "footprint_gb"
     direction: str             # "decrease" | "increase"
     magnitude_pct: float | None = None
     confidence: float = 0.5

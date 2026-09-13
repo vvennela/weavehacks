@@ -32,7 +32,7 @@ def generate_trace(workload: Workload, seed: int = 0) -> list[Request]:
     Arrivals are Poisson when burstiness == 1. Above that, inter-arrival gaps are
     drawn from a Gamma with shape 1/burstiness, which clusters requests into bursts
     at the same mean rate. Bursts matter: a co-tenant's prefill burst is what breaks
-    the other model's p99, and averaged-out traffic would hide exactly that.
+    the other model's p95, and averaged-out traffic would hide exactly that.
     """
     rng = np.random.default_rng(seed)
     requests: list[Request] = []
@@ -89,7 +89,7 @@ def summarize(
     if not results:
         return Measurement(
             p50_latency_ms=float("inf"),
-            p99_latency_ms=float("inf"),
+            p95_latency_ms=float("inf"),
             throughput_rps=0.0,
             footprint_gb=footprint_gb,
             kv_occupancy=kv_occupancy,
@@ -100,7 +100,7 @@ def summarize(
     latencies = np.array([r.latency_ms for r in results])
     return Measurement(
         p50_latency_ms=float(np.percentile(latencies, 50)),
-        p99_latency_ms=float(np.percentile(latencies, 99)),
+        p95_latency_ms=float(np.percentile(latencies, 95)),
         throughput_rps=len(results) / wall_time_s if wall_time_s > 0 else 0.0,
         footprint_gb=footprint_gb,
         kv_occupancy=kv_occupancy,

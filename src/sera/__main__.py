@@ -1,6 +1,6 @@
 """Run the loop.
 
-    python -m loop --spec specs/demo.yaml
+    python -m sera --spec specs/demo.yaml
 
 Phase 1 tunes each model alone, Phase 2 asks whether they can share a card. Both
 write to one ledger, and Phase 2 reads what Phase 1 wrote.
@@ -45,7 +45,7 @@ def select_runner(force_sim: bool = False) -> TrialRunner:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="loop", description=__doc__)
+    ap = argparse.ArgumentParser(prog="sera", description=__doc__)
     ap.add_argument("--spec", default="specs/demo.yaml")
     ap.add_argument("--ledger", default="runs/ledger.jsonl")
     ap.add_argument("--sim", action="store_true", help="force the simulator")

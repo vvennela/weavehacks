@@ -1,9 +1,12 @@
-# weavehacks — an agentic inference optimization team
+# Sera — an agentic inference optimization team
+
+Sera finds a faster, smaller way to serve your models on the hardware you already
+have, and proves every change with a measurement.
 
 Three specialist agents tune a model's serving configuration, argue over a bounded
 trial budget, and write every result to a ledger including the ones that failed. Then
 a second phase re-reads that ledger with a different question — not "what was fastest"
-but "what is small enough that two models could share one GPU" — and finds out by
+but "what is small enough that both models could share one GPU" — and finds out by
 running them together.
 
 **Phase 1: how should each model run?**
@@ -15,8 +18,12 @@ running them together.
 
 ```bash
 uv venv --python 3.12 && uv pip install -e .
-PYTHONPATH=src python -m loop --spec specs/demo.yaml --fresh
+PYTHONPATH=src python -m sera --spec specs/molab.yaml --fresh
 ```
+
+`specs/molab.yaml` is the target environment: **one** RTX PRO 6000 Blackwell, 96GB,
+running Qwen3-0.6B beside GLM-4-9B. On one GPU the claim is better use of that device
+— not that a second card was freed.
 
 No GPU required. No API key required. The loop runs against a simulator by default and
 prints its full reasoning. Set `LOOP_VLLM_HOST` to run trials on real hardware, and
@@ -24,7 +31,7 @@ prints its full reasoning. Set `LOOP_VLLM_HOST` to run trials on real hardware, 
 
 ```bash
 PYTHONPATH=src python -m pytest tests/ -q      # 32 tests
-PYTHONPATH=src python -m loop --spec specs/tight.yaml --fresh   # harder SLOs
+PYTHONPATH=src python -m sera --spec specs/demo.yaml --fresh    # 2-GPU variant
 ```
 
 ---
@@ -72,29 +79,37 @@ the prediction held. Reverts included — they are the most informative rows in 
 
 ---
 
-## The result it reaches on `specs/demo.yaml`
+## The result it reaches on `specs/molab.yaml`
 
-Both models clear their SLO alone. The fit check says they share a 24GB card with
-18.7GB to spare. They still cannot share it:
+Both models are improved alone — Qwen3 3446ms → 856ms p95, GLM-4 7057ms → 2789ms — and
+GLM-4's int4 candidate is reverted for scoring 0.945 against a 0.975 floor despite being
+the fastest thing tried. Then Phase 2 asks whether they can share the card:
 
 ```
-[interference]
-  model_a: p99 1607ms solo -> 2501ms co-resident with model_b (+56%)
-  model_b: p99  745ms solo -> 4426ms co-resident with model_a (+494%)
+[fit check]  10.21GB against 86.40GB usable — 76.19GB headroom
+[joint trial 1]
+  qwen3_06b: p95  856ms solo -> 4466ms co-resident (+422%)
+  glm4_9b:   p95 2789ms solo -> 7589ms co-resident (+172%)
+  both FAIL
 
-[verdict] REVERTED — model_b breached SLO (4426ms vs 3000ms)
-  Memory was not the binding constraint: the fit check cleared with 18.73GB spare.
-  Device-time contention was — model_b's p99 inflated +494% beside model_a,
-  whose traffic is 94% prefill.
+[retune] feeding qwen3_06b's contended measurement back to the reducer
+  -> under contention the digest reads 50.8% bandwidth, not 25.9%, so the
+     quantization specialist argues from bandwidth instead of tensor cores
+  -> finds 792ms
+
+[joint trial 2]
+  qwen3_06b: p95 792ms solo -> 2934ms co-resident (+271%)
+  still FAIL. Phase-2 allowance spent.
+
+[result] no safe joint placement. The per-model configurations stand.
 ```
 
-Two things worth noticing. The frontier reader **rejected the fastest config it
-found** (466ms) because it occupied both GPUs, which is the opposite of what freeing a
-GPU requires — it took a 1607ms single-device config instead. And when a model had no
-viable single-device config at all, the constraint was routed back to the specialists
-for a retune with tensor parallelism off the table. That back-edge is the loop closing.
-
----
+Three things worth noticing. Memory was never the binding constraint — the fit check
+cleared with 76GB spare and the trial still failed, which is why the joint trial exists
+at all. The back-edge is not narration: the contended measurement re-enters the reducer,
+the digest genuinely changes, and the specialist changes its *mechanism* in response.
+And the run ends in a refusal. Sera reports that no safe placement was found rather than
+shipping a configuration that breaks both SLOs.
 
 ## Honest comparison against a conventional tuner
 

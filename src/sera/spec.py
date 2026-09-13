@@ -37,9 +37,17 @@ class ModelSpec:
     num_kv_heads: int
     max_model_len: int
     base_dtype: str = "bf16"
+    revision: str = "main"
+    # Read from config.json, never inferred. Qwen3-0.6B declares head_dim 128 with
+    # hidden_size 1024 over 16 heads, so hidden_size // num_attn_heads would give 64
+    # and halve every KV-cache number downstream. Left as None only for older
+    # architectures whose config omits it, where the quotient is correct.
+    head_dim_override: int | None = None
 
     @property
     def head_dim(self) -> int:
+        if self.head_dim_override is not None:
+            return self.head_dim_override
         return self.hidden_size // self.num_attn_heads
 
     def __post_init__(self) -> None:
@@ -48,10 +56,10 @@ class ModelSpec:
                 f"{self.name}: num_attn_heads ({self.num_attn_heads}) must be divisible "
                 f"by num_kv_heads ({self.num_kv_heads})"
             )
-        if self.hidden_size % self.num_attn_heads != 0:
+        if self.head_dim_override is None and self.hidden_size % self.num_attn_heads != 0:
             raise SpecError(
-                f"{self.name}: hidden_size ({self.hidden_size}) must be divisible "
-                f"by num_attn_heads ({self.num_attn_heads})"
+                f"{self.name}: hidden_size ({self.hidden_size}) is not divisible by "
+                f"num_attn_heads ({self.num_attn_heads}) and no head_dim_override was given"
             )
 
 
@@ -101,12 +109,18 @@ class Workload:
 
 @dataclass(frozen=True)
 class Slo:
-    """What 'fast enough' means for one model. Breaching any field fails the gate."""
+    """What 'fast enough' means for one model.
+
+    p95 end-to-end latency is the primary requirement, matching the Sera spec.
+    Only the fields that are set are gated; `p50_latency_ms` is advisory and is
+    reported rather than enforced.
+    """
 
     model: str
-    p99_latency_ms: float
+    p95_latency_ms: float
     p50_latency_ms: float | None = None
     min_throughput_rps: float | None = None
+    max_error_rate: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -182,6 +196,23 @@ class Spec:
                     raise SpecError(f"model '{m.name}' has no {label} declared") from exc
         if not self.gpus:
             raise SpecError("at least one GPU must be declared")
+
+        # An unsatisfiable requirement is worse than a strict one: every trial
+        # reverts, the loop reports no viable config, and nothing in the output
+        # says the target was impossible. Throughput cannot exceed offered load,
+        # so catch that here rather than letting it look like a tuning failure.
+        for m in self.models:
+            slo, wl = self.slo(m.name), self.workload(m.name)
+            if slo.min_throughput_rps is not None:
+                if slo.min_throughput_rps > wl.request_rate_rps:
+                    raise SpecError(
+                        f"{m.name}: min_throughput_rps ({slo.min_throughput_rps}) exceeds "
+                        f"offered load request_rate_rps ({wl.request_rate_rps}) — no "
+                        "configuration can serve more traffic than arrives, so this SLO "
+                        "is unsatisfiable by construction"
+                    )
+            if slo.p95_latency_ms <= 0:
+                raise SpecError(f"{m.name}: p95_latency_ms must be positive")
 
 
 def _one(items: list, needle: str, label: str, key: str = "name"):

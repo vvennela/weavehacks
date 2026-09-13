@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from loop.ledger import Ledger, Measurement, Prediction, Substrate, TrialRecord, Verdict
+from sera.ledger import Ledger, Measurement, Prediction, Substrate, TrialRecord, Verdict
 
 
 def _meas(p99: float, footprint: float, tput: float = 10.0) -> Measurement:
     return Measurement(
-        p50_latency_ms=p99 / 3, p99_latency_ms=p99, throughput_rps=tput,
+        p50_latency_ms=p99 / 3, p95_latency_ms=p99, throughput_rps=tput,
         footprint_gb=footprint,
     )
 
@@ -26,13 +26,13 @@ def test_roundtrip_survives_reload(tmp_path):
     path = tmp_path / "l.jsonl"
     led = Ledger(path)
     led.append(_row("a", Verdict.ACCEPTED, 100, 2.0,
-                    prediction=Prediction("p99_latency_ms", "decrease", 20.0)))
+                    prediction=Prediction("p95_latency_ms", "decrease", 20.0)))
     reread = Ledger(path)
     assert len(reread.all()) == 1
     row = reread.all()[0]
     assert row.verdict is Verdict.ACCEPTED
     assert row.substrate is Substrate.SIM
-    assert row.measurement.p99_latency_ms == 100
+    assert row.measurement.p95_latency_ms == 100
     assert row.prediction.direction == "decrease"
 
 
@@ -95,7 +95,7 @@ def test_reverts_are_retained_not_discarded(tmp_path):
     ],
 )
 def test_prediction_held_is_computed_not_asserted(direction, before, after, expected):
-    assert Prediction("p99_latency_ms", direction).held(before, after) is expected
+    assert Prediction("p95_latency_ms", direction).held(before, after) is expected
 
 
 def test_paper_rejection_costs_no_trial(tmp_path):

@@ -40,7 +40,7 @@ class BatchingSpecialist(Specialist):
                     lever=self.lever,
                     delta=delta,
                     prediction=Prediction(
-                        metric="p99_latency_ms",
+                        metric="p95_latency_ms",
                         direction="decrease",
                         magnitude_pct=20.0,
                         confidence=0.7,
@@ -56,7 +56,7 @@ class BatchingSpecialist(Specialist):
 
         # Prefill blocking: the classic cause of a bad tail with a fine median.
         prefill_heavy = d.prefill_token_share >= PREFILL_HEAVY_THRESHOLD
-        breaching = d.p99_slo_ratio > 1.0
+        breaching = d.p95_slo_ratio > 1.0
         if prefill_heavy and breaching and not cfg.enable_chunked_prefill:
             token_budget = max(512, ctx.model.max_model_len // 4)
             delta = {
@@ -69,15 +69,15 @@ class BatchingSpecialist(Specialist):
                     lever=self.lever,
                     delta=delta,
                     prediction=Prediction(
-                        metric="p99_latency_ms",
+                        metric="p95_latency_ms",
                         direction="decrease",
                         magnitude_pct=35.0,
                         confidence=0.65,
                         rationale="chunked prefill stops long prompts from monopolizing steps",
                     ),
                     rationale=(
-                        f"Prefill is {d.prefill_token_share:.0%} of tokens and p99 is "
-                        f"{d.p99_slo_ratio:.2f}x SLO while the median is healthier — the "
+                        f"Prefill is {d.prefill_token_share:.0%} of tokens and p95 is "
+                        f"{d.p95_slo_ratio:.2f}x SLO while the median is healthier — the "
                         "signature of decode stalling behind whole-prompt prefill steps. "
                         f"Chunking at {token_budget} tokens interleaves the two so decoding "
                         "sequences keep progressing. It costs time-to-first-token."

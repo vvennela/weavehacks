@@ -61,7 +61,7 @@ def _():
         sys.path.insert(0, str(Path("src").resolve()))
 
     try:
-        import loop  # noqa: F401
+        import sera  # noqa: F401
 
         _source = "local checkout"
     except ImportError:  # pragma: no cover - molab path
@@ -69,10 +69,10 @@ def _():
 
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "-q",
-             "git+https://github.com/vvennela/weavehacks.git@test1"],
+             "git+https://github.com/vvennela/sera.git@test1"],
             check=True,
         )
-        import loop  # noqa: F401
+        import sera  # noqa: F401
 
         _source = "installed from git"
 
@@ -141,9 +141,9 @@ def _(mo):
 
 @app.cell
 def _(pd):
-    from loop.spec import load_spec
+    from sera.spec import load_spec
 
-    spec = load_spec("../specs/demo.yaml")
+    spec = load_spec("../specs/molab.yaml")
 
     spec_table = pd.DataFrame(
         [
@@ -155,7 +155,7 @@ def _(pd):
                 "rps": spec.workload(m.name).request_rate_rps,
                 "input_len": spec.workload(m.name).input_len_mean,
                 "output_len": spec.workload(m.name).output_len_mean,
-                "p99_SLO_ms": spec.slo(m.name).p99_latency_ms,
+                "p95_SLO_ms": spec.slo(m.name).p95_latency_ms,
                 "quality_floor": spec.quality_floor(m.name).min_score,
             }
             for m in spec.models
@@ -202,11 +202,11 @@ def _(spec):
     import tempfile
     from pathlib import Path as _P
 
-    from loop.ledger import Ledger
-    from loop.phase1 import Phase1
-    from loop.runner.sim_runner import SimRunner
+    from sera.ledger import Ledger
+    from sera.phase1 import Phase1
+    from sera.runner.sim_runner import SimRunner
 
-    run_dir = _P(tempfile.mkdtemp(prefix="weavehacks-"))
+    run_dir = _P(tempfile.mkdtemp(prefix="sera-"))
     runner = SimRunner()
     ledger = Ledger(run_dir / "ledger.jsonl")
 
@@ -216,7 +216,7 @@ def _(spec):
 
 @app.cell
 def _(ledger, pd, spec):
-    from loop.config import InferenceConfig
+    from sera.config import InferenceConfig
 
     rows = []
     for _i, _r in enumerate(ledger.all()):
@@ -230,12 +230,12 @@ def _(ledger, pd, spec):
                 "lever": _r.lever or "—",
                 "config": InferenceConfig(**_r.config).label().split("[", 1)[1].rstrip("]")
                 if isinstance(_r.config.get("model"), str) else "joint",
-                "p99_ms": round(_m.p99_latency_ms, 1) if _m else None,
+                "p95_ms": round(_m.p95_latency_ms, 1) if _m else None,
                 "footprint_GB": round(_m.footprint_gb, 2) if _m else None,
                 "quality": round(_r.quality_score, 4) if _r.quality_score else None,
                 "verdict": _r.verdict.value,
                 "prediction_held": _r.prediction_held,
-                "slo_ms": spec.slo(_r.models[0]).p99_latency_ms,
+                "slo_ms": spec.slo(_r.models[0]).p95_latency_ms,
             }
         )
     ledger_df = pd.DataFrame(rows)
@@ -244,14 +244,14 @@ def _(ledger, pd, spec):
 
 @app.cell(hide_code=True)
 def _(VERDICT_COLORS, alt, base_chart, ledger_df, mo):
-    _d = ledger_df[ledger_df.p99_ms.notna()].copy()
+    _d = ledger_df[ledger_df.p95_ms.notna()].copy()
 
     _bars = (
         alt.Chart(_d)
         .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=26)
         .encode(
             x=alt.X("n:O", title="trial", axis=alt.Axis(labelAngle=0)),
-            y=alt.Y("p99_ms:Q", title="p99 latency (ms)", scale=alt.Scale(type="log")),
+            y=alt.Y("p95_ms:Q", title="p95 latency (ms)", scale=alt.Scale(type="log")),
             color=alt.Color(
                 "verdict:N",
                 title="verdict",
@@ -259,7 +259,7 @@ def _(VERDICT_COLORS, alt, base_chart, ledger_df, mo):
                     domain=list(VERDICT_COLORS), range=list(VERDICT_COLORS.values())
                 ),
             ),
-            tooltip=["model", "proposed_by", "lever", "config", "p99_ms",
+            tooltip=["model", "proposed_by", "lever", "config", "p95_ms",
                      "footprint_GB", "quality", "verdict", "prediction_held"],
         )
     )
@@ -294,9 +294,9 @@ def _(ledger, mo, phase1_results):
     _lines = []
     for _name, _o in phase1_results.items():
         _lines.append(
-            f"- **{_name}**: p99 {_o.baseline.p99_latency_ms:,.0f}ms → "
-            f"{_o.best_measurement.p99_latency_ms:,.0f}ms "
-            f"({_o.p99_improvement_pct:+.0f}%), footprint "
+            f"- **{_name}**: p95 {_o.baseline.p95_latency_ms:,.0f}ms → "
+            f"{_o.best_measurement.p95_latency_ms:,.0f}ms "
+            f"({_o.p95_improvement_pct:+.0f}%), footprint "
             f"{_o.baseline.footprint_gb:.2f} → {_o.best_measurement.footprint_gb:.2f}GB  \n"
             f"  `{_o.best_config.label()}`"
         )
@@ -327,9 +327,9 @@ def _(mo):
 
 @app.cell
 def _(ledger, pd, spec):
-    from loop.phase2 import Phase2
+    from sera.phase2 import Phase2
 
-    _p2 = Phase2(spec, __import__("loop.runner.sim_runner", fromlist=["SimRunner"]).SimRunner(),
+    _p2 = Phase2(spec, __import__("sera.runner.sim_runner", fromlist=["SimRunner"]).SimRunner(),
                  ledger, verbose=False)
 
     frontier_rows = []
@@ -339,7 +339,7 @@ def _(ledger, pd, spec):
                 {
                     "model": _name,
                     "footprint_GB": round(_e.footprint_gb, 2),
-                    "p99_ms": round(_e.solo_p99_ms, 1),
+                    "p95_ms": round(_e.solo_p95_ms, 1),
                     "devices": _e.config.tensor_parallel_size,
                     "placement": "1 device" if _e.single_device else "2 devices",
                     "config": _e.config.label().split("[", 1)[1].rstrip("]"),
@@ -356,20 +356,20 @@ def _(SERIES_1, SERIES_2, alt, base_chart, frontier_df, mo):
         .mark_point(size=150, filled=True, strokeWidth=2, stroke="#fcfcfb")
         .encode(
             x=alt.X("footprint_GB:Q", title="memory footprint (GB)"),
-            y=alt.Y("p99_ms:Q", title="p99 latency (ms)"),
+            y=alt.Y("p95_ms:Q", title="p95 latency (ms)"),
             color=alt.Color(
                 "placement:N", title="placement",
                 scale=alt.Scale(domain=["1 device", "2 devices"],
                                 range=[SERIES_1, SERIES_2]),
             ),
             shape=alt.Shape("placement:N", title="placement"),
-            tooltip=["model", "config", "footprint_GB", "p99_ms", "placement"],
+            tooltip=["model", "config", "footprint_GB", "p95_ms", "placement"],
         )
     )
     _labels = (
         alt.Chart(frontier_df)
         .mark_text(align="left", dx=10, dy=-6, fontSize=10, color="#52514e")
-        .encode(x="footprint_GB:Q", y="p99_ms:Q", text="placement:N")
+        .encode(x="footprint_GB:Q", y="p95_ms:Q", text="placement:N")
     )
     _c = (_pts + _labels).facet(
         column=alt.Column("model:N", title=None,
@@ -399,10 +399,10 @@ def _(p2_result, pd, spec):
     contention_rows = []
     for _ev in p2_result.evidence:
         contention_rows += [
-            {"model": _ev.model, "condition": "alone", "p99_ms": round(_ev.solo_p99_ms, 1),
-             "slo_ms": spec.slo(_ev.model).p99_latency_ms},
-            {"model": _ev.model, "condition": "sharing a GPU", "p99_ms": round(_ev.joint_p99_ms, 1),
-             "slo_ms": spec.slo(_ev.model).p99_latency_ms},
+            {"model": _ev.model, "condition": "alone", "p95_ms": round(_ev.solo_p95_ms, 1),
+             "slo_ms": spec.slo(_ev.model).p95_latency_ms},
+            {"model": _ev.model, "condition": "sharing a GPU", "p95_ms": round(_ev.joint_p95_ms, 1),
+             "slo_ms": spec.slo(_ev.model).p95_latency_ms},
         ]
     contention_df = pd.DataFrame(contention_rows)
     return (contention_df,)
@@ -418,20 +418,20 @@ def _(SERIES_1, SERIES_2, alt, base_chart, contention_df, mo, p2_result):
             .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=44)
             .encode(
                 x=alt.X("condition:N", title=None, axis=alt.Axis(labelAngle=0)),
-                y=alt.Y("p99_ms:Q", title="p99 latency (ms)"),
+                y=alt.Y("p95_ms:Q", title="p95 latency (ms)"),
                 color=alt.Color(
                     "condition:N", title="condition",
                     scale=alt.Scale(domain=["alone", "sharing a GPU"],
                                     range=[SERIES_1, SERIES_2]),
                 ),
-                tooltip=["model", "condition", "p99_ms", "slo_ms"],
+                tooltip=["model", "condition", "p95_ms", "slo_ms"],
             )
         )
         _vals = (
             alt.Chart(contention_df)
             .mark_text(dy=-8, fontSize=11, color="#52514e")
-            .encode(x="condition:N", y="p99_ms:Q",
-                    text=alt.Text("p99_ms:Q", format=",.0f"))
+            .encode(x="condition:N", y="p95_ms:Q",
+                    text=alt.Text("p95_ms:Q", format=",.0f"))
         )
         _slo = (
             alt.Chart(contention_df)
@@ -467,7 +467,7 @@ def _(mo, p2_result):
         )
     else:
         _worst = (
-            max(p2_result.evidence, key=lambda e: e.p99_inflation_pct)
+            max(p2_result.evidence, key=lambda e: e.p95_inflation_pct)
             if p2_result.evidence else None
         )
         _verdict = f"### Verdict: reverted\n\n{p2_result.reason}\n\n"
@@ -475,8 +475,8 @@ def _(mo, p2_result):
             _verdict += (
                 f"**Memory fit was never the binding constraint** — the fit check "
                 f"cleared with {p2_result.fit_detail.get('headroom_gb', 0):.1f}GB spare. "
-                f"Device-time contention was: `{_worst.model}`'s p99 inflated "
-                f"**{_worst.p99_inflation_pct:+.0f}%** beside `{_worst.neighbour}`, "
+                f"Device-time contention was: `{_worst.model}`'s p95 inflated "
+                f"**{_worst.p95_inflation_pct:+.0f}%** beside `{_worst.neighbour}`, "
                 f"whose traffic is {_worst.neighbour_prefill_share:.0%} prefill."
             )
     mo.md(_verdict)
@@ -501,7 +501,7 @@ def _(mo):
 def _(Ledger, pd, run_dir, runner, spec):
     import statistics
 
-    from loop.baseline import sweep
+    from sera.baseline import sweep
 
     _agent_trials = {}
     for _m in spec.model_names:

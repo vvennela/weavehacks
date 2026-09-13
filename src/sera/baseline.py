@@ -46,9 +46,9 @@ class BaselineResult:
     trials_run: int
     paper_rejections: int
     trials_to_target: int | None       # None means it never got there
-    best_p99_ms: float
+    best_p95_ms: float
     best_config: InferenceConfig | None
-    target_p99_ms: float
+    target_p95_ms: float
 
     def describe(self) -> str:
         reached = (
@@ -58,7 +58,7 @@ class BaselineResult:
         )
         return (
             f"{self.strategy:14} {self.model:10} {reached}, "
-            f"best p99 {self.best_p99_ms:.0f}ms"
+            f"best p95 {self.best_p95_ms:.0f}ms"
         )
 
 
@@ -92,7 +92,7 @@ def sweep(
 
     trials = 0
     paper_rejections = 0
-    best_p99 = float("inf")
+    best_p95 = float("inf")
     best_cfg: InferenceConfig | None = None
     trials_to_target: int | None = None
 
@@ -126,7 +126,7 @@ def sweep(
         meas: Measurement = outcome.measurements[model.name]
         quality = full_eval(cfg, floor)
 
-        slo_ok = meas.p99_latency_ms <= slo.p99_latency_ms
+        slo_ok = meas.p95_latency_ms <= slo.p95_latency_ms
         if slo.min_throughput_rps is not None:
             slo_ok = slo_ok and meas.throughput_rps >= slo.min_throughput_rps
 
@@ -145,14 +145,14 @@ def sweep(
         if verdict is Verdict.ACCEPTED:
             if trials_to_target is None:
                 trials_to_target = trials
-            if meas.p99_latency_ms < best_p99:
-                best_p99, best_cfg = meas.p99_latency_ms, cfg
+            if meas.p95_latency_ms < best_p95:
+                best_p95, best_cfg = meas.p95_latency_ms, cfg
 
     return BaselineResult(
         strategy=strategy, model=model.name, trials_run=trials,
         paper_rejections=paper_rejections, trials_to_target=trials_to_target,
-        best_p99_ms=best_p99, best_config=best_cfg,
-        target_p99_ms=slo.p99_latency_ms,
+        best_p95_ms=best_p95, best_config=best_cfg,
+        target_p95_ms=slo.p95_latency_ms,
     )
 
 

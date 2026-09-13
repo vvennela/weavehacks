@@ -69,7 +69,7 @@ class ParallelismSpecialist(Specialist):
             lever=self.lever,
             delta=delta,
             prediction=Prediction(
-                metric="p99_latency_ms",
+                metric="p95_latency_ms",
                 direction="decrease",
                 magnitude_pct=net,
                 confidence=0.7,

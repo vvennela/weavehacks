@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from loop.arbiter import Arbiter
-from loop.config import InferenceConfig, baseline_config
-from loop.ledger import Ledger, Prediction
-from loop.phase1 import Phase1
-from loop.reduction import reduce_metrics
-from loop.runner.base import Tenant
-from loop.runner.sim_runner import SimRunner
-from loop.spec import load_spec
-from loop.specialists import ALL_SPECIALISTS
-from loop.specialists.base import Context, Dead, Proposal
+from sera.arbiter import Arbiter
+from sera.config import InferenceConfig, baseline_config
+from sera.ledger import Ledger, Prediction
+from sera.phase1 import Phase1
+from sera.reduction import reduce_metrics
+from sera.runner.base import Tenant
+from sera.runner.sim_runner import SimRunner
+from sera.spec import load_spec
+from sera.specialists import ALL_SPECIALISTS
+from sera.specialists.base import Context, Dead, Proposal
 
 SPEC = "specs/demo.yaml"
 
@@ -19,7 +19,7 @@ SPEC = "specs/demo.yaml"
 def _proposal(name: str, delta: dict, conf: float = 0.7) -> Proposal:
     return Proposal(
         specialist=name, lever=name, delta=delta,
-        prediction=Prediction("p99_latency_ms", "decrease", 30.0, conf),
+        prediction=Prediction("p95_latency_ms", "decrease", 30.0, conf),
         rationale="test",
     )
 
@@ -53,7 +53,7 @@ def test_arbiter_respects_slot_budget(tmp_path):
 
 def test_calibration_reorders_the_queue(tmp_path):
     """A specialist that has been wrong loses the contested slot to one that hasn't."""
-    from loop.ledger import Measurement, Substrate, TrialRecord, Verdict
+    from sera.ledger import Measurement, Substrate, TrialRecord, Verdict
 
     led = Ledger(tmp_path / "l.jsonl")
     for i in range(4):
@@ -145,7 +145,7 @@ def test_dead_lever_is_reported_when_no_devices_are_free(tmp_path):
     )
     ctx = Context(digest=digest, config=cfg, model=model, gpu=gpu,
                   ledger=Ledger(tmp_path / "l.jsonl"), available_gpus=1)
-    from loop.specialists import ParallelismSpecialist
+    from sera.specialists import ParallelismSpecialist
 
     v = ParallelismSpecialist().propose(ctx)
     assert isinstance(v, Dead)
@@ -161,7 +161,7 @@ def test_simulator_is_deterministic(tmp_path):
                         spec.gpu("gpu0"), seed=spec.seed)
         for _ in range(3)
     ]
-    p99s = {r.measurements["model_a"].p99_latency_ms for r in runs}
+    p99s = {r.measurements["model_a"].p95_latency_ms for r in runs}
     assert len(p99s) == 1, f"simulator is not deterministic: {p99s}"
 
 
@@ -178,6 +178,6 @@ def test_co_tenancy_is_never_faster_than_running_alone(tmp_path):
     for t in tenants:
         solo = runner.run([t], gpu, seed=spec.seed)
         assert (
-            joint.measurements[t.model.name].p99_latency_ms
-            >= solo.measurements[t.model.name].p99_latency_ms
+            joint.measurements[t.model.name].p95_latency_ms
+            >= solo.measurements[t.model.name].p95_latency_ms
         )

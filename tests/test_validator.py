@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from loop.config import InferenceConfig
-from loop.spec import GpuSpec, ModelSpec
-from loop.validator import fits_together, validate
+from sera.config import InferenceConfig
+from sera.spec import GpuSpec, ModelSpec
+from sera.validator import fits_together, validate
 
 MODEL = ModelSpec(
     name="m", hf_id="x/m", params_b=1.5, num_layers=28, hidden_size=1536,
