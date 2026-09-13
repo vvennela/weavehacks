@@ -1,0 +1,453 @@
+{
+  "schema_version": "sera-stable-release-package-v2",
+  "status": "passed",
+  "source_sha": "befda96a602af9fbf9dd3fd9bb423fb50c894d08",
+  "checkout_sha": "1a1a38ee9f755c6f51eb305de70ac317d2a3c55b",
+  "source_tree": "8d3af9f0ed2aef319c8b75e97564df80e16f79b2",
+  "source_tree_equal": true,
+  "platform": "macOS-26.5.2-arm64-arm-64bit",
+  "temporary_directory": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+  "wheel": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist/sera_inference-0.2.0-py3-none-any.whl",
+  "wheel_sha256": "e5e3a0856385e4da8523f5d9f4aa294a86bf490dbc99bf1dcd2c1144e653334d",
+  "wheel_size_bytes": 229796,
+  "verified_python_source_files": [
+    "sera/__init__.py",
+    "sera/agent.py",
+    "sera/api.py",
+    "sera/config.py",
+    "sera/diagnosis.py",
+    "sera/fit.py",
+    "sera/hardware.py",
+    "sera/investigation.py",
+    "sera/investigation_prompt.py",
+    "sera/investigation_report.py",
+    "sera/ledger.py",
+    "sera/measurement.py",
+    "sera/memory.py",
+    "sera/metrics.py",
+    "sera/pipeline.py",
+    "sera/placement.py",
+    "sera/placement_capacity.py",
+    "sera/placement_config.py",
+    "sera/placement_decoding.py",
+    "sera/placement_reference.py",
+    "sera/placement_runtime.py",
+    "sera/placement_search.py",
+    "sera/placement_search_tracing.py",
+    "sera/placement_tracing.py",
+    "sera/portable_runtime.py",
+    "sera/pressure_pilot.py",
+    "sera/provider_check.py",
+    "sera/quality.py",
+    "sera/recovery.py",
+    "sera/relay.py",
+    "sera/runtime.py",
+    "sera/search_policy.py",
+    "sera/stage_config.py",
+    "sera/stages.py",
+    "sera/storage.py",
+    "sera/swarm.py",
+    "sera/techniques.py",
+    "sera/trace_evidence.py",
+    "sera/tracing.py",
+    "sera/weave_evidence.py",
+    "sera/weave_integration.py",
+    "sera_loop/__init__.py",
+    "sera_loop/__main__.py",
+    "sera_loop/arbiter.py",
+    "sera_loop/baseline.py",
+    "sera_loop/config.py",
+    "sera_loop/fixtures.py",
+    "sera_loop/ledger.py",
+    "sera_loop/loadgen.py",
+    "sera_loop/phase1.py",
+    "sera_loop/phase2.py",
+    "sera_loop/quality.py",
+    "sera_loop/reduction.py",
+    "sera_loop/report.py",
+    "sera_loop/spec.py",
+    "sera_loop/tracing.py",
+    "sera_loop/types.py",
+    "sera_loop/validator.py",
+    "sera_loop/runner/__init__.py",
+    "sera_loop/runner/base.py",
+    "sera_loop/runner/fake_vllm.py",
+    "sera_loop/runner/sim_runner.py",
+    "sera_loop/runner/vllm_runner.py",
+    "sera_loop/specialists/__init__.py",
+    "sera_loop/specialists/base.py",
+    "sera_loop/specialists/batching.py",
+    "sera_loop/specialists/parallelism.py",
+    "sera_loop/specialists/quantization.py"
+  ],
+  "checks": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "befda96"
+      ],
+      "cwd": "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery",
+      "exit_code": 0,
+      "stdout": "befda96a602af9fbf9dd3fd9bb423fb50c894d08\n",
+      "stderr": "",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery",
+      "exit_code": 0,
+      "stdout": "1a1a38ee9f755c6f51eb305de70ac317d2a3c55b\n",
+      "stderr": "",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "befda96a602af9fbf9dd3fd9bb423fb50c894d08^{tree}"
+      ],
+      "cwd": "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery",
+      "exit_code": 0,
+      "stdout": "8d3af9f0ed2aef319c8b75e97564df80e16f79b2\n",
+      "stderr": "",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery",
+      "exit_code": 0,
+      "stdout": "8d3af9f0ed2aef319c8b75e97564df80e16f79b2\n",
+      "stderr": "",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "befda96a602af9fbf9dd3fd9bb423fb50c894d08",
+        "--",
+        "sera",
+        "src/sera_loop",
+        "pyproject.toml"
+      ],
+      "cwd": "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "build",
+        "--wheel",
+        "--out-dir",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist"
+      ],
+      "cwd": "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Building wheel...\nSuccessfully built /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist/sera_inference-0.2.0-py3-none-any.whl\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "venv",
+        "--python",
+        "3.11",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using CPython 3.11.15\nCreating virtual environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base\nActivate with: source /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/activate\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist/sera_inference-0.2.0-py3-none-any.whl"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.11.15 environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base\nResolved 9 packages in 7ms\nPrepared 1 package in 6ms\nInstalled 9 packages in 15ms\n + annotated-types==0.8.0\n + numpy==2.4.6\n + prometheus-client==0.26.0\n + pydantic==2.13.5\n + pydantic-core==2.46.5\n + pyyaml==6.0.3\n + sera-inference==0.2.0 (from file:///var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist/sera_inference-0.2.0-py3-none-any.whl)\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/python"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.11.15 environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base\nChecked 9 packages in 0.40ms\nAll installed packages are compatible\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/python",
+        "-I",
+        "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery/evidence/final-package-release-v1/installed_features_smoke.py"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"version\": \"0.2.0\", \"exports\": [\"optimize\", \"place\", \"optimize_placement\", \"measure_placement_references\", \"optimize_on_hardware\", \"inspect_recovery\", \"resume\"], \"checks\": [\"wheel-only imports\", \"SQLite checkpoint roundtrip\", \"exclusive optimizer ownership\", \"pre-baseline resume fails before GPU/provider\"], \"gpu_calls\": 0, \"provider_calls\": 0}\n",
+      "stderr": "",
+      "isolated_python": true
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/python",
+        "-I",
+        "-c",
+        "import importlib.util; names=('weave','openai','vllm','torch','experiments','benchmarks'); assert all(importlib.util.find_spec(name) is None for name in names); print('PASS: base import requires no Weave, provider, GPU, or repository modules')"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "PASS: base import requires no Weave, provider, GPU, or repository modules\n",
+      "stderr": "",
+      "isolated_python": true
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "list",
+        "--python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/python",
+        "--format",
+        "json"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "[{\"name\":\"annotated-types\",\"version\":\"0.8.0\"},{\"name\":\"numpy\",\"version\":\"2.4.6\"},{\"name\":\"prometheus-client\",\"version\":\"0.26.0\"},{\"name\":\"pydantic\",\"version\":\"2.13.5\"},{\"name\":\"pydantic-core\",\"version\":\"2.46.5\"},{\"name\":\"pyyaml\",\"version\":\"6.0.3\"},{\"name\":\"sera-inference\",\"version\":\"0.2.0\"},{\"name\":\"typing-extensions\",\"version\":\"4.16.0\"},{\"name\":\"typing-inspection\",\"version\":\"0.4.4\"}]\n",
+      "stderr": "Using Python 3.11.15 environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "venv",
+        "--python",
+        "3.11",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using CPython 3.11.15\nCreating virtual environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm\nActivate with: source /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/activate\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist/sera_inference-0.2.0-py3-none-any.whl[swarm]"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.11.15 environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm\nResolved 68 packages in 28ms\nInstalled 68 packages in 157ms\n + abnf==2.2.0\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + backoff==2.2.1\n + cachetools==7.1.8\n + certifi==2026.7.22\n + cffi==2.1.1\n + chardet==7.6.0\n + charset-normalizer==3.5.1\n + cint==1.0.0\n + click==8.5.0\n + cryptography==50.0.1\n + diskcache-weave==5.6.3.post1\n + fickling==0.1.12\n + filelock==3.32.6\n + googleapis-common-protos==1.75.3\n + gql==4.0.0\n + graphql-core==3.2.12\n + graphviz==0.21\n + h11==0.16.0\n + httpcore==1.0.9\n + httpcore2==2.12.0\n + httpx==0.28.1\n + httpx2==2.12.0\n + idna==3.19\n + intervaltree==3.2.1\n + jinja2==3.1.6\n + jiter==0.17.0\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + kaitaistruct==0.11\n + markupsafe==3.0.3\n + multidict==6.8.0\n + networkx==3.6.1\n + numpy==2.4.6\n + openai==3.13.0\n + opentelemetry-api==1.44.0\n + opentelemetry-exporter-otlp-proto-common==1.44.0\n + opentelemetry-exporter-otlp-proto-http==1.44.0\n + opentelemetry-proto==1.44.0\n + opentelemetry-sdk==1.44.0\n + opentelemetry-semantic-conventions==0.65b0\n + packaging==26.3\n + pdfminer-six==20260107\n + pillow==12.3.0\n + polyfile-weave==0.5.9\n + prometheus-client==0.26.0\n + propcache==0.5.2\n + protobuf==7.36.1\n + pycparser==3.0\n + pydantic==2.13.5\n + pydantic-core==2.46.5\n + pyyaml==6.0.3\n + referencing==0.37.0\n + requests==2.34.2\n + rpds-py==2026.6.3\n + sentry-sdk==2.69.1\n + sera-inference==0.2.0 (from file:///var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist/sera_inference-0.2.0-py3-none-any.whl)\n + sniffio==1.3.1\n + sortedcontainers==2.4.0\n + tenacity==9.1.4\n + truststore==0.10.4\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.7.0\n + weave==0.53.2\n + yarl==1.24.5\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/python"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.11.15 environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm\nChecked 68 packages in 1ms\nAll installed packages are compatible\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/python",
+        "-I",
+        "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery/evidence/final-package-release-v1/installed_features_smoke.py"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"version\": \"0.2.0\", \"exports\": [\"optimize\", \"place\", \"optimize_placement\", \"measure_placement_references\", \"optimize_on_hardware\", \"inspect_recovery\", \"resume\"], \"checks\": [\"wheel-only imports\", \"SQLite checkpoint roundtrip\", \"exclusive optimizer ownership\", \"pre-baseline resume fails before GPU/provider\"], \"gpu_calls\": 0, \"provider_calls\": 0}\n",
+      "stderr": "",
+      "isolated_python": true
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/python",
+        "-I",
+        "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery/tests/installed_package_smoke.py"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "PASS: installed 0.2.0 API setup, scoped tracing hooks, usable-result ownership; all service boundaries stubbed\n",
+      "stderr": "",
+      "isolated_python": true
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/sera-provider-check",
+        "--help"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "usage: sera-provider-check [-h] --project PROJECT --output-dir OUTPUT_DIR\n                           [--model MODEL] [--provider {wandb,codex-relay}]\n                           [--relay-dir RELAY_DIR]\n\noptions:\n  -h, --help            show this help message and exit\n  --project PROJECT\n  --output-dir OUTPUT_DIR\n  --model MODEL         Hosted investigator model to certify\n  --provider {wandb,codex-relay}\n  --relay-dir RELAY_DIR\n                        Shared request directory for the local Codex\n                        controller\n",
+      "stderr": "",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "list",
+        "--python",
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/python",
+        "--format",
+        "json"
+      ],
+      "cwd": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h",
+      "exit_code": 0,
+      "stdout": "[{\"name\":\"abnf\",\"version\":\"2.2.0\"},{\"name\":\"annotated-types\",\"version\":\"0.8.0\"},{\"name\":\"anyio\",\"version\":\"4.15.1\"},{\"name\":\"attrs\",\"version\":\"26.1.0\"},{\"name\":\"backoff\",\"version\":\"2.2.1\"},{\"name\":\"cachetools\",\"version\":\"7.1.8\"},{\"name\":\"certifi\",\"version\":\"2026.7.22\"},{\"name\":\"cffi\",\"version\":\"2.1.1\"},{\"name\":\"chardet\",\"version\":\"7.6.0\"},{\"name\":\"charset-normalizer\",\"version\":\"3.5.1\"},{\"name\":\"cint\",\"version\":\"1.0.0\"},{\"name\":\"click\",\"version\":\"8.5.0\"},{\"name\":\"cryptography\",\"version\":\"50.0.1\"},{\"name\":\"diskcache-weave\",\"version\":\"5.6.3.post1\"},{\"name\":\"fickling\",\"version\":\"0.1.12\"},{\"name\":\"filelock\",\"version\":\"3.32.6\"},{\"name\":\"googleapis-common-protos\",\"version\":\"1.75.3\"},{\"name\":\"gql\",\"version\":\"4.0.0\"},{\"name\":\"graphql-core\",\"version\":\"3.2.12\"},{\"name\":\"graphviz\",\"version\":\"0.21\"},{\"name\":\"h11\",\"version\":\"0.16.0\"},{\"name\":\"httpcore\",\"version\":\"1.0.9\"},{\"name\":\"httpcore2\",\"version\":\"2.12.0\"},{\"name\":\"httpx\",\"version\":\"0.28.1\"},{\"name\":\"httpx2\",\"version\":\"2.12.0\"},{\"name\":\"idna\",\"version\":\"3.19\"},{\"name\":\"intervaltree\",\"version\":\"3.2.1\"},{\"name\":\"jinja2\",\"version\":\"3.1.6\"},{\"name\":\"jiter\",\"version\":\"0.17.0\"},{\"name\":\"jsonschema\",\"version\":\"4.26.0\"},{\"name\":\"jsonschema-specifications\",\"version\":\"2025.9.1\"},{\"name\":\"kaitaistruct\",\"version\":\"0.11\"},{\"name\":\"markupsafe\",\"version\":\"3.0.3\"},{\"name\":\"multidict\",\"version\":\"6.8.0\"},{\"name\":\"networkx\",\"version\":\"3.6.1\"},{\"name\":\"numpy\",\"version\":\"2.4.6\"},{\"name\":\"openai\",\"version\":\"3.13.0\"},{\"name\":\"opentelemetry-api\",\"version\":\"1.44.0\"},{\"name\":\"opentelemetry-exporter-otlp-proto-common\",\"version\":\"1.44.0\"},{\"name\":\"opentelemetry-exporter-otlp-proto-http\",\"version\":\"1.44.0\"},{\"name\":\"opentelemetry-proto\",\"version\":\"1.44.0\"},{\"name\":\"opentelemetry-sdk\",\"version\":\"1.44.0\"},{\"name\":\"opentelemetry-semantic-conventions\",\"version\":\"0.65b0\"},{\"name\":\"packaging\",\"version\":\"26.3\"},{\"name\":\"pdfminer-six\",\"version\":\"20260107\"},{\"name\":\"pillow\",\"version\":\"12.3.0\"},{\"name\":\"polyfile-weave\",\"version\":\"0.5.9\"},{\"name\":\"prometheus-client\",\"version\":\"0.26.0\"},{\"name\":\"propcache\",\"version\":\"0.5.2\"},{\"name\":\"protobuf\",\"version\":\"7.36.1\"},{\"name\":\"pycparser\",\"version\":\"3.0\"},{\"name\":\"pydantic\",\"version\":\"2.13.5\"},{\"name\":\"pydantic-core\",\"version\":\"2.46.5\"},{\"name\":\"pyyaml\",\"version\":\"6.0.3\"},{\"name\":\"referencing\",\"version\":\"0.37.0\"},{\"name\":\"requests\",\"version\":\"2.34.2\"},{\"name\":\"rpds-py\",\"version\":\"2026.6.3\"},{\"name\":\"sentry-sdk\",\"version\":\"2.69.1\"},{\"name\":\"sera-inference\",\"version\":\"0.2.0\"},{\"name\":\"sniffio\",\"version\":\"1.3.1\"},{\"name\":\"sortedcontainers\",\"version\":\"2.4.0\"},{\"name\":\"tenacity\",\"version\":\"9.1.4\"},{\"name\":\"truststore\",\"version\":\"0.10.4\"},{\"name\":\"typing-extensions\",\"version\":\"4.16.0\"},{\"name\":\"typing-inspection\",\"version\":\"0.4.4\"},{\"name\":\"urllib3\",\"version\":\"2.7.0\"},{\"name\":\"weave\",\"version\":\"0.53.2\"},{\"name\":\"yarl\",\"version\":\"1.24.5\"}]\n",
+      "stderr": "Using Python 3.11.15 environment at: /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm\n",
+      "isolated_python": false
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/python",
+        "-I",
+        "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery/evidence/final-package-release-v3/installed_total_device_smoke.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"package_path\": \"/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/lib/python3.11/site-packages/sera/__init__.py\", \"accounting_mode\": \"explicit-total-device\", \"default_mode\": \"per-service\", \"per_service_memory_verified\": false, \"checks\": [\"installed public signatures\", \"explicit mode forwarded through place and optimize_placement\", \"constructor marks service memory unknown\", \"unknown mode rejected before execution\"], \"gpu_calls\": 0, \"provider_calls\": 0, \"runtime_boundaries\": \"stubbed\"}\n",
+      "stderr": "",
+      "isolated_python": true
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/bin/python",
+        "-I",
+        "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery/evidence/stable-release-package-v2/installed_stage_smoke.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"package_path\": \"/private/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/base/lib/python3.11/site-packages/sera/__init__.py\", \"k_semantics\": \"allowed regression in earlier measured objectives\", \"default_minimum_gain\": \"strictly positive; no percentage floor\", \"checks\": [\"installed public API shape\", \"alias and percentage validation\", \"latency and memory ceilings preserve original hard limits\", \"2% gain with 1% regression passes; 4% regression fails\", \"zero gain fails\", \"public API forwards independent k and minimum gain\"], \"gpu_calls\": 0, \"provider_calls\": 0, \"weave_service_calls\": 0, \"stage_execution_boundary\": \"stubbed; pure measurement gates are real\"}\n",
+      "stderr": "",
+      "isolated_python": true
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/python",
+        "-I",
+        "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery/evidence/final-package-release-v3/installed_total_device_smoke.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"package_path\": \"/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/lib/python3.11/site-packages/sera/__init__.py\", \"accounting_mode\": \"explicit-total-device\", \"default_mode\": \"per-service\", \"per_service_memory_verified\": false, \"checks\": [\"installed public signatures\", \"explicit mode forwarded through place and optimize_placement\", \"constructor marks service memory unknown\", \"unknown mode rejected before execution\"], \"gpu_calls\": 0, \"provider_calls\": 0, \"runtime_boundaries\": \"stubbed\"}\n",
+      "stderr": "",
+      "isolated_python": true
+    },
+    {
+      "command": [
+        "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/bin/python",
+        "-I",
+        "/Users/vishnuv/Documents/Documents/weavehacks-optimizer-recovery/evidence/stable-release-package-v2/installed_stage_smoke.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "stdout": "{\"status\": \"passed\", \"package_path\": \"/private/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/swarm/lib/python3.11/site-packages/sera/__init__.py\", \"k_semantics\": \"allowed regression in earlier measured objectives\", \"default_minimum_gain\": \"strictly positive; no percentage floor\", \"checks\": [\"installed public API shape\", \"alias and percentage validation\", \"latency and memory ceilings preserve original hard limits\", \"2% gain with 1% regression passes; 4% regression fails\", \"zero gain fails\", \"public API forwards independent k and minimum gain\"], \"gpu_calls\": 0, \"provider_calls\": 0, \"weave_service_calls\": 0, \"stage_execution_boundary\": \"stubbed; pure measurement gates are real\"}\n",
+      "stderr": "",
+      "isolated_python": true
+    }
+  ],
+  "limits": [
+    "No GPU runtime installed or started.",
+    "No provider or Weave service calls.",
+    "Installed API smoke stubs service and GPU boundaries.",
+    "Dependency checks cover Python 3.11 on this macOS host, not Linux CUDA compatibility.",
+    "This is package validation, not a live release rehearsal or production certification.",
+    "No version bump, tag, publication, live outage, or soak test performed.",
+    "Installed stage smoke stubs the stage execution boundary but executes actual percentage helpers and measurement gates. The broader staged controller tests use synthetic GPU/provider/trace boundaries.",
+    "Source befda96 supersedes interim3bfaaf5 wheel ea0d62e00c2ebd43481a153441160bcb12bf8964568bf92e79beba49aa8b5934 before live use."
+  ],
+  "audit_script": "evidence/final-package-release-v1/audit.py",
+  "package_version": "0.2.0",
+  "reproducibility": {
+    "second_wheel": "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/repeat-dist/sera_inference-0.2.0-py3-none-any.whl",
+    "second_wheel_sha256": "e5e3a0856385e4da8523f5d9f4aa294a86bf490dbc99bf1dcd2c1144e653334d",
+    "byte_identical": true,
+    "build_command": [
+      "uv",
+      "build",
+      "--wheel",
+      "--out-dir",
+      "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/repeat-dist"
+    ],
+    "hash_command": [
+      "shasum",
+      "-a",
+      "256",
+      "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/dist/sera_inference-0.2.0-py3-none-any.whl",
+      "/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-final-package-zni1kj4h/repeat-dist/sera_inference-0.2.0-py3-none-any.whl"
+    ],
+    "build_exit_code": 0,
+    "hash_exit_code": 0
+  },
+  "focused_source_tests": {
+    "command": [
+      "uv",
+      "run",
+      "--frozen",
+      "--extra",
+      "dev",
+      "pytest",
+      "-q",
+      "tests/test_staged_pipeline.py",
+      "tests/test_staged_api.py",
+      "tests/test_stage_config.py",
+      "tests/test_stage_baseline.py",
+      "tests/test_stage_search_filter.py"
+    ],
+    "source_sha": "befda96a602af9fbf9dd3fd9bb423fb50c894d08",
+    "exit_code": 0,
+    "outcome": "146 passed in 16.59s",
+    "limits": "Synthetic service/provider/trace boundaries; real staged API, investigator, swarm, checkpoint, quality, and objective gate behavior."
+  },
+  "stage_contract": {
+    "k": "allowed percentage regression in earlier measured objectives",
+    "default_minimum_gain": "strictly positive",
+    "min_improvement_pct": "separate optional percentage floor",
+    "quality": "never relaxed",
+    "original_hard_limits": "never relaxed"
+  },
+  "gpu_calls": 0,
+  "provider_calls": 0,
+  "weave_service_calls": 0
+}
