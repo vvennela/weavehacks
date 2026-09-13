@@ -151,7 +151,19 @@ Each round gives the active quantization and batching specialists the baseline m
 
 The controller counts failed starts against the budget, excludes tested configurations, stops after two rounds without a frontier change, and stops immediately on cleanup failure. With at least three trials left, it can also select one untested specialist proposal for exploration. It returns the best eligible measured runner; a failed-quality baseline is not a safe fallback. All trials, proposals, reviews, and the measured frontier are saved.
 
-The current live value set is still narrow: FP8 KV and batch tokens 2,048 for small Qwen; batch tokens 2,048 only for the proven Qwen72B FP8 reference. It does not automatically activate the expanded schema ranges. Combination trials, broader value generation, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The provider citation gate currently prevents this new controller from launching GPU trials.
+Default values remain narrow: FP8 KV and batch tokens 2,048 for small Qwen; batch tokens 2,048 only for the proven Qwen72B FP8 reference. A caller can now supply `investigation_space=sera.InvestigationSpace(supported_changes={...})` with an explicit budget. This declares up to 32 single-setting candidates using the supported batching/context controls. Sera freezes their full configuration hashes before loading. An optional `candidate_hashes` list restricts the pool further. It rejects no-ops, invalid coupled settings, incompatible sequence limits, and unverified combined FP8 weights/KV. After baseline tokenization, it excludes candidates whose context cannot cover the same input and output limit. It does not silently activate the expanded ranges or execute a full grid.
+
+Combination trials, automatic value generation, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The citation fix now constrains the provider to exact available metric names and verifies the same request schema locally. No new hosted provider check has run, so the current provider gate still prevents agent-controlled GPU trials in this build.
+
+### Rehearse the decision loop without a GPU
+
+```sh
+python -m experiments.rehearse_investigation --output-dir sera-runs/offline-loop
+```
+
+Use a new output directory. This runs the production controller with **synthetic agents, answers, latency, and memory**. It makes no LM or GPU calls. The scripted first trial is fast but wrong, so Sera rejects it. The next round receives that failed prediction and chooses a passing alternative. The rehearsal checks a fresh returned-runner request and cleanup, then saves `result.json`, `report.md`, and `investigation.md`.
+
+For a nontechnical partner: use this to explain how the decision loop works. Say that the inputs and agents are scripted. Use the separate Qwen72B recording to show real GPU results. The offline rehearsal proves software control flow, not agent intelligence or a speedup. The normal result summary now shows specialist predictions, cited evidence, arbitration, trial gates, later history, and the final runner.
 
 ## User priorities
 

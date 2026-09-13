@@ -96,3 +96,29 @@ def test_scope_is_saved_and_passed_to_controller_without_changing_defaults(tmp_p
         investigation_space=sera.InvestigationSpace(supported_changes={'max_num_batched_tokens': [1024, 2048]}))
     assert supplied['supported_changes'] == {'max_num_batched_tokens': [1024, 2048]}
     assert len(supplied['candidate_hashes']) == 2
+
+
+def test_explicit_pool_runs_only_selected_unseen_candidates(tmp_path, monkeypatch):
+    from test_investigation import install_fakes
+    runners, seen, agent = install_fakes(monkeypatch)
+    options = sera.InvestigationSpace(supported_changes={'max_num_batched_tokens': [1024, 2048, 3072]})
+    with sera.optimize(models=[MODEL_ID], prompts=['question'], output_dir=tmp_path/'pool',
+        evaluation=lambda prompt, output: True, evaluation_version='fixture-v1',
+        constraints=sera.Constraints(quality_floor=.99), agent=agent, provider_check='fixture',
+        budget=sera.Budget(max_candidate_trials=2), investigation_space=options) as result:
+        executed = result.report['search_trials']
+        assert len(executed) == 2
+        assert len({trial['config_hash'] for trial in executed}) == 2
+        allowed = result.report['investigation_space']['candidate_hashes']
+        assert len(allowed) == 3
+        assert all(trial['config_hash'] in allowed for trial in executed)
+        assert all(trial['runtime']['configuration']['kv_cache_dtype'] == 'auto' for trial in executed)
+        proposals = [e for role, e in seen if role == 'proposal']
+        assert len(proposals) == 2
+        assert len(proposals[0]['frozen_candidate_hashes']) == 3
+        assert len(proposals[1]['frozen_candidate_hashes']) == 2
+        assert executed[0]['config_hash'] not in proposals[1]['frozen_candidate_hashes']
+        assert options.supported_changes == {'max_num_batched_tokens': [1024, 2048, 3072]}
+        summary = (tmp_path/'pool'/'report.md').read_text()
+        assert '### Round 2' in summary
+        assert 'Prediction:' in summary

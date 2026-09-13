@@ -145,6 +145,9 @@ def render_summary(report, output_dir):
     lines.extend(["", f"Workload: {report.get('workload')}",
                   f"Generation: {report.get('generation')}",
                   f"Record: {output_dir / 'result.json'}", ""])
+    if report.get('search'):
+        from .investigation_report import render_investigation
+        lines.extend([render_investigation(report), ''])
     return "\n".join(lines)
 
 
@@ -358,9 +361,16 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         return result
     except BaseException as error:
         report.update(status="failed", error=f"{type(error).__name__}: {error}")
+        result.models = []
         try:
             if active is not None:
                 active.close()
+        except BaseException as cleanup_error:
+            report.update(cleanup_error=type(cleanup_error).__name__, returned_runner_closed=False)
+            raise
         finally:
-            result._save()
+            try:
+                result._save()
+            except BaseException as save_error:
+                report['save_error'] = type(save_error).__name__
         raise

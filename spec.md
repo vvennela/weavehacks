@@ -531,6 +531,8 @@ The loop stops when:
 
 Implementation checkpoint: supplying an explicit `Budget` enables a bounded single-model controller using the existing active controls. It runs sequential trials, carries a digest of failures and prediction reviews into the next round, tracks the measured frontier, and restores the best eligible runner. Local tests cover this connection; no live multi-round run is established. The new provider citation check still blocks agent-controlled execution. Broader policy-generated values, combination trials, joint placement, and session-time budgeting remain target behavior, not implemented claims. Omitting `Budget` preserves the original one-candidate milestone.
 
+An explicit `InvestigationSpace` can supply up to 32 legal single-setting values and an optional subset of full configuration hashes. Sera records and enforces this pool; the agent cannot add settings outside it. Defaults do not change when the parameter is omitted. Candidate sequence limits must cover the declared load, and reduced context limits must cover the baseline input tokens plus the unchanged output allowance. This is explicit scoped search, not automatic policy-generated values or exhaustive collection. The local offline rehearsal uses scripted agents and synthetic measurements and must be labeled as such.
+
 ## 14. Validation
 
 The validator checks candidates before vLLM starts.
