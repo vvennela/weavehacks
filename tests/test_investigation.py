@@ -126,6 +126,91 @@ def test_two_rounds_use_failure_evidence_and_return_best_eligible_runner(tmp_pat
     assert not any(r.ready for r in runners)
 
 
+def test_simulated_swarm_rejects_fast_wrong_trial_inspects_failure_and_returns_safe_runner(tmp_path, monkeypatch):
+    """Exercise the real controller, not live model intelligence or GPU performance."""
+    from sera.config import CONTROL_ROLES
+    from sera.storage import content_hash
+    from sera.tracing import use_event_sink
+
+    runners, _, base_agent = install_fakes(monkeypatch)
+    recorded_diagnoses, failure_reads = {}, []
+
+    def record(event_name, payload):
+        if event_name == 'recorded_trial_diagnosis':
+            recorded_diagnoses[payload['trial_id']] = deepcopy(payload)
+
+    def read_saved_trace(query_id, supplied):
+        assert query_id == 'quality_outputs'
+        rows = []
+        if supplied['history']:
+            # Read the verdict actually produced and saved by this optimize call.
+            saved = json.loads((tmp_path/'run'/'result.json').read_text())
+            failed = saved['search_trials'][0]
+            payload = recorded_diagnoses['trial-1']
+            assert payload['diagnosis'] == failed['diagnosis']
+            assert failed['task_quality']['mean'] == 0
+            assert failed['decision']['selected'] == 'baseline'
+            assert supplied['required_inspection'] is True
+            assert any(scope['trial_id'] == 'trial-1' and scope['config_hash'] == failed['config_hash']
+                       for scope in supplied['trace_scope'])
+            failure_reads.append(supplied['investigator_id'])
+            rows.append(dict(payload, call_id='simulated-diagnosis-trial-1',
+                             output_sha256=content_hash(payload), record_type='trial_diagnosis'))
+        return dict(source='simulated offline trace sink', query_id=query_id, records=rows)
+
+    class ScriptedSwarm(type(base_agent)):
+        def fork(self):
+            return ScriptedSwarm()
+
+        def request(self, role, supplied, instruction):
+            self.history.append(dict(role=role, evidence=deepcopy(supplied)))
+            if supplied.get('swarm_phase') == 'inspect':
+                return ArbiterDecision(ranked_proposal_ids=[] if supplied['inspections'] else ['quality_outputs'],
+                                       reason='Inspect the saved quality verdict once')
+            if role == 'arbiter':
+                return ArbiterDecision(ranked_proposal_ids=supplied['legal_proposal_ids'][:1],
+                                       reason='Authorize one experiment, not deployment')
+            later_round = bool(supplied['history'])
+            if later_round:
+                rows = supplied['inspections'][0]['result']['records']
+                assert rows[0]['diagnosis']['observed']['quality']['mean'] == 0
+                assert supplied['history'][0]['review']['prediction_outcome'] == 'refuted'
+                assert 'kv_cache_dtype' not in supplied['supported_changes']
+            lever = 'max_num_batched_tokens' if later_round else 'kv_cache_dtype'
+            return Proposal(action='trial', proposal_id='same-scripted-id', agent_role=CONTROL_ROLES[lever],
+                parent_trial_id=supplied['trial_id'], model_id=supplied['model_id'],
+                changed_lever=lever, proposed_value=supplied['supported_changes'][lever][0],
+                evidence_used=['p95_latency_ms'], predicted_metric_change='Reduce p95 by at least 5%',
+                confidence=.5, expected_trial_cost=1,
+                falsification_condition='Reject if quality fails or p95 gain is below 5%',
+                reason='Try batching after simulated-diagnosis-trial-1 showed wrong answers'
+                       if later_round else 'Test cache precision; gate still decides deployment')
+
+    with use_event_sink(record):
+        with run(tmp_path, ScriptedSwarm(), swarm=True, trace_reader=read_saved_trace) as result:
+            baseline, wrong, safe = result.trials
+            assert wrong['reduced']['p95_latency_ms'] < safe['reduced']['p95_latency_ms'] < baseline['reduced']['p95_latency_ms']
+            assert wrong['task_quality']['passed'] is False and wrong['decision']['selected'] == 'baseline'
+            assert safe['task_quality']['passed'] is True and safe['decision']['selected'] == 'candidate'
+            assert len({trial['config_hash'] for trial in result.trials}) == 3
+            rounds = result.report['search']['rounds']
+            assert [item['trial_ids'] for item in rounds] == [['trial-1'], ['trial-2']]
+            assert all(len(item['arbiter']['ranked_proposal_ids']) == 1 for item in rounds)
+            assert sorted(failure_reads) == ['memory_context', 'output_quality', 'scheduling']
+            assert all(item['successful_inspections'] == 1 and item['status'] == 'accepted'
+                       for item in rounds[1]['specialists'])
+            assert result.report['search']['trials_used'] == 2
+            assert result.report['decision']['selected'] == 'trial-2'
+            assert result.models[0].configuration.max_num_batched_tokens == 2048
+            assert result.models[0].configuration.kv_cache_dtype == baseline['runtime']['configuration']['kv_cache_dtype']
+            assert result.models[0].generate('new question') == 'fresh answer'
+            saved = json.loads((tmp_path/'run'/'result.json').read_text())
+            assert saved['search']['rounds'] == rounds
+            assert saved['decision']['selected'] == 'trial-2'
+            assert sum(runner.ready for runner in runners) == 1
+    assert len(runners) == 3 and not any(runner.ready for runner in runners)
+
+
 def test_failed_start_consumes_trial_and_next_round_can_recover(tmp_path, monkeypatch):
     runners, seen, agent = install_fakes(monkeypatch, startup_failure=True)
     with run(tmp_path, agent) as result:
