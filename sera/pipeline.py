@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from .config import BASELINE_NAME, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, Candidate, Constraints, Objective, RuntimeConfig, Workload, validate_candidate
+from .config import BASELINE_NAME, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, Budget, Candidate, Constraints, Objective, RuntimeConfig, Workload, validate_candidate
 from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
@@ -53,6 +53,8 @@ class SeraResult:
 
     @property
     def trials(self):
+        if "search_trials" in self.report:
+            return self.baselines + self.report["search_trials"]
         return self.baselines + ([self.report["candidate_trial"]] if "candidate_trial" in self.report else [])
 
     @property
@@ -65,6 +67,10 @@ class SeraResult:
 
     @property
     def frontier(self):
+        if "search_trials" in self.report:
+            from .investigation import search_frontier
+            return search_frontier(self.report["baseline"], self.report["search_trials"],
+                                   constraints=self.report.get("constraints"))
         return measured_frontier(self.report.get("baseline", {}), self.report.get("candidate_trial"),
                                  constraints=self.report.get("constraints"))
 
@@ -103,9 +109,11 @@ def render_summary(report, output_dir):
              ("Task scores use the supplied versioned evaluator; see each trial's gate and constraints."
               if report.get("evaluation") else
               "Task quality was not verified. The gate checks token agreement, not correct answers."),
-             "This is one comparison, not a statistically established speedup.", ""]
-    for key, label in (("baseline", "Baseline"), ("candidate_trial", "Candidate")):
-        trial = report.get(key)
+             ("This bounded search is not a statistically established advantage over other search methods."
+              if report.get('search') else "This is one comparison, not a statistically established speedup."), ""]
+    entries = [(report.get("baseline"), "Baseline"), (report.get("candidate_trial"), "Candidate")]
+    entries.extend((trial, trial['trial_id']) for trial in report.get('search_trials', []))
+    for trial, label in entries:
         if trial:
             reduced = trial.get("reduced", {})
             lines.append(f"{label}: {trial['status']}; requests={reduced.get('request_count', 'unavailable')}; "
@@ -128,6 +136,12 @@ def render_summary(report, output_dir):
         lines.append(f"{label}: {gate['mean']:.4f}; required >= {gate['floor']}; pass={gate['passed']}.")
     if report.get("constraints"):
         lines.append(f"Hard limits: {report['constraints']}; failures: {decision.get('constraint_failures', {})}.")
+    if report.get("search"):
+        search = report["search"]
+        lines.extend(["", f"Investigation trials: {search['trials_used']}/{search['budget']['max_candidate_trials']}; "
+                      f"stop: {search.get('stop_reason', 'running')}.",
+                      "Each round records proposals, arbitration, measurements, gates, and prediction review.",
+                      "This bounded investigation is not proof of a search advantage."])
     lines.extend(["", f"Workload: {report.get('workload')}",
                   f"Generation: {report.get('generation')}",
                   f"Record: {output_dir / 'result.json'}", ""])
@@ -136,14 +150,17 @@ def render_summary(report, output_dir):
 
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
              objective=None, evaluation=None, evaluation_version=None, constraints=None,
-             workload=None, baseline_configuration=None):
-    """One measured candidate, fixed or agent-proposed; no joint placement or search claim.
+             workload=None, baseline_configuration=None, budget=None):
+    """One candidate, or an opt-in bounded agent investigation; no joint placement.
 
-    Uses at most 32 supplied prompts, serial load, up to 16 warm-ups, three
+    Uses at most 32 supplied prompts, declared loads, up to 16 warm-ups, three
     measured passes, and separate quality passes. The caller owns result.close().
     """
     objective = Objective() if objective is None else Objective.model_validate(objective)
     workload = Workload() if workload is None else Workload.model_validate(workload)
+    budget = Budget.model_validate(budget) if budget is not None else None
+    if budget is not None and (agent is None or candidate is not None):
+        raise ValueError("An investigation budget requires an agent and no fixed candidate")
     if evaluation is None:
         if constraints is not None or evaluation_version is not None:
             raise ValueError("Verified constraints require an evaluation callable and its version")
@@ -168,6 +185,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     revision = LARGE_MODEL_REVISION if model_id == LARGE_MODEL_ID else MODEL_REVISION
     if model_id == LARGE_MODEL_ID and baseline_configuration is None:
         from .fit import optimize_fit
+        if budget is not None:
+            raise ValueError("Investigate the explicit proven FP8 reference after the fit-first path")
         if candidate is not None:
             raise ValueError("The fit-first path selects its candidate from the validated memory plans")
         return optimize_fit(prompts=prompts, output_dir=output_dir, objective=objective,
@@ -243,6 +262,13 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         stable = token_agreement(baseline["quality"], baseline["self_check"])["passed"]
         can_compare = evaluation is not None or stable
         trial = None
+        if budget is not None:
+            from .investigation import investigate
+            # The controller owns all later runtimes, including cleanup and the live return.
+            investigation_runner, active = active, None
+            return investigate(result=result, active=investigation_runner, agent=agent,
+                history_start=history_start, budget=budget, objective=objective, constraints=constraints,
+                evaluation=evaluation, evaluation_version=evaluation_version, workload=workload)
         if agent is not None and baseline["status"] == "collected" and can_compare:
             from .agent import validate_proposal
             evidence = agent_evidence(baseline, objective, constraints)

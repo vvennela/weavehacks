@@ -53,7 +53,7 @@ The W&B client, typed proposal/ranking/final-selection schemas, and bounded prov
 
 The first provider check failed (19/30 valid first responses; 22/30 after retries). Its records are preserved. After expressing action/cost consistency in the wire schema and bounding ranking to one candidate, the second check passed 30/30 on the first response with no retries. This establishes schema compatibility, not recommendation quality.
 
-The approved proposal expansion adds batch-token limits (1–65,536), sequence limits (1–256), and context limits (65–4,096), alongside FP8 KV. Each proposal changes one setting and must match its actual parent, the run's allowed values, and any frozen candidate list. These are schema bounds, not verified operating points. Existing live defaults remain FP8 KV or batch tokens 2,048. The older provider record does not certify the expanded schema; a new matching check is required before agent-controlled runs.
+The approved proposal expansion adds batch-token limits (1–65,536), sequence limits (1–256), and context limits (65–4,096), alongside FP8 KV. Each proposal changes one setting and must match its actual parent, the run's allowed values, and any frozen candidate list. These are schema bounds, not verified operating points. Existing live defaults remain FP8 KV or batch tokens 2,048. The older provider record does not certify the expanded schema. The new check produced 30/30 valid JSON responses, but only 26/30 valid evidence citations, so **agent-controlled runs in this new build remain blocked**. See [the saved check](evidence/provider-v4/README.md). The rehearsed live-demo revision is preserved below.
 
 ## Install
 
@@ -143,6 +143,16 @@ This makes 30 requests using the actual three schemas and synthetic evidence. Ea
 
 After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `provider_check=".../result.json"` to `optimize`. Sera gives the agent the measured baseline, validates one proposal, measures it if legal, applies the unchanged gate, and returns the outcome for a final recommendation. A keep-baseline or invalid proposal consumes no candidate GPU trial. The final agent response cannot change the deterministic selection.
 
+## Bounded agent investigation
+
+The production controller now accepts `budget=sera.Budget(max_candidate_trials=2)` with an agent and a matching passed provider record. Omitting `budget` preserves the one-candidate path. This opt-in controller is implemented and tested locally; it has not run a live multi-round investigation.
+
+Each round gives the active quantization and batching specialists the baseline measurements and a short history of previous trials. An arbiter selects an experiment. Sera validates it, measures it with the existing runner, applies the unchanged quality and performance gates, and asks the agent to review its prediction. The next round receives the result, including failures. Raw measurements remain in the saved report, not in the next prompt.
+
+The controller counts failed starts against the budget, excludes tested configurations, stops after two rounds without a frontier change, and stops immediately on cleanup failure. With at least three trials left, it can also select one untested specialist proposal for exploration. It returns the best eligible measured runner; a failed-quality baseline is not a safe fallback. All trials, proposals, reviews, and the measured frontier are saved.
+
+The current live value set is still narrow: FP8 KV and batch tokens 2,048 for small Qwen; batch tokens 2,048 only for the proven Qwen72B FP8 reference. It does not automatically activate the expanded schema ranges. Combination trials, broader value generation, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The provider citation gate currently prevents this new controller from launching GPU trials.
+
 ## User priorities
 
 Pass `objective=sera.Objective(priority="throughput")` to `optimize` to maximize measured output tokens per second. Other choices are `"latency"` (default: minimize p95) and `"memory"` (minimize sampled peak total GPU memory, including runtime reservation). The default required relative improvement is 5%; `min_improvement_fraction` can be declared before the run. The 99% token-agreement gate is unchanged for every priority.
@@ -187,7 +197,7 @@ The latency limit above is an example requirement, not a measured guarantee. `ma
 
 Verified mode uses task scores instead of token agreement for acceptance. It applies the same evaluator to the separate baseline and candidate quality passes, saves per-prompt scores and evaluator errors, and keeps the declared floor fixed. Empty output, invalid scores, evaluator errors, or unmet limits cannot pass. A baseline evaluator error stops the experiment before a candidate is loaded. A wrong but successfully graded baseline does not prevent testing a candidate.
 
-If only the candidate meets requirements, Sera can select it without claiming a speedup. If neither meets requirements, it closes the runtime and returns `no-safe-configuration` with `models=[]`; it never returns a failed-quality baseline as verified. Scoring uses only the supplied prompts and evaluator and is not a general quality guarantee. The workload remains the current serial quick-check workload; concurrency sweeps are not implemented.
+If only the candidate meets requirements, Sera can select it without claiming a speedup. If neither meets requirements, it closes the runtime and returns `no-safe-configuration` with `models=[]`; it never returns a failed-quality baseline as verified. Scoring uses only the supplied prompts and evaluator and is not a general quality guarantee. Workload concurrency defaults to `[1]`; an explicit sweep can use `[1, 2, 4, 8]`.
 
 The first live verified check returned no safe configuration: the tiny model passed only 2/8 strict JSON tasks and the agent declined a trial. See [the preserved result](evidence/verified-agent-v1/README.md). Do not present this as a quality or optimization success.
 
@@ -199,9 +209,12 @@ It estimates BF16 and online FP8 weight plans before loading. The estimate inclu
 
 With an agent, the arbiter selects at most one estimated-feasible plan. Sera then loads the original weights with `fp8_per_tensor`, measures the workload, applies task and resource limits, and returns the live runner only on a pass. The unquantized baseline is marked infeasible, never fabricated. This path passed the live eight-task check. It establishes feasible deployment, not a speedup over a baseline that did not run. No multi-GPU allocation or wider search is implemented.
 
-To run the same eight-task demo from this repository on the supplied GPU, install the `agent` extra and Weave in the existing environment, supply `WANDB_API_KEY`, and use the saved matching provider check:
+The rehearsed code and its matching provider certificate are at commit `8dcfb00`. Until the new build passes its citation gate, use that revision in a separate checkout for the live demo. Do not use the old provider certificate to bypass validation in the new build. On the supplied GPU, with Weave installed and `WANDB_API_KEY` in the environment:
 
 ```sh
+git worktree add --detach ../sera-rehearsed-demo 8dcfb00
+cd ../sera-rehearsed-demo
+uv pip install '.[agent]'
 python -m experiments.run_fit_demo \
   --project vvennela-n-a/wandb_agent_default_project \
   --provider-check evidence/provider-v2/result.json \

@@ -529,6 +529,8 @@ The loop stops when:
 - No legal untested proposal remains.
 - The session has insufficient time for another trial and teardown.
 
+Implementation checkpoint: supplying an explicit `Budget` enables a bounded single-model controller using the existing active controls. It runs sequential trials, carries a digest of failures and prediction reviews into the next round, tracks the measured frontier, and restores the best eligible runner. Local tests cover this connection; no live multi-round run is established. The new provider citation check still blocks agent-controlled execution. Broader policy-generated values, combination trials, joint placement, and session-time budgeting remain target behavior, not implemented claims. Omitting `Budget` preserves the original one-candidate milestone.
+
 ## 14. Validation
 
 The validator checks candidates before vLLM starts.

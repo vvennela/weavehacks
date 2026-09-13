@@ -52,6 +52,13 @@ class Workload(BaseModel):
         return values
 
 
+class Budget(BaseModel):
+    """Opt-in candidate-trial budget; baseline setup does not consume it."""
+
+    model_config = ConfigDict(strict=True, frozen=True, extra="forbid")
+    max_candidate_trials: int = Field(default=8, ge=1, le=8)
+
+
 class RuntimeConfig(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
 
