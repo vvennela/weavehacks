@@ -1,0 +1,157 @@
+{
+  "schema_version": "sera-final-benchmark-audit-v1",
+  "audit_passed": true,
+  "gpu_trials_during_audit": 0,
+  "provider_calls_during_audit": 0,
+  "policies": {
+    "full-evidence": {
+      "first_hit": 1,
+      "trials": 3,
+      "final_p95_ms": 625.7277270015038,
+      "policy_wall_seconds": 271.71318567199705,
+      "provider_calls": 39,
+      "provider_attempts": 39,
+      "invalid_provider_attempts": 0,
+      "rejected_specialist_responses": 0,
+      "selected_ids": [
+        "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+        "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f"
+      ],
+      "selected_only_evidence_verified": true
+    },
+    "no-history": {
+      "first_hit": 1,
+      "trials": 3,
+      "final_p95_ms": 625.7277270015038,
+      "policy_wall_seconds": 221.45310592799797,
+      "provider_calls": 38,
+      "provider_attempts": 38,
+      "invalid_provider_attempts": 0,
+      "rejected_specialist_responses": 0,
+      "selected_ids": [
+        "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+        "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f"
+      ],
+      "selected_only_evidence_verified": true
+    },
+    "round-robin": {
+      "first_hit": 1,
+      "trials": 3,
+      "final_p95_ms": 625.7277270015038,
+      "policy_wall_seconds": 191.25341974099865,
+      "provider_calls": 12,
+      "provider_attempts": 12,
+      "invalid_provider_attempts": 0,
+      "rejected_specialist_responses": 0,
+      "selected_ids": [
+        "595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544",
+        "fa106b43532bc24a3c1b54583aaf787601b650f912f8c6710d1ef7e4944ebe7f",
+        "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f"
+      ],
+      "selected_only_evidence_verified": true
+    }
+  },
+  "pressure": {
+    "cache-v2": {
+      "scenario": "not-established",
+      "peak_kv_percent": 78.98550724637681,
+      "preemptions": 0.0,
+      "measured_queue_ms": 99.4584492083656,
+      "queue_count_delta": 24.0,
+      "request_count": 24,
+      "errors": 0,
+      "cleanup_memory_mib": 0,
+      "median_request_ms": 264.98162600000796,
+      "p95_request_ms": 397.9155320012069,
+      "startup_seconds": 45.053537788997346,
+      "profile_hash": "fce50dec067489de60ebffb187523fda66f6ed9d03e9b0d6c71da04e858028c2"
+    },
+    "queue-v1": {
+      "scenario": "not-established",
+      "peak_kv_percent": 24.576271186440678,
+      "preemptions": 0.0,
+      "measured_queue_ms": 5.3336783333482645,
+      "queue_count_delta": 24.0,
+      "request_count": 24,
+      "errors": 0,
+      "cleanup_memory_mib": 0,
+      "median_request_ms": 213.30144750027102,
+      "p95_request_ms": 308.57131400262006,
+      "startup_seconds": 45.04630803300097,
+      "profile_hash": "2b47036799f67059721e93c6329d2ab138caeef62b097a784558cc21e1c11f9a"
+    }
+  },
+  "source_sha256": {
+    "live-grid-agent-replay-v1/comparison.json": "d1d1c29d0f22b30752de7e91f5d3ec78fddfe6342986a71b53590faa38284d29",
+    "live-grid-agent-replay-v1/full-evidence-policy.json": "c2f32ab08fbbc33793d7329dc79a148aa2443a76f2ce449530b39f0af5f1bae4",
+    "live-grid-agent-replay-v1/no-history-policy.json": "dac3b9dc4ac4e2b38e6a434ab050e6823bb91d490bc1550ad411dbab596021da",
+    "live-grid-agent-replay-v1/round-robin-policy.json": "58ad8ffd3f30aed8d588751ebf3793fa802fa5ffe39f0019c0fee01e8f7c9427",
+    "pressure-pair-v3/registration.json": "17fbf1e705e72517ba2987782eea9bc246140a65bdf433362448b08642a3b1b1",
+    "pressure-pair-v3/cache-v2/result.json": "c2a6e3bcfdd0114917f8824b6de308efd09e093be81eed9ad89a5bfc063b2ab0",
+    "pressure-pair-v3/cache-v2/metrics-before.prom": "23e082a61653bffe3e5103593d3025d67ce92623f70b15df595c9a9392e331db",
+    "pressure-pair-v3/cache-v2/metrics-after.prom": "2a8fd14cd9bf9b4cf689e188e4607004fc747893a88ad06f8127a0b3713dd23a",
+    "pressure-pair-v3/cache-v2/metrics-at-peak.prom": "0b5fdffff86eb3e02def7aefc332e98b62af6a2ecf8d40cad4c5405bab37908f",
+    "pressure-pair-v3/queue-v1/result.json": "b52836ddea1091ccda219f8756a0a080e406deb2dc3be6a6cc150b09f65aa13f",
+    "pressure-pair-v3/queue-v1/metrics-before.prom": "3e1c5cc540cf711ce3155a105a3c9214cdd14d586c747e67d7083ba30033dadd",
+    "pressure-pair-v3/queue-v1/metrics-after.prom": "3bfa7da2243fa63f6d953a2cee914123b329cab8a41c7dc26c6ae243be7db0d4",
+    "pressure-pair-v3/queue-v1/metrics-at-peak.prom": "e3531e2d975abb346ce138c619ff232d6c83f381b26f6da466b99cd0951dfd70"
+  },
+  "replay_source": {
+    "driver_revision": "3a9cb31",
+    "installed_library_revision": "d8c7304",
+    "identical_replay_module_hashes": {
+      "swarm": {
+        "d8c7304": "b6eb07a652c52616e9b5efa53aa79522d9586e2422219494e5082f1045533704",
+        "3a9cb31": "b6eb07a652c52616e9b5efa53aa79522d9586e2422219494e5082f1045533704"
+      },
+      "agent": {
+        "d8c7304": "d4dcfd9db3a70e390d0863d279df7ff2398e90a5e5283118bfd99a22d1fcfd27",
+        "3a9cb31": "d4dcfd9db3a70e390d0863d279df7ff2398e90a5e5283118bfd99a22d1fcfd27"
+      },
+      "investigation_prompt": {
+        "d8c7304": "bd4b851edc937928d5b312f427476d3f6b917887f9d1bdba00f2d15ef7a885e4",
+        "3a9cb31": "bd4b851edc937928d5b312f427476d3f6b917887f9d1bdba00f2d15ef7a885e4"
+      },
+      "provider_check": {
+        "d8c7304": "45cde2c9a2112e5963bb8c6d1c51761c3ebe0cb22640fde8d2352d72b37a82a5",
+        "3a9cb31": "45cde2c9a2112e5963bb8c6d1c51761c3ebe0cb22640fde8d2352d72b37a82a5"
+      },
+      "relay": {
+        "d8c7304": "7e718cbd3ce4950fabaa7aa7a51e56386da6e8ecc8a4545161d08f9922ac8bf8",
+        "3a9cb31": "7e718cbd3ce4950fabaa7aa7a51e56386da6e8ecc8a4545161d08f9922ac8bf8"
+      },
+      "storage": {
+        "d8c7304": "6b9dec854ffb63bc59e854d5215bf4031f518028c50eb6a5d75be5f553b64c8e",
+        "3a9cb31": "6b9dec854ffb63bc59e854d5215bf4031f518028c50eb6a5d75be5f553b64c8e"
+      },
+      "tracing": {
+        "d8c7304": "5d86aa3919abf60af5f95edd563c530c06346c7423ba5698919a7b6aa6520bf9",
+        "3a9cb31": "5d86aa3919abf60af5f95edd563c530c06346c7423ba5698919a7b6aa6520bf9"
+      },
+      "techniques": {
+        "d8c7304": "33e70c0cd56b9a48e28566de5f5125d20607e63023f05958ae8738d7d7f24ae9",
+        "3a9cb31": "33e70c0cd56b9a48e28566de5f5125d20607e63023f05958ae8738d7d7f24ae9"
+      },
+      "diagnosis": {
+        "d8c7304": "c378b24bfae45500220d951a85d8d2c9a891dbbaa020d2a855eccf469095a7d0",
+        "3a9cb31": "c378b24bfae45500220d951a85d8d2c9a891dbbaa020d2a855eccf469095a7d0"
+      },
+      "trace_evidence": {
+        "d8c7304": "c3b5aca365219dd6e25ce23cf15d50000ddc58cff10fb5482b30bfaaac7aa11a",
+        "3a9cb31": "c3b5aca365219dd6e25ce23cf15d50000ddc58cff10fb5482b30bfaaac7aa11a"
+      }
+    },
+    "config_difference": "3a9cb31 permits TP 1/2/4/8; d8c7304 permits TP1. All frozen configs use TP1.",
+    "scope": "Retrospective git comparison. No new placement, portable-runtime, or GPU execution in replay."
+  },
+  "ablation_win": false,
+  "strict_section_19_4_claim": false,
+  "limitations": [
+    "Saved-artifact consistency audit, not cryptographic proof of execution.",
+    "Provider replay inspected selected cached metrics, not fresh Weave calls.",
+    "All policy first-hit counts tie; neither intelligence ablation was beaten.",
+    "Neither preregistered pressure profile was established."
+  ]
+}
