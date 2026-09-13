@@ -174,7 +174,7 @@ def build_investigation_prompt(evidence):
     """Return a detached prompt projection; validation still uses the original evidence."""
     projection = _Projection()
     result = _pick(evidence, ('swarm_phase', 'investigator_id', 'trial_id', 'model_id', 'revision',
-        'configuration', 'objective', 'constraints', 'remaining_trials', 'supported_changes',
+        'configuration', 'objective', 'constraints', 'workload', 'remaining_trials', 'supported_changes',
         'frozen_candidate_hashes', 'legal_proposal_ids', 'required_inspection', 'failure_inspection_required',
         'degraded', 'inspection_status', 'quality_mode', 'decision_scope',
         'search_policy', 'total_trial_cap', 'round_trial_capacity', 'plateau',

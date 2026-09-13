@@ -37,6 +37,7 @@ def trial_trace_scope(trial):
 
 
 def agent_evidence(baseline, objective=None, constraints=None, *, prompts=()):
+    from copy import deepcopy
     from .config import SUPPORTED_CHANGES
     from .trace_evidence import request_evidence
     requests = request_evidence(baseline, prompts)
@@ -58,6 +59,7 @@ def agent_evidence(baseline, objective=None, constraints=None, *, prompts=()):
             "quality_mode": "verified" if constraints is not None else "token-agreement",
             "task_quality": baseline.get("task_quality"),
             "request_evidence": requests,
+            "workload": deepcopy(baseline.get("workload", {})),
             "trace_scope": [trial_trace_scope(baseline)],
             "configuration": baseline["runtime"]["configuration"],
             "metrics": metrics, "remaining_trials": 1, "supported_changes": supported,

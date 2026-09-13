@@ -38,6 +38,19 @@ def trial_record():
                       {'concurrency': 2, 'metrics': {'after-measurement': other_after}}]}
 
 
+def test_warm_cache_measurement_scope_reaches_compacted_investigator_prompt():
+    from sera.investigation_prompt import build_investigation_prompt
+    trial = trial_record()
+    trial['workload'] = {'concurrency': [1, 2], 'cache_evaluation': {
+        'measured_scope': 'repeated-prompts-after-per-load-warmup',
+        'cold_cache_measurement': False}}
+    supplied = agent_evidence(trial)
+    assert supplied['workload'] == trial['workload']
+    assert build_investigation_prompt(supplied)['workload'] == trial['workload']
+    supplied['workload']['cache_evaluation']['cold_cache_measurement'] = True
+    assert trial['workload']['cache_evaluation']['cold_cache_measurement'] is False
+
+
 def test_parsed_load_snapshots_reach_agent_with_explicit_cumulative_names():
     trial = trial_record()
     original = deepcopy(trial)
