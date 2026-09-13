@@ -21,13 +21,23 @@ class StrictRecord(BaseModel):
 
 
 class Proposal(StrictRecord):
+    model_config = ConfigDict(json_schema_extra={"anyOf": [
+        {"properties": {"action": {"const": "keep-baseline"}, "expected_trial_cost": {"const": 0},
+                        "changed_lever": {"type": "null"}, "proposed_value": {"type": "null"}}},
+        {"properties": {"action": {"const": "trial"}, "expected_trial_cost": {"const": 1},
+                        "agent_role": {"const": "quantization"}, "changed_lever": {"const": "kv_cache_dtype"},
+                        "proposed_value": {"const": "fp8"}}},
+        {"properties": {"action": {"const": "trial"}, "expected_trial_cost": {"const": 1},
+                        "agent_role": {"const": "batching"}, "changed_lever": {"const": "max_num_batched_tokens"},
+                        "proposed_value": {"const": 2048}}},
+    ]})
     action: Literal["trial", "keep-baseline"]
     proposal_id: str = Field(min_length=1)
     agent_role: Literal["quantization", "batching"]
     parent_trial_id: str = Field(min_length=1)
     model_id: str = Field(min_length=1)
     changed_lever: Literal["kv_cache_dtype", "max_num_batched_tokens"] | None
-    proposed_value: str | int | None
+    proposed_value: Literal["fp8", 2048] | None
     evidence_used: list[str] = Field(min_length=1)
     predicted_metric_change: str = Field(min_length=1)
     confidence: float = Field(ge=0, le=1)
@@ -58,7 +68,7 @@ class Proposal(StrictRecord):
 
 
 class ArbiterDecision(StrictRecord):
-    ranked_proposal_ids: list[str]
+    ranked_proposal_ids: list[str] = Field(max_length=1)
     reason: str = Field(min_length=1)
 
     @model_validator(mode="after")

@@ -8,9 +8,11 @@ The first fixed-candidate path is implemented. It supports one pinned Qwen3-0.6B
 
 The latest runner check returned `2` for `2 + 3`. Its runtime worked, but its answer was wrong. See [the saved evidence](evidence/sera-runner-v1/README.md). Do not treat runtime success as model correctness.
 
-Agent selection, Weave traces, task-correctness acceptance, joint placement, and the search benchmark are not implemented. A fixed candidate is not an agent recommendation.
+Agent-controlled selection is implemented behind the provider check, but has not passed live acceptance. Weave traces, task-correctness acceptance, joint placement, and the search benchmark are not implemented. A fixed candidate is not an agent recommendation.
 
 The W&B client, typed proposal/ranking/final-selection schemas, and bounded provider check are implemented. The client reads `WANDB_API_KEY` from the process environment; it never saves the key or request headers. Agent-controlled GPU execution stays disabled until the provider check passes.
+
+The first provider check failed (19/30 valid first responses; 22/30 after retries). Its records are preserved. The wire schema now expresses action/cost consistency and limits ranking to the one-candidate budget; this revision needs a fresh provider check.
 
 ## Install
 
@@ -95,3 +97,9 @@ provider_report = check_provider(
 ```
 
 This makes 30 requests using the actual three schemas and synthetic evidence. Each failed response permits one retry. It requires 29 first-pass valid responses and all 30 valid within the retry limit. All attempts, truncation, errors, timings, and separate evidence-reference checks are saved. A pass establishes schema compatibility, not useful search or model correctness. Credential/access errors stop the check early.
+
+After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `provider_check=".../result.json"` to `optimize`. Sera gives the agent the measured baseline, validates one proposal, measures it if legal, applies the unchanged gate, and returns the outcome for a final recommendation. A keep-baseline or invalid proposal consumes no candidate GPU trial. The final agent response cannot change the deterministic selection.
+
+## Cache-pressure pilot
+
+`sera.pressure_pilot.run_pressure_pilot` runs the approved BF16-only profile: GPU memory fraction 0.025, eight concurrent 2,048-token inputs, context limit 4,096, and at most eight sequences. It uses synthetic padding, two warm-ups, and three waves. The predeclared scenario criterion is sampled KV use at least 80% plus at least one measured preemption, with zero request errors and successful cleanup. Otherwise it reports `not-established`. This pilot is separate from answer quality and candidate performance; there is no FP8 trial or automatic tuning.

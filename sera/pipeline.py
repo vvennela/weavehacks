@@ -11,6 +11,22 @@ from .runtime import CleanupError, GENERATION, SeraModel
 from .storage import content_hash, save_json
 
 
+def agent_evidence(baseline):
+    from .config import SUPPORTED_CHANGES
+    metrics = dict(baseline["reduced"])
+    snapshot = baseline.get("metrics", {}).get("after-measurement", {})
+    metrics.update(mean_queue_ms=snapshot.get("mean_queue_ms"),
+                   mean_ttft_ms=snapshot.get("mean_ttft_ms"),
+                   preemptions=snapshot.get("preemptions"))
+    return {"trial_id": "baseline", "model_id": MODEL_ID, "revision": MODEL_REVISION,
+            "configuration": baseline["runtime"]["configuration"],
+            "metrics": metrics, "remaining_trials": 1, "supported_changes": SUPPORTED_CHANGES,
+            "baseline_self_check": token_agreement(baseline["quality"], baseline["self_check"]),
+            "limitations": ["No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+                            "Token agreement does not establish task correctness.",
+                            "This small sample cannot establish statistical significance."]}
+
+
 @dataclass
 class SeraResult:
     models: list[SeraModel]
@@ -95,8 +111,8 @@ def render_summary(report, output_dir):
     return "\n".join(lines)
 
 
-def optimize(*, models, prompts, output_dir=None, candidate=None):
-    """Fixed-candidate milestone; no agent, joint placement, or search claim.
+def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None):
+    """One measured candidate, fixed or agent-proposed; no joint placement or search claim.
 
     Uses at most 32 supplied prompts, serial load, up to 16 warm-ups, three
     measured passes, and separate quality passes. The caller owns result.close().
@@ -108,21 +124,32 @@ def optimize(*, models, prompts, output_dir=None, candidate=None):
     for prompt in prompts:
         if not isinstance(prompt, (str, list)) or not prompt:
             raise ValueError("Each prompt must be nonempty text or chat messages")
-    candidate = validate_candidate(candidate if candidate is not None else Candidate(
-        name="kv-fp8", reason="The predeclared first candidate changes only the checked KV precision",
-        config=RuntimeConfig(kv_cache_dtype="fp8")))
+    provider_validation = None
+    if agent is not None:
+        from .provider_check import require_provider_check
+        if candidate is not None or provider_check is None:
+            raise ValueError("Agent mode requires provider_check and no fixed candidate")
+        provider_validation = require_provider_check(provider_check, agent)
+        history_start = len(agent.history)
+    else:
+        candidate = validate_candidate(candidate if candidate is not None else Candidate(
+            name="kv-fp8", reason="The predeclared first candidate changes only the checked KV precision",
+            config=RuntimeConfig(kv_cache_dtype="fp8")))
     folder = Path(output_dir or Path("sera-runs") / uuid.uuid4().hex).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     report = {"schema_version": "sera-single-model-v1", "status": "running",
-              "created_at": datetime.now(timezone.utc).isoformat(), "mode": "fixed-candidate",
+              "created_at": datetime.now(timezone.utc).isoformat(),
+              "mode": "agent-guided" if agent is not None else "fixed-candidate",
               "model_id": MODEL_ID, "model_revision": MODEL_REVISION,
-              "baseline_name": BASELINE_NAME, "candidate": candidate.model_dump(),
+              "baseline_name": BASELINE_NAME, "candidate": candidate.model_dump() if candidate else None,
               "prompts": prompts, "workload_hash": content_hash(prompts),
               "generation": {**GENERATION, "enable_thinking": False},
               "workload": {"prompt_count": len(prompts), "concurrency": 1,
                            "warmup_requests": min(len(prompts), 16),
                            "measured_requests": 3 * len(prompts), "quality_requests": len(prompts)},
-              "task_quality_verified": False, "agent_selection": "not-enabled",
+              "task_quality_verified": False,
+              "agent_selection": "enabled" if agent is not None else "not-enabled",
+              "provider_validation": provider_validation,
               "limits": ["single model", "one candidate", "non-streaming requests",
                          "TTFT and queue percentiles unavailable", "no task-correctness claim"],
               "rejected": []}
@@ -137,7 +164,25 @@ def optimize(*, models, prompts, output_dir=None, candidate=None):
         baseline = report["baseline"]
         stable = token_agreement(baseline["quality"], baseline["self_check"])["passed"]
         trial = None
-        if baseline["status"] == "collected" and stable:
+        if agent is not None and baseline["status"] == "collected" and stable:
+            from .agent import validate_proposal
+            evidence = agent_evidence(baseline)
+            report["agent_input"] = evidence
+            try:
+                proposal = agent.propose(evidence)
+                if proposal is None:
+                    raise ValueError("Agent produced no schema-valid proposal within one retry")
+                report["proposal"] = proposal.model_dump()
+                candidate = validate_proposal(proposal, evidence)
+                report["proposal_validation"] = "passed"
+                report["candidate"] = candidate.model_dump() if candidate else None
+            except Exception as error:
+                candidate = None
+                report["proposal_validation"] = "rejected"
+                report["rejected"].append({"reason": f"{type(error).__name__}: {error}"})
+            report["agent_calls"] = agent.history[history_start:]
+            result._save()
+        if baseline["status"] == "collected" and stable and candidate is not None:
             active.close()
             result._save()
             active = SeraModel(artifact_dir=folder / "candidate", configuration=candidate.config)
@@ -152,6 +197,25 @@ def optimize(*, models, prompts, output_dir=None, candidate=None):
             report["candidate_trial"] = trial
             result._save()
         report["decision"] = select_candidate(baseline, trial)
+        if agent is not None and trial is None and stable:
+            report["decision"]["reason"] = ("agent-kept-baseline" if report.get("proposal_validation") == "passed"
+                                             else "agent-proposal-rejected")
+        if agent is not None and report.get("proposal"):
+            feedback = {"proposal": report["proposal"], "decision": report["decision"],
+                        "candidate_tested": trial is not None,
+                        "baseline_metrics": baseline.get("reduced"),
+                        "candidate_metrics": trial.get("reduced") if trial else None,
+                        "candidate_status": trial.get("status") if trial else "not-tested",
+                        "eligible_trial_ids": [report["decision"]["selected"]]}
+            report["agent_feedback"] = feedback
+            try:
+                final = agent.review(feedback)
+                if final is None or final.selected_trial_id not in feedback["eligible_trial_ids"]:
+                    raise ValueError("Final agent response did not respect the deterministic selection")
+                report["agent_final"] = final.model_dump()
+            except Exception as error:
+                report["agent_final_error"] = f"{type(error).__name__}: {error}"
+            report["agent_calls"] = agent.history[history_start:]
         result._save()
         if report["decision"]["selected"] == "baseline" and trial is not None:
             active.close()
