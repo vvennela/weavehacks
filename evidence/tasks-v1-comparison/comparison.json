@@ -1,0 +1,775 @@
+{
+  "benchmark": "sera-task-v1",
+  "dataset_sha256": "eb33e22a1375f62ee031605653447ff7b904a3d9a3965bf5e81ca33a24fc9b22",
+  "baseline": {
+    "benchmark": "sera-task-v1",
+    "dataset_sha256": "eb33e22a1375f62ee031605653447ff7b904a3d9a3965bf5e81ca33a24fc9b22",
+    "passed": 3,
+    "total": 24,
+    "accuracy": 0.125,
+    "format_valid": 3,
+    "failure_counts": {
+      "invalid_json_format": 21
+    },
+    "by_category": {
+      "coding": {
+        "passed": 2,
+        "total": 12,
+        "accuracy": 0.16666666666666666
+      },
+      "extraction": {
+        "passed": 1,
+        "total": 6,
+        "accuracy": 0.16666666666666666
+      },
+      "reasoning": {
+        "passed": 0,
+        "total": 6,
+        "accuracy": 0
+      }
+    },
+    "by_difficulty": {
+      "easy": {
+        "passed": 2,
+        "total": 8,
+        "accuracy": 0.25
+      },
+      "harder": {
+        "passed": 1,
+        "total": 8,
+        "accuracy": 0.125
+      },
+      "moderate": {
+        "passed": 0,
+        "total": 8,
+        "accuracy": 0
+      }
+    },
+    "per_case": [
+      {
+        "id": "code-01-slice",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-02-default",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-03-filter",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-04-inclusive-repair",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      {
+        "id": "code-05-stable-sort",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-06-alias",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-07-run-count",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-08-fallback-repair",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-09-negative-divmod",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-10-default-list",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-11-bisect-repair",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-12-overlap-repair",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      {
+        "id": "reason-01-remainder",
+        "category": "reasoning",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-02-unit-conversion",
+        "category": "reasoning",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-03-inclusion",
+        "category": "reasoning",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-04-critical-path",
+        "category": "reasoning",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-05-modular",
+        "category": "reasoning",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-06-path-count",
+        "category": "reasoning",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-01-record",
+        "category": "extraction",
+        "difficulty": "easy",
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      {
+        "id": "extract-02-status-filter",
+        "category": "extraction",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-03-latest-event",
+        "category": "extraction",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-04-null-zero",
+        "category": "extraction",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-05-ledger",
+        "category": "extraction",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-06-latest-valid",
+        "category": "extraction",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      }
+    ],
+    "runtime": {
+      "status": "collected",
+      "cleanup_pass": true,
+      "request_errors": 0,
+      "truncated_outputs": 0,
+      "measured_requests": 24,
+      "median_latency_ms": 128.8646574998893,
+      "p95_latency_ms": 421.3053100002071,
+      "max_latency_ms": 54626.46675199994,
+      "total_request_seconds": 58.24432882699966,
+      "completion_tokens": 400,
+      "output_tokens_per_request_second": 6.867621415779394,
+      "startup_seconds": 40.13646634199995,
+      "sampled_peak_memory_mib": 88307,
+      "memory_after_mib": 0
+    }
+  },
+  "fp8_kv": {
+    "benchmark": "sera-task-v1",
+    "dataset_sha256": "eb33e22a1375f62ee031605653447ff7b904a3d9a3965bf5e81ca33a24fc9b22",
+    "passed": 1,
+    "total": 24,
+    "accuracy": 0.041666666666666664,
+    "format_valid": 1,
+    "failure_counts": {
+      "invalid_json_format": 23
+    },
+    "by_category": {
+      "coding": {
+        "passed": 1,
+        "total": 12,
+        "accuracy": 0.08333333333333333
+      },
+      "extraction": {
+        "passed": 0,
+        "total": 6,
+        "accuracy": 0
+      },
+      "reasoning": {
+        "passed": 0,
+        "total": 6,
+        "accuracy": 0
+      }
+    },
+    "by_difficulty": {
+      "easy": {
+        "passed": 0,
+        "total": 8,
+        "accuracy": 0
+      },
+      "harder": {
+        "passed": 1,
+        "total": 8,
+        "accuracy": 0.125
+      },
+      "moderate": {
+        "passed": 0,
+        "total": 8,
+        "accuracy": 0
+      }
+    },
+    "per_case": [
+      {
+        "id": "code-01-slice",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-02-default",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-03-filter",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-04-inclusive-repair",
+        "category": "coding",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-05-stable-sort",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-06-alias",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-07-run-count",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-08-fallback-repair",
+        "category": "coding",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-09-negative-divmod",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-10-default-list",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-11-bisect-repair",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "code-12-overlap-repair",
+        "category": "coding",
+        "difficulty": "harder",
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      {
+        "id": "reason-01-remainder",
+        "category": "reasoning",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-02-unit-conversion",
+        "category": "reasoning",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-03-inclusion",
+        "category": "reasoning",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-04-critical-path",
+        "category": "reasoning",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-05-modular",
+        "category": "reasoning",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "reason-06-path-count",
+        "category": "reasoning",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-01-record",
+        "category": "extraction",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-02-status-filter",
+        "category": "extraction",
+        "difficulty": "easy",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-03-latest-event",
+        "category": "extraction",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-04-null-zero",
+        "category": "extraction",
+        "difficulty": "moderate",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-05-ledger",
+        "category": "extraction",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      },
+      {
+        "id": "extract-06-latest-valid",
+        "category": "extraction",
+        "difficulty": "harder",
+        "passed": false,
+        "format_valid": false,
+        "reason": "invalid_json_format"
+      }
+    ],
+    "runtime": {
+      "status": "collected",
+      "cleanup_pass": true,
+      "request_errors": 0,
+      "truncated_outputs": 0,
+      "measured_requests": 24,
+      "median_latency_ms": 130.01312699952905,
+      "p95_latency_ms": 219.13676700023643,
+      "max_latency_ms": 301.13039600018965,
+      "total_request_seconds": 3.4510076109991132,
+      "completion_tokens": 358,
+      "output_tokens_per_request_second": 103.73781815460968,
+      "startup_seconds": 40.13669409100021,
+      "sampled_peak_memory_mib": 88673,
+      "memory_after_mib": 0
+    }
+  },
+  "paired": {
+    "both_correct": 1,
+    "both_wrong": 21,
+    "regressions": [
+      "code-04-inclusive-repair",
+      "extract-01-record"
+    ],
+    "gains": [],
+    "different_text_both_correct": 0,
+    "mean_token_agreement": 0.7717334257218549
+  },
+  "per_case": [
+    {
+      "id": "code-01-slice",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-02-default",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-03-filter",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-04-inclusive-repair",
+      "category": "coding",
+      "baseline_pass": true,
+      "fp8_pass": false,
+      "baseline_reason": "correct",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.7142857142857143
+    },
+    {
+      "id": "code-05-stable-sort",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-06-alias",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.1935483870967742
+    },
+    {
+      "id": "code-07-run-count",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-08-fallback-repair",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-09-negative-divmod",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.3333333333333333
+    },
+    {
+      "id": "code-10-default-list",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-11-bisect-repair",
+      "category": "coding",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "code-12-overlap-repair",
+      "category": "coding",
+      "baseline_pass": true,
+      "fp8_pass": true,
+      "baseline_reason": "correct",
+      "fp8_reason": "correct",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "reason-01-remainder",
+      "category": "reasoning",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "reason-02-unit-conversion",
+      "category": "reasoning",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "reason-03-inclusion",
+      "category": "reasoning",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.5833333333333334
+    },
+    {
+      "id": "reason-04-critical-path",
+      "category": "reasoning",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "reason-05-modular",
+      "category": "reasoning",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "reason-06-path-count",
+      "category": "reasoning",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.9166666666666666
+    },
+    {
+      "id": "extract-01-record",
+      "category": "extraction",
+      "baseline_pass": true,
+      "fp8_pass": false,
+      "baseline_reason": "correct",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.14285714285714285
+    },
+    {
+      "id": "extract-02-status-filter",
+      "category": "extraction",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "extract-03-latest-event",
+      "category": "extraction",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.4
+    },
+    {
+      "id": "extract-04-null-zero",
+      "category": "extraction",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": true,
+      "token_agreement": 1
+    },
+    {
+      "id": "extract-05-ledger",
+      "category": "extraction",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.10714285714285714
+    },
+    {
+      "id": "extract-06-latest-valid",
+      "category": "extraction",
+      "baseline_pass": false,
+      "fp8_pass": false,
+      "baseline_reason": "invalid_json_format",
+      "fp8_reason": "invalid_json_format",
+      "identical_text": false,
+      "token_agreement": 0.13043478260869565
+    }
+  ],
+  "selection": "Not made: this is a task-quality pilot, not an optimization acceptance run.",
+  "limits": [
+    "24 original cases; not official HLE, DeepSWE, or SWE-bench scores.",
+    "One measured pass per configuration; latency is descriptive, not statistically established.",
+    "Task latency excludes warmup; saved server metrics include warmup.",
+    "Output token counts can differ. Request-level token throughput is not isolated decode speed.",
+    "Coding tasks test tracing and repair selection, not free-form code execution or repository repair."
+  ]
+}

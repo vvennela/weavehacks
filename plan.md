@@ -1,6 +1,6 @@
 # Sera: incremental delivery plan
 
-Status: Qwen BF16 baseline runtime check passed in Molab. The measured first milestone is not complete. See evidence/qwen-baseline-cuda-link/README.md.
+Status: Qwen BF16 and FP8 KV runtime checks passed. The 24-case task-quality pilot is complete; see evidence/tasks-v1-comparison/README.md. The measured first milestone is not complete. Its quality contract needs a decision before implementation continues.
 
 ## First milestone
 
@@ -8,7 +8,7 @@ One model → baseline → one candidate → quality gate → usable runner and 
 
 Use Qwen/Qwen3-0.6B on the supplied NVIDIA runtime. Keep each experiment small, save its evidence, and report the result before choosing the next change. Do not build the entire system in one pass.
 
-The local session is Apple Silicon. The connected Molab runtime has an NVIDIA RTX PRO 6000 Blackwell Server Edition, compute capability 12.0, and 97,887 MiB of GPU memory. Qwen generated three responses through vLLM 0.26.0, exposed metrics, and released GPU memory after shutdown. FP8 compatibility, provider reliability, baseline restart, and the quality gate remain unverified. The initial 20-minute compatibility window was spent on runtime setup; the FP8 matrix did not run.
+The local session is Apple Silicon. The connected Molab runtime has an NVIDIA RTX PRO 6000 Blackwell Server Edition, compute capability 12.0, and 97,887 MiB of GPU memory. Qwen BF16 and FP8 KV runs generated responses through vLLM 0.26.0, exposed metrics, and released GPU memory after shutdown. The baseline started again for the task pilot. FP8 weights, GLM compatibility, provider reliability, and the product quality gate remain unverified. The initial 20-minute compatibility window was spent on runtime setup; the later bounded check established Qwen FP8 KV operation only.
 
 ## Work order
 
@@ -50,4 +50,6 @@ SQLite recovery, multi-GPU support, full frontier search, and notebook polish fo
 - The LM fails its schema check: keep the fixed-candidate path working. Do not let malformed proposals reach GPU execution. Select another provider model only after it passes the same check.
 - FP8 fails: disable only the failed model/precision paths. Keep working paths; if none remain, use batching and remove unsupported quantization claims.
 
-The next experiment is Qwen FP8 KV-cache compatibility using the working runtime configuration. Keep GLM and agent selection out of that experiment. Do not enable any FP8 path before its measured check passes. The smoke check used three raw completion prompts and is not the milestone workload or its quality gate.
+The user requested objective task vectors instead of relying on output similarity. An Astra subagent created and independently checked the frozen 24-case sera-task-v1 pilot. BF16 scored 3/24 and FP8 KV scored 1/24 under its strict JSON contract. Formatting dominates these scores; the report preserves them and separately identifies four correct fenced payloads per run. Both configurations also make task errors. Median latency is effectively tied; a retained 54.626-second BF16 outlier prevents a clean speed claim.
+
+Next decision: should answer correctness and JSON-format compliance be separate gates? Do not silently replace the existing 99% token-agreement rule or promote FP8 based on this pilot. The pilot's 128-token limit and single 24-case pass are not the first milestone's workload. FP8 weights, GLM, agent selection, and a returned Sera runner remain unverified or unfinished.

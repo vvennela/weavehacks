@@ -1,0 +1,93 @@
+{
+  "label": "qwen-fp8-kv",
+  "model_id": "Qwen/Qwen3-0.6B",
+  "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "quantization": null,
+  "kv_cache_dtype": "fp8",
+  "command": [
+    "/tmp/uv-venv/bin/python",
+    "-m",
+    "vllm.entrypoints.openai.api_server",
+    "--model",
+    "Qwen/Qwen3-0.6B",
+    "--revision",
+    "c1899de289a04d12100db370d81485cdf75e47ca",
+    "--tokenizer-revision",
+    "c1899de289a04d12100db370d81485cdf75e47ca",
+    "--served-model-name",
+    "sera-smoke",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "21204",
+    "--dtype",
+    "bfloat16",
+    "--kv-cache-dtype",
+    "fp8",
+    "--tensor-parallel-size",
+    "1",
+    "--max-model-len",
+    "4096",
+    "--max-num-seqs",
+    "8",
+    "--max-num-batched-tokens",
+    "4096",
+    "--gpu-memory-utilization",
+    "0.90",
+    "--no-enable-prefix-caching",
+    "--enable-chunked-prefill",
+    "--enforce-eager",
+    "--generation-config",
+    "vllm",
+    "--seed",
+    "0"
+  ],
+  "status": "pass",
+  "task_quality_verified": false,
+  "versions": {
+    "vllm": "0.26.0",
+    "torch": "2.11.0",
+    "transformers": "5.17.0"
+  },
+  "cuda_link_check": "pass",
+  "cuda_home": "/tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13",
+  "cuda_library": "/tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13/lib/libcudart.so.13",
+  "startup_seconds": 58.255,
+  "outputs": [
+    {
+      "prompt": "The capital of France is",
+      "text": " Paris. The capital of Italy is Rome. The capital of Spain is Madrid. The capital of China is Beijing. The capital of Japan is Tokyo. The capital",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 37,
+        "completion_tokens": 32,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "prompt": "Two plus two equals",
+      "text": " two, and two plus two equals two. So, the problem is to find the value of the expression 2 + 2 + 2 + 2",
+      "usage": {
+        "prompt_tokens": 4,
+        "total_tokens": 36,
+        "completion_tokens": 32,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "prompt": "A GPU is useful because",
+      "text": " it can process data in parallel. This is the case for all types of data, including images, videos, and audio. The GPU is also known as a",
+      "usage": {
+        "prompt_tokens": 5,
+        "total_tokens": 37,
+        "completion_tokens": 32,
+        "prompt_tokens_details": null
+      }
+    }
+  ],
+  "memory_before_mib": 0,
+  "sampled_peak_memory_mib": 88669,
+  "memory_after_mib": 0,
+  "cleanup_pass": true,
+  "elapsed_seconds": 59.661
+}

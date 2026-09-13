@@ -1,6 +1,6 @@
 # Sera Technical Specification
 
-Status: Hackathon specification; Qwen BF16 runtime check passed; FP8 and agent-provider checks are unverified
+Status: Hackathon specification; Qwen BF16 and FP8 KV runtime checks passed; task-quality acceptance is under review after the pilot; FP8 weights, GLM, and agent-provider checks are unverified
 
 ## 1. Purpose
 
