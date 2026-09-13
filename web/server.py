@@ -1,0 +1,237 @@
+"""Local Sera frontend and account server. Run: python3 web/server.py."""
+import argparse
+import hashlib
+import hmac
+import json
+import os
+import re
+import secrets
+import sqlite3
+import threading
+import time
+from collections import defaultdict, deque
+from http.cookies import SimpleCookie
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import urlsplit
+
+ROOT = Path(__file__).resolve().parents[1]
+SESSION_SECONDS = 86400
+# Shared walkthrough login, seeded on start so a fresh checkout can sign in immediately.
+DEMO_EMAIL = 'demo@serademo.com'
+DEMO_PASSWORD = 'clustersss'
+
+
+class Server(ThreadingHTTPServer):
+    def __init__(self, port, database, demo_account=True):
+        self.database = Path(database)
+        self.database.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        self.database.touch(mode=0o600, exist_ok=True)
+        os.chmod(self.database, 0o600)
+        self.attempts = defaultdict(deque)
+        self.lock = threading.Lock()
+        with self.connect() as db:
+            db.executescript('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL,
+                    salt TEXT NOT NULL, password_hash TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL,
+                    expires REAL NOT NULL);
+            ''')
+        if demo_account:
+            self.seed_demo_account()
+        super().__init__(("127.0.0.1", port), Handler)
+
+    def seed_demo_account(self):
+        """Create the demo login once; a real account with that email is left alone."""
+        with self.connect() as db:
+            if db.execute('SELECT 1 FROM users WHERE email=?', (DEMO_EMAIL,)).fetchone():
+                return
+            salt = secrets.token_hex(16)
+            db.execute('INSERT INTO users(email,salt,password_hash) VALUES(?,?,?)',
+                       (DEMO_EMAIL, salt, password_hash(DEMO_PASSWORD, salt)))
+
+    def connect(self):
+        return sqlite3.connect(self.database)
+
+
+def password_hash(password, salt):
+    return hashlib.pbkdf2_hmac('sha256', password.encode(), bytes.fromhex(salt), 600000).hex()
+
+
+class Handler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(ROOT / 'output'), **kwargs)
+
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-store')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('X-Frame-Options', 'SAMEORIGIN')
+        self.send_header('Referrer-Policy', 'same-origin')
+        super().end_headers()
+
+    def valid_host(self):
+        return self.headers.get('Host') in {
+            f'localhost:{self.server.server_port}', f'127.0.0.1:{self.server.server_port}'}
+
+    def reply(self, status, data, cookie=None):
+        body = json.dumps(data).encode()
+        self.send_response(status)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', str(len(body)))
+        if cookie:
+            self.send_header('Set-Cookie', cookie)
+        self.end_headers()
+        self.wfile.write(body)
+
+    def redirect(self, path):
+        self.send_response(303)
+        self.send_header('Location', path)
+        self.send_header('Content-Length', '0')
+        self.end_headers()
+
+    def token_hash(self):
+        cookie = SimpleCookie()
+        try:
+            cookie.load(self.headers.get('Cookie', ''))
+            token = cookie['sera_session'].value
+        except (KeyError, ValueError):
+            return ''
+        return hashlib.sha256(token.encode()).hexdigest()
+
+    def user(self):
+        with self.server.connect() as db:
+            return db.execute('''SELECT users.id, users.email FROM sessions
+                JOIN users ON users.id=sessions.user_id
+                WHERE token_hash=? AND expires>?''', (self.token_hash(), time.time())).fetchone()
+
+    def serve_get(self, head=False):
+        if not self.valid_host():
+            self.send_error(403)
+            return
+        path = urlsplit(self.path).path
+        routes = {'/': 'index.html', '/sign-in': 'sign-in.html', '/get-started': 'get-started.html',
+                  '/lab': 'sera-lab-preview.html', '/designs': 'sera-design-directions.html',
+                  '/product': 'product.html', '/solutions': 'solutions.html',
+                  '/models': 'models.html', '/resources': 'resources.html'}
+        legacy = {'/' + filename: route for route, filename in routes.items()}
+        legacy['/sera-design-preview.html'] = '/'
+        if path in legacy:
+            self.redirect(legacy[path])
+            return
+        if path != '/' and path.endswith('/') and path.rstrip('/') in routes:
+            self.redirect(path.rstrip('/'))
+            return
+        if path == '/api/session' and not head:
+            user = self.user()
+            self.reply(200 if user else 401, {'email': user[1]} if user else {'error': 'Sign in to continue.'})
+            return
+        if path in ('/lab', '/designs') and not self.user():
+            self.redirect('/sign-in')
+            return
+        if path in ('/sign-in', '/get-started') and self.user():
+            self.redirect('/lab')
+            return
+        # Serve only public frontend files, never account databases or directory listings.
+        name = routes.get(path, path.removeprefix('/'))
+        allowed = {p.name for p in (ROOT / 'output').iterdir()
+                   if p.is_file() and p.suffix in ('.html', '.css', '.js', '.svg', '.png', '.ico')}
+        if name not in allowed:
+            self.send_error(404)
+            return
+        self.path = '/' + name
+        if head:
+            super().do_HEAD()
+        else:
+            super().do_GET()
+
+    def do_GET(self):
+        self.serve_get()
+
+    def do_HEAD(self):
+        self.serve_get(head=True)
+
+    def do_POST(self):
+        if not self.valid_host() or self.headers.get('Origin') != 'http://' + self.headers.get('Host', ''):
+            self.reply(403, {'error': 'Please submit this form from the Sera website.'})
+            return
+        path = urlsplit(self.path).path
+        if path not in ('/api/sign-in', '/api/sign-up', '/api/sign-out'):
+            self.reply(404, {'error': 'Page not found.'})
+            return
+        if self.headers.get('Content-Type', '').split(';')[0] != 'application/json':
+            self.reply(415, {'error': 'Expected a JSON request.'})
+            return
+        try:
+            length = int(self.headers.get('Content-Length', '0'))
+            if not 0 < length <= 8192:
+                raise ValueError()
+            data = json.loads(self.rfile.read(length))
+            if not isinstance(data, dict):
+                raise ValueError()
+        except (ValueError, UnicodeDecodeError):
+            self.reply(400, {'error': 'Invalid request.'})
+            return
+        if path == '/api/sign-out':
+            with self.server.connect() as db:
+                db.execute('DELETE FROM sessions WHERE token_hash=?', (self.token_hash(),))
+            self.reply(200, {'ok': True}, 'sera_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0')
+            return
+        with self.server.lock:
+            attempts = self.server.attempts[self.client_address[0]]
+            now = time.time()
+            while attempts and attempts[0] < now - 60:
+                attempts.popleft()
+            if len(attempts) >= 15:
+                self.reply(429, {'error': 'Too many attempts. Please wait a minute and try again.'})
+                return
+            attempts.append(now)
+        email, password = data.get('email', ''), data.get('password', '')
+        if not isinstance(email, str) or not isinstance(password, str):
+            self.reply(400, {'error': 'Enter your email and password.'})
+            return
+        email = email.strip().lower()
+        if len(email) > 254 or not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', email) or not 10 <= len(password) <= 128:
+            self.reply(400, {'error': 'Use a valid email and a password of 10–128 characters.'})
+            return
+        with self.server.connect() as db:
+            if path == '/api/sign-up':
+                salt = secrets.token_hex(16)
+                try:
+                    cursor = db.execute('INSERT INTO users(email,salt,password_hash) VALUES(?,?,?)',
+                                        (email, salt, password_hash(password, salt)))
+                    user_id = cursor.lastrowid
+                except sqlite3.IntegrityError:
+                    self.reply(409, {'error': 'An account with this email already exists. Sign in instead.'})
+                    return
+            else:
+                row = db.execute('SELECT id,salt,password_hash FROM users WHERE email=?', (email,)).fetchone()
+                actual = password_hash(password, row[1] if row else '00' * 16)
+                if not row or not hmac.compare_digest(actual, row[2]):
+                    self.reply(401, {'error': 'Email or password is incorrect.'})
+                    return
+                user_id = row[0]
+            db.execute('DELETE FROM sessions WHERE expires<=? OR token_hash=?', (time.time(), self.token_hash()))
+            token = secrets.token_urlsafe(32)
+            db.execute('INSERT INTO sessions VALUES(?,?,?)',
+                       (hashlib.sha256(token.encode()).hexdigest(), user_id, time.time() + SESSION_SECONDS))
+        self.reply(200, {'ok': True, 'redirect': '/lab'},
+                   f'sera_session={token}; HttpOnly; SameSite=Strict; Path=/; Max-Age={SESSION_SECONDS}')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=8877)
+    parser.add_argument('--database', default=str(ROOT / '.local' / 'accounts.sqlite3'))
+    parser.add_argument('--no-demo-account', action='store_true',
+                        help='skip seeding the shared demo login')
+    args = parser.parse_args()
+    server = Server(args.port, args.database, demo_account=not args.no_demo_account)
+    print(f'Sera is running at http://localhost:{server.server_port}', flush=True)
+    if not args.no_demo_account:
+        print(f'Demo login: {DEMO_EMAIL} / {DEMO_PASSWORD}', flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.server_close()

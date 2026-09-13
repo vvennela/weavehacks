@@ -1,0 +1,334 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.24.2",
+    "script_metadata_hash": "df47f8358c619a1898b1eae759928dc8"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "a67a35b5120accac453bc24663948511",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "e553aae7ff4b4ee78c8287953c3fc26b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"sera\">Sera</h1>\n<span class=\"paragraph\">Give Sera your models and a few representative prompts. It finds a fast,\nmemory-efficient way to run them on the hardware you have, proves the\nchange with measurements, and refuses anything that damages quality.</span>\n<span class=\"paragraph\">You do not choose quantization, batching, or parallelism settings.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "53b4b8dad5fdb680cadddc9cc17cc22d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"1-setup\">1. Setup</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "d164a7a65512b9706fad6c5e19f2b6bd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-ui-element object-id='bkHC-0' random-id='2cc909eb-b31f-19ef-f367-bfb1d4e91727'><marimo-text data-initial-value='&quot;Qwen/Qwen3-0.6B&quot;' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eModels (comma separated)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-placeholder='&quot;&quot;' data-kind='&quot;text&quot;' data-full-width='true' data-disabled='false' data-debounce='true'></marimo-text></marimo-ui-element><marimo-ui-element object-id='bkHC-1' random-id='1dbc7caa-f138-e068-187f-6a5912cc7c3f'><marimo-text-area data-initial-value='&quot;Explain paged attention in simple English.&#92;nSummarize why batching affects tail latency.&quot;' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eRepresentative prompts (one per line)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-placeholder='&quot;&quot;' data-disabled='false' data-debounce='true' data-full-width='true'></marimo-text-area></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "87c28d0f6195616f61a046cdadf5a35d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='674fc821-f2b2-7119-b618-b9c8fd38e384'><marimo-text data-initial-value='&quot;&quot;' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eW&amp;amp;B API key (optional, for tracing)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-placeholder='&quot;&quot;' data-kind='&quot;password&quot;' data-full-width='true' data-disabled='false' data-debounce='true'></marimo-text></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "d51f47cccb15d4528a95214e7f43badc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-callout-output data-html='&quot;&#92;u003cspan&#92;u003eNo W&amp;amp;B key set. Sera still runs; the trace link will be unavailable.&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;neutral&quot;'></marimo-callout-output>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "529d1c4f12a05e5646b6b2571e03d019",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"2-run\">2. Run</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "3e47088af3651daf360782785f8bb4de",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='bd5551b6-7784-b6a0-ee12-0fff17fa79fb'><marimo-dropdown data-initial-value='[&quot;Example data \u2014 an improvement&quot;]' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eResult source&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-options='[&quot;Example data \u2014 an improvement&quot;,&quot;Example data \u2014 no safe improvement&quot;,&quot;Live run (needs a backend)&quot;]' data-allow-select-none='false' data-searchable='false' data-full-width='false' data-disabled='false'></marimo-dropdown></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "17813c92354c9bde8e80cfa55f24f682",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "ce6f081b150af4c9943138334ad987e1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "9d1e287765e763246759828f03fa6ee8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-callout-output data-html='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003ch3 id=&#92;&quot;sera-found-a-faster-configuration-and-verified-it&#92;&quot;&#92;u003eSera found a faster configuration and verified it.&#92;u003c/h3&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;success&quot;'></marimo-callout-output>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "5d4edba79253ac0953771cb126ce07b7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"3-what-sera-did\">3. What Sera did</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "f4bdd9916b03c686ad40f3b160ffd05d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: row;justify-content: space-between;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><div style='flex: 1'><marimo-stat data-value='5' data-label='&quot;Trials run&quot;' data-bordered='false' data-target_direction='&quot;increase&quot;'></marimo-stat></div><div style='flex: 1'><marimo-stat data-value='2' data-label='&quot;Accepted&quot;' data-bordered='false' data-target_direction='&quot;increase&quot;'></marimo-stat></div><div style='flex: 1'><marimo-stat data-value='2' data-label='&quot;Rolled back&quot;' data-bordered='false' data-target_direction='&quot;increase&quot;'></marimo-stat></div><div style='flex: 1'><marimo-stat data-value='1' data-label='&quot;Failed&quot;' data-bordered='false' data-target_direction='&quot;increase&quot;'></marimo-stat></div><div style='flex: 1'><marimo-stat data-value='2' data-label='&quot;Ruled out first&quot;' data-bordered='false' data-target_direction='&quot;increase&quot;'></marimo-stat></div></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "25405a8acbbfde829cb76736cd6ff0e8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='1c9d141d-b6d9-26db-88e0-30a49ee7f822'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t0&#92;&quot;,&#92;&quot;Phase&#92;&quot;:1,&#92;&quot;Proposed by&#92;&quot;:&#92;&quot;baseline&#92;&quot;,&#92;&quot;Lever&#92;&quot;:&#92;&quot;\u2014&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Accepted&#92;&quot;,&#92;&quot;p95 (ms)&#92;&quot;:&#92;&quot;412&#92;&quot;,&#92;&quot;Memory (GB)&#92;&quot;:&#92;&quot;6.8&#92;&quot;,&#92;&quot;Quality&#92;&quot;:&#92;&quot;1.000&#92;&quot;},{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t1&#92;&quot;,&#92;&quot;Phase&#92;&quot;:1,&#92;&quot;Proposed by&#92;&quot;:&#92;&quot;batching&#92;&quot;,&#92;&quot;Lever&#92;&quot;:&#92;&quot;batching&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Accepted&#92;&quot;,&#92;&quot;p95 (ms)&#92;&quot;:&#92;&quot;268&#92;&quot;,&#92;&quot;Memory (GB)&#92;&quot;:&#92;&quot;7.1&#92;&quot;,&#92;&quot;Quality&#92;&quot;:&#92;&quot;0.997&#92;&quot;},{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t2&#92;&quot;,&#92;&quot;Phase&#92;&quot;:1,&#92;&quot;Proposed by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;Lever&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Quality dropped \u2014 rolled back&#92;&quot;,&#92;&quot;p95 (ms)&#92;&quot;:&#92;&quot;231&#92;&quot;,&#92;&quot;Memory (GB)&#92;&quot;:&#92;&quot;4.3&#92;&quot;,&#92;&quot;Quality&#92;&quot;:&#92;&quot;0.961&#92;&quot;},{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t3&#92;&quot;,&#92;&quot;Phase&#92;&quot;:1,&#92;&quot;Proposed by&#92;&quot;:&#92;&quot;batching&#92;&quot;,&#92;&quot;Lever&#92;&quot;:&#92;&quot;batching&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Too slow \u2014 rolled back&#92;&quot;,&#92;&quot;p95 (ms)&#92;&quot;:&#92;&quot;498&#92;&quot;,&#92;&quot;Memory (GB)&#92;&quot;:&#92;&quot;7.9&#92;&quot;,&#92;&quot;Quality&#92;&quot;:&#92;&quot;0.996&#92;&quot;},{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t4&#92;&quot;,&#92;&quot;Phase&#92;&quot;:1,&#92;&quot;Proposed by&#92;&quot;:&#92;&quot;parallelism&#92;&quot;,&#92;&quot;Lever&#92;&quot;:&#92;&quot;parallelism&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Failed to run&#92;&quot;,&#92;&quot;p95 (ms)&#92;&quot;:&#92;&quot;unavailable&#92;&quot;,&#92;&quot;Memory (GB)&#92;&quot;:&#92;&quot;unavailable&#92;&quot;,&#92;&quot;Quality&#92;&quot;:&#92;&quot;unavailable&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='8' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-show-filters='false' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "86ed6e21e4f96836f62392605a720b8b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-accordion data-labels='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eRuled out before running (2)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-multiple='false'><div><marimo-ui-element object-id='iLit-0' random-id='ba58f2bb-907a-c76c-9dcb-387d07b0a9f1'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Proposed by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;Why it was ruled out&#92;&quot;:&#92;&quot;int4 weights are not supported for this architecture on the installed vLLM build.&#92;&quot;},{&#92;&quot;Proposed by&#92;&quot;:&#92;&quot;parallelism&#92;&quot;,&#92;&quot;Why it was ruled out&#92;&quot;:&#92;&quot;Tensor parallelism of 4 needs 4 devices; 1 is available.&#92;&quot;}]&quot;' data-total-rows='2' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-show-filters='false' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div></marimo-accordion>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "885d093a7b2b61d7aec87ec86a57c5dd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-accordion data-labels='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eTrials that did not survive (3)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-multiple='false'><div><marimo-ui-element object-id='ZHCJ-0' random-id='fc0a8902-7f21-5d9e-60ae-efdcae8cc885'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t2&#92;&quot;,&#92;&quot;What happened&#92;&quot;:&#92;&quot;Quality dropped \u2014 rolled back&#92;&quot;,&#92;&quot;Detail&#92;&quot;:&#92;&quot;Fastest candidate measured, but behavior drifted below the floor. Rolled back.&#92;&quot;},{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t3&#92;&quot;,&#92;&quot;What happened&#92;&quot;:&#92;&quot;Too slow \u2014 rolled back&#92;&quot;,&#92;&quot;Detail&#92;&quot;:&#92;&quot;Throughput rose but tail latency regressed past the baseline.&#92;&quot;},{&#92;&quot;Trial&#92;&quot;:&#92;&quot;t4&#92;&quot;,&#92;&quot;What happened&#92;&quot;:&#92;&quot;Failed to run&#92;&quot;,&#92;&quot;Detail&#92;&quot;:&#92;&quot;Engine failed to start: only one device visible.&#92;&quot;}]&quot;' data-total-rows='3' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-show-filters='false' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div></marimo-accordion>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "bd2d1624bab4448b97274e227fea47e5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"4-result\">4. Result</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "e445ea7a39178ce7d8ed4f3582cc2946",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Recommended for <code>Qwen/Qwen3-0.6B</code></strong></span>\n<ul>\n<li><code>max_num_seqs</code>: <code>256</code> \u2192 <code>512</code></li>\n<li><code>max_num_batched_tokens</code>: <code>8192</code> \u2192 <code>16384</code></li>\n<li><code>enable_chunked_prefill</code>: <code>False</code> \u2192 <code>True</code></li>\n</ul>\n<span class=\"paragraph\"><em>Largest verified latency win. The faster fp8 candidate was rejected because it failed the quality gate.</em></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "a3181d4c0c576fdd2883d9e0373bc3e5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Measured improvement</strong></span></span><marimo-ui-element object-id='TqIu-0' random-id='23164993-9a26-1575-de77-485af641dd04'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Metric&#92;&quot;:&#92;&quot;p95 latency&#92;&quot;,&#92;&quot;Baseline&#92;&quot;:&#92;&quot;412 ms&#92;&quot;,&#92;&quot;Optimized&#92;&quot;:&#92;&quot;268 ms&#92;&quot;,&#92;&quot;Change&#92;&quot;:&#92;&quot;-35.0%&#92;&quot;},{&#92;&quot;Metric&#92;&quot;:&#92;&quot;Median latency&#92;&quot;,&#92;&quot;Baseline&#92;&quot;:&#92;&quot;182 ms&#92;&quot;,&#92;&quot;Optimized&#92;&quot;:&#92;&quot;121 ms&#92;&quot;,&#92;&quot;Change&#92;&quot;:&#92;&quot;\u2014&#92;&quot;},{&#92;&quot;Metric&#92;&quot;:&#92;&quot;Throughput&#92;&quot;,&#92;&quot;Baseline&#92;&quot;:&#92;&quot;22.4 req/s&#92;&quot;,&#92;&quot;Optimized&#92;&quot;:&#92;&quot;38.9 req/s&#92;&quot;,&#92;&quot;Change&#92;&quot;:&#92;&quot;+73.7%&#92;&quot;},{&#92;&quot;Metric&#92;&quot;:&#92;&quot;GPU memory&#92;&quot;,&#92;&quot;Baseline&#92;&quot;:&#92;&quot;6.8 GB&#92;&quot;,&#92;&quot;Optimized&#92;&quot;:&#92;&quot;7.1 GB&#92;&quot;,&#92;&quot;Change&#92;&quot;:&#92;&quot;+4.4%&#92;&quot;}]&quot;' data-total-rows='4' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-show-filters='false' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "bfcbb34d97dccd385c2e8745068eaf8a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Behavior-preservation proxy: 0.997</strong> against a floor of <strong>0.990</strong> \u2014 passed.</span>\n<span class=\"paragraph\">Task quality was not verified. This checks behavior preservation only.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "e8e1b8c9941fa58e1539769c7ffbd84b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Other configurations on the measured frontier</strong></span></span><marimo-ui-element object-id='DnEU-0' random-id='7e719b6d-16ba-e566-4196-02f47881e6c0'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Configuration&#92;&quot;:&#92;&quot;Lowest verified latency&#92;&quot;,&#92;&quot;p95 latency&#92;&quot;:&#92;&quot;268 ms&#92;&quot;,&#92;&quot;GPU memory&#92;&quot;:&#92;&quot;7.1 GB&#92;&quot;,&#92;&quot;Quality&#92;&quot;:&#92;&quot;0.997&#92;&quot;},{&#92;&quot;Configuration&#92;&quot;:&#92;&quot;Smallest memory footprint&#92;&quot;,&#92;&quot;p95 latency&#92;&quot;:&#92;&quot;412 ms&#92;&quot;,&#92;&quot;GPU memory&#92;&quot;:&#92;&quot;6.8 GB&#92;&quot;,&#92;&quot;Quality&#92;&quot;:&#92;&quot;1.000&#92;&quot;}]&quot;' data-total-rows='2' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-show-filters='false' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "a169dab0fc26f06fe587088d0c93b426",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-accordion data-labels='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eRun details and defaults&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-multiple='false'><div><span class=\"markdown prose dark:prose-invert contents\"><ul>\n<li><strong>Mode</strong>: quick</li>\n<li><strong>GPU</strong>: 1x NVIDIA L40S (48 GB)</li>\n<li><strong>Trial budget</strong>: 8 candidates, 5 used</li>\n<li><strong>Concurrency sweep</strong>: 1, 2, 4, 8</li>\n<li><strong>Quality tolerance</strong>: 0.99 of baseline</li>\n<li><strong>Full trace</strong>: <a href=\"https://wandb.ai/sera/sera-demo/r/call/0193f2a1-demo\" rel=\"noopener noreferrer\" target=\"_blank\">https://wandb.ai/sera/sera-demo/r/call/0193f2a1-demo</a></li>\n</ul></span></div></marimo-accordion>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "57d0fac0707b074af3ed27969a329b83",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"5-use-the-optimized-model\">5. Use the optimized model</h2>\n<span class=\"paragraph\">Sera returns loaded models, not configuration files. The wrapper hides\nwhether vLLM runs in-process or as a managed server.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "f8672499344aea8bec9790313f0d0d9a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Copy this to use the result in your own code</strong></span></span><marimo-ui-element object-id='Pvdt-0' random-id='2a452065-fbf7-2fe3-6243-574530b91b74'><marimo-code-editor data-initial-value='&quot;import sera&#92;n&#92;nresult = sera.optimize(&#92;n    models=[&#92;&quot;Qwen/Qwen3-0.6B&#92;&quot;],&#92;n    prompts=[&#92;&quot;your representative prompt&#92;&quot;],&#92;n)&#92;n&#92;nmodel = result.models[0]&#92;nprint(model.generate(&#92;&quot;your prompt here&#92;&quot;))&quot;' data-label='null' data-language='&quot;python&quot;' data-placeholder='&quot;&quot;' data-disabled='true' data-show-copy-button='true' data-debounce='false'></marimo-code-editor></marimo-ui-element><marimo-accordion data-labels='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eRecommended settings, as data&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-multiple='false'><div><marimo-ui-element object-id='Pvdt-1' random-id='c658c4a2-de94-5e41-52b0-e0b095d70df5'><marimo-code-editor data-initial-value='&quot;# Recommended configuration.&#92;n{&#92;n    &#x27;model&#x27;: &#x27;Qwen/Qwen3-0.6B&#x27;,&#92;n    &#x27;weight_dtype&#x27;: &#x27;bf16&#x27;,&#92;n    &#x27;kv_cache_dtype&#x27;: &#x27;bf16&#x27;,&#92;n    &#x27;max_num_seqs&#x27;: 512,&#92;n    &#x27;max_num_batched_tokens&#x27;: 16384,&#92;n    &#x27;enable_chunked_prefill&#x27;: True,&#92;n    &#x27;tensor_parallel_size&#x27;: 1,&#92;n    &#x27;pipeline_parallel_size&#x27;: 1,&#92;n    &#x27;gpu_memory_utilization&#x27;: 0.9,&#92;n}&quot;' data-label='null' data-language='&quot;python&quot;' data-placeholder='&quot;&quot;' data-disabled='true' data-show-copy-button='true' data-debounce='false'></marimo-code-editor></marimo-ui-element></div></marimo-accordion></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "3e18c7c0aef816b87a945c4d40e5b6b5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong><code>Qwen/Qwen3-0.6B</code></strong></span>\n<blockquote>\n<span class=\"paragraph\">Paged attention stores the KV cache in fixed-size blocks, so the engine can serve many requests without reserving contiguous memory for each one.</span>\n</blockquote></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
