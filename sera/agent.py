@@ -144,6 +144,10 @@ class WandbAgent:
         self.model = model
         self.history = []
 
+    def fork(self):
+        """Create an investigator with the same provider identity and isolated history."""
+        return WandbAgent(project=self.project, model=self.model)
+
     def request(self, role, evidence, instruction):
         wire_schema = request_schema(role, evidence)
         api_key = os.environ.get("WANDB_API_KEY")

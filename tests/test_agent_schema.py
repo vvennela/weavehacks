@@ -198,3 +198,15 @@ def test_dynamic_validation_does_not_replace_parent_and_specialist_context_valid
     parsed = parse_response('proposal', json.dumps(proposal_data()),
                             {'metrics': {'p95_latency_ms': 100}})
     assert parsed == Proposal(**proposal_data())
+def test_agent_fork_keeps_provider_identity_without_shared_history():
+    from sera.agent import WandbAgent, schema_hash
+    parent = WandbAgent(project='fixture/project', model='fixture-model')
+    parent.history.append({'existing': True})
+    before = schema_hash()
+    child = parent.fork()
+    assert child is not parent
+    assert child.model == parent.model and child.project == parent.project
+    assert child.history == [] and child.history is not parent.history
+    child.history.append({'child': True})
+    assert parent.history == [{'existing': True}]
+    assert schema_hash() == before

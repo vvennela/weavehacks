@@ -14,6 +14,7 @@ import sys
 
 import sera
 from benchmarks.grade import SYSTEM_PROMPT, dataset_hash, grade_case, load_cases
+from experiments.weave_evidence import QUERY_IDS, WeaveEvidenceReader
 from sera.config import LARGE_MODEL_ID, MODEL_ID, resolve_investigation_space
 from sera.provider_check import require_provider_check
 from sera.storage import save_json
@@ -28,7 +29,9 @@ class TracedInvestigationAgent:
 
     def __init__(self, agent, weave):
         self._agent = agent
-        self.trace_failures = []
+        self._weave = weave
+        self._children = []
+        self._trace_failures = []
 
         def record_agent_response(record):
             """Log an already returned provider attempt; span duration is export time, not inference time."""
@@ -50,6 +53,18 @@ class TracedInvestigationAgent:
             'fit_quantization_advisor', 'quantization_specialist', 'batching_specialist',
             'search_specialist', 'arbiter', 'frontier_reviewer', 'agent_request')}
         self._review = weave.op(name='frontier_reviewer')(review)
+        self._swarm_requests = {(investigator, phase): traced_request(f'swarm_{investigator}_{label}')
+            for investigator in ('scheduling', 'memory_context', 'output_quality')
+            for phase, label in (('inspect', 'inspection'), ('propose', 'proposal'), ('refine', 'peer_review'))}
+
+    def fork(self):
+        child = TracedInvestigationAgent(self._agent.fork(), self._weave)
+        self._children.append(child)
+        return child
+
+    @property
+    def trace_failures(self):
+        return self._trace_failures + [failure for child in self._children for failure in child.trace_failures]
 
     def _call_and_record(self, function, *args):
         start = len(self.history)
@@ -81,7 +96,7 @@ class TracedInvestigationAgent:
                         self._record_response(record)
                     except Exception as error:
                         # Observability failure must not rewrite a valid recommendation or its raw evidence.
-                        self.trace_failures.append({'event': 'record_agent_response', 'error_type': type(error).__name__})
+                        self._trace_failures.append({'event': 'record_agent_response', 'error_type': type(error).__name__})
 
     @property
     def model(self):
@@ -96,6 +111,9 @@ class TracedInvestigationAgent:
         return self._agent.history
 
     def request(self, role, evidence, instruction):
+        swarm_key = (evidence.get('investigator_id'), evidence.get('swarm_phase'))
+        if swarm_key in self._swarm_requests:
+            return self._swarm_requests[swarm_key](role, evidence, instruction)
         specialist = evidence.get('specialist_role')
         if role == 'arbiter' and 'fit_plan' in evidence and specialist == 'quantization':
             name = 'fit_quantization_advisor'
@@ -124,6 +142,21 @@ def weave_event_sink(weave):
     return sink
 
 
+def traced_evidence_reader(weave, reader):
+    """Trace only query evidence and the bounded result, never the client object."""
+    def operation(query_id):
+        def read(evidence):
+            return reader(query_id, evidence)
+        return weave.op(name=f'weave_inspect_{query_id}')(read)
+
+    operations = {query_id: operation(query_id) for query_id in QUERY_IDS}
+
+    def inspect(query_id, evidence):
+        return operations[query_id](evidence)
+
+    return inspect
+
+
 def trial_trace_failures(report):
     trials = [report.get('baseline'), report.get('candidate_trial'),
               (report.get('deployment') or {}).get('candidate_trial'), *report.get('search_trials', [])]
@@ -145,6 +178,8 @@ def main(argv=None):
                         help='Qwen72B only: first measure FP8 deployment, then investigate within the same budget')
     parser.add_argument('--auto-space', action='store_true',
                         help='Build the bounded candidate pool after baseline measurement; conflicts with explicit controls')
+    parser.add_argument('--swarm', action='store_true',
+                        help='Use isolated investigators and read persisted Weave evidence; requires tracing')
     parser.add_argument('--batching-values', type=int, nargs='+',
                         help='Explicit candidate max_num_batched_tokens values; baseline is 4096')
     parser.add_argument('--sequence-values', type=int, nargs='+',
@@ -168,6 +203,8 @@ def main(argv=None):
             raise ValueError('output-dir must be a new directory')
         if not args.project.strip():
             raise ValueError('project must be nonempty')
+        if args.swarm and args.no_weave:
+            raise ValueError('--swarm requires Weave; remove --no-weave')
         if args.fit_first and args.model != LARGE_MODEL_ID:
             raise ValueError('--fit-first is supported only for Qwen72B')
         budget = sera.Budget(max_candidate_trials=args.budget)
@@ -205,6 +242,7 @@ def main(argv=None):
                   'model_id': args.model, 'budget': budget.model_dump(),
                   'fit_first': args.fit_first,
                   'automatic_space': args.auto_space,
+                  'swarm': args.swarm,
                   'objective': objective.model_dump(), 'workload': workload.model_dump(),
                   'investigation_space': frozen_space, 'provider_validation': certificate,
                   'evaluation_cases_sha256': dataset_hash(cases),
@@ -217,14 +255,19 @@ def main(argv=None):
     def run_investigation():
         result = None
         try:
+            trace_reader = None
             if weave is not None:
                 call = weave.get_current_call()
                 invocation['weave_url'] = call.ui_url if call is not None else None
+                if args.swarm:
+                    trace_reader = traced_evidence_reader(weave, WeaveEvidenceReader(
+                        client, call.trace_id if call is not None else None))
             result = sera.optimize(models=[args.model], prompts=prompts, output_dir=folder,
                 evaluation=evaluate_answer, evaluation_version='sera-easy-strict-json-v1',
                 constraints=sera.Constraints(quality_floor=.99), objective=objective,
                 workload=workload, baseline_configuration=baseline, budget=budget,
                 investigation_space=space, automatic_space=args.auto_space,
+                swarm=args.swarm, trace_reader=trace_reader,
                 agent=agent, provider_check=args.provider_check)
             result.report.update(workload_name='easy-json-system-v1', evaluation_cases=cases,
                 evaluation_cases_sha256=dataset_hash(cases), weave_url=invocation['weave_url'],

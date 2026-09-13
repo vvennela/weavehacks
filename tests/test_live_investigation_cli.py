@@ -698,3 +698,84 @@ def test_automatic_space_saves_actual_measured_policy_audit(cli, monkeypatch, tm
     invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
     assert invocation['investigation_space'] == resolved
     assert invocation['candidate_policy'] == policy
+
+
+def test_swarm_requires_weave_before_external_work(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit) as error:
+        cli.main(arguments(tmp_path) + ['--swarm', '--no-weave'])
+    assert error.value.code == 2
+    assert observed['calls'] == [] and not (tmp_path/'run').exists()
+
+
+def test_swarm_reader_uses_current_trace_and_named_read_op_without_serializing_client(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    weave = recording_weave()
+    sys.modules['weave'].op = weave.op
+    sys.modules['weave'].get_current_call = lambda: SimpleNamespace(ui_url='fixture-url', trace_id='current-run')
+    original = cli.sera.optimize
+    reads = []
+
+    class Reader:
+        def __init__(self, client, trace_id):
+            assert trace_id == 'current-run' and callable(client.flush)
+
+        def __call__(self, query_id, evidence):
+            reads.append((query_id, evidence))
+            return {'source': 'weave', 'records': [{'call_id': 'persisted-call'}]}
+
+    def optimize(**kwargs):
+        assert kwargs['swarm'] is True and kwargs['automatic_space'] is True
+        assert kwargs['trace_reader']('quality_outputs', {'trace_scope': []})['source'] == 'weave'
+        return original(**kwargs)
+
+    monkeypatch.setattr(cli, 'WeaveEvidenceReader', Reader)
+    monkeypatch.setattr(cli.sera, 'optimize', optimize)
+    assert cli.main(arguments_without_batching(tmp_path) + ['--auto-space', '--swarm']) == 0
+    operation = next(call for call in weave.calls if call['name'] == 'weave_inspect_quality_outputs')
+    assert operation['parent'] == 'run_investigation'
+    assert operation['args'] == ({'trace_scope': []},)
+    assert operation['output']['records'][0]['call_id'] == 'persisted-call'
+    assert len(reads) == 1
+    invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
+    assert invocation['swarm'] is True and observed['closed']
+
+
+def test_default_cli_does_not_create_reader_or_enable_swarm(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    monkeypatch.setattr(cli, 'WeaveEvidenceReader', lambda *args: pytest.fail('unexpected trace reader'))
+    assert cli.main(arguments(tmp_path)) == 0
+    assert observed['kwargs']['swarm'] is False and observed['kwargs']['trace_reader'] is None
+
+
+@pytest.mark.parametrize('investigator', ['scheduling', 'memory_context', 'output_quality'])
+def test_forked_trace_agents_have_isolated_histories_and_named_investigation_phases(cli, investigator):
+    class Agent:
+        model = 'fixture-model'
+        project = 'fixture/project'
+
+        def __init__(self):
+            self.history = []
+
+        def fork(self):
+            return Agent()
+
+        def request(self, role, evidence, instruction):
+            self.history.append({'role': role, 'attempts': []})
+            return len(self.history)
+
+        def review(self, evidence):
+            return self.request('frontier', evidence, 'review')
+
+    weave = recording_weave()
+    parent = cli.TracedInvestigationAgent(Agent(), weave)
+    child = parent.fork()
+    for phase in ('inspect', 'propose', 'refine'):
+        child.request('arbiter' if phase == 'inspect' else 'proposal',
+                      {'investigator_id': investigator, 'swarm_phase': phase}, phase)
+    assert parent.history == [] and len(child.history) == 3
+    assert child.history is not parent.history
+    assert [call['name'] for call in weave.calls] == [
+        f'swarm_{investigator}_inspection', f'swarm_{investigator}_proposal', f'swarm_{investigator}_peer_review']
+    child._trace_failures.append({'event': 'fixture-child-failure'})
+    assert parent.trace_failures == [{'event': 'fixture-child-failure'}]
