@@ -15,7 +15,7 @@ Our long-term goal is like choosing a route home: the best plan depends on wheth
 - The original Qwen72B model needs about 135 GiB just for its saved weights. Those weights cannot fit in our GPU's roughly 96 GB of memory.
 - The recommendation agent chose FP8 weight quantization. In plain English, this stores most model weights using fewer bits. That saves memory, but can change answers, so it needs a quality check.
 - Sera loaded the original weights and applied that change during loading. We did not substitute a separately downloaded, already-compressed model.
-- The running model passed all eight easy questions, including the required answer format. Sera then returned a usable model, and a fresh question also passed.
+- The running model passed all eight easy questions, including the required answer format. Sera then returned a usable model, and an additional request also passed. That check was not a held-out question.
 - All 24 timed requests completed. The measured p95 response time was 573 milliseconds: at least 95% of those requests finished within that time. Peak GPU memory was 86.38 GiB.
 - Sera saved the evidence and released the GPU after the test. The agent's final-review wording needed a fix; a separate review of the saved evidence then passed. Both records remain available.
 
@@ -28,6 +28,40 @@ Open the [live investigation report](evidence/live-investigation-v1/report.md) a
 “The agent suggested a setting. Sera tested it, but response time improved by only 0.013%, below our 5% rule. Both settings still passed all eight questions. In the next round, the decision agent used that failed prediction to decline another trial. Sera gave back the working model and checked a new request.”
 
 This was two decision rounds and one candidate GPU trial, not two trials or a search win. The new request repeated a known question; it was not a held-out test. The run is now closed, and the notebook displays saved real evidence. Only batching was active; two-model placement is still unfinished.
+
+### Next rehearsal: let Sera choose the settings
+
+**Live proof pending for this exact path.** A rehearsal has started from commit `27f877d`; its result is not yet established. Local checks cover the connected code, not a completed GPU rehearsal with automatic settings and detailed child traces. The older recording above remains the proven fallback.
+
+For a nontechnical partner: “One advisor recommends how to make the model fit. Sera loads it and checks the answers. Then Sera uses the actual input lengths, request load, and available measurements to choose a small set of settings to investigate. A second advisor recommends an experiment. The decision agent can approve it or stop, and every tested change must pass the same answer checks.”
+
+Run from the repository root on the supported Linux GPU, after preparing the model files and setting `WANDB_API_KEY` in the environment. Use the build whose `python -m experiments.run_investigation --help` lists `--auto-space`:
+
+```sh
+python -m experiments.run_investigation \
+  --model Qwen/Qwen2.5-72B-Instruct \
+  --fit-first --auto-space --budget 3 \
+  --priority latency --concurrency 1 2 4 8 \
+  --project vvennela-n-a/wandb_agent_default_project \
+  --provider-check evidence/provider-v5/result.json \
+  --output-dir sera-runs/fit-auto-investigation
+```
+
+This starts real GPU and agent work. Use a new output directory. Do not combine `--auto-space` with explicit batching, sequence, context, or FP8-KV flags. The budget permits **one deployment and at most two later candidate trials**, not three extra trials. Advisors may stop sooner. Questions and the 99% quality floor remain unchanged; automatic settings do not add another precision mode.
+
+After the command finishes, show these items in order:
+
+1. **The fit decision:** show the quantization advisor's recommendation and the independent arbiter's decision. BF16 rejection is a memory estimate, not a measured BF16 comparison.
+2. **The automatic choices:** open `result.json` and its `candidate_policy` record. It explains the proposed values, source measurements, and missing data. No generated candidates means stop, not a hidden default experiment.
+3. **The investigation:** open `report.md`. Follow the proposal, arbiter decision, actual trial, quality gate, and prediction review. Count executed trials, not just proposals or decision rounds.
+4. **The trace:** open the saved Weave link. Check separate advisor/arbiter/reviewer calls and recorded model-request outputs. Inspect the bounded output examples supplied to later decisions. An agent's stated reason is a hypothesis; it cannot overrule the task evaluator.
+5. **The return and cleanup:** check `post_return_task_passed`, `returned_runner_closed`, and the runtime cleanup result. The command sends a new request using a known question and then closes the runner. It does not leave an interactive service open.
+
+Request-log child spans record saved results: their span duration is logging time, not model response time. Use the recorded `latency_ms` for request timing. Queue snapshots are cumulative, not measured-window averages. Neither selected examples nor a passing trace prove a speedup or the best possible plan.
+
+The agents receive a bounded view of local saved request records—the same records exported to Weave. They do **not** query the remote Weave service or use Weave MCP to investigate. Weave makes their inputs, outputs, and decisions visible; it is not a separate evidence-retrieval step in this run.
+
+Only mark this rehearsal passed after the saved run confirms the fit-to-search handoff, automatic-space audit, actual provider decisions, trace child outputs, usable returned runner, and cleanup. If the arbiter declines every tuning proposal, report that outcome honestly: it proves the connected workflow, not a measured tuning comparison. `demo.py` displays named saved evidence; its existing batching-only recording does not become proof of this new path.
 
 ### Three-minute walkthrough
 
@@ -55,7 +89,7 @@ The smaller Qwen3-0.6B path also completed a live agent-guided rejection and bas
 
 The returned baseline runner answered `1` for `1 + 1`. Its runtime worked, but its answer was wrong. Do not treat runtime success or token agreement as model correctness.
 
-The initial live checks used eight easy prompts and 24 measured requests per configuration. Later four-load comparisons used 96 measured requests per configuration, still on eight questions rather than the full 32-prompt acceptance workload. The large-model run proves feasible deployment through weight quantization, not a measured speedup or search advantage. The real two-round investigation also passed its returned-runner check. Joint placement and the search benchmark remain unfinished. Weave tracing ran through the experiment wrapper, not automatic package instrumentation.
+The initial live checks used eight easy prompts and 24 measured requests per configuration. Later four-load comparisons used 96 measured requests per configuration, still on eight questions rather than the full 32-prompt acceptance workload. The large-model run proves feasible deployment through weight quantization, not a measured speedup or search advantage. The real two-round investigation also passed its returned-runner check. Joint placement and the search benchmark remain unfinished. Those earlier Weave runs used the experiment wrapper. The new child-trace and output-evidence path needs its own live check; it does not change historical traces.
 
 The W&B client, typed proposal/ranking/final-selection schemas, and bounded provider check are implemented. The client reads `WANDB_API_KEY` from the process environment; it never saves the key or request headers. Agent-controlled GPU execution stays disabled until the provider check passes.
 
@@ -122,7 +156,7 @@ candidate = sera.Candidate(
 )
 ```
 
-Pass it as `candidate=candidate` to `optimize`. These are the two milestone candidates; the broader search space is not enabled.
+Pass it as `candidate=candidate` to `optimize`. These are the two default milestone candidates. Explicit or automatic investigation spaces require a separate opt-in agent budget.
 
 The comparison uses concurrency 1, up to 16 warm-ups, and three measured passes. Quality uses separate serial passes and a baseline self-check. One to 32 prompts are accepted; fewer than 32 are a quick check, not the full milestone measurement contract. Each request permits 64 output tokens. Overlong inputs are rejected, never silently truncated.
 
@@ -155,7 +189,7 @@ After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `
 
 The production controller accepts `budget=sera.Budget(max_candidate_trials=2)` with an agent and a matching passed provider record. Omitting `budget` preserves the one-candidate path. It completed a [real two-round investigation](evidence/live-investigation-v1/README.md): one measured batch-token candidate, prediction review, later arbitration using that history, reference restoration, a new request, and cleanup.
 
-Each round gives the active quantization and batching specialists the baseline measurements and a short history of previous trials. An arbiter selects an experiment. Sera validates it, measures it with the existing runner, applies the unchanged quality and performance gates, and asks the agent to review its prediction. The next round receives the result, including failures. Raw measurements remain in the saved report, not in the next prompt.
+Each round gives the active quantization and batching specialists the baseline measurements and a short history of previous trials. An arbiter selects an experiment. Sera validates it, measures it with the existing runner, applies the unchanged quality and performance gates, and asks the agent to review its prediction. The next round receives the result, including failures. The new implementation also supplies bounded examples of actual inputs and outputs, prioritizing task failures and slow requests. Complete raw records remain saved; examples are selected evidence, not representative averages or instructions from model output. Live proof of this richer path is pending.
 
 A post-run fix now forwards queue/first-token/preemption snapshots for every load and previous trial. Their names state that they are cumulative since startup, including warmup and earlier loads; they are not load-window averages. The first live investigation omitted these fields. An offline check against its unchanged saved data verifies the fix, but no new live-agent result is claimed for that richer input.
 
@@ -163,7 +197,9 @@ The controller counts failed starts against the budget, excludes tested configur
 
 Default values remain narrow: FP8 KV and batch tokens 2,048 for small Qwen; batch tokens 2,048 only for the proven Qwen72B FP8 reference. A caller can now supply `investigation_space=sera.InvestigationSpace(supported_changes={...})` with an explicit budget. This declares up to 32 single-setting candidates using the supported batching/context controls. Sera freezes their full configuration hashes before loading. An optional `candidate_hashes` list restricts the pool further. It rejects no-ops, invalid coupled settings, incompatible sequence limits, and unverified combined FP8 weights/KV. After baseline tokenization, it excludes candidates whose context cannot cover the same input and output limit. It does not silently activate the expanded ranges or execute a full grid.
 
-Combination trials, automatic value generation, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The citation fix constrains the provider to exact available metric names and verifies the same request schema locally. The [current hosted check passed 30/30 on the first attempt](evidence/provider-v5/README.md), including every evidence-reference check. The provider gate no longer blocks live trials for this build.
+Normal-mode automatic value generation is now opt-in through `automatic_space=True` on `optimize`, with an agent and budget. It runs after baseline measurement and records its full rationale. It proposes bounded single-setting context, sequence, or batch-token changes; it does not generate precision changes or combinations. Explicit/frozen spaces cannot be combined with this mode. Missing essential evidence produces no candidates, not guesses or fallback defaults. This wiring passed local checks; the live automatic-space rehearsal is pending.
+
+Combination trials, joint placement, session-time budgeting, and a live search-advantage claim remain unfinished. The citation fix constrains the provider to exact available metric names and verifies the same request schema locally. The [current hosted check passed 30/30 on the first attempt](evidence/provider-v5/README.md), including every evidence-reference check. The provider gate no longer blocks the current wire schemas; it does not certify useful reasoning about new evidence.
 
 ### Run a bounded live investigation
 
@@ -223,11 +259,13 @@ The specified Qwen0.6B + GLM-4-9B pair is not ready for verified placement. GLM 
 
 In plain English: the programs run, but these two smaller models do not yet meet the promised answer contract. More GPU memory does not fix that. Changing the task rules or model pair needs an explicit decision. This does not invalidate the successful Qwen72B deployment and rehearsal. No joint-placement or smaller-card benefit is claimed.
 
-A separate `experiments.run_structured_quality_pilot` command now tests native JSON decoding for one specified BF16 model at a time. It keeps the eight questions, exact answers, generation limits, and 99% floor. Its schema does not contain the answers. It saves raw responses and diagnostic request latency without repairing output. A passing pilot would establish only this new decoding profile; joint scheduling, a declared smaller-card budget, and a measured concurrent trial would still be needed.
+A separate `experiments.run_structured_quality_pilot` command tests native JSON decoding for one specified model at a time, with BF16 weights by default or explicitly requested FP8 weights. It keeps the eight questions, exact answers, generation limits, and 99% floor. Its schema does not contain the answers. It saves raw responses and diagnostic request latency without repairing output. A passing pilot establishes only its declared decoding/precision profile; joint scheduling, a declared smaller-card budget, and a measured concurrent trial would still be needed.
 
 The [Qwen structured-output pilot completed at 7/8](evidence/qwen-structured-quality-v3/README.md): all answers were valid JSON, but filtering was still wrong. Median request latency was 112.60 ms, with a retained 59.21-second filtering outlier. Cleanup passed. This is a quality rejection, not a verified baseline or speedup. The [placement plan](docs/placement-plan.md) separates this quality gate from the remaining shared-runtime work and required budget/latency decisions.
 
 [GLM passed the same structured-output pilot at 8/8](evidence/glm-structured-quality-v1/README.md), including filtering. Median request latency was 141.05 ms, with a 1.36-second maximum on the first request. Cleanup passed. GLM now has a passing isolated BF16 quality profile; Qwen still does not. Neither pilot proves quantized quality, joint fit, or concurrent performance.
+
+The [Qwen FP8-weight structured pilot also scored 7/8](evidence/qwen-fp8-structured-quality-v1/README.md), with the same semantic filtering error and valid JSON throughout. It does not provide a passing Qwen baseline or a new FP8-specific failure. No speedup follows from comparing these short diagnostic runs.
 
 The [saved-results audit](evidence/release-benchmark-audit/README.md) reproduced all 64 saved task grades and the four-load Qwen72B comparison. It found no complete frozen small-model search universe, so a measured grid/random comparison remains unavailable.
 
