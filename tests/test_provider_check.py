@@ -21,6 +21,20 @@ def test_packaged_provider_command_returns_check_status(monkeypatch, tmp_path, p
     assert provider_check.main(['--project', 'test/project', '--output-dir', str(tmp_path/'check')]) == expected
 
 
+def test_optional_fail_fast_stops_on_a_request_that_cannot_pass(monkeypatch, tmp_path):
+    from sera.agent import WandbAgent, ProviderTransportError
+    from sera.provider_check import check_provider
+    current = WandbAgent(project='test/project')
+    def fail(payload):
+        raise ProviderTransportError('Provider HTTP 400', http_status=400)
+    monkeypatch.setattr(current, '_complete', fail)
+    report = check_provider(project=current.project, agent=current,
+                            output_dir=tmp_path/'check', stop_on_failure=True)
+    assert report['passed'] is False and report['completed_requests'] == 1
+    assert report['stop_reason'] == 'provider-contract-failed'
+    assert len(report['requests'][0]['attempts']) == 2
+
+
 def valid_response(case):
     evidence = case['evidence']
     if case['role'] == 'proposal':

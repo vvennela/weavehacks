@@ -84,7 +84,7 @@ def validate_context(role, parsed, evidence):
         raise ValueError("Frontier reader selected an ineligible trial")
 
 
-def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None):
+def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None, stop_on_failure=False):
     agent = WandbAgent(project=project, model=model) if agent is None else agent
     if agent.project != project or agent.model != model or agent.history:
         raise ValueError("Format check requires a fresh agent matching model and project")
@@ -128,6 +128,9 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None):
             record["context_checks"].append(context)
             save_json(path, record)
             print(f"Provider check {len(agent.history)}/{len(cases)}: {case['id']}; valid={parsed is not None}", flush=True)
+            if stop_on_failure and not context['passed']:
+                record['stop_reason'] = 'provider-contract-failed'
+                break
             last = agent.history[-1]["attempts"][-1]
             if last.get("http_status") in {401, 403, 404}:
                 record["stop_reason"] = last["error"]
