@@ -19,6 +19,12 @@ def require(condition, message):
         raise ValueError(message)
 
 
+def require_completed_run(report):
+    require(report.get('trace_status') == 'enabled' and report.get('swarm_enabled') is True
+            and report.get('status') == 'closed' and report.get('returned_runner_closed') is True,
+            'Run is not a closed, traced swarm result')
+
+
 def audit_run(folder, calls_path, model, controller_path):
     folder = Path(folder)
     report = json.loads((folder / 'result.json').read_text())
@@ -35,8 +41,7 @@ def audit_run(folder, calls_path, model, controller_path):
     audit = Audit(report, calls)
     require(report['model_id'] == LARGE_MODEL_ID and report['model_revision'] == LARGE_MODEL_REVISION,
             'Run does not use the pinned Qwen72B model')
-    require(report['trace_status'] == 'enabled' and report['swarm_enabled'] is True
-            and report['status'] == 'ready', 'Run is not a ready, traced swarm result')
+    require_completed_run(report)
     require(report['constraints']['quality_floor'] == .99
             and report['objective'] == {'priority': 'latency', 'min_improvement_fraction': .05}
             and report['workload']['concurrency'] == [1, 2, 4, 8], 'Workload or gates changed')
