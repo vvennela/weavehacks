@@ -587,9 +587,11 @@ Weave mirrors the optimization as one root trace with child operations for:
 
 Secrets must not enter SQLite, logs, reports, agent prompts, or Weave traces.
 
-## 19. Grid-search comparison
+## 19. Benchmark against naive grid search
 
-The comparison is an evaluation harness, not Sera's search implementation.
+Naive grid search is an external benchmark control. It is not part of Sera's search implementation or public API.
+
+The benchmark tests whether Sera's evidence-driven policy finds a stronger valid configuration within the same GPU-trial budget.
 
 ### 19.1 Candidate universe
 
@@ -600,7 +602,7 @@ The full universe is executed once to establish the oracle result. The evaluatio
 ### 19.2 Compared methods
 
 - Sera with metrics, history, specialists, and arbiter
-- Fixed-order grid search using a preregistered lexicographic order
+- Naive fixed-order grid search using a preregistered lexicographic order and no adaptive selection
 - Uniform random search over 20 recorded seeds
 - Sera without reduced telemetry
 - Sera without trial history
@@ -614,6 +616,8 @@ All methods receive:
 - The same measurements
 - The same quality gate
 - The same objective
+
+The naive grid receives the same deterministic legality checks as Sera. This prevents invalid settings from creating a false advantage. The measured difference comes from trial selection.
 
 ### 19.3 Primary metric
 
@@ -632,7 +636,7 @@ Secondary metrics are:
 
 The hackathon claim passes when Sera:
 
-- Reaches the near-oracle threshold in fewer trials than fixed-order grid search, and
+- Reaches the near-oracle threshold in fewer trials than naive fixed-order grid search, and
 - Beats the median random-search result at the same budget, and
 - Performs better than at least one intelligence ablation.
 

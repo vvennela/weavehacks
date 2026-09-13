@@ -106,17 +106,18 @@ Sera returns a structured result, not terminal output alone.
 - Failed predictions and observed interference
 - A readable notebook report
 
-## Beating grid search
+## Benchmark against naive grid search
 
-Sera's benchmark target is to reach an acceptable configuration with fewer GPU trials than grid search.
+Grid search is a benchmark control. It is not part of Sera.
 
-The comparison uses the same models, hardware, candidate setting space, workload, quality gate, and total trial budget. A complete small grid establishes the best known result. Sera wins when it does one of the following:
+The test gives Sera and a naive fixed-order grid search the same models, hardware, legal candidate settings, workload, quality gate, and trial budget. The grid tries configurations in a fixed order and does not use measurements to choose its next trial.
+
+Sera passes the benchmark when it does one of the following:
 
 - Reaches the target latency, memory, and quality constraints in fewer trials
 - Finds a better valid configuration within the same trial budget
-- Rejects invalid configurations without spending GPU time on them
 
-Sera does not claim that a bounded agent search always beats an exhaustive search after every grid point has run. Its advantage is search efficiency: it uses measurements and past results to decide which experiment is worth running next.
+An exhaustive grid eventually tests every configuration. That is not the comparison. The comparison measures which method finds a strong valid configuration first. Sera uses measurements and past results to choose which experiment is worth running next.
 
 The evaluation also compares Sera with uniform random search and versions of Sera that cannot see reduced telemetry or trial history. These ablations test whether the measured feedback loop causes the improvement.
 
@@ -144,7 +145,7 @@ The Marimo notebook is the test and demonstration environment. The product remai
 
 Molab runs on CoreWeave and provides one NVIDIA RTX Pro 6000 Blackwell GPU with 96 GB of GPU memory. A session can run for up to 12 hours. This is enough to run real vLLM trials instead of a simulation.
 
-The demonstration loads Qwen/Qwen3-0.6B and zai-org/glm-4-9b-chat-hf with a prepared prompt set. It compares Sera with grid search over the same candidate space and trial budget. It then shows completed phase-one evidence, runs a joint placement trial, and displays how measured contention changes the next decision. Weave exposes the full loop, while the notebook shows the final frontier and recommended configuration.
+The demonstration loads Qwen/Qwen3-0.6B and zai-org/glm-4-9b-chat-hf with a prepared prompt set. It compares Sera with naive grid search over the same candidate space and trial budget. It then shows completed phase-one evidence, runs a joint placement trial, and displays how measured contention changes the next decision. Weave exposes the full loop, while the notebook shows the final frontier and recommended configuration.
 
 On a single GPU, trials run sequentially. The demonstration proves better use of that GPU; it does not claim to free a second GPU.
 
