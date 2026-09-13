@@ -43,6 +43,8 @@ class PlacementWorkload:
     evaluator: object
     evaluator_version: str
     workload: Workload = field(default_factory=Workload)
+    response_formats: list[dict] | None = None
+    response_format_version: str | None = None
 
     def validated(self):
         from copy import deepcopy
@@ -58,12 +60,18 @@ class PlacementWorkload:
                     not isinstance(message['content'], str) or not message['content'].strip()
                     for message in messages)):
                 raise ValueError('Prompts must contain nonempty text chat messages')
+        from .placement_decoding import validate_formats
+        formats = validate_formats(self.prompts, self.response_formats, self.response_format_version)
         return PlacementWorkload(deepcopy(self.prompts), self.evaluator, self.evaluator_version,
-                                 Workload.model_validate(self.workload.model_dump()))
+                                 Workload.model_validate(self.workload.model_dump()), formats,
+                                 self.response_format_version)
 
     def manifest(self):
-        return dict(prompts=self.prompts, evaluator_version=self.evaluator_version,
-                    workload=self.workload.model_dump(), generation=GENERATION)
+        value = dict(prompts=self.prompts, evaluator_version=self.evaluator_version,
+                     workload=self.workload.model_dump(), generation=GENERATION)
+        if self.response_formats is not None:
+            value.update(response_formats=self.response_formats, response_format_version=self.response_format_version)
+        return value
 
 
 def _gate(trial, profile, service, *, isolated_p95_ms=None, joint=False):
@@ -230,6 +238,7 @@ def _run_placement(arguments, weave_project):
 def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=None,
            _references_only=False, _isolated_reference=None, _trial_namespace=None):
     import re
+    from .placement_decoding import runner_for_profile
     if _trial_namespace is not None and (not isinstance(_trial_namespace, str)
             or re.fullmatch(r'[A-Za-z0-9_-]{1,64}', _trial_namespace) is None):
         raise ValueError('trial_namespace must be a short stable identifier')
@@ -278,10 +287,11 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
             profile = profiles[service.model_id]
             model = SeraModel(model_id=service.model_id, revision=service.revision,
                 configuration=service.configuration, artifact_dir=folder/f'isolated-{index}')
+            runner = runner_for_profile(model, profile)
             report['isolated_runtimes'].append(model.record)
             try:
                 model.start()
-                trial = collect_trial(model, profile.prompts, 'isolated', workload=profile.workload)
+                trial = collect_trial(runner, profile.prompts, 'isolated', workload=profile.workload)
                 report['isolated'][service.model_id] = trial
                 gate = _gate(trial, profile, service)
             finally:
@@ -340,7 +350,7 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
                 configuration=service.configuration, artifact_dir=folder/f'joint-{index}', placement_owner=owner)
             # Own a runner before start, so a partial second startup cannot leak the first.
             owner.models.append(model)
-            models.append(model)
+            models.append(runner_for_profile(model, profiles[service.model_id]))
             model.start()
         joint = collect_joint(models, profiles, **(dict(trial_id=_trial_namespace+'/joint') if _trial_namespace else {}))
         report['joint'] = joint

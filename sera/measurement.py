@@ -118,6 +118,9 @@ def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None, ph
         except Exception as error:
             result = {"text": "", "token_ids": [], "prompt_token_ids": tokens,
                       "error": f"{type(error).__name__}: {error}"}
+        if 'response_format' in payload:
+            from copy import deepcopy
+            result['response_format'] = deepcopy(payload['response_format'])
         return {"prompt_index": index, **result}
 
     def snapshot(name):

@@ -127,15 +127,21 @@ The manifest's schema is `sera-placement-rehearsal-v1`. It contains:
   for `search`. The reference stage emits an index of these paths.
 - `provider_check`: existing matching provider certificate path for `search`.
 - `weave_project`: optional explicit trace project matching the agent project.
+- `response_formats` and `response_format_version`: optional explicit decoding
+  profile. The first maps both model IDs to one caller-supplied JSON schema format
+  per prompt; the second names the approved version. Isolated, joint, and
+  post-return probe requests all send these exact formats.
 
 Relative paths resolve from the manifest directory. The search stage uses the
 existing `SERA_AGENT_PROVIDER`, `SERA_AGENT_MODEL`, `SERA_PROJECT`, and relay/key
 environment setup. Keys are never printed or stored in the manifest.
 
-The CLI uses the unchanged eight-task strict JSON profile and hashes its dataset.
+The CLI uses the unchanged eight tasks and strict JSON grader and hashes its dataset.
 It does not silently adopt new structured decoding, thinking, output length, or
-system prompts. An approved different decoding profile must be implemented and
-hashed before it can become the live reference. `check` makes no GPU, provider,
+system prompts. A caller-supplied versioned decoding profile is included in the
+workload hash and saved on every request; changing or omitting it invalidates the
+reference. No benchmark or answer-key code is imported by the installed runtime.
+`check` makes no GPU, provider,
 or Weave call; success means the manifest is valid, not that either model passes.
 
 The live search command also tests one post-return request per runner, grades it,
@@ -144,8 +150,10 @@ task, not a claim about unseen questions. A failed task or cleanup exits nonzero
 
 ## Live blockers
 
-The existing Qwen structured result is 7/8 and still fails the 0.99 requirement.
-Nothing here relaxes or hides it. A quality-valid configuration and frozen
+The earlier Qwen structured result is 7/8 and still fails the 0.99 requirement.
+Nothing here relaxes or hides it. A separately tested requested-type profile must
+pass new isolated and joint measurements before replacing that failed reference.
+A quality-valid configuration and frozen
 calibration-backed service allocations are required before a passing joint run
 can be demonstrated. The approved 10% relative latency contract is now implemented;
 its numeric ceilings are derived from isolated results before joint startup.

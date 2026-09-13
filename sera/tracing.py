@@ -83,7 +83,7 @@ def recorded_model_request(*, trial_id, model_id, revision, config_hash, phase,
     error = response.get('error')
     safe_prompt = (prompt if isinstance(prompt, str) else
                    [{'role': message['role'], 'content': message['content']} for message in prompt])
-    return emit_event('recorded_model_request', {
+    payload = {
         'trial_id': trial_id, 'model_id': model_id, 'revision': revision,
         'config_hash': config_hash, 'phase': phase, 'concurrency': concurrency,
         'prompt_index': prompt_index, 'input': safe_prompt, 'output': response.get('text'),
@@ -92,4 +92,7 @@ def recorded_model_request(*, trial_id, model_id, revision, config_hash, phase,
         'prompt_token_ids': response.get('prompt_token_ids'), 'token_ids': response.get('token_ids'),
         'finish_reason': response.get('finish_reason'), 'latency_ms': response.get('latency_ms'),
         'timing_scope': 'Span duration is logging time, not inference; latency_ms is the recorded request latency.',
-    })
+    }
+    if 'response_format' in response:
+        payload['response_format'] = deepcopy(response['response_format'])
+    return emit_event('recorded_model_request', payload)

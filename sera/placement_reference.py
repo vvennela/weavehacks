@@ -21,12 +21,13 @@ def _number(value):
     return type(value) in (int, float) and math.isfinite(value) and value > 0
 
 
-def _check_requests(requests, indices, input_tokens):
+def _check_requests(requests, indices, input_tokens, formats=None):
     _require(isinstance(requests, list) and len(requests) == len(indices), 'request count')
     for item, index in zip(requests, indices):
         _require(isinstance(item, dict) and type(item.get('prompt_index')) is int
                  and item['prompt_index'] == index, 'prompt index')
         _require(item.get('prompt_token_ids') == input_tokens[index], 'input tokens')
+        _require(item.get('response_format') == (formats[index] if formats is not None else None), 'request decoding profile')
         _require(not item.get('error') and isinstance(item.get('text'), str) and bool(item['text'].strip()),
                  'request errors')
         tokens = item.get('token_ids')
@@ -68,6 +69,9 @@ def bind_placement_reference(path, plan, profiles):
                  'pinned model identity')
         _require(runtime.get('configuration') == service.configuration.model_dump()
                  and trial.get('config_hash') == service.configuration.config_hash, 'configuration binding')
+        if profile.response_formats is not None:
+            _require(runtime.get('response_format_version') == profile.response_format_version
+                     and runtime.get('response_formats_hash') == content_hash(profile.response_formats), 'runtime decoding profile')
         _require(runtime.get('cleanup_pass') is True and runtime.get('status') == 'closed', 'isolated cleanup')
         gpu, versions = runtime.get('gpu', {}), runtime.get('versions', {})
         _require(isinstance(gpu.get('uuid'), str) and bool(gpu['uuid'])
@@ -91,8 +95,8 @@ def bind_placement_reference(path, plan, profiles):
         _require(trial.get('workload', {}).get('concurrency') == profile.workload.concurrency, 'workload levels')
         requests, warmup = [], []
         for load in loads:
-            _check_requests(load.get('warmup'), list(range(min(count, 16))), tokens)
-            _check_requests(load.get('requests'), [i % count for i in range(min(3*count, 96))], tokens)
+            _check_requests(load.get('warmup'), list(range(min(count, 16))), tokens, profile.response_formats)
+            _check_requests(load.get('requests'), [i % count for i in range(min(3*count, 96))], tokens, profile.response_formats)
             window = load.get('measurement_window', {})
             started, ended = window.get('started'), window.get('ended')
             elapsed = load.get('reduced', {}).get('request_wall_seconds')
@@ -104,7 +108,7 @@ def bind_placement_reference(path, plan, profiles):
             warmup.extend(load['warmup'])
         _require(trial.get('requests') == requests and trial.get('warmup') == warmup, 'request ledger binding')
         _require(trial.get('reduced') == reduce_loads(loads), 'raw aggregate metrics do not match saved reduction')
-        _check_requests(trial.get('quality'), list(range(count)), tokens)
+        _check_requests(trial.get('quality'), list(range(count)), tokens, profile.response_formats)
         _require(trial.get('self_check', []) == [] and trial.get('generation_errors') == 0, 'isolated protocol')
         gate = _gate(trial, profile, service)
         _require(gate['passed'], f"{model_id}: task or latency requirements; "

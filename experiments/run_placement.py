@@ -24,7 +24,7 @@ def load_manifest(path):
     path = Path(path).resolve()
     manifest = json.loads(path.read_text())
     allowed = {'schema_version', 'plans', 'memory_estimates', 'isolated_references',
-               'concurrency', 'provider_check', 'weave_project'}
+               'concurrency', 'provider_check', 'weave_project', 'response_formats', 'response_format_version'}
     if set(manifest) - allowed or manifest.get('schema_version') != 'sera-placement-rehearsal-v1':
         raise ValueError('Use the explicit sera-placement-rehearsal-v1 manifest')
     plans = [validate_placement_plan(plan) for plan in manifest['plans']]
@@ -51,8 +51,13 @@ def load_manifest(path):
     by_prompt = {content_hash(prompt):case for prompt,case in zip(prompts, cases)}
     def evaluate(prompt, output):
         return grade_case(by_prompt[content_hash(prompt)], output)['passed']
-    profiles = {service.model_id:PlacementWorkload(prompts, evaluate, BENCHMARK_VERSION, workload)
-                for service in plans[0].services}
+    formats = manifest.get('response_formats')
+    model_ids = {service.model_id for service in plans[0].services}
+    if formats is not None and (not isinstance(formats, dict) or set(formats) != model_ids):
+        raise ValueError('response_formats must supply the exact per-prompt schema list for both models')
+    profiles = {model:PlacementWorkload(prompts, evaluate, BENCHMARK_VERSION, workload,
+        response_formats=formats[model] if formats is not None else None,
+        response_format_version=manifest.get('response_format_version')).validated() for model in model_ids}
     def resolve(value):
         candidate = Path(value)
         return candidate if candidate.is_absolute() else path.parent/candidate
@@ -99,7 +104,9 @@ def run_search(loaded, output_dir, *, objective, budget):
             prompt = loaded['workloads'][model.model_id].prompts[0]
             response = model.generate(prompt)
             probes.append(dict(model_id=model.model_id, scope='post-return request, first unchanged task',
-                               response=response.to_dict(), grade=grade_case(loaded['cases'][0], response.text)))
+                response_format=loaded['workloads'][model.model_id].response_formats[0]
+                    if loaded['workloads'][model.model_id].response_formats is not None else None,
+                response=response.to_dict(), grade=grade_case(loaded['cases'][0], response.text)))
         result.report['returned_runner_probes'] = probes
         result._save()
     result.report['rehearsal_passed'] = (len(probes) == 2 and all(probe['grade']['passed'] for probe in probes)

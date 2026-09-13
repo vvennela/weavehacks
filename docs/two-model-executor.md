@@ -20,6 +20,10 @@ implementation does not change questions, scores, thresholds, or model choices.
   evaluator version, and declared load levels. Both models use the same load
   levels, but can have different representative prompts. Each model receives
   exactly the same prompts and generation settings alone and together.
+  Optional `response_formats` supplies one JSON schema format per prompt and
+  requires `response_format_version`. The exact schemas/version enter the workload
+  hash, runtime record, and every warmup, timed, and quality request. Reusing a
+  reference under a changed schema is rejected.
 - One `PlacementMemoryEstimate` per model: weight, KV cache, workspace, process
   overhead, and fragmentation bytes. These are explicit caller estimates, not
   measured guarantees. Each total must fit its allocation.
@@ -84,6 +88,13 @@ process, substantial unattributed device memory, or a breached budget fails the
 joint gate. Sampling is once per second and can miss short peaks. This is not
 hardware partitioning or a continuous memory cap. NVIDIA queries do not run
 inside each request's latency timer.
+
+With per-prompt decoding enabled, a returned runner remembers the schema for each
+measured prompt. A new prompt requires `model.generate(new_prompt,
+response_format=your_schema)`; Sera does not guess its task type. A caller cannot
+silently replace the schema of a measured prompt. Returned responses remain
+`SeraResponse` objects. Scores from the measured sample are not a correctness
+guarantee for new questions.
 
 ## Optional Weave tracing
 
