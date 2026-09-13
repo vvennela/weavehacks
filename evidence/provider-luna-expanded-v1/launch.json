@@ -1,0 +1,18 @@
+{
+  "source_revision": "c10c9fe2be796150263821aba873014d9043651a",
+  "command": [
+    "/tmp/uv-venv/bin/python",
+    "-m",
+    "sera.provider_check",
+    "--project",
+    "vvennela-n-a/wandb_agent_default_project",
+    "--model",
+    "gpt-5.6-luna",
+    "--provider",
+    "codex-relay",
+    "--relay-dir",
+    "/tmp/sera-relay-luna-expanded-v1",
+    "--output-dir",
+    "/marimo/sera-evidence/provider-luna-expanded-v1"
+  ]
+}
