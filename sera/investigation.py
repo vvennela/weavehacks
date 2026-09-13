@@ -7,6 +7,7 @@ from .config import CONTROL_ROLES, Candidate, RuntimeConfig, validate_candidate
 from .measurement import measured_frontier, objective_value, select_candidate, token_agreement
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION
+from .trace_evidence import request_evidence
 
 
 def search_frontier(baseline, trials, *, constraints):
@@ -51,7 +52,7 @@ def remaining_candidates(evidence, baseline_config, seen, workload, baseline):
     return legal
 
 
-def round_evidence(initial, search, trials, remaining):
+def round_evidence(initial, search, trials, remaining, *, prompts=()):
     from .pipeline import load_snapshot_metrics
 
     evidence = deepcopy(initial)
@@ -60,6 +61,7 @@ def round_evidence(initial, search, trials, remaining):
         ('trial_id', 'status', 'config_hash', 'reduced', 'task_quality', 'decision', 'error',
          'failure_stage') if key in trial},
         configuration=deepcopy(trial['runtime']['configuration']),
+        request_evidence=request_evidence(trial, prompts),
         proposal=deepcopy(trial.get('proposal')), review=deepcopy(trial.get('review')),
         review_error=trial.get('review_error')) for trial in trials]
     evidence['previous_rounds'] = [dict(round=record['round'], trial_ids=record['trial_ids'][:],
@@ -71,6 +73,9 @@ def round_evidence(initial, search, trials, remaining):
     # Exact metric names remain valid citations, including failed-trial measurements.
     for index, trial in enumerate(trials, search.get('initial_trials_used', 0) + 1):
         metrics = dict(trial.get('reduced', {}))
+        requests = request_evidence(trial, prompts)
+        metrics.update(trace_failed_task_count=requests['failed_task_count'],
+                       trace_measured_request_count=requests['measured_request_count'])
         metrics['sampled_peak_memory_mib'] = trial['runtime'].get('sampled_peak_memory_mib')
         metrics.update(load_snapshot_metrics(trial))
         for key, value in metrics.items():
@@ -238,7 +243,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 report['investigation_space'] = empty | {'space_hash': content_hash(empty)}
             report['limits'][1] = 'evidence-generated single-setting controls'
             save()
-        initial = pipeline.agent_evidence(baseline, objective, constraints)
+        initial = pipeline.agent_evidence(baseline, objective, constraints, prompts=report['prompts'])
         if report.get('deployment'):
             initial['deployment_context'] = deployment_context(report['deployment'])
         space = report.get('investigation_space')
@@ -265,7 +270,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 search['stop_reason'] = 'no-legal-untested-candidate'
                 break
             record = dict(round=len(search['rounds']) + 1, specialists=[], trial_ids=[])
-            evidence = round_evidence(initial, search, report['search_trials'], remaining)
+            evidence = round_evidence(initial, search, report['search_trials'], remaining,
+                                      prompts=report['prompts'])
             search['rounds'].append(record)
             before_frontier = frontier_points()
             experiments = choose_experiments(agent, evidence, legal, record, remaining)
@@ -335,6 +341,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                     objective=objective.model_dump(), candidate_tested=True,
                     candidate_status=trial['status'], baseline_metrics=baseline.get('reduced'),
                     candidate_metrics=trial.get('reduced'),
+                    baseline_request_evidence=request_evidence(baseline, report['prompts']),
+                    candidate_request_evidence=request_evidence(trial, report['prompts']),
                     eligible_trial_ids=[trial_id if decision['selected'] == 'candidate' else
                                         ('baseline' if decision['selected'] else 'no-safe-configuration')])
                 trial['review_evidence'] = feedback

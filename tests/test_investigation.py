@@ -104,10 +104,19 @@ def test_two_rounds_use_failure_evidence_and_return_best_eligible_runner(tmp_pat
         later = [e for role, e in seen if role == 'proposal' and e['remaining_trials'] == 1]
         assert later and later[0]['history'][0]['trial']['task_quality']['passed'] is False
         assert later[0]['history'][0]['review']['prediction_outcome'] == 'refuted'
+        failed_request = later[0]['history'][0]['request_evidence']['quality_examples'][0]
+        assert failed_request['output'] == 'wrong'
+        assert failed_request['input'] == 'question'
+        assert failed_request['task_score'] == 0
+        baseline_request = later[0]['request_evidence']['quality_examples'][0]
+        assert baseline_request['output'] == 'correct'
+        reviews = [e for role, e in seen if role == 'frontier']
+        assert reviews[0]['candidate_request_evidence']['quality_examples'][0]['output'] == 'wrong'
         assert 'quality' not in later[0]['history'][0]['trial']
         assert 'evidence' not in later[0]['previous_rounds'][0]['specialists'][0]
         assert 'trial_1_p95_latency_ms' in later[0]['metrics']
         assert later[0]['metrics']['trial_1_sampled_peak_memory_mib'] == 2000
+        assert later[0]['metrics']['trial_1_trace_failed_task_count'] == 1
         assert result.report['search']['trials_used'] == 2
         assert result.report['search']['stop_reason'] == 'budget-exhausted'
         assert result.report['decision']['selected'] == 'trial-2'
@@ -221,7 +230,7 @@ def use_investigation_space(monkeypatch, supported_changes, candidate_hashes=Non
 def test_setup_failure_closes_transferred_baseline(tmp_path, monkeypatch):
     runners, _, agent = install_fakes(monkeypatch)
 
-    def fail_evidence(*args):
+    def fail_evidence(*args, **kwargs):
         raise ValueError('fixture evidence failure')
 
     monkeypatch.setattr(pipeline, 'agent_evidence', fail_evidence)

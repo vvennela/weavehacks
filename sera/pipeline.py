@@ -23,9 +23,13 @@ def load_snapshot_metrics(trial):
     return metrics
 
 
-def agent_evidence(baseline, objective=None, constraints=None):
+def agent_evidence(baseline, objective=None, constraints=None, *, prompts=()):
     from .config import SUPPORTED_CHANGES
+    from .trace_evidence import request_evidence
+    requests = request_evidence(baseline, prompts)
     metrics = dict(baseline["reduced"])
+    metrics.update(trace_failed_task_count=requests['failed_task_count'],
+                   trace_measured_request_count=requests['measured_request_count'])
     snapshot = baseline.get("metrics", {}).get("after-measurement", {})
     metrics.update(mean_queue_ms=snapshot.get("mean_queue_ms"),
                    mean_ttft_ms=snapshot.get("mean_ttft_ms"),
@@ -40,6 +44,7 @@ def agent_evidence(baseline, objective=None, constraints=None):
             "constraints": constraints.model_dump() if constraints is not None else None,
             "quality_mode": "verified" if constraints is not None else "token-agreement",
             "task_quality": baseline.get("task_quality"),
+            "request_evidence": requests,
             "configuration": baseline["runtime"]["configuration"],
             "metrics": metrics, "remaining_trials": 1, "supported_changes": supported,
             "baseline_self_check": token_agreement(baseline["quality"], baseline["self_check"]),
@@ -310,7 +315,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                 evaluation=evaluation, evaluation_version=evaluation_version, workload=workload)
         if agent is not None and baseline["status"] == "collected" and can_compare:
             from .agent import validate_proposal
-            evidence = agent_evidence(baseline, objective, constraints)
+            evidence = agent_evidence(baseline, objective, constraints, prompts=prompts)
             report["agent_input"] = evidence
             try:
                 proposal = agent.propose(evidence)
