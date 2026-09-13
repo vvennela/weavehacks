@@ -36,3 +36,5 @@ The optimization root span ends before the public API returns. Caller generation
 - Run `python evidence/public-api-release-v1/audit.py` from the repository to repeat the read-only audit.
 
 The Linux GPU child used Python `-I` and imported Sera from site-packages. The local Codex controller remains separate repository tooling. This is a release-candidate check, not a published package or release tag.
+
+Temporary GPU library symlinks and the controller lock are excluded from the saved evidence. All measurements, outputs, and trace records remain intact.
