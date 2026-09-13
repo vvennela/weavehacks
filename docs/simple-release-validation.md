@@ -1,5 +1,21 @@
 # Local release validation
 
+## Merged candidate
+
+The merged API and recovery wheel was checked again outside the checkout.
+
+- Package: `sera-inference` 0.2.0, source `d8c7304`.
+- Wheel SHA-256: `1617374eb978c15f67c85fa0464af2d288474af1721c2a9be240500a80982e6a`.
+- Fresh Python 3.11.15 base install: seven packages; isolated import passed without Weave, vLLM, or repository modules.
+- Fresh swarm install: 67 packages; dependency checks, installed provider-check help, and the isolated package smoke all passed.
+- GPU, provider, certificate, and Weave service boundaries were stubbed in that smoke. It made no live calls.
+- Combined API, recovery, and benchmark suite at `316de88`: **917 passed**.
+- The same wheel was installed in Molab through marimo's package manager. A fresh isolated process found `sera.api.optimize` in site-packages and accepted the existing 34-case Luna certificate. It reused the existing GPU runtime and cached model files.
+
+The live check is separate from these local checks. Do not treat the local smoke as a GPU result.
+
+## Original API worker check
+
 These checks validate the 0.2.0 package candidate. They do not replace the final
 live GPU rehearsal after all worker branches are merged.
 

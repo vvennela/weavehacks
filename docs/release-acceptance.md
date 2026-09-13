@@ -1,6 +1,8 @@
 # Next release: acceptance checklist
 
-The completed single-model recordings are saved under `evidence/expanded-swarm-comparison`. This checklist covers the next implementation pass, not a claim that it has passed.
+The completed single-model recordings are saved under `evidence/expanded-swarm-comparison`. This checklist distinguishes implementation from live acceptance.
+
+Current checkpoint: items 1–4 from the work plan are merged as the three groups below. The combined suite passes 917 tests. Clean installation of the merged wheel passes; the installed public API is undergoing a separate Molab rehearsal. Transport recovery has offline fault coverage, not a new demonstrated live outage. The benchmark collector and replay adapters are implemented, but no new frozen GPU collection or search-superiority result exists. See [package validation](simple-release-validation.md), [recovery scope](relay-recovery.md), and [benchmark instructions](benchmark-collection.md).
 
 ## 1. Simple entry point and packaging
 

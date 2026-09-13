@@ -6,9 +6,13 @@ The [candidate catalog and expanding search](docs/candidate-catalog.md) describe
 
 ## Demo rehearsal: plain-English guide
 
+### Current release work
+
+The simple API, clean-install packaging, controller recovery, and frozen benchmark collector are merged. The combined suite passes **917 tests**. See [release acceptance](docs/release-acceptance.md), [the simple API](docs/simple-release.md), and [benchmark collection](docs/benchmark-collection.md). Clean installation passes; a separate installed-package GPU rehearsal is in progress. Recovery fault tests are not proof of a real unattended outage, and collector implementation is not proof that Sera beats grid or random search. Two-model placement and broader hardware remain later work.
+
 ### Current expanded loop
 
-The implementation, connection retries, and current demo view pass 851 local tests. [Luna](evidence/provider-luna-expanded-v1/README.md) and [Astra](evidence/provider-astra-expanded-v1/README.md) each passed all 34 current schema cases without a retry.
+The saved expanded-loop release passed 851 local tests. [Luna](evidence/provider-luna-expanded-v1/README.md) and [Astra](evidence/provider-astra-expanded-v1/README.md) each passed all 34 current schema cases without a retry.
 
 Lead with the [verified Astra run](evidence/live-astra-expanded-v1/README.md), which is now the main view in `demo.py`. Three investigators read Weave evidence in each of three rounds. Sera measured prefix caching, graph execution, and their combination. All four configurations, including the reference, passed all eight tasks. The winner reduced worst-load p95 from **770.49 ms to 619.85 ms**, a **19.55%** improvement. Sera stopped after one no-progress round and its measured confirmation, passed a request through the winning runner, and closed it cleanly. The saved trace has 662 calls and 45 typed agent responses; these are not GPU trial counts.
 
