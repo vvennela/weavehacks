@@ -1,5 +1,7 @@
 # Demo readiness: full goal remains incomplete
 
+Latest checkpoint: 724 local tests pass. The [compact-prompt replay](../evidence/failure-replay-v3/README.md) passes reading, legal selection, and budget stopping, but still fails factual reasoning. The [three-Astra diagnostic](../evidence/astra-swarm-diagnostic-v1/README.md) reached correct central conclusions but was not blind and did not run inside Sera. Neither result closes autonomous-swarm acceptance. Hosted investigator selection is now explicit and requires a certificate for that model.
+
 Read-only audit of main `17255ae`, the product/specification, implementation, and saved evidence. No new tests, provider requests, or GPU trials were run for this note.
 
 Later checkpoint: source `679cfa4` exposes the missing prompt-length summary and per-load averages. The [offline arithmetic check](../evidence/token-evidence-audit-v1.json), 691 local tests, and [isolated wheel check](../evidence/local-wheel-check-v1.json) passed. The [corrected hosted replay](../evidence/failure-replay-v2/README.md) still failed factual reasoning and correct stopping despite receiving those fields. All six phases read evidence; round two proposed unavailable FP8 KV and validation rejected it. No new GPU trial ran. This resolves the evidence-unit omission, not the swarm-acceptance or full-release gaps below.

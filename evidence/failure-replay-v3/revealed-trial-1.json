@@ -1,0 +1,835 @@
+{
+  "trial_id": "trial-1",
+  "status": "startup-failed",
+  "runtime": {
+    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+    "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+    "configuration": {
+      "dtype": "bfloat16",
+      "quantization": "fp8_per_tensor",
+      "kv_cache_dtype": "auto",
+      "tensor_parallel_size": 1,
+      "max_model_len": 256,
+      "max_num_seqs": 8,
+      "max_num_batched_tokens": 4096,
+      "gpu_memory_utilization": 0.9,
+      "enable_prefix_caching": false,
+      "enable_chunked_prefill": true,
+      "enforce_eager": true
+    },
+    "config_hash": "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536",
+    "status": "startup-failed",
+    "generation": {
+      "temperature": 0,
+      "top_p": 1,
+      "top_k": -1,
+      "seed": 0,
+      "max_tokens": 64
+    },
+    "enable_thinking": false,
+    "sampled_peak_memory_mib": 88383,
+    "telemetry_errors": 0,
+    "versions": {
+      "vllm": "0.26.0",
+      "torch": "2.11.0",
+      "transformers": "5.17.0",
+      "flashinfer-python": "0.6.14"
+    },
+    "gpu": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-5e3cde45-6576-3bc3-fba4-dafa77928dc2",
+      "compute_capability": "12.0",
+      "total_mib": 97887,
+      "used_mib": 0,
+      "driver": "595.71.05"
+    },
+    "memory_before_mib": 0,
+    "command": [
+      "/tmp/uv-venv/bin/python",
+      "-m",
+      "vllm.entrypoints.openai.api_server",
+      "--model",
+      "Qwen/Qwen2.5-72B-Instruct",
+      "--revision",
+      "495f39366efef23836d0cfae4fbe635880d2be31",
+      "--tokenizer-revision",
+      "495f39366efef23836d0cfae4fbe635880d2be31",
+      "--served-model-name",
+      "sera-model",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "22929",
+      "--dtype",
+      "bfloat16",
+      "--kv-cache-dtype",
+      "auto",
+      "--tensor-parallel-size",
+      "1",
+      "--max-model-len",
+      "256",
+      "--max-num-seqs",
+      "8",
+      "--max-num-batched-tokens",
+      "4096",
+      "--gpu-memory-utilization",
+      "0.9",
+      "--no-enable-prefix-caching",
+      "--enable-chunked-prefill",
+      "--enforce-eager",
+      "--generation-config",
+      "vllm",
+      "--seed",
+      "0",
+      "--cpu-offload-gb",
+      "0",
+      "--enable-tokenizer-info-endpoint",
+      "--shutdown-timeout",
+      "15",
+      "--quantization",
+      "fp8_per_tensor"
+    ],
+    "pid": 39814,
+    "error": "RuntimeError: vLLM exited with code 1; see server.log",
+    "memory_after_mib": 0,
+    "cleanup_pass": true,
+    "startup_failure": {
+      "category": "cutlass-internal-error",
+      "stage": "startup",
+      "callsite": "cutlass_gemm_caller",
+      "kernel_source": "cutlass_gemm_caller.cuh",
+      "kernel_line": 62,
+      "source": {
+        "path": "server.log",
+        "sha256": "0ecab48aa5f47a86284b294135bf33bf523e13da139a06cac3aea0ba5901f065",
+        "line_numbers": [
+          404,
+          539
+        ],
+        "matched_line_sha256": [
+          "72fa7511d82faeb7451494d2f95c8933344cb8308bd365b628cfe7cf36ab0264",
+          "3b08cab0f38d5af01a3449796eb398b6d2e975d709f11109c2a821364ddecd7d"
+        ]
+      },
+      "root_cause_status": "not-established",
+      "known_message": "cutlass_gemm_caller reported Error Internal."
+    }
+  },
+  "config_hash": "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536",
+  "proposal": {
+    "action": "trial",
+    "proposal_id": "trial-max_model_len-256",
+    "agent_role": "batching",
+    "parent_trial_id": "baseline",
+    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+    "changed_lever": "max_model_len",
+    "proposed_value": 256,
+    "evidence_used": [
+      "p95_latency_ms",
+      "p99_latency_ms",
+      "p50_latency_ms",
+      "request_wall_seconds",
+      "request_count",
+      "successful_requests",
+      "input_tokens",
+      "output_tokens",
+      "input_tokens_per_second",
+      "output_tokens_per_second",
+      "sampled_peak_memory_mib",
+      "concurrency_8_cumulative_snapshot_mean_queue_ms",
+      "concurrency_8_cumulative_snapshot_mean_ttft_ms"
+    ],
+    "predicted_metric_change": "p95_latency_ms decreases below 735.3 ms",
+    "confidence": 0.6,
+    "expected_trial_cost": 1,
+    "falsification_condition": "p95_latency_ms >= 735.3 ms after the trial",
+    "reason": "Baseline p95 latency is 774 ms, exceeding the 5 % improvement target. The workload uses only ~2265 input tokens per request, far below the current max_model_len of 4096, so reducing max_model_len to 256 will shrink the KV cache and overall memory footprint, lowering GPU pressure and improving throughput. The quality floor should remain satisfied. If the new p95 latency does not drop below 735.3 ms, the change will be considered ineffective."
+  },
+  "selection_reason": "arbiter",
+  "arbiter_proposal_id": "output_quality:trial-max_model_len-256",
+  "investigator_id": "output_quality",
+  "failure_stage": "startup",
+  "error": "RuntimeError",
+  "task_quality": {
+    "version": "sera-easy-strict-json-v1",
+    "floor": 0.99,
+    "mean": 0.0,
+    "valid_outputs": false,
+    "passed": false,
+    "task_quality_verified": false,
+    "per_prompt": [
+      {
+        "prompt_index": 0,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      },
+      {
+        "prompt_index": 1,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      },
+      {
+        "prompt_index": 2,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      },
+      {
+        "prompt_index": 3,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      },
+      {
+        "prompt_index": 4,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      },
+      {
+        "prompt_index": 5,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      },
+      {
+        "prompt_index": 6,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      },
+      {
+        "prompt_index": 7,
+        "score": 0.0,
+        "error": "missing-or-invalid-output"
+      }
+    ]
+  },
+  "decision": {
+    "selected": "baseline",
+    "outcome": "no-safe-improvement",
+    "baseline_self_check": {
+      "version": "token-agreement-v1",
+      "floor": 0.99,
+      "scores": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mean": 1.0,
+      "valid_outputs": true,
+      "passed": true,
+      "task_quality_verified": false
+    },
+    "candidate_quality": {
+      "version": "sera-easy-strict-json-v1",
+      "floor": 0.99,
+      "mean": 0.0,
+      "valid_outputs": false,
+      "passed": false,
+      "task_quality_verified": false,
+      "per_prompt": [
+        {
+          "prompt_index": 0,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        },
+        {
+          "prompt_index": 1,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        },
+        {
+          "prompt_index": 2,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        },
+        {
+          "prompt_index": 3,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        },
+        {
+          "prompt_index": 4,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        },
+        {
+          "prompt_index": 5,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        },
+        {
+          "prompt_index": 6,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        },
+        {
+          "prompt_index": 7,
+          "score": 0.0,
+          "error": "missing-or-invalid-output"
+        }
+      ]
+    },
+    "p95_improvement_fraction": null,
+    "objective": {
+      "priority": "latency",
+      "min_improvement_fraction": 0.05
+    },
+    "objective_improvement_fraction": null,
+    "constraints": {
+      "quality_floor": 0.99,
+      "p95_latency_ms": null,
+      "max_memory_mib": null
+    },
+    "constraint_failures": {
+      "baseline": [],
+      "candidate": [
+        "measurement-failed",
+        "task-quality-failed",
+        "input-token-mismatch",
+        "objective-metric-unavailable"
+      ]
+    },
+    "baseline_quality": {
+      "version": "sera-easy-strict-json-v1",
+      "floor": 0.99,
+      "mean": 1.0,
+      "valid_outputs": true,
+      "passed": true,
+      "task_quality_verified": true,
+      "per_prompt": [
+        {
+          "prompt_index": 0,
+          "score": 1.0,
+          "error": null
+        },
+        {
+          "prompt_index": 1,
+          "score": 1.0,
+          "error": null
+        },
+        {
+          "prompt_index": 2,
+          "score": 1.0,
+          "error": null
+        },
+        {
+          "prompt_index": 3,
+          "score": 1.0,
+          "error": null
+        },
+        {
+          "prompt_index": 4,
+          "score": 1.0,
+          "error": null
+        },
+        {
+          "prompt_index": 5,
+          "score": 1.0,
+          "error": null
+        },
+        {
+          "prompt_index": 6,
+          "score": 1.0,
+          "error": null
+        },
+        {
+          "prompt_index": 7,
+          "score": 1.0,
+          "error": null
+        }
+      ]
+    },
+    "reason": "candidate-constraints-failed"
+  },
+  "diagnosis": {
+    "failure_kind": "startup-failed",
+    "observed": {
+      "status": "startup-failed",
+      "failure_stage": "startup",
+      "error_type": "RuntimeError",
+      "runtime_failure": {
+        "category": "cutlass-internal-error",
+        "stage": "startup",
+        "known_message": "cutlass_gemm_caller reported Error Internal.",
+        "source": {
+          "path": "server.log",
+          "sha256": "0ecab48aa5f47a86284b294135bf33bf523e13da139a06cac3aea0ba5901f065",
+          "line_numbers": [
+            404,
+            539
+          ],
+          "matched_line_sha256": [
+            "72fa7511d82faeb7451494d2f95c8933344cb8308bd365b628cfe7cf36ab0264",
+            "3b08cab0f38d5af01a3449796eb398b6d2e975d709f11109c2a821364ddecd7d"
+          ]
+        },
+        "root_cause_status": "not-established",
+        "callsite": "cutlass_gemm_caller",
+        "kernel_source": "cutlass_gemm_caller.cuh",
+        "kernel_line": 62
+      },
+      "generation_errors": null,
+      "selection_reason": "candidate-constraints-failed",
+      "constraint_failures": [
+        "measurement-failed",
+        "task-quality-failed",
+        "input-token-mismatch",
+        "objective-metric-unavailable"
+      ],
+      "quality": null,
+      "objective": {
+        "priority": "latency",
+        "baseline_value": 774.183014999835,
+        "candidate_value": null,
+        "improvement_fraction": null,
+        "required_improvement_fraction": 0.05
+      }
+    },
+    "evidence_paths": [
+      "status",
+      "decision",
+      "failure_stage",
+      "error",
+      "runtime/sampled_peak_memory_mib",
+      "runtime/startup_failure",
+      "task_quality/per_prompt"
+    ],
+    "root_cause": {
+      "status": "not-established",
+      "reason": "The observed outcome does not establish a model, kernel, memory-pressure, or scheduling cause. A startup error category is not the underlying server-log cause."
+    },
+    "next_proposal_constraints": [
+      "Do not retry the same tested configuration in this bounded search.",
+      "Preserve the fixed quality floor and all workload constraints.",
+      "Inspect the persisted failure record; absent requests are not a quality or speed result."
+    ]
+  },
+  "diagnosis_trace_export": {
+    "status": "complete",
+    "emitted_events": 1
+  },
+  "review_evidence": {
+    "proposal": {
+      "action": "trial",
+      "proposal_id": "trial-max_model_len-256",
+      "agent_role": "batching",
+      "parent_trial_id": "baseline",
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "changed_lever": "max_model_len",
+      "proposed_value": 256,
+      "evidence_used": [
+        "p95_latency_ms",
+        "p99_latency_ms",
+        "p50_latency_ms",
+        "request_wall_seconds",
+        "request_count",
+        "successful_requests",
+        "input_tokens",
+        "output_tokens",
+        "input_tokens_per_second",
+        "output_tokens_per_second",
+        "sampled_peak_memory_mib",
+        "concurrency_8_cumulative_snapshot_mean_queue_ms",
+        "concurrency_8_cumulative_snapshot_mean_ttft_ms"
+      ],
+      "predicted_metric_change": "p95_latency_ms decreases below 735.3 ms",
+      "confidence": 0.6,
+      "expected_trial_cost": 1,
+      "falsification_condition": "p95_latency_ms >= 735.3 ms after the trial",
+      "reason": "Baseline p95 latency is 774 ms, exceeding the 5 % improvement target. The workload uses only ~2265 input tokens per request, far below the current max_model_len of 4096, so reducing max_model_len to 256 will shrink the KV cache and overall memory footprint, lowering GPU pressure and improving throughput. The quality floor should remain satisfied. If the new p95 latency does not drop below 735.3 ms, the change will be considered ineffective."
+    },
+    "decision": {
+      "selected": "baseline",
+      "outcome": "no-safe-improvement",
+      "baseline_self_check": {
+        "version": "token-agreement-v1",
+        "floor": 0.99,
+        "scores": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "mean": 1.0,
+        "valid_outputs": true,
+        "passed": true,
+        "task_quality_verified": false
+      },
+      "candidate_quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 0.0,
+        "valid_outputs": false,
+        "passed": false,
+        "task_quality_verified": false,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          },
+          {
+            "prompt_index": 1,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          },
+          {
+            "prompt_index": 2,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          },
+          {
+            "prompt_index": 3,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          },
+          {
+            "prompt_index": 4,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          },
+          {
+            "prompt_index": 5,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          },
+          {
+            "prompt_index": 6,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          },
+          {
+            "prompt_index": 7,
+            "score": 0.0,
+            "error": "missing-or-invalid-output"
+          }
+        ]
+      },
+      "p95_improvement_fraction": null,
+      "objective": {
+        "priority": "latency",
+        "min_improvement_fraction": 0.05
+      },
+      "objective_improvement_fraction": null,
+      "constraints": {
+        "quality_floor": 0.99,
+        "p95_latency_ms": null,
+        "max_memory_mib": null
+      },
+      "constraint_failures": {
+        "baseline": [],
+        "candidate": [
+          "measurement-failed",
+          "task-quality-failed",
+          "input-token-mismatch",
+          "objective-metric-unavailable"
+        ]
+      },
+      "baseline_quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 1.0,
+        "valid_outputs": true,
+        "passed": true,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 1.0,
+            "error": null
+          }
+        ]
+      },
+      "reason": "candidate-constraints-failed"
+    },
+    "diagnosis": {
+      "failure_kind": "startup-failed",
+      "observed": {
+        "status": "startup-failed",
+        "failure_stage": "startup",
+        "error_type": "RuntimeError",
+        "generation_errors": null,
+        "selection_reason": "candidate-constraints-failed",
+        "constraint_failures": [
+          "measurement-failed",
+          "task-quality-failed",
+          "input-token-mismatch",
+          "objective-metric-unavailable"
+        ],
+        "quality": null,
+        "objective": {
+          "priority": "latency",
+          "baseline_value": 774.183014999835,
+          "candidate_value": null,
+          "improvement_fraction": null,
+          "required_improvement_fraction": 0.05
+        }
+      },
+      "evidence_paths": [
+        "status",
+        "decision",
+        "failure_stage",
+        "error",
+        "runtime/sampled_peak_memory_mib",
+        "task_quality/per_prompt"
+      ],
+      "root_cause": {
+        "status": "not-established",
+        "reason": "The observed outcome does not establish a model, kernel, memory-pressure, or scheduling cause. A startup error category is not the underlying server-log cause."
+      },
+      "next_proposal_constraints": [
+        "Do not retry the same tested configuration in this bounded search.",
+        "Preserve the fixed quality floor and all workload constraints.",
+        "Inspect the persisted failure record; absent requests are not a quality or speed result."
+      ]
+    },
+    "objective": {
+      "priority": "latency",
+      "min_improvement_fraction": 0.05
+    },
+    "candidate_tested": true,
+    "candidate_status": "startup-failed",
+    "baseline_metrics": {
+      "request_count": 96,
+      "successful_requests": 96,
+      "generation_errors": 0,
+      "request_wall_seconds": 25.295842929999708,
+      "output_tokens": 660,
+      "input_tokens": 9060,
+      "p50_latency_ms": 705.4281220007397,
+      "p95_latency_ms": 774.183014999835,
+      "p99_latency_ms": 836.0755710000376,
+      "output_tokens_per_second": 26.091243601820057,
+      "input_tokens_per_second": 358.1616167158935,
+      "p99_reliable": false,
+      "p95_ttft_ms": null,
+      "p95_queue_ms": null,
+      "p95_time_per_output_token_ms": null
+    },
+    "candidate_metrics": null,
+    "baseline_request_evidence": {
+      "source": "saved trial request records; also used for optional Weave export",
+      "trial_id": "baseline",
+      "config_hash": "b73ef7a2884fb0f9a40855b9db9ff81380d08bb12ecc0c332b8a74f6d3c2a018",
+      "quality_examples": [
+        {
+          "source_path": "quality/0",
+          "prompt_index": 0,
+          "concurrency": 1,
+          "input": [
+            {
+              "role": "system",
+              "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+            },
+            {
+              "role": "user",
+              "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+            }
+          ],
+          "output": "{\"answer\": 5}",
+          "input_truncated": false,
+          "output_truncated": false,
+          "error": null,
+          "finish_reason": "stop",
+          "latency_ms": 495.0618319999194,
+          "completion_tokens": 7,
+          "task_score": 1.0,
+          "evaluator_error": null
+        },
+        {
+          "source_path": "quality/1",
+          "prompt_index": 1,
+          "concurrency": 1,
+          "input": [
+            {
+              "role": "system",
+              "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+            },
+            {
+              "role": "user",
+              "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+            }
+          ],
+          "output": "{\"answer\": 9}",
+          "input_truncated": false,
+          "output_truncated": false,
+          "error": null,
+          "finish_reason": "stop",
+          "latency_ms": 508.5789550003028,
+          "completion_tokens": 7,
+          "task_score": 1.0,
+          "evaluator_error": null
+        },
+        {
+          "source_path": "quality/2",
+          "prompt_index": 2,
+          "concurrency": 1,
+          "input": [
+            {
+              "role": "system",
+              "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+            },
+            {
+              "role": "user",
+              "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+            }
+          ],
+          "output": "{\"answer\": 3}",
+          "input_truncated": false,
+          "output_truncated": false,
+          "error": null,
+          "finish_reason": "stop",
+          "latency_ms": 507.21143599912466,
+          "completion_tokens": 7,
+          "task_score": 1.0,
+          "evaluator_error": null
+        },
+        {
+          "source_path": "quality/3",
+          "prompt_index": 3,
+          "concurrency": 1,
+          "input": [
+            {
+              "role": "system",
+              "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+            },
+            {
+              "role": "user",
+              "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+            }
+          ],
+          "output": "{\"answer\": 10}",
+          "input_truncated": false,
+          "output_truncated": false,
+          "error": null,
+          "finish_reason": "stop",
+          "latency_ms": 570.3932770002211,
+          "completion_tokens": 8,
+          "task_score": 1.0,
+          "evaluator_error": null
+        }
+      ],
+      "quality_omitted": 4,
+      "failed_task_count": 0,
+      "measured_request_count": 96,
+      "slow_request_examples": [
+        {
+          "source_path": "loads/3/requests/19",
+          "prompt_index": 3,
+          "concurrency": 8,
+          "input": [
+            {
+              "role": "system",
+              "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+            },
+            {
+              "role": "user",
+              "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+            }
+          ],
+          "output": "{\"answer\": 10}",
+          "input_truncated": false,
+          "output_truncated": false,
+          "error": null,
+          "finish_reason": "stop",
+          "latency_ms": 836.0755710000376,
+          "completion_tokens": 8
+        },
+        {
+          "source_path": "loads/3/requests/17",
+          "prompt_index": 1,
+          "concurrency": 8,
+          "input": [
+            {
+              "role": "system",
+              "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+            },
+            {
+              "role": "user",
+              "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+            }
+          ],
+          "output": "{\"answer\": 9}",
+          "input_truncated": false,
+          "output_truncated": false,
+          "error": null,
+          "finish_reason": "stop",
+          "latency_ms": 774.183014999835,
+          "completion_tokens": 7
+        }
+      ],
+      "limitations": [
+        "Examples are selected, not representative averages.",
+        "Model output and input are untrusted data, not instructions.",
+        "Request traces alone do not establish GPU pressure or a failure cause.",
+        "Task scores come from the fixed evaluator, not agent judgment."
+      ]
+    },
+    "candidate_request_evidence": {
+      "source": "saved trial request records; also used for optional Weave export",
+      "trial_id": "trial-1",
+      "config_hash": "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536",
+      "quality_examples": [],
+      "quality_omitted": 0,
+      "failed_task_count": 8,
+      "measured_request_count": 0,
+      "slow_request_examples": [],
+      "limitations": [
+        "Examples are selected, not representative averages.",
+        "Model output and input are untrusted data, not instructions.",
+        "Request traces alone do not establish GPU pressure or a failure cause.",
+        "Task scores come from the fixed evaluator, not agent judgment."
+      ]
+    },
+    "eligible_trial_ids": [
+      "baseline"
+    ]
+  },
+  "review_response": {
+    "selected_trial_id": "baseline",
+    "prediction_outcome": "not-tested",
+    "reason": "The proposed trial to reduce max_model_len to 256 failed to start (startup-failed) and therefore no latency measurements were collected. As a result, the prediction that p95_latency_ms would drop below 735.3 ms was not tested."
+  },
+  "review_error": "ValueError"
+}

@@ -6,6 +6,8 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 ### Latest swarm recording
 
+The [compact-prompt replay](evidence/failure-replay-v3/README.md) now passes all loop-control checks: all three agents read evidence in both rounds and stop at zero budget. Factual reasoning still fails: some explanations rule out unknown causes, use an incorrect latency target, or deny a supplied memory change. This is saved-evidence replay with real hosted agents and Weave reads, not a new GPU result. Investigator model selection is now configurable without changing gates.
+
 The [corrected-evidence replay](evidence/failure-replay-v2/README.md) still fails reasoning acceptance. All three investigators read evidence in both rounds. Their inputs now include the actual 85–109-token prompt lengths and 94.375-token average, but they still claim 2,265 tokens per request. Round one selected a legal batching proposal; round two proposed unavailable FP8 KV with no trial budget, and validation rejected every proposal. No GPU trial ran. Clearer data did not solve the peer-copying problem. The [readiness audit](docs/demo-readiness.md) keeps the full goal open.
 
 The [two-iteration GPU run](evidence/live-swarm-investigation-v1/README.md) is saved with its [Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a31-ec01-7c30-86cd-c51337b414a9). Three investigators compared findings. The context candidate crashed at startup; the batch candidate passed quality but gained only 0.054%, below 5%. Sera returned the working baseline and released the GPU.
