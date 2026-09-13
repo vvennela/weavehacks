@@ -2,7 +2,8 @@
 
 Run from the repository root with python -m experiments.run_investigation.
 This command uses GPU time. Importing the module does not run an experiment.
-Declare at least one control explicitly. FP8 KV is opt-in for Qwen3-0.6B only;
+Declare controls explicitly or opt in to a post-baseline pool with --auto-space.
+FP8 KV is opt-in for Qwen3-0.6B only;
 Qwen72B uses FP8 weights, so its combined FP8 weights/KV path stays disabled.
 """
 
@@ -16,6 +17,7 @@ from benchmarks.grade import SYSTEM_PROMPT, dataset_hash, grade_case, load_cases
 from sera.config import LARGE_MODEL_ID, MODEL_ID, resolve_investigation_space
 from sera.provider_check import require_provider_check
 from sera.storage import save_json
+from sera.tracing import TraceSinkError, recorded_model_request, use_event_sink
 
 
 CASES_PATH = Path(__file__).resolve().parents[1]/'benchmarks'/'easy_cases.json'
@@ -26,21 +28,52 @@ class TracedInvestigationAgent:
 
     def __init__(self, agent, weave):
         self._agent = agent
+        self.trace_failures = []
+
+        def record_agent_response(record):
+            """Log an already returned provider attempt; span duration is export time, not inference time."""
+            return record
+
+        self._record_response = weave.op(record_agent_response)
 
         def traced_request(name):
             def request(role, evidence, instruction):
-                return agent.request(role, evidence, instruction)
+                return self._call_and_record(agent.request, role, evidence, instruction)
             return weave.op(name=name)(request)
 
         def review(evidence):
             # Its internal request must not re-enter this adapter.
-            return agent.review(evidence)
+            return self._call_and_record(agent.review, evidence)
 
         # Official op naming API: https://docs.wandb.ai/weave/guides/tracking/ops
         self._requests = {name: traced_request(name) for name in (
             'fit_quantization_advisor', 'quantization_specialist', 'batching_specialist',
             'search_specialist', 'arbiter', 'frontier_reviewer', 'agent_request')}
         self._review = weave.op(name='frontier_reviewer')(review)
+
+    def _call_and_record(self, function, *args):
+        start = len(self.history)
+        try:
+            return function(*args)
+        finally:
+            for entry in self.history[start:]:
+                for attempt in entry.get('attempts', []):
+                    choices = (attempt.get('raw_response') or {}).get('choices') or []
+                    choice = choices[0] if choices and isinstance(choices[0], dict) else {}
+                    message = choice.get('message') or {}
+                    record = {'model': entry.get('model', self.model), 'role': entry.get('role'),
+                              'attempt': attempt.get('attempt'), 'finish_reason': choice.get('finish_reason'),
+                              'content': message.get('content') if isinstance(message.get('content'), str) else None,
+                              'latency_ms': attempt.get('latency_ms'), 'schema_valid': attempt.get('schema_valid'),
+                              'reasoning_source': 'not returned',
+                              'timing_scope': 'Recorded provider output; span measures export, not inference.'}
+                    if isinstance(message.get('reasoning'), str):
+                        record.update(reasoning=message['reasoning'], reasoning_source='provider-returned reasoning')
+                    try:
+                        self._record_response(record)
+                    except Exception as error:
+                        # Observability failure must not rewrite a valid recommendation or its raw evidence.
+                        self.trace_failures.append({'event': 'record_agent_response', 'error_type': type(error).__name__})
 
     @property
     def model(self):
@@ -68,6 +101,33 @@ class TracedInvestigationAgent:
         return self._review(evidence)
 
 
+def weave_event_sink(weave):
+    """Trace saved records, not inference calls; do not include runtime objects."""
+    def operation(name):
+        def record(payload):
+            return payload
+        return weave.op(name=name)(record)
+
+    operations = {name: operation(name) for name in ('recorded_model_request', 'recorded_trial_metrics')}
+
+    def sink(event_name, payload):
+        operations[event_name](payload)
+
+    return sink
+
+
+def trial_trace_failures(report):
+    trials = [report.get('baseline'), report.get('candidate_trial'),
+              (report.get('deployment') or {}).get('candidate_trial'), *report.get('search_trials', [])]
+    failures = []
+    for trial in trials:
+        exported = (trial or {}).get('trace_export') or {}
+        if exported.get('status') == 'failed':
+            failures.append({'trial_id': trial.get('trial_id'), 'event': exported.get('failed_event'),
+                             'error_type': exported.get('error_type'), 'emitted_events': exported.get('emitted_events')})
+    return failures
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model', required=True, choices=[MODEL_ID, LARGE_MODEL_ID])
@@ -75,6 +135,8 @@ def main(argv=None):
                         help='Maximum candidate trials, 1 to 8; includes deployment with --fit-first')
     parser.add_argument('--fit-first', action='store_true',
                         help='Qwen72B only: first measure FP8 deployment, then investigate within the same budget')
+    parser.add_argument('--auto-space', action='store_true',
+                        help='Build the bounded candidate pool after baseline measurement; conflicts with explicit controls')
     parser.add_argument('--batching-values', type=int, nargs='+',
                         help='Explicit candidate max_num_batched_tokens values; baseline is 4096')
     parser.add_argument('--sequence-values', type=int, nargs='+',
@@ -111,9 +173,11 @@ def main(argv=None):
             ('max_model_len', args.context_values)) if values is not None}
         if args.fp8_kv:
             changes['kv_cache_dtype'] = ['fp8']
-        space = sera.InvestigationSpace(supported_changes=changes)
-        frozen_space = resolve_investigation_space(space, baseline=reference,
-                                                   model_id=args.model, workload=workload)
+        if args.auto_space and changes:
+            raise ValueError('--auto-space cannot be combined with explicit candidate controls')
+        space = None if args.auto_space else sera.InvestigationSpace(supported_changes=changes)
+        frozen_space = (None if args.auto_space else resolve_investigation_space(
+            space, baseline=reference, model_id=args.model, workload=workload))
         cases = load_cases(CASES_PATH)
         agent = sera.WandbAgent(project=args.project)
         certificate = require_provider_check(args.provider_check, agent)
@@ -132,6 +196,7 @@ def main(argv=None):
     invocation = {'schema_version': 'sera-live-investigation-invocation-v1', 'passed': False,
                   'model_id': args.model, 'budget': budget.model_dump(),
                   'fit_first': args.fit_first,
+                  'automatic_space': args.auto_space,
                   'objective': objective.model_dump(), 'workload': workload.model_dump(),
                   'investigation_space': frozen_space, 'provider_validation': certificate,
                   'evaluation_cases_sha256': dataset_hash(cases),
@@ -139,6 +204,7 @@ def main(argv=None):
                   'limits': 'A bounded live investigation is not proof of search superiority.'}
     client = None
     weave = None
+    sink = None
 
     def run_investigation():
         result = None
@@ -150,18 +216,36 @@ def main(argv=None):
                 evaluation=evaluate_answer, evaluation_version='sera-easy-strict-json-v1',
                 constraints=sera.Constraints(quality_floor=.99), objective=objective,
                 workload=workload, baseline_configuration=baseline, budget=budget,
-                investigation_space=space, agent=agent, provider_check=args.provider_check)
+                investigation_space=space, automatic_space=args.auto_space,
+                agent=agent, provider_check=args.provider_check)
             result.report.update(workload_name='easy-json-system-v1', evaluation_cases=cases,
                 evaluation_cases_sha256=dataset_hash(cases), weave_url=invocation['weave_url'],
                 trace_status='disabled-explicitly' if args.no_weave else 'enabled',
                 post_return_task_passed=False)
+            failures = trial_trace_failures(result.report)
+            if isinstance(agent, TracedInvestigationAgent):
+                failures.extend(agent.trace_failures)
             if result.models:
-                response = result.models[0].generate(prompts[0])
+                runner = result.models[0]
+                response = runner.generate(prompts[0])
                 result.report['post_return_probe'] = response.to_dict()
                 result.report['post_return_task_passed'] = evaluate_answer(prompts[0], response.text)
-            invocation.update(search=result.report.get('search'),
+                result._save()
+                if weave is not None:
+                    try:
+                        recorded_model_request(trial_id=(result.report.get('decision') or {}).get('selected'),
+                            model_id=runner.model_id, revision=runner.revision,
+                            config_hash=runner.configuration.config_hash, phase='post-return-probe',
+                            concurrency=1, prompt_index=0, prompt=prompts[0], response=response.to_dict())
+                    except TraceSinkError as error:
+                        failures.append({'event': error.event_name, 'error_type': error.error_type})
+            if failures:
+                result.report['trace_status'] = 'failed'
+            invocation.update(search=result.report.get('search'), trace_export_failures=failures,
+                investigation_space=result.report.get('investigation_space', frozen_space),
+                candidate_policy=result.report.get('candidate_policy'),
                 passed=bool(result.report.get('task_quality_verified')
-                            and result.report['post_return_task_passed']))
+                            and result.report['post_return_task_passed'] and not failures))
             result._save()
             result.print_summary()
         finally:
@@ -179,8 +263,10 @@ def main(argv=None):
             import weave
             client = weave.init(args.project)
             agent = TracedInvestigationAgent(agent, weave)
+            sink = weave_event_sink(weave)
             run_investigation = weave.op(run_investigation)
-        run_investigation()
+        with use_event_sink(sink):
+            run_investigation()
     except Exception as error:
         invocation.update(passed=False, error=type(error).__name__)
         print(f'Investigation failed: {type(error).__name__}. Inspect saved evidence.', file=sys.stderr)

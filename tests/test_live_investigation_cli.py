@@ -41,6 +41,11 @@ def install_boundaries(cli, monkeypatch, tmp_path, *, no_runner=False, probe_err
         get_current_call=lambda: SimpleNamespace(ui_url='https://wandb.ai/fixture/call')))
 
     class Runner:
+        def __init__(self):
+            self.model_id = observed['kwargs']['models'][0]
+            self.revision = 'fixture-pinned-revision'
+            self.configuration = observed['kwargs']['baseline_configuration'] or RuntimeConfig()
+
         def generate(self, prompt):
             observed['probe_prompt'] = prompt
             if probe_error:
@@ -87,6 +92,7 @@ def test_declared_profile_reaches_optimizer_and_saves_fresh_probe(cli, monkeypat
     assert cli.main(arguments(tmp_path, model)) == 0
     kwargs = observed['kwargs']
     assert kwargs['models'] == [model]
+    assert kwargs['automatic_space'] is False
     assert kwargs['budget'].max_candidate_trials == 2
     assert kwargs['investigation_space'].supported_changes == {'max_num_batched_tokens': [2048, 1024]}
     assert kwargs['constraints'].quality_floor == .99
@@ -417,3 +423,245 @@ def test_child_trace_setup_failure_does_not_start_optimizer_and_flushes_client(c
     assert observed['calls'] == ['provider-check', 'weave-init']
     assert observed['flushed']
     assert not (tmp_path/'run').exists()
+
+
+@pytest.mark.parametrize('method', ['request', 'review'])
+def test_provider_returned_reasoning_and_failed_attempts_are_exported_exactly_once(cli, method):
+    class Agent:
+        model = 'fixture-model'
+        project = 'test/project'
+
+        def __init__(self):
+            self.history = [{'role': 'old-call', 'attempts': []}]
+
+        def request(self, role, evidence, instruction):
+            self.history.append({'role': role, 'model': self.model, 'headers': {'secret': 'never-log'},
+                'attempts': [
+                    {'attempt': 1, 'schema_valid': False, 'latency_ms': 12.0,
+                     'raw_response': {'headers': {'secret': 'never-log'}, 'choices': [{
+                         'finish_reason': 'length', 'message': {'content': '{"partial":',
+                         'reasoning': 'Exact provider reasoning on failed attempt.', 'api_key': 'never-log'}}]}},
+                    {'attempt': 2, 'schema_valid': True, 'latency_ms': 15.0,
+                     'raw_response': {'choices': [{'finish_reason': 'stop', 'message': {
+                         'content': '{"reason":"Measured evidence"}',
+                         'reasoning': 'Exact provider reasoning on valid attempt.'}}]}}]})
+            return {'accepted': True}
+
+        def review(self, evidence):
+            return self.request('frontier', evidence, 'review instruction')
+
+    base = Agent()
+    weave = recording_weave()
+    traced = cli.TracedInvestigationAgent(base, weave)
+    if method == 'request':
+        response = traced.request('arbiter', {}, 'rank')
+    else:
+        response = traced.review({})
+    assert response == {'accepted': True}
+    assert len(base.history) == 2
+    exported = [call for call in weave.calls if call['name'] == 'record_agent_response']
+    assert len(exported) == 2
+    first, second = [call['args'][0] for call in exported]
+    assert first['content'] == '{"partial":'
+    assert first['reasoning'] == 'Exact provider reasoning on failed attempt.'
+    assert first['finish_reason'] == 'length' and first['schema_valid'] is False
+    assert second['reasoning'] == 'Exact provider reasoning on valid attempt.'
+    assert second['reasoning_source'] == 'provider-returned reasoning'
+    assert second['attempt'] == 2 and second['latency_ms'] == 15.0
+    assert 'never-log' not in repr(exported)
+    assert all(call['parent'] in {'arbiter', 'frontier_reviewer'} for call in exported)
+
+
+def test_absent_provider_reasoning_is_not_invented(cli):
+    agent = SimpleNamespace(model='fixture-model', project='test/project', history=[])
+
+    def request(*args):
+        agent.history.append({'role': 'arbiter', 'attempts': [
+            {'attempt': 1, 'schema_valid': False, 'latency_ms': 1.0}]})
+        return None
+
+    agent.request = request
+    agent.review = lambda evidence: request()
+    weave = recording_weave()
+    traced = cli.TracedInvestigationAgent(agent, weave)
+    assert traced.request('arbiter', {}, 'rank') is None
+    exported = next(call for call in weave.calls if call['name'] == 'record_agent_response')['args'][0]
+    assert 'reasoning' not in exported
+    assert exported['reasoning_source'] == 'not returned'
+
+
+@pytest.mark.parametrize('model,extra', [(MODEL_ID, []), (LARGE_MODEL_ID, ['--fit-first'])])
+def test_automatic_space_is_explicit_without_a_guessed_premeasurement_pool(cli, monkeypatch, tmp_path, model, extra):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    assert cli.main(arguments_without_batching(tmp_path, model) + ['--auto-space', *extra]) == 0
+    assert observed['kwargs']['automatic_space'] is True
+    assert observed['kwargs']['investigation_space'] is None
+    invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
+    assert invocation['automatic_space'] is True
+    assert invocation['investigation_space'] is None  # The fake optimizer has no measured policy output.
+
+
+@pytest.mark.parametrize('flags', [
+    ['--batching-values', '2048'], ['--sequence-values', '4'],
+    ['--context-values', '2048'], ['--fp8-kv'],
+])
+def test_auto_space_conflicts_with_every_explicit_control_before_external_work(cli, monkeypatch, tmp_path, flags):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit) as error:
+        cli.main(arguments_without_batching(tmp_path) + ['--auto-space', *flags])
+    assert error.value.code == 2
+    assert observed['calls'] == []
+    assert not (tmp_path/'run').exists()
+
+
+def test_measured_events_and_returned_probe_use_named_child_export_ops(cli, monkeypatch, tmp_path):
+    from sera.tracing import emit_event, event_sink_enabled
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    weave = recording_weave()
+    sys.modules['weave'].op = weave.op
+    original = cli.sera.optimize
+
+    def optimize(**kwargs):
+        result = original(**kwargs)
+        emit_event('recorded_model_request', {'output': 'saved measured output', 'latency_ms': 23.0,
+                                            'timing_scope': 'logging only'})
+        emit_event('recorded_trial_metrics', {'trial_id': 'trial-1', 'status': 'collected'})
+        return result
+
+    monkeypatch.setattr(cli.sera, 'optimize', optimize)
+    assert cli.main(arguments(tmp_path)) == 0
+    requests = [call for call in weave.calls if call['name'] == 'recorded_model_request']
+    assert len(requests) == 2
+    assert requests[0]['args'][0]['output'] == 'saved measured output'
+    returned = requests[1]['args'][0]
+    assert returned['phase'] == 'post-return-probe'
+    assert returned['output'] == '{"answer": 5}' and returned['latency_ms'] == 10
+    assert 'logging time' in returned['timing_scope']
+    assert all(call['parent'] == 'run_investigation' for call in requests)
+    assert any(call['name'] == 'recorded_trial_metrics' for call in weave.calls)
+    assert not event_sink_enabled()
+    assert observed['closed']
+
+
+def test_no_weave_disables_even_an_inherited_event_sink(cli, monkeypatch, tmp_path):
+    from sera.tracing import emit_event, event_sink_enabled, use_event_sink
+    install_boundaries(cli, monkeypatch, tmp_path)
+    original = cli.sera.optimize
+    inherited = []
+
+    def optimize(**kwargs):
+        assert not event_sink_enabled()
+        assert emit_event('recorded_model_request', {'output': 'not exported'}) is False
+        return original(**kwargs)
+
+    monkeypatch.setattr(cli.sera, 'optimize', optimize)
+    with use_event_sink(lambda *event: inherited.append(event)):
+        assert cli.main(arguments(tmp_path) + ['--no-weave']) == 0
+        assert event_sink_enabled()
+    assert inherited == []
+
+
+@pytest.mark.parametrize('location', ['baseline', 'candidate_trial', 'search_trials', 'deployment'])
+def test_saved_measurement_trace_failure_is_explicit_without_rewriting_quality(cli, monkeypatch, tmp_path, location):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    original = cli.sera.optimize
+
+    def optimize(**kwargs):
+        result = original(**kwargs)
+        trial = {'trial_id': 'saved-trial', 'trace_export': {'status': 'failed', 'emitted_events': 2,
+                 'failed_event': 'recorded_model_request', 'error_type': 'RuntimeError'}}
+        result.report[location] = ([trial] if location == 'search_trials' else
+                                   {'candidate_trial': trial} if location == 'deployment' else trial)
+        return result
+
+    monkeypatch.setattr(cli.sera, 'optimize', optimize)
+    assert cli.main(arguments(tmp_path)) == 1
+    invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
+    assert invocation['trace_export_failures'][0]['event'] == 'recorded_model_request'
+    assert invocation['passed'] is False
+    assert observed['result'].report['task_quality_verified'] is True
+    assert observed['result'].report['trace_status'] == 'failed'
+    assert observed['closed'] and observed['flushed']
+
+
+def test_post_return_export_failure_keeps_saved_output_and_closes_runner(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    weave = recording_weave()
+
+    def op(fn=None, *, name=None):
+        def decorate(function):
+            if name == 'recorded_model_request':
+                def fail(*args, **kwargs):
+                    raise RuntimeError('fixture trace export failed')
+                return fail
+            return weave.op(function, name=name)
+        return decorate(fn) if fn is not None else decorate
+
+    sys.modules['weave'].op = op
+    assert cli.main(arguments(tmp_path)) == 1
+    report = json.loads((tmp_path/'run'/'result.json').read_text())
+    assert report['post_return_probe']['text'] == '{"answer": 5}'
+    assert report['task_quality_verified'] is True
+    assert observed['closed'] and observed['flushed']
+
+
+def test_provider_export_failure_preserves_recommendation_but_fails_invocation(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    original = cli.sera.optimize
+
+    class Agent:
+        model = 'fixture-model'
+
+        def __init__(self, project):
+            self.project = project
+            self.history = []
+
+        def request(self, *args):
+            self.history.append({'role': 'arbiter', 'attempts': [{'attempt': 1, 'schema_valid': True}]})
+            return {'accepted': True}
+
+        def review(self, evidence):
+            return self.request()
+
+    def op(fn=None, *, name=None):
+        def decorate(function):
+            if function.__name__ == 'record_agent_response':
+                def fail(*args):
+                    raise RuntimeError('fixture export failure')
+                return fail
+            return function
+        return decorate(fn) if fn is not None else decorate
+
+    def optimize(**kwargs):
+        agent = kwargs['agent']
+        assert agent.request('arbiter', {}, 'rank') == {'accepted': True}
+        assert agent.history[0]['attempts'][0]['schema_valid'] is True
+        return original(**kwargs)
+
+    monkeypatch.setattr(cli.sera, 'WandbAgent', Agent)
+    monkeypatch.setattr(cli.sera, 'optimize', optimize)
+    sys.modules['weave'].op = op
+    assert cli.main(arguments(tmp_path)) == 1
+    invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
+    assert invocation['trace_export_failures'] == [
+        {'event': 'record_agent_response', 'error_type': 'RuntimeError'}]
+    assert observed['result'].report['task_quality_verified'] is True
+    assert observed['closed'] and observed['flushed']
+
+
+def test_automatic_space_saves_actual_measured_policy_audit(cli, monkeypatch, tmp_path):
+    install_boundaries(cli, monkeypatch, tmp_path)
+    original = cli.sera.optimize
+    resolved = {'max_num_batched_tokens': [2048]}
+    policy = {'fixture': 'measured baseline policy audit'}
+
+    def optimize(**kwargs):
+        result = original(**kwargs)
+        result.report.update(investigation_space=resolved, candidate_policy=policy)
+        return result
+
+    monkeypatch.setattr(cli.sera, 'optimize', optimize)
+    assert cli.main(arguments_without_batching(tmp_path) + ['--auto-space']) == 0
+    invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
+    assert invocation['investigation_space'] == resolved
+    assert invocation['candidate_policy'] == policy
