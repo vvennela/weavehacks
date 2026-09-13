@@ -211,11 +211,12 @@ The defaults exist to keep the minimum call small.
 - Default concurrency sweep: 1, 2, 4, and 8
 - Default warm-up requests: one full pass through the prompt sample, capped at 16 requests
 - Default measured requests: three passes through the prompt sample, capped at 96 requests
-- Default candidate budget: eight trials across both phases
-- Reserved phase-two budget for two models: two trials
+- Normal optimization target: no fixed total candidate-trial limit; use the measured plateau rule below
+- An explicit candidate budget remains available for bounded comparisons and benchmarks; it is not a requirement to stop normal optimization after eight trials
+- For explicitly budgeted two-model runs, reserve two phase-two trials
 - Default quality tolerance: candidate proxy score must be at least 0.99 relative to the baseline
 - Default objective: pass quality first, then minimize p95 end-to-end latency, then minimize peak GPU memory
-- Default stop rule: stop after two rounds without frontier improvement or when the budget ends
+- Normal stop rule: after a round without qualifying objective progress, allow one confirmation round; stop if that round also makes no qualifying progress, or reset the check if it does
 
 Defaults must be printed in the summary and stored in the ledger.
 
@@ -520,14 +521,20 @@ Each round works as follows:
 8. Results enter the ledger.
 9. The next round receives a digest of successful, failed, and reverted trials.
 
-The scheduler selects one exploration trial from an untested legal proposal when the budget contains at least three remaining trials. This prevents the arbiter from testing only one familiar lever.
+For a bounded search, the scheduler selects one exploration trial from an untested legal proposal when the budget contains at least three remaining trials. This prevents the arbiter from testing only one familiar lever. In uncapped plateau mode, authorize at most one trial per round so its result informs the next decision; this per-round limit is not a total trial cap.
 
-The loop stops when:
+Normal optimization uses measured objective progress, not a fixed trial count, to decide when to stop. Compare the best quality-valid objective measurement after a round with the best quality-valid measurement before it. A qualifying improvement must be positive and reach the declared objective's minimum improvement fraction (five percent for the current latency workload). Throughput improves upward; latency and memory improve downward. A failed trial, missing objective measurement, or failed quality gate cannot establish progress. Changes only to other frontier dimensions do not reset this objective-specific check.
 
-- The candidate budget is exhausted.
-- Two complete rounds produce no frontier improvement.
-- No legal untested proposal remains.
-- The session has insufficient time for another trial and teardown.
+After the first round without qualifying progress, record the plateau and allow one confirmation round. If the confirmation round also makes no qualifying progress, stop with `objective-plateau-confirmed`. A qualifying improvement resets the check. Include the measurements, relative change, threshold, and confirmation state in the next round's evidence and the saved report. There is no fixed total trial-count limit in this mode.
+
+Other stop conditions remain explicit:
+
+- No legal untested proposal remains, or the agents explicitly decline further experiments. Do not claim a measured confirmation round occurred when none ran.
+- The user cancels, or a runtime safety failure prevents another trial.
+- An optional user-supplied candidate budget is exhausted in bounded mode.
+- The session has insufficient time for another trial and teardown; automatic session-time budgeting remains an implementation gap.
+
+These stop reasons do not establish global optimality. The result states what was measured, which user requirements passed, and why Sera stopped. The fixed section 19 benchmark budget and universe are unchanged.
 
 Implementation checkpoint: supplying an explicit `Budget` enables a bounded single-model controller using the existing active controls. It runs sequential trials, carries a digest of failures and prediction reviews into the next round, tracks the measured frontier, and restores the best eligible runner. A real Qwen72B investigation completed two decision rounds and one candidate trial; later arbitration used the refuted prediction to decline a second trial. The retained runner passed a new request and cleanup. This proves the connected loop, not a speedup or search advantage. Provider-v5 passed the current citation check with 30/30 valid first responses and context checks. Broader policy-generated values, combination trials, joint placement, and session-time budgeting remain target behavior, not implemented claims. Omitting `Budget` preserves the original one-candidate milestone.
 

@@ -54,7 +54,9 @@ Sera establishes a baseline for each model. It then measures the run and gives a
 - The batching specialist changes how requests are grouped and scheduled.
 - The parallelism specialist changes how model work is divided.
 
-An arbiter ranks the proposals and spends the experiment budget on the strongest candidates. A deterministic validator rejects illegal settings and configurations that cannot fit before they consume GPU time.
+An arbiter ranks the proposals and selects the strongest useful experiments. A deterministic validator rejects illegal settings and configurations that cannot fit before they consume GPU time.
+
+Normal optimization has no fixed total trial count. The orchestrator measures progress against the user's objective while preserving the quality requirements. A round without a qualifying objective improvement starts a plateau check. Sera allows one further round; qualifying progress resets the check, while a second round without progress ends the search. An experiment failure is evidence for the next round, not a reason to restart the same experiment. No legal proposal, an explicit agent abstention, cancellation, or a runtime safety failure can stop the run earlier, with its actual reason recorded. An optional user limit and the fixed benchmark budget remain separate controls.
 
 Each surviving candidate is loaded, warmed up, tested with representative work, and checked for quality. Sera records successful trials, failed trials, and reverts. It keeps a frontier of useful configurations instead of selecting only the fastest result.
 
