@@ -248,7 +248,7 @@ def choose_experiments(agent, evidence, legal, record, remaining):
 
 def investigate(*, result, active, agent, history_start, budget, objective, constraints,
                 evaluation, evaluation_version, workload, initial_trials_used=0,
-                swarm=False, trace_reader=None, runtime_factory=None):
+                swarm=False, trace_reader=None, runtime_factory=None, investigation_controls=None):
     from . import pipeline
     runtime_factory = pipeline.SeraModel if runtime_factory is None else runtime_factory
 
@@ -269,6 +269,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 for trial in result.frontier}
 
     try:
+        from .search_policy import validate_investigation_controls
+        controls = validate_investigation_controls(investigation_controls)
         from .swarm import choose_swarm_experiments, validate_swarm_options
         validate_swarm_options(swarm, budget, agent, trace_reader)
         from .ledger import JournalAgent
@@ -302,12 +304,22 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             initial['supported_changes'] = deepcopy(space['supported_changes'])
             if space.get('candidate_hashes') is not None:
                 initial['frozen_candidate_hashes'] = list(space['candidate_hashes'])
+        if controls is not None:
+            report['investigation_controls'] = list(controls)
+            initial['investigation_controls'] = list(controls)
+            initial['supported_changes'] = {key: values for key, values in initial['supported_changes'].items()
+                                            if key in controls}
+            initial['frozen_candidate_hashes'] = [entry[3].config.config_hash for entry in
+                remaining_candidates(initial, baseline_config, {baseline_config.config_hash}, workload, baseline)]
+            search['candidate_filter'] = dict(allowed_controls=list(controls),
+                comparison_reference='original measured baseline configuration')
 
         def refresh_candidates():
             from .search_policy import expand_search_space
             from .storage import content_hash
             policy = expand_search_space(baseline, report['search_trials'],
-                                          model_id=report['model_id'], workload=workload)
+                                          model_id=report['model_id'], workload=workload,
+                                          investigation_controls=controls)
             report['candidate_policy'] = policy
             space = policy['space'] or dict(supported_changes={}, candidate_hashes=[])
             from .techniques import technique_catalog
@@ -317,6 +329,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 frozen_candidate_hashes=list(space['candidate_hashes']),
                 candidate_options=deepcopy(policy['candidates']),
                 candidate_parents=deepcopy(policy['candidate_parents']))
+            if controls is not None:
+                initial['candidate_filter'] = deepcopy(policy['candidate_filter'])
             for option in policy['candidates']:
                 config = RuntimeConfig.model_validate(option['configuration'])
                 validate_candidate(Candidate(name=option['config_hash'], reason=option['reason'], config=config),

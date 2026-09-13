@@ -167,7 +167,48 @@ def propose_search_space(baseline, *, model_id, workload, explicit_space=None):
     return report
 
 
-def expand_search_space(baseline, trials, *, model_id, workload):
+def validate_investigation_controls(controls):
+    """Return a stable allowlist, or None for the existing unrestricted search."""
+    if controls is None:
+        return None
+    if not isinstance(controls, (list, tuple)) or any(
+            not isinstance(control, str) or control not in CONTROL_ROLES for control in controls):
+        raise ValueError('investigation_controls must be a list or tuple of supported control names')
+    return tuple(control for control in CONTROL_ROLES if control in controls)
+
+
+def expand_search_space(baseline, trials, *, model_id, workload, investigation_controls=None):
+    """Generate candidates, then restrict all changes before exposing the pool."""
+    controls = validate_investigation_controls(investigation_controls)
+    report = _expand_search_space(baseline, trials, model_id=model_id, workload=workload)
+    if controls is None:
+        return report
+    original = report['candidates']
+    base = baseline.get('runtime', {}).get('configuration', {})
+    allowed = [candidate for candidate in original if all(
+        key in controls or value == base.get(key)
+        for key, value in candidate['configuration'].items())]
+    changes = {}
+    for candidate in allowed:
+        for lever, value in candidate['changed'].items():
+            if value not in changes.setdefault(lever, []):
+                changes[lever].append(value)
+    parent_ids = {baseline['trial_id'], *(candidate['parent_trial_id'] for candidate in allowed)}
+    report.update(candidates=allowed,
+        candidate_parents={key: value for key, value in report['candidate_parents'].items()
+                           if key in parent_ids},
+        status='generated' if allowed else 'no-candidate',
+        space=dict(supported_changes=changes, candidate_hashes=sorted(
+            candidate['config_hash'] for candidate in allowed)) if allowed else None,
+        rationale=list(dict.fromkeys(candidate['reason'] for candidate in allowed)),
+        candidate_filter=dict(allowed_controls=list(controls),
+            excluded_candidate_count=len(original) - len(allowed),
+            comparison_reference='original measured baseline configuration',
+            reason='Only the listed controls may differ, including inherited combination changes.'))
+    return report
+
+
+def _expand_search_space(baseline, trials, *, model_id, workload):
     """Generate the next normal-mode pool from actual outcomes, never a frozen benchmark.
 
     Single-control experiments retain the original reference as parent. A pairwise
