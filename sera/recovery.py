@@ -164,6 +164,8 @@ def resume(*, output_dir, expected_run_hash, agent, provider_check, evaluation=N
             evaluation_version=evaluation_version, workload=Workload(concurrency=report['workload']['concurrency']),
             initial_trials_used=report['search']['initial_trials_used'], swarm=swarm,
             trace_reader=trace_reader, runtime_factory=runtime_factory)
+        if 'investigation_controls' in report:
+            arguments['investigation_controls'] = report['investigation_controls']
         if weave_project is not None:
             return _resume_traced(arguments, weave_project)
         report['recovery_events'][-1]['trace_mode'] = 'caller-managed'

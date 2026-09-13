@@ -3,6 +3,7 @@
 from .config import Budget, Candidate, Constraints, InvestigationSpace, Objective, RuntimeConfig, Workload
 from .pipeline import SeraResult
 from .api import optimize
+from .stages import StagedResult
 from .recovery import inspect_recovery, resume
 from .runtime import SeraModel, SeraResponse
 from .agent import WandbAgent
@@ -18,3 +19,4 @@ __all__ += ["inspect_recovery", "resume"]
 __all__ += ["place", "PlacementResult", "PlacementWorkload", "PlacementMemoryEstimate",
             "PlacementPlan", "PlacementService", "PlacementConstraints", "measure_placement_references"]
 __all__ += ["optimize_placement", "PlacementSearchResult"]
+__all__ += ["StagedResult"]

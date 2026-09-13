@@ -4,7 +4,7 @@ import inspect
 import os
 
 from . import pipeline
-from .config import Budget, LARGE_MODEL_ID, MODEL_ID, Workload
+from .config import Budget, LARGE_MODEL_ID, MODEL_ID, Objective, Workload
 
 
 _LEGACY_OPTIONS = {'candidate', 'agent', 'budget', 'investigation_space',
@@ -34,7 +34,8 @@ def _configured_agent():
     return WandbAgent(project=project, model=model)
 
 
-def optimize(*, models, prompts, mode='auto', **options):
+def optimize(*, models, prompts, mode='auto', stages=None, k=None,
+             max_latency_regression_pct=0.0, **options):
     """Run the full configured swarm and return a caller-owned live result.
 
     With no explicit low-level search options, ``auto`` selects a Weave-backed
@@ -53,6 +54,18 @@ def optimize(*, models, prompts, mode='auto', **options):
     """
     if mode not in ('auto', 'swarm', 'fixed'):
         raise ValueError('mode must be auto, swarm, or fixed')
+    if stages is not None:
+        from .stages import run_stages
+        return run_stages(models=models, prompts=prompts, stages=stages,
+            k=5.0 if k is None else k, max_latency_regression_pct=max_latency_regression_pct,
+            mode=mode, options=options, run_stage=optimize)
+    if max_latency_regression_pct != 0.0:
+        raise ValueError('max_latency_regression_pct requires stages')
+    if k is not None:
+        from .stage_config import validate_stage_options
+        threshold = validate_stage_options(['latency'], k).k_fraction
+        objective = Objective.model_validate(options.get('objective') or Objective())
+        options['objective'] = Objective(priority=objective.priority, min_improvement_fraction=threshold)
     arguments = dict(models=models, prompts=prompts, **options)
     inspect.signature(pipeline.optimize).bind(**arguments)
     if mode == 'fixed':
