@@ -1,10 +1,12 @@
 """Fit-first loading for the pinned 72B model; estimates never count as measurements."""
 
 from datetime import datetime, timezone
+from copy import deepcopy
 from pathlib import Path
 import uuid
 
 from .config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, RuntimeConfig, Workload
+from .agent import ArbiterDecision
 from .memory import fits_memory
 from .measurement import collect_trial, select_candidate
 from .quality import evaluate_quality
@@ -14,8 +16,6 @@ from .storage import content_hash
 
 def recommend_fit_plan(agent, evidence):
     """A quantization advisor proposes a legal plan; the arbiter decides to test it."""
-    from .agent import ArbiterDecision
-
     supplied = evidence | {"specialist_role": "quantization"}
     record = {"role": "quantization", "evidence": supplied, "status": "rejected"}
     try:
@@ -40,20 +40,35 @@ def continue_fit_investigation(result, active, *, agent, history_start, budget,
                               investigation_space, objective, constraints,
                               evaluation, evaluation_version, workload):
     """Promote a measured, eligible deployment to the search reference without reloading."""
-    from .investigation import investigate
-
     report = result.report
-    deployment = {"infeasible_baseline": report["baseline"]}
-    for key in ("candidate", "candidate_trial", "planning_specialist", "planning_decision",
-                "agent_feedback", "agent_final", "agent_final_error", "decision"):
-        if key in report:
-            deployment[key] = report.pop(key)
-    report.update(deployment=deployment,
-        baseline=dict(deployment["candidate_trial"], trial_id="baseline"),
-        baseline_name="sera-fp8-weight-reference-v1",
-        baseline_configuration=active.configuration.model_dump(),
-        investigation_space=investigation_space,
-        agent_selection="enabled", status="running")
+    try:
+        from .investigation import investigate
+
+        keys = ("candidate", "candidate_trial", "planning_specialist", "planning_decision",
+                "agent_feedback", "agent_final", "agent_final_error", "decision")
+        # Prepare the handoff before changing the fit report. Historical deployment
+        # evidence must not share nested mutable objects with the new reference.
+        deployment = {"infeasible_baseline": deepcopy(report["baseline"])}
+        deployment.update({key: deepcopy(report[key]) for key in keys if key in report})
+        reference = dict(deepcopy(deployment["candidate_trial"]), trial_id="baseline")
+        configuration = active.configuration.model_dump()
+        report.update(deployment=deployment, baseline=reference,
+            baseline_name="sera-fp8-weight-reference-v1",
+            baseline_configuration=configuration, investigation_space=investigation_space,
+            agent_selection="enabled", status="running")
+        for key in keys:
+            report.pop(key, None)
+    except BaseException:
+        # optimize_fit already transferred ownership here, but investigate has not
+        # received it yet. The transfer preparation must close its own runner.
+        result.models = []
+        try:
+            active.close()
+            report['returned_runner_closed'] = True
+        except BaseException as cleanup_error:
+            report.update(cleanup_error=type(cleanup_error).__name__, returned_runner_closed=False)
+            raise
+        raise
     # Ownership moves directly to investigate, whose exception path closes it.
     result.models = []
     return investigate(result=result, active=active, agent=agent,
@@ -167,17 +182,24 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
                                        "specialist_recommendation": specialist.get("response")}
                 report["agent_calls"] = agent.history[history_start:]
                 result._save()
-            ranking = agent.request("arbiter", evidence,
-                "Rank at most one plan from legal_plan_ids for a real trial. These are memory estimates, "
-                "not latency or quality measurements. Explain the fit trade-off and why a trial is useful. "
-                "Do not rank an infeasible plan or claim that quality has passed. The prediction is deployment "
-                "feasibility, not a throughput gain: no BF16 baseline will run, so speedup cannot be measured. "
-                "An empty ranking declines the trial.") if evidence["legal_plan_ids"] else None
-            report["planning_decision"] = ranking.model_dump() if ranking is not None else None
+            chosen = None
+            report["planning_decision"] = None
+            if evidence["legal_plan_ids"]:
+                try:
+                    ranking = agent.request("arbiter", evidence,
+                        "Rank at most one plan from legal_plan_ids for a real trial. These are memory estimates, "
+                        "not latency or quality measurements. Explain the fit trade-off and why a trial is useful. "
+                        "Do not rank an infeasible plan or claim that quality has passed. The prediction is deployment "
+                        "feasibility, not a throughput gain: no BF16 baseline will run, so speedup cannot be measured. "
+                        "An empty ranking declines the trial.")
+                    report["planning_decision"] = ranking.model_dump() if ranking is not None else None
+                    ranking = ArbiterDecision.model_validate(report["planning_decision"])
+                    if any(plan_id not in evidence["legal_plan_ids"] for plan_id in ranking.ranked_proposal_ids):
+                        raise ValueError("Arbiter named an illegal fit plan")
+                    chosen = next((p for p in feasible if ranking.ranked_proposal_ids == [p["plan_id"]]), None)
+                except Exception as error:
+                    report["planning_error"] = type(error).__name__
             report["agent_calls"] = agent.history[history_start:]
-            ids = ranking.ranked_proposal_ids if ranking is not None else []
-            chosen = next((p for p in feasible if ids == [p["plan_id"]]
-                           and p["plan_id"] in evidence["legal_plan_ids"]), None)
             if chosen is None:
                 report["rejected"].append({"reason": "Agent declined or returned an invalid fit plan"})
         result._save()
@@ -232,9 +254,17 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
         return result
     except BaseException as failure:
         report.update(status="failed", error=f"{type(failure).__name__}: {failure}")
+        result.models = []
         try:
             if active is not None:
                 active.close()
+                report["returned_runner_closed"] = True
+        except BaseException as cleanup_error:
+            report.update(cleanup_error=type(cleanup_error).__name__, returned_runner_closed=False)
+            raise
         finally:
-            result._save()
+            try:
+                result._save()
+            except BaseException as save_error:
+                report["save_error"] = type(save_error).__name__
         raise

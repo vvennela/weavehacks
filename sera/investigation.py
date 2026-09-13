@@ -98,6 +98,26 @@ def specialist_participation(evidence, legal):
     return participation
 
 
+def deployment_context(deployment):
+    """Carry the measured fit decision without replaying its raw outputs as history."""
+    reference = deployment['infeasible_baseline']
+    trial = deployment['candidate_trial']
+    feedback = deployment.get('agent_feedback', {})
+    gate = trial.get('task_quality', {})
+    return {
+        'bf16_baseline_measured': False,
+        'infeasible_baseline': {key: deepcopy(reference[key]) for key in
+                               ('status', 'reason', 'fit_estimate') if key in reference},
+        'selected_configuration': deepcopy(trial['runtime']['configuration']),
+        'task_quality': {key: deepcopy(gate[key]) for key in
+                         ('version', 'floor', 'mean', 'valid_outputs', 'passed') if key in gate},
+        'feasibility_prediction': deepcopy(feedback.get('prediction')),
+        'feasibility_review': deepcopy(deployment.get('agent_final')),
+        'review_error': deployment.get('agent_final_error'),
+        'comparison_scope': 'Search compares against the measured FP8 reference, not BF16 performance.',
+    }
+
+
 def choose_experiments(agent, evidence, legal, record, remaining):
     record['specialist_participation'] = specialist_participation(evidence, legal)
     proposals = {}
@@ -198,6 +218,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                       limits=['single model', 'already-active single-setting controls',
                               'no combination trials', 'no live search-advantage claim'])
         initial = pipeline.agent_evidence(baseline, objective, constraints)
+        if report.get('deployment'):
+            initial['deployment_context'] = deployment_context(report['deployment'])
         space = report.get('investigation_space')
         if space is not None:
             initial['supported_changes'] = deepcopy(space['supported_changes'])

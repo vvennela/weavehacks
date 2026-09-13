@@ -1,6 +1,7 @@
 """Fit planning and search share one live owner and one total trial budget."""
 
 from copy import deepcopy
+import json
 
 import pytest
 
@@ -142,3 +143,117 @@ def test_invalid_search_space_is_rejected_before_fit_probe_or_artifacts(tmp_path
         run(tmp_path, agent, investigation_space=sera.InvestigationSpace(
             supported_changes={'kv_cache_dtype': ['fp8']}))
     assert not (tmp_path/'run').exists()
+
+
+def test_malformed_fit_arbiter_response_cannot_start_a_runtime(tmp_path, monkeypatch):
+    runners, calls, agent = boundaries(monkeypatch)
+    request = agent.request
+
+    def malformed_arbiter(role, evidence, instruction):
+        response = request(role, evidence, instruction)
+        if role == 'arbiter' and 'legal_plan_ids' in evidence and 'specialist_role' not in evidence:
+            return response.model_copy(update={'reason': ''})
+        return response
+
+    agent.request = malformed_arbiter
+    with run(tmp_path, agent) as result:
+        assert result.models == []
+        assert runners == []
+        assert result.report['planning_error'] == 'ValidationError'
+        assert result.report['planning_decision']['reason'] == ''
+        assert result.report['decision']['selected'] is None
+        assert 'search' not in result.report
+        assert not any(call['role'] == 'proposal' for call in calls)
+
+
+def test_transfer_setup_failure_closes_fit_runner_and_keeps_original_trial(tmp_path, monkeypatch):
+    runners, _, agent = boundaries(monkeypatch)
+    transfer = fit.continue_fit_investigation
+
+    def break_transfer(result, active, **kwargs):
+        active.configuration = object()
+        return transfer(result, active, **kwargs)
+
+    monkeypatch.setattr(fit, 'continue_fit_investigation', break_transfer)
+    with pytest.raises(AttributeError):
+        run(tmp_path, agent)
+    assert len(runners) == 1
+    assert not runners[0].ready
+    saved = json.loads((tmp_path/'run'/'result.json').read_text())
+    assert saved['status'] == 'failed'
+    assert saved['candidate_trial']['trial_id'] == 'candidate'
+    assert saved['baseline']['status'] == 'infeasible'
+    assert saved['returned_runtimes'] == []
+    assert saved['returned_runner_closed'] is True
+
+
+def test_promoted_reference_does_not_mutate_historical_deployment(tmp_path, monkeypatch):
+    _, _, agent = boundaries(monkeypatch)
+    with run(tmp_path, agent, budget=1) as result:
+        original = deepcopy(result.report['deployment']['candidate_trial'])
+        result.report['baseline']['runtime']['extra_live_state'] = True
+        result.report['baseline']['quality'][0]['text'] = 'changed reference field'
+        assert result.report['deployment']['candidate_trial'] == original
+
+
+def test_frozen_search_space_still_rejects_an_out_of_space_proposal_after_fit(tmp_path, monkeypatch):
+    runners, _, agent = boundaries(monkeypatch)
+    allowed = sera.RuntimeConfig(quantization='fp8_per_tensor', max_num_batched_tokens=1024).config_hash
+    space = sera.InvestigationSpace(supported_changes={'max_num_batched_tokens': [2048, 1024]},
+                                    candidate_hashes=[allowed])
+    with run(tmp_path, agent, investigation_space=space) as result:
+        assert len(runners) == 1
+        assert result.models[0] is runners[0]
+        assert result.report['investigation_space']['candidate_hashes'] == [allowed]
+        assert result.report['search']['trials_used'] == 1
+        assert result.report['search_trials'] == []
+        assert result.report['search']['stop_reason'] == 'no-valid-selected-proposal'
+        assert result.report['search']['rounds'][0]['specialists'][0]['status'] == 'rejected'
+
+
+def test_final_fit_save_failure_closes_runner_and_clears_published_models(tmp_path, monkeypatch):
+    runners, _, agent = boundaries(monkeypatch)
+    save = pipeline.SeraResult._save
+    failed = False
+
+    def fail_save(result):
+        nonlocal failed
+        if result.report['status'] == 'ready' and not failed:
+            failed = True
+            raise OSError('fixture save failure')
+        return save(result)
+
+    monkeypatch.setattr(pipeline.SeraResult, '_save', fail_save)
+    with pytest.raises(OSError, match='fixture save failure'):
+        run(tmp_path, agent)
+    assert len(runners) == 1
+    assert not runners[0].ready
+    saved = json.loads((tmp_path/'run'/'result.json').read_text())
+    assert saved['returned_runtimes'] == []
+    assert saved['returned_runner_closed'] is True
+
+
+def test_search_receives_compact_fit_context_without_counting_fit_twice(tmp_path, monkeypatch):
+    _, calls, agent = boundaries(monkeypatch)
+    space = sera.InvestigationSpace(supported_changes={'max_num_batched_tokens': [2048, 1024]})
+    with run(tmp_path, agent, budget=3, investigation_space=space) as result:
+        searches = [call['evidence'] for call in calls if call['role'] == 'proposal']
+        assert len(searches) == 2
+        context = searches[0]['deployment_context']
+        assert context['bf16_baseline_measured'] is False
+        assert context['infeasible_baseline']['status'] == 'infeasible'
+        assert context['infeasible_baseline']['fit_estimate']['estimated_fit'] is False
+        assert context['selected_configuration']['quantization'] == 'fp8_per_tensor'
+        assert context['task_quality']['passed'] is True
+        assert context['task_quality']['floor'] == .99
+        assert context['feasibility_prediction']['kind'] == 'deployment-feasibility'
+        assert context['feasibility_review']['prediction_outcome'] == 'confirmed'
+        assert 'not BF16 performance' in context['comparison_scope']
+        assert 'requests' not in context and 'quality' not in context
+        assert 'per_prompt' not in context['task_quality']
+        assert searches[0]['history'] == []
+        assert searches[1]['deployment_context'] == context
+        assert len(searches[1]['history']) == 1
+        assert searches[1]['history'][0]['trial']['trial_id'] == 'trial-2'
+        assert result.report['search']['initial_trials_used'] == 1
+        assert result.report['search']['trials_used'] == 2
