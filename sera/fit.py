@@ -12,6 +12,56 @@ from .runtime import CleanupError, GENERATION, SeraModel, gpu_snapshot
 from .storage import content_hash
 
 
+def recommend_fit_plan(agent, evidence):
+    """A quantization advisor proposes a legal plan; the arbiter decides to test it."""
+    from .agent import ArbiterDecision
+
+    supplied = evidence | {"specialist_role": "quantization"}
+    record = {"role": "quantization", "evidence": supplied, "status": "rejected"}
+    try:
+        response = agent.request("arbiter", supplied,
+            "Act as the quantization specialist, not the final arbiter. Recommend at most one "
+            "legal_plan_ids entry using the supplied weight, KV, workspace and GPU estimates. "
+            "Explain the precision and memory trade-off. Empty means abstain. No latency or "
+            "task quality has been measured: propose deployment feasibility, not a speedup. "
+            "The independent arbiter and deterministic gates will decide whether to use it.")
+        record["response"] = response.model_dump() if response is not None else None
+        response = ArbiterDecision.model_validate(record["response"])
+        if any(plan_id not in evidence["legal_plan_ids"] for plan_id in response.ranked_proposal_ids):
+            raise ValueError("Quantization specialist named an illegal fit plan")
+        record["status"] = "accepted" if response.ranked_proposal_ids else "abstained"
+        return record, response.ranked_proposal_ids
+    except Exception as error:
+        record["error"] = type(error).__name__
+        return record, []
+
+
+def continue_fit_investigation(result, active, *, agent, history_start, budget,
+                              investigation_space, objective, constraints,
+                              evaluation, evaluation_version, workload):
+    """Promote a measured, eligible deployment to the search reference without reloading."""
+    from .investigation import investigate
+
+    report = result.report
+    deployment = {"infeasible_baseline": report["baseline"]}
+    for key in ("candidate", "candidate_trial", "planning_specialist", "planning_decision",
+                "agent_feedback", "agent_final", "agent_final_error", "decision"):
+        if key in report:
+            deployment[key] = report.pop(key)
+    report.update(deployment=deployment,
+        baseline=dict(deployment["candidate_trial"], trial_id="baseline"),
+        baseline_name="sera-fp8-weight-reference-v1",
+        baseline_configuration=active.configuration.model_dump(),
+        investigation_space=investigation_space,
+        agent_selection="enabled", status="running")
+    # Ownership moves directly to investigate, whose exception path closes it.
+    result.models = []
+    return investigate(result=result, active=active, agent=agent,
+        history_start=history_start, budget=budget, initial_trials_used=1,
+        objective=objective, constraints=constraints, evaluation=evaluation,
+        evaluation_version=evaluation_version, workload=workload)
+
+
 def plan_fit(*, gpu_memory_mib, workspace_bytes=4 * 1024**3):
     if type(gpu_memory_mib) is not int or gpu_memory_mib <= 0:
         raise ValueError("GPU memory must be a positive integer in MiB")
@@ -61,7 +111,8 @@ def fit_review_evidence(plan, trial, decision):
 
 
 def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_version,
-                 constraints, agent, provider_check, workload=None):
+                 constraints, agent, provider_check, workload=None, budget=None,
+                 investigation_space=None):
     from .pipeline import SeraResult
     from .provider_check import require_provider_check
     workload = Workload() if workload is None else Workload.model_validate(workload)
@@ -109,16 +160,24 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
             evidence = {"fit_plan": plan, "objective": objective.model_dump(),
                         "constraints": constraints.model_dump(),
                         "legal_plan_ids": [p["plan_id"] for p in feasible], "remaining_trials": 1}
+            if budget is not None:
+                specialist, recommended = recommend_fit_plan(agent, evidence)
+                report["planning_specialist"] = specialist
+                evidence = evidence | {"legal_plan_ids": recommended,
+                                       "specialist_recommendation": specialist.get("response")}
+                report["agent_calls"] = agent.history[history_start:]
+                result._save()
             ranking = agent.request("arbiter", evidence,
                 "Rank at most one plan from legal_plan_ids for a real trial. These are memory estimates, "
                 "not latency or quality measurements. Explain the fit trade-off and why a trial is useful. "
                 "Do not rank an infeasible plan or claim that quality has passed. The prediction is deployment "
                 "feasibility, not a throughput gain: no BF16 baseline will run, so speedup cannot be measured. "
-                "An empty ranking declines the trial.")
+                "An empty ranking declines the trial.") if evidence["legal_plan_ids"] else None
             report["planning_decision"] = ranking.model_dump() if ranking is not None else None
             report["agent_calls"] = agent.history[history_start:]
             ids = ranking.ranked_proposal_ids if ranking is not None else []
-            chosen = next((p for p in feasible if ids == [p["plan_id"]]), None)
+            chosen = next((p for p in feasible if ids == [p["plan_id"]]
+                           and p["plan_id"] in evidence["legal_plan_ids"]), None)
             if chosen is None:
                 report["rejected"].append({"reason": "Agent declined or returned an invalid fit plan"})
         result._save()
@@ -164,6 +223,12 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
                 active.close()
             report["status"] = "no-safe-configuration"
         result._save()
+        if budget is not None and result.models:
+            runner, active = active, None
+            return continue_fit_investigation(result, runner, agent=agent,
+                history_start=history_start, budget=budget, investigation_space=investigation_space,
+                objective=objective, constraints=constraints, evaluation=evaluation,
+                evaluation_version=evaluation_version, workload=workload)
         return result
     except BaseException as failure:
         report.update(status="failed", error=f"{type(failure).__name__}: {failure}")

@@ -206,14 +206,18 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     revision = LARGE_MODEL_REVISION if model_id == LARGE_MODEL_ID else MODEL_REVISION
     if model_id == LARGE_MODEL_ID and baseline_configuration is None:
         from .fit import optimize_fit
-        if budget is not None:
-            raise ValueError("Investigate the explicit proven FP8 reference after the fit-first path")
         if candidate is not None:
             raise ValueError("The fit-first path selects its candidate from the validated memory plans")
+        if max(workload.concurrency) > RuntimeConfig().max_num_seqs:
+            raise ValueError("Workload concurrency exceeds the reference sequence limit")
+        if investigation_space is not None:
+            investigation_space = resolve_investigation_space(investigation_space,
+                baseline=RuntimeConfig(quantization="fp8_per_tensor"),
+                model_id=model_id, workload=workload)
         return optimize_fit(prompts=prompts, output_dir=output_dir, objective=objective,
                             evaluation=evaluation, evaluation_version=evaluation_version,
                             constraints=constraints, agent=agent, provider_check=provider_check,
-                            workload=workload)
+                            workload=workload, budget=budget, investigation_space=investigation_space)
     baseline_config = RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(baseline_configuration)
     if baseline_configuration is not None:
         if model_id != LARGE_MODEL_ID or baseline_config != RuntimeConfig(quantization="fp8_per_tensor"):
