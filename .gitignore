@@ -27,3 +27,7 @@ models/
 
 # os
 .DS_Store
+
+# macOS/iCloud conflict duplicates — never real files
+*[ ]2.*
+* 2.*

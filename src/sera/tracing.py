@@ -37,7 +37,7 @@ def init(project: str | None = None, enabled: bool | None = None) -> bool:
     except ImportError:
         return False
 
-    project = project or os.environ.get("WANDB_PROJECT", "weavehacks")
+    project = project or os.environ.get("WANDB_PROJECT", "sera")
     entity = os.environ.get("WANDB_ENTITY")
     target = f"{entity}/{project}" if entity else project
 

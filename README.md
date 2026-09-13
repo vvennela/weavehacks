@@ -26,7 +26,7 @@ running Qwen3-0.6B beside GLM-4-9B. On one GPU the claim is better use of that d
 — not that a second card was freed.
 
 No GPU required. No API key required. The loop runs against a simulator by default and
-prints its full reasoning. Set `LOOP_VLLM_HOST` to run trials on real hardware, and
+prints its full reasoning. Set `SERA_VLLM_HOST` to run trials on real hardware, and
 `WANDB_API_KEY` to trace the run in Weave.
 
 ```bash

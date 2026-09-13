@@ -29,7 +29,7 @@ def select_runner(force_sim: bool = False) -> TrialRunner:
     The choice is announced rather than silent: a run that quietly fell back to
     simulation and reported the numbers as measurements would be worse than useless.
     """
-    if force_sim or not os.environ.get("LOOP_VLLM_HOST"):
+    if force_sim or not os.environ.get("SERA_VLLM_HOST"):
         return SimRunner()
 
     try:
