@@ -114,6 +114,14 @@ def render_summary(report, output_dir):
                          f"peak memory={trial.get('runtime', {}).get('sampled_peak_memory_mib', 'unavailable')} MiB; "
                          f"output tokens={reduced.get('output_tokens', 'unavailable')}; "
                          f"startup={trial.get('runtime', {}).get('startup_seconds', 'unavailable')} s.")
+            for load in trial.get("loads", []):
+                values = load.get("reduced", {})
+                lines.append(f"  concurrency={load['concurrency']}; requests={values.get('request_count')}; "
+                             f"p95={values.get('p95_latency_ms')} ms; "
+                             f"throughput={values.get('output_tokens_per_second')} output tokens/s.")
+    if any(report.get(key, {}).get("loads") for key in ("baseline", "candidate_trial")):
+        lines.extend(["", "Selection latency is the worst per-load p95; percentiles are not pooled. "
+                      "Aggregate throughput divides all output tokens by the sum of measured load durations."])
     gate = decision.get("candidate_quality")
     if gate:
         label = "Task score" if report.get("evaluation") else "Token agreement"

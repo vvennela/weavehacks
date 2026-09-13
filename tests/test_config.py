@@ -76,4 +76,3 @@ def test_batch_candidate_preserves_explicit_fp8_weight_reference():
     candidate = Candidate(name="batch-2048", reason="Compare batching after weights fit",
                           config=RuntimeConfig(quantization="fp8_per_tensor", max_num_batched_tokens=2048))
     assert validate_candidate(candidate, baseline=baseline) == candidate
-

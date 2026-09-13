@@ -11,6 +11,8 @@ MODEL_ID = "Qwen/Qwen3-0.6B"
 MODEL_REVISION = "c1899de289a04d12100db370d81485cdf75e47ca"
 LARGE_MODEL_ID = "Qwen/Qwen2.5-72B-Instruct"
 LARGE_MODEL_REVISION = "495f39366efef23836d0cfae4fbe635880d2be31"
+GLM_MODEL_ID = "zai-org/glm-4-9b-chat-hf"
+GLM_MODEL_REVISION = "8599336fc6c125203efb2360bfaf4c80eef1d1bf"
 BASELINE_NAME = "sera-baseline-v1"
 
 

@@ -6,6 +6,7 @@ import pytest
 
 from sera.config import RuntimeConfig, Workload
 from sera.measurement import collect_trial, reduce_loads
+from sera.pipeline import render_summary
 
 
 @pytest.mark.parametrize('loads', [[], [0], [True], [2, 1], [1, 1], [9]])
@@ -82,3 +83,13 @@ def test_sweep_rejects_load_above_service_sequence_limit_before_generation(tmp_p
     with pytest.raises(ValueError):
         collect_trial(Model(), ['a'], 'candidate', workload=Workload(concurrency=[2]))
     assert not list(Path(tmp_path).iterdir())
+
+
+def test_summary_shows_each_load_instead_of_only_a_pooled_number(tmp_path):
+    report = {'status': 'closed', 'baseline': {'status': 'collected', 'loads': [
+        {'concurrency': 4, 'reduced': {'request_count': 24, 'p95_latency_ms': 600.0,
+                                     'output_tokens_per_second': 40.0}}]}}
+    summary = render_summary(report, tmp_path)
+    assert 'concurrency=4' in summary
+    assert 'p95=600.0 ms' in summary
+    assert 'worst per-load' in summary

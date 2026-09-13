@@ -39,6 +39,14 @@ def test_fit_runtime_requires_the_pinned_model_revision(tmp_path):
     assert runner.model_id == LARGE_MODEL_ID
 
 
+def test_glm_runner_requires_its_pinned_revision(tmp_path):
+    from sera.config import GLM_MODEL_ID, GLM_MODEL_REVISION
+    with pytest.raises(ValueError):
+        SeraModel(artifact_dir=tmp_path/'wrong-glm', model_id=GLM_MODEL_ID, revision='main')
+    runner = SeraModel(artifact_dir=tmp_path/'glm', model_id=GLM_MODEL_ID, revision=GLM_MODEL_REVISION)
+    assert runner.model_id == GLM_MODEL_ID
+
+
 def test_verified_candidate_needs_no_output_reference_from_an_infeasible_baseline():
     baseline = {'trial_id': 'baseline', 'status': 'infeasible'}
     candidate = {'trial_id': 'candidate', 'status': 'collected', 'input_token_ids': [[1]],

@@ -14,7 +14,7 @@ import time
 import urllib.error
 import urllib.request
 
-from .config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, RuntimeConfig
+from .config import GLM_MODEL_ID, GLM_MODEL_REVISION, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, RuntimeConfig
 from .metrics import parse_vllm_metrics
 from .storage import save_json
 
@@ -83,7 +83,8 @@ class SeraModel:
 
     def __init__(self, *, artifact_dir, configuration=None, model_id=MODEL_ID,
                  revision=MODEL_REVISION):
-        pinned = {MODEL_ID: MODEL_REVISION, LARGE_MODEL_ID: LARGE_MODEL_REVISION}
+        pinned = {MODEL_ID: MODEL_REVISION, LARGE_MODEL_ID: LARGE_MODEL_REVISION,
+                  GLM_MODEL_ID: GLM_MODEL_REVISION}
         if pinned.get(model_id) != revision:
             raise ValueError("The runner requires a supported, pinned model revision")
         self.model_id = model_id

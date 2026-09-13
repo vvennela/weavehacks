@@ -37,7 +37,7 @@ These are small, specific checks, not proof that the model answers every questio
 - Rehearse one fresh prompt, then confirm how to stop: blank input closes the interactive runner. Do not close it just before the live part.
 - If the live service fails, use the recorded demo and say: “This is a saved real GPU run, not live inference.” Do not present saved output as a fresh answer.
 
-Current rehearsal status: the recorded notebook executes and its Molab view has been inspected. The underlying live pipeline and fresh returned-runner request passed. The separate interactive demo command still needs an end-to-end rehearsal; do not describe that rehearsal as complete yet.
+Current rehearsal status: **passed**. The exact interactive command started the model, passed all eight tasks, accepted a fresh prompt through its input, answered `7 + 8` as `15`, and closed cleanly on blank input. Startup was 60 seconds with the weights cached. The recorded notebook also executes and its Molab view has been inspected. See [rehearsal evidence](evidence/demo-rehearsal-v1/README.md).
 
 ## Current implementation
 
