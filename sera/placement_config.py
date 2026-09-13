@@ -26,8 +26,15 @@ class PlacementConstraints(_PlacementRecord):
     """Required per-model gates; do not infer limits from calibration results."""
 
     quality_floor: float = Field(ge=0, le=1)
-    p95_latency_ms: float = Field(gt=0)
+    p95_latency_ms: float | None = Field(default=None, gt=0)
+    max_p95_slowdown_fraction: float | None = Field(default=None, ge=0)
     max_generation_errors: int = Field(ge=0, le=0)
+
+    @model_validator(mode='after')
+    def require_latency_contract(self):
+        if self.p95_latency_ms is None and self.max_p95_slowdown_fraction is None:
+            raise ValueError('Each model requires an absolute or relative p95 latency limit')
+        return self
 
 
 class PlacementService(_PlacementRecord):
@@ -79,6 +86,10 @@ class PlacementPlan(_PlacementRecord):
     @property
     def plan_hash(self) -> str:
         checked = validate_placement_plan(self).model_dump()
+        # Keep hashes stable for the original absolute-only contract.
+        for service in checked['services']:
+            if service['constraints']['max_p95_slowdown_fraction'] is None:
+                service['constraints'].pop('max_p95_slowdown_fraction')
         checked['services'].sort(key=lambda service: service['model_id'])
         return content_hash({'schema_version': 'sera-placement-plan-v1', 'plan': checked})
 

@@ -66,7 +66,7 @@ class PlacementWorkload:
                     workload=self.workload.model_dump(), generation=GENERATION)
 
 
-def _gate(trial, profile, service):
+def _gate(trial, profile, service, *, isolated_p95_ms=None, joint=False):
     quality = evaluate_quality(trial, profile.prompts, profile.evaluator,
         version=profile.evaluator_version, floor=service.constraints.quality_floor)
     trial['task_quality'] = quality
@@ -79,12 +79,22 @@ def _gate(trial, profile, service):
     trial['measured_task_quality'] = measured_quality
     p95 = trial.get('reduced', {}).get('p95_latency_ms')
     import math
-    latency_pass = type(p95) in (int, float) and math.isfinite(p95) and 0 < p95 <= service.constraints.p95_latency_ms
+    limit = service.constraints.p95_latency_ms
+    slowdown = service.constraints.max_p95_slowdown_fraction
+    reference_valid = type(isolated_p95_ms) in (int, float) and math.isfinite(isolated_p95_ms) and isolated_p95_ms > 0
+    if joint and slowdown is not None and reference_valid:
+        relative_limit = isolated_p95_ms * (1 + slowdown)
+        limit = relative_limit if limit is None else min(limit, relative_limit)
+    latency_pass = (type(p95) in (int, float) and math.isfinite(p95) and p95 > 0
+                    and (limit is None or p95 <= limit)
+                    and not (joint and slowdown is not None and not reference_valid))
     errors_pass = type(trial.get('generation_errors')) is int and trial['generation_errors'] == 0
     passed = trial.get('status') == 'collected' and quality['passed'] and measured_quality['passed'] and latency_pass and errors_pass
     return dict(passed=bool(passed), quality_pass=quality['passed'],
                 measured_quality_pass=measured_quality['passed'], latency_pass=bool(latency_pass),
-                errors_pass=errors_pass, p95_latency_ms=p95)
+                errors_pass=errors_pass, p95_latency_ms=p95, latency_limit_ms=limit,
+                latency_limit_source='matching-isolated-reference' if joint and slowdown is not None else 'absolute-or-reference-measurement',
+                isolated_p95_ms=isolated_p95_ms, max_p95_slowdown_fraction=slowdown)
 
 
 def collect_joint(models, profiles):
@@ -294,6 +304,23 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
             result._save()
             return result
 
+        limits = {}
+        for service in plan.services:
+            trial = report['isolated'][service.model_id]
+            reference_p95 = trial['reduced']['p95_latency_ms']
+            ratio = service.constraints.max_p95_slowdown_fraction
+            limit = service.constraints.p95_latency_ms
+            if ratio is not None:
+                relative = reference_p95 * (1 + ratio)
+                limit = relative if limit is None else min(limit, relative)
+            limits[service.model_id] = dict(p95_latency_limit_ms=limit,
+                max_p95_slowdown_fraction=ratio, isolated_p95_ms=reference_p95,
+                isolated_trial_sha256=content_hash(trial), config_hash=trial['config_hash'],
+                workload_hash=report['workload_hash'],
+                derivation='Approved contract applied to matching isolated p95 before joint startup')
+        report['derived_joint_latency_limits'] = limits
+        result._save()
+
         owner = SharedGPUOwner(plan)
         result.owner = owner
         owner.acquire()
@@ -311,7 +338,9 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
         joint = collect_joint(models, profiles)
         report['joint'] = joint
         joint['gates'] = {service.model_id:_gate(joint['trials'][service.model_id],
-            profiles[service.model_id], service) for service in plan.services}
+            profiles[service.model_id], service, joint=True,
+            isolated_p95_ms=report['isolated'][service.model_id]['reduced']['p95_latency_ms'])
+            for service in plan.services}
         for model_id, trial in joint['trials'].items():
             same_tokens = trial.get('input_token_ids') == report['isolated'][model_id].get('input_token_ids')
             joint['gates'][model_id]['input_tokens_match'] = same_tokens

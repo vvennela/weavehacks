@@ -9,6 +9,7 @@ from pathlib import Path
 from .measurement import reduce_loads, reduce_requests
 from .runtime import GENERATION
 from .storage import content_hash
+from .placement_config import validate_placement_plan
 
 
 def _require(condition, reason):
@@ -51,7 +52,7 @@ def bind_placement_reference(path, plan, profiles):
     record = json.loads(raw)
     expected_manifest = {model:profile.manifest() for model,profile in profiles.items()}
     _require(record.get('schema_version') == 'sera-placement-v1', 'schema')
-    _require(record.get('plan_hash') == plan.plan_hash and content_hash(record.get('plan')) == content_hash(plan.model_dump()), 'plan binding')
+    _require(record.get('plan_hash') == plan.plan_hash and validate_placement_plan(record.get('plan')).plan_hash == plan.plan_hash, 'plan binding')
     _require(record.get('workload_hash') == content_hash(expected_manifest)
              and record.get('workloads') == expected_manifest, 'workload binding')
     isolated = deepcopy(record.get('isolated', {}))

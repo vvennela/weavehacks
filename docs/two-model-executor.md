@@ -14,6 +14,8 @@ implementation does not change questions, scores, thresholds, or model choices.
 - A validated `PlacementPlan` for the pinned Qwen3-0.6B and GLM-4-9B pair. It declares
   measured physical capacity, a smaller-card memory budget, each service's byte
   allocation, its full runtime configuration, and its quality and p95 limits.
+  A latency contract can be an absolute `p95_latency_ms`, a relative
+  `max_p95_slowdown_fraction`, or both (the tighter limit wins).
 - One `PlacementWorkload` per model: prompts, a callable absolute task evaluator,
   evaluator version, and declared load levels. Both models use the same load
   levels, but can have different representative prompts. Each model receives
@@ -130,7 +132,12 @@ the tracing addition.
 ## Live gates still open
 
 - A quality-valid Qwen configuration under the unchanged approved task contract.
-- Approved calibration and frozen smaller-card allocations and latency limits.
+- Approved calibration and frozen smaller-card allocations. The user approved a
+  10% joint slowdown allowance: set `max_p95_slowdown_fraction=0.10` before the
+  isolated measurements. Keep the same eight tasks, 0.99 floor, and zero errors.
+  The executor derives each numeric joint ceiling as that exact plan's isolated
+  p95 multiplied by 1.10, and saves its workload/configuration/hash provenance
+  before joint startup. Joint results cannot redefine their own acceptance limit.
 - A passing joint GPU run and fresh returned-runner calls on that hardware.
 - An unchanged-budget unquantized comparison before claiming quantization enabled
   placement. One passing pair alone cannot establish that claim.
