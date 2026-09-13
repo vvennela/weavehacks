@@ -1,0 +1,223 @@
+{
+  "schema_version": "sera-joint-placement-audit-v1",
+  "audit_passed": true,
+  "joint_acceptance": true,
+  "source_sha256": {
+    "manifest.json": "4805b51eb3368fa447d650e7ecbc6b918aecfc859a7f1dc527e75bc2df64bca0",
+    "result.json": "1647cc2d8570a645146c46331115003009966a3ca16ec797c78f0ea50d2e9178",
+    "references/ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23.json": "0d65fa4d843215c36056e7daa09e24977d8836fda60c9948ad46200711729f36",
+    "trial-001/result.json": "38e815a186843715f43afef0a09d165d1a331965b99d45b64e060dafa44f6fd3",
+    "trial-001/joint-0/runtime.json": "f371d321f97cf2de9844f5b8d3c20a45edefde7d153934b25eb105352fb0fffe",
+    "trial-001/joint-0/server.log": "86324cbdba6066d0100e16ad7638bbfb8a8ca85aa5dd666c855d8b7e8789edc4",
+    "trial-001/joint-1/runtime.json": "f747f583200abea170aea407d7629391c13454edb87452cbf1250c91bfdecde8",
+    "trial-001/joint-1/server.log": "6f753efd6b04758a3a37aec9f90431aee703c67a7a056351575f664f8f93e897",
+    "weave-calls-normalized.json": "2f381fb2ffdc6c8b22ef502a757a7bd977a98c3cd43ae2722fc07b88a9d54c7b"
+  },
+  "services": {
+    "Qwen/Qwen3-0.6B": {
+      "quality_passes": 8,
+      "timed_quality_passes": 96,
+      "isolated_p95_ms": 136.49446699855616,
+      "joint_p95_ms": 138.7766269981512,
+      "joint_limit_ms": 150.14391369841178,
+      "slowdown_fraction": 0.01671979860999917,
+      "per_load_p95_ms": {
+        "1": 109.29305299941916,
+        "2": 135.19177499983925,
+        "4": 138.7766269981512,
+        "8": 133.01895399854402
+      },
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": null,
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.02092208362703934,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "startup_seconds": 45.04818669499946
+    },
+    "zai-org/glm-4-9b-chat-hf": {
+      "quality_passes": 8,
+      "timed_quality_passes": 96,
+      "isolated_p95_ms": 170.84933600199292,
+      "joint_p95_ms": 177.9330960016523,
+      "joint_limit_ms": 187.93426960219224,
+      "slowdown_fraction": 0.04146202827254042,
+      "per_load_p95_ms": {
+        "1": 160.18194900243543,
+        "2": 151.84265499920002,
+        "4": 166.79977999956463,
+        "8": 177.9330960016523
+      },
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.16737666901631473,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "startup_seconds": 65.06332675700105
+    }
+  },
+  "overlap": [
+    {
+      "concurrency": 1,
+      "overlap_seconds": 2.1352159730013227,
+      "coverage_fraction": 0.6743827638541222,
+      "windows": {
+        "Qwen/Qwen3-0.6B": {
+          "started": 20270.389930568,
+          "ended": 20272.525146541,
+          "clock": "process-perf-counter"
+        },
+        "zai-org/glm-4-9b-chat-hf": {
+          "started": 20270.389845919,
+          "ended": 20273.556024071,
+          "clock": "process-perf-counter"
+        }
+      }
+    },
+    {
+      "concurrency": 2,
+      "overlap_seconds": 1.3063351569981023,
+      "coverage_fraction": 0.77128981180778,
+      "windows": {
+        "Qwen/Qwen3-0.6B": {
+          "started": 20274.603713863,
+          "ended": 20275.91004902,
+          "clock": "process-perf-counter"
+        },
+        "zai-org/glm-4-9b-chat-hf": {
+          "started": 20274.603320038,
+          "ended": 20276.297022116,
+          "clock": "process-perf-counter"
+        }
+      }
+    },
+    {
+      "concurrency": 4,
+      "overlap_seconds": 0.6550715929988655,
+      "coverage_fraction": 0.7024539133568489,
+      "windows": {
+        "Qwen/Qwen3-0.6B": {
+          "started": 20277.363133735,
+          "ended": 20278.018205328,
+          "clock": "process-perf-counter"
+        },
+        "zai-org/glm-4-9b-chat-hf": {
+          "started": 20277.362879772,
+          "ended": 20278.295427204,
+          "clock": "process-perf-counter"
+        }
+      }
+    },
+    {
+      "concurrency": 8,
+      "overlap_seconds": 0.3563763509991986,
+      "coverage_fraction": 0.7132585735072007,
+      "windows": {
+        "Qwen/Qwen3-0.6B": {
+          "started": 20279.358127371,
+          "ended": 20279.714503722,
+          "clock": "process-perf-counter"
+        },
+        "zai-org/glm-4-9b-chat-hf": {
+          "started": 20279.357808635,
+          "ended": 20279.857454015,
+          "clock": "process-perf-counter"
+        }
+      }
+    }
+  ],
+  "sampled_total_peak_mib": 19904,
+  "declared_budget_mib": 24576,
+  "cleanup_memory_mib": 0,
+  "weave_calls": 279,
+  "weave_request_outputs_matched": 272,
+  "typed_arbiter_calls_matched": 1,
+  "returned_runner_probes_passed": 2,
+  "capacity_evidence": {
+    "established": true,
+    "selected_plan_id": "ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23",
+    "unquantized_plan_id": "e793a1faed3bbf8b90c17064ff5839e1ec257aa51aff667ead72dfd6de4a2c56",
+    "changed_weight_precision": {
+      "zai-org/glm-4-9b-chat-hf": {
+        "before": null,
+        "after": "fp8_per_tensor"
+      }
+    },
+    "unquantized_failure_basis": "deterministic-estimate-not-measured",
+    "unquantized_fit_check": {
+      "Qwen/Qwen3-0.6B": {
+        "required_bytes": 2939368245,
+        "allocation_bytes": 3221225472,
+        "components": {
+          "weights_bytes": 1213328262,
+          "kv_bytes": 469762048,
+          "workspace_bytes": 128849019,
+          "process_overhead_bytes": 1073741824,
+          "fragmentation_bytes": 53687092
+        },
+        "fits": true
+      },
+      "zai-org/glm-4-9b-chat-hf": {
+        "required_bytes": 20611816491,
+        "allocation_bytes": 18253611008,
+        "components": {
+          "weights_bytes": 18865643848,
+          "kv_bytes": 167772160,
+          "workspace_bytes": 450971567,
+          "process_overhead_bytes": 1073741824,
+          "fragmentation_bytes": 53687092
+        },
+        "fits": false
+      }
+    },
+    "quantized_outcome": "measured-safe-placement",
+    "measured_quantized_peak_bytes": 20870856704,
+    "declared_budget_bytes": 25769803776,
+    "physical_gpu_bytes": 102641958912,
+    "measured_declared_headroom_bytes": 4898947072,
+    "measured_memory_savings_bytes": null,
+    "memory_accounting": "total-device",
+    "allocation_scope": "Configured vLLM budgets, not separately verified hard caps; no claim that every possible BF16 allocation fails the total device budget",
+    "scope": "Measured passing quantized pair versus otherwise-matching BF16 plan rejected by the supplied memory estimate; no measured BF16 joint latency or memory savings, no global-optimality claim",
+    "workload_hash": "a708ff95ce839715db79ef4426b9bb6a879cc92f183b8c90e6fba9b9b4f39065"
+  },
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09bce-654d-71f2-aaf4-3accd0872b4e",
+  "gpu_trials_during_audit": 0,
+  "provider_calls_during_audit": 0,
+  "limits": [
+    "Total-device accounting, not separately verified service memory caps; sampled peaks can miss spikes.",
+    "Passing fixed FP8 pair versus estimated same-allocation BF16 rejection, not all possible BF16 allocations.",
+    "One eligible measured plan and one arbiter choice; not a multi-round placement swarm.",
+    "Post-return probes and final cleanup are saved external records, not children of the ended root trace.",
+    "Artifact consistency audit, not independent proof of execution."
+  ],
+  "negative_checks": {
+    "wrong-answer": {
+      "rejected": true,
+      "failed_check": "assert grade_case(loaded['cases'][row['prompt_index']], row['text'])['passed']",
+      "source_edits": false,
+      "method": "in-memory file-read substitution"
+    },
+    "changed-p95": {
+      "rejected": true,
+      "failed_check": "assert reduce_requests(load['requests'], elapsed) == load['reduced']",
+      "source_edits": false,
+      "method": "in-memory file-read substitution"
+    }
+  }
+}
