@@ -24,6 +24,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -42,11 +43,15 @@ from .fake_vllm import (
     METRIC_KV_USAGE,
     METRIC_KV_USAGE_LEGACY,
     METRIC_PREEMPTIONS,
+    METRIC_RUNNING,
 )
 
 HEALTH_TIMEOUT_S = 300.0
 REQUEST_TIMEOUT_S = 300.0
 WARMUP_CAP = 16
+# How often to scrape the engine gauges during a trial. Fast enough to characterize a
+# short trial, slow enough that scraping is not itself a load on the server.
+SAMPLE_INTERVAL_S = 0.25
 
 # vLLM accepts these as --quantization. Everything else in the lever space needs a
 # differently-quantized checkpoint, which is a different model repo, not a flag.
@@ -380,15 +385,16 @@ class VllmRunner(TrialRunner):
             # Every tenant replays from ONE t0, concurrently. This is the only way
             # co-tenancy shows up in the numbers.
             t0 = time.monotonic()
-            with ThreadPoolExecutor(max_workers=len(tenants)) as pool:
-                futures = {
-                    t.model.name: pool.submit(
-                        self._replay, endpoints[t.model.name], traces[t.model.name], t0
-                    )
-                    for t in tenants
-                }
-                replayed = {n: f.result() for n, f in futures.items()}
-            wall = time.monotonic() - t0
+            with _EngineSampler(endpoints) as sampler:
+                with ThreadPoolExecutor(max_workers=len(tenants)) as pool:
+                    futures = {
+                        t.model.name: pool.submit(
+                            self._replay, endpoints[t.model.name], traces[t.model.name], t0
+                        )
+                        for t in tenants
+                    }
+                    replayed = {n: f.result() for n, f in futures.items()}
+                wall = time.monotonic() - t0
 
             after = {
                 n: parse_prometheus(_get(f"{ep.base_url}/metrics"))
@@ -402,7 +408,11 @@ class VllmRunner(TrialRunner):
             results, errors = replayed[name]
             b, a = before[name], after[name]
 
-            kv = _kv_usage(a)
+            # Sampled while the load was in flight. The post-drain scrape is only a
+            # fallback for a trial too short to catch a single sample.
+            kv = sampler.mean_kv(name)
+            if kv is None:
+                kv = _kv_usage(a)
             preempts = int(a.get(METRIC_PREEMPTIONS, 0.0) - b.get(METRIC_PREEMPTIONS, 0.0))
             gen_tokens = a.get(METRIC_GENERATION_TOKENS, 0.0) - b.get(
                 METRIC_GENERATION_TOKENS, 0.0
@@ -425,15 +435,72 @@ class VllmRunner(TrialRunner):
                 wall_time_s=wall,
             )
             m.preemptions = max(0, preempts)
+            m.mean_batch_size = sampler.mean_batch(name)
             measurements[name] = m
             notes[name] = (
                 f"errors={errors} requests={len(results)}/{len(traces[name])} "
-                f"gen_tokens={gen_tokens:.0f}"
+                f"gen_tokens={gen_tokens:.0f} gauge_samples={len(sampler.samples[name])}"
             )
 
         return TrialOutcome(
             measurements=measurements, substrate=self.substrate, ok=True, notes=notes
         )
+
+
+class _EngineSampler:
+    """Polls /metrics while the load is in flight.
+
+    Gauges are the point. `vllm:num_requests_running` and `vllm:kv_cache_usage_perc`
+    describe the engine *at this instant*, so reading them once after the replay has
+    drained measures an idle server — which is exactly what the runner used to do, and
+    why every vLLM-substrate trial reported KV occupancy 0.0 and handed the quantization
+    specialist a cache that looked permanently empty. Counters (tokens, preemptions) are
+    cumulative and are still correctly read as an after-minus-before difference.
+
+    Samples with nothing running are dropped rather than averaged in: they are the
+    ramp-up and drain tails, and including them reports a batch smaller than any batch
+    that actually ran.
+    """
+
+    def __init__(self, endpoints: dict[str, Endpoint], interval_s: float = SAMPLE_INTERVAL_S):
+        self._endpoints = endpoints
+        self._interval = interval_s
+        self._stop = threading.Event()
+        self._threads: list[threading.Thread] = []
+        self.samples: dict[str, list[tuple[float, float]]] = {n: [] for n in endpoints}
+
+    def _poll(self, name: str, ep: Endpoint) -> None:
+        while not self._stop.is_set():
+            try:
+                m = parse_prometheus(_get(f"{ep.base_url}/metrics", timeout=2.0))
+                running = m.get(METRIC_RUNNING, 0.0)
+                if running > 0:
+                    self.samples[name].append((running, _kv_usage(m)))
+            except Exception:  # noqa: BLE001
+                # A scrape that fails mid-trial costs one sample. Never the trial:
+                # this thread must not be able to fail a measurement it only observes.
+                pass
+            self._stop.wait(self._interval)
+
+    def __enter__(self) -> _EngineSampler:
+        for name, ep in self._endpoints.items():
+            th = threading.Thread(target=self._poll, args=(name, ep), daemon=True)
+            th.start()
+            self._threads.append(th)
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        self._stop.set()
+        for th in self._threads:
+            th.join(timeout=2.0)
+
+    def mean_batch(self, name: str) -> float | None:
+        rows = self.samples[name]
+        return sum(r for r, _ in rows) / len(rows) if rows else None
+
+    def mean_kv(self, name: str) -> float | None:
+        rows = self.samples[name]
+        return sum(k for _, k in rows) / len(rows) if rows else None
 
 
 def _kv_usage(metrics: dict[str, float]) -> float:

@@ -43,12 +43,21 @@ class QuantizationSpecialist(Specialist):
             WEIGHT_LADDER[idx_now + 1] if idx_now + 1 < len(WEIGHT_LADDER) else None
         )
 
-        # None means the substrate could not measure it. Comparing None-as-zero
-        # against the threshold would silently conclude "not bandwidth bound" from
-        # an absence of evidence, so the bandwidth argument is simply unavailable
-        # and the specialist has to make its case on prefill share or cache pressure.
+        # None means neither the substrate nor the roofline derivation could produce a
+        # number. Comparing None-as-zero against the threshold would silently conclude
+        # "not bandwidth bound" from an absence of evidence, so the bandwidth argument
+        # is simply unavailable and the specialist has to make its case on prefill share
+        # or cache pressure.
+        #
+        # A derived figure is real evidence but weaker evidence: it is a roofline
+        # computed from measured throughput, accurate to within about 25% of the
+        # simulator's physical accounting. Weaker evidence gets a discounted
+        # confidence, and a dead reason that says "not established" rather than
+        # "ruled out" — a number carrying that much error cannot refute a bottleneck,
+        # only fail to demonstrate one.
         bw = d.mem_bandwidth_util
         bandwidth_known = bw is not None
+        bandwidth_derived = d.mem_bandwidth_source == "derived"
         bandwidth_bound = bandwidth_known and bw >= BANDWIDTH_LIVE_THRESHOLD
         kv_pressured = d.kv_occupancy >= KV_PRESSURE_THRESHOLD
 
@@ -63,14 +72,23 @@ class QuantizationSpecialist(Specialist):
         compute_live = compute_bound and tensor_core_gain and d.p95_slo_ratio > 1.0
 
         if not bandwidth_bound and not kv_pressured and not compute_live:
-            why = (
-                (
-                    f"bandwidth utilization {bw:.1%} is below "
+            if bandwidth_known and bandwidth_derived:
+                why = (
+                    f"derived bandwidth utilization {bw:.1%} is below "
+                    f"{BANDWIDTH_LIVE_THRESHOLD:.0%} — derived rather than measured, so "
+                    "this fails to establish bandwidth pressure rather than ruling it out"
+                )
+            elif bandwidth_known:
+                why = (
+                    f"measured bandwidth utilization {bw:.1%} is below "
                     f"{BANDWIDTH_LIVE_THRESHOLD:.0%}"
                 )
-                if bandwidth_known
-                else "bandwidth utilization was not measurable, so it cannot support a case"
-            ) + f" and KV occupancy {d.kv_occupancy:.1%} is low"
+            else:
+                why = (
+                    "bandwidth utilization was neither measurable nor derivable, so it "
+                    "cannot support a case"
+                )
+            why += f" and KV occupancy {d.kv_occupancy:.1%} is low"
             if compute_bound and not tensor_core_gain:
                 why += (
                     f"; prefill dominates at {d.prefill_token_share:.0%} but the next step "
@@ -147,21 +165,39 @@ class QuantizationSpecialist(Specialist):
         # a specialist loses calibration and, with it, its share of the budget.
         if bandwidth_bound:
             mechanism = (
-                f"Bandwidth utilization is {bw:.1%} and weights are "
-                f"{d.weights_share_of_footprint:.0%} of the footprint at "
+                f"Bandwidth utilization is {bw:.1%} ({d.mem_bandwidth_source}) and weights "
+                f"are {d.weights_share_of_footprint:.0%} of the footprint at "
                 f"{d.weight_bytes_per_param:.0f} bytes/param. Every decode step re-reads the "
                 f"full weight tensor, so {cfg.weight_dtype} to {nxt} cuts the bytes that "
                 "step must move."
             )
-            expected, confidence = 45.0, 0.75
+            # The size of the win does not depend on how we learned we are in this
+            # regime — halving weight bytes halves the bytes a decode step moves either
+            # way, and the derivation understates traffic, so if anything it understates
+            # the win. What the weaker evidence buys is less certainty that we are in
+            # the regime at all, which is what confidence means. Discounting magnitude
+            # instead would corrupt the calibration signal: the ledger would score the
+            # specialist as over-delivering and reward a claim it hedged.
+            expected = 45.0
+            confidence = 0.6 if bandwidth_derived else 0.75
+            if bandwidth_derived:
+                mechanism += (
+                    " That utilization was not read from a counter — no serving engine "
+                    "exposes one — but derived from measured throughput against the "
+                    "declared weight and cache shapes, so it is a floor on the real "
+                    "figure. Confidence is discounted accordingly; the expected "
+                    "magnitude is not, because the mechanism is unchanged."
+                )
         else:
             mechanism = (
                 f"Prefill is {d.prefill_token_share:.0%} of tokens and p95 is "
                 f"{d.p95_slo_ratio:.2f}x SLO, so this is compute bound rather than "
                 + (
-                    f"bandwidth bound — utilization is only {bw:.1%}. "
+                    f"bandwidth bound — {d.mem_bandwidth_source} utilization is only "
+                    f"{bw:.1%}. "
                     if bandwidth_known
-                    else "bandwidth bound, and bandwidth was not measurable here. "
+                    else "bandwidth bound, and bandwidth was neither measurable nor "
+                    "derivable here. "
                 )
                 + f"{nxt} runs on native tensor cores at materially higher throughput, so "
                 "the win here is arithmetic, not bytes."

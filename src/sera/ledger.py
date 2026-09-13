@@ -61,6 +61,14 @@ class Measurement:
     unavailable. Sera must not replace missing measurements with agent estimates."
     Recording 0.0 would read to the quantization specialist as "bandwidth is idle",
     which is the opposite of "we do not know".
+
+    `mean_batch_size` is the average number of sequences resident in the engine while
+    the trial ran, and it is here rather than derived downstream because both substrates
+    can state it outright: vLLM publishes `vllm:num_requests_running` and the simulator
+    knows its own batch exactly. Inferring it instead — Little's law on p50 latency —
+    was measurably wrong by up to 62% on a saturated workload, because p50 understates
+    mean residency on a skewed distribution. Also None when unsampled, for the same
+    reason as above.
     """
 
     p50_latency_ms: float
@@ -70,6 +78,7 @@ class Measurement:
     kv_occupancy: float = 0.0
     preemptions: int = 0
     mem_bandwidth_util: float | None = None
+    mean_batch_size: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)

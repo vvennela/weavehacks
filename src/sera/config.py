@@ -41,6 +41,15 @@ DTYPE_QUALITY_PENALTY: dict[str, float] = {
     "int4": 0.055,
 }
 
+# Fraction of spec-sheet HBM bandwidth a real streaming decode read achieves. No
+# kernel hits the number on the box; ~80% is the usual ceiling for a large sequential
+# read. It lives here rather than in the simulator because two components now divide
+# by it — the simulator, computing utilization from bytes it moved, and the reduction,
+# deriving utilization from measured throughput. If they used different denominators
+# they would report different numbers for the same physical traffic, against a
+# specialist threshold that was calibrated on only one of them.
+ACHIEVABLE_BW_FRACTION = 0.80
+
 Lever = Literal["quantization", "batching", "parallelism"]
 
 
