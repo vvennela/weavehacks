@@ -1,0 +1,20 @@
+{
+  "action": "keep-baseline",
+  "changed_lever": null,
+  "proposed_value": null,
+  "observed_facts": [
+    "Baseline prepared prompts contain 85–109 tokens, mean 94.375 [measured_facts.baseline.prepared_prompt_tokens].",
+    "Baseline p95_latency_ms increases from 575.684 at concurrency 1 to 774.183 at concurrency 8; all 96 requests succeed [source_call_id: 01a09a88-7f2f-79db-b826-70299f401de1; reduced.p95_latency_ms, reduced.successful_requests].",
+    "Baseline quality.mean is 1 and quality.passed is true against floor 0.99 [measured_facts.baseline.quality].",
+    "The max_model_len=256 trial failed during startup with cutlass-internal-error. Its root cause is not established, and it has no quality or latency measurement [source_call_id: 01a09a88-7f33-7d2b-9a90-3e8a01b13ef4; diagnosis.observed.runtime_failure, diagnosis.root_cause, diagnosis.observed.objective.candidate_value]."
+  ],
+  "hypothesis": "The only legal candidate lowers max_num_batched_tokens from 4096 to 2048. Assuming the measured prompt lengths represent scheduled inputs, eight maximum-length prompts total only 872 tokens. Both budgets exceed this workload, so reducing the budget has no supported scheduling mechanism for the required latency improvement. Keep the baseline.",
+  "predicted_metric_change": "If independently tested, predict approximately unchanged p95_latency_ms, with less than the required 5% improvement from 774.183 ms. This is a prediction, not a measured candidate result.",
+  "falsification_condition": "A comparable valid evaluation of max_num_batched_tokens=2048 with p95_latency_ms at or below 735.474 ms, verified quality at least 0.99, and all workload constraints preserved would refute the prediction.",
+  "limitations": [
+    "The candidate has not been measured; that alone does not disqualify an experiment.",
+    "Scheduler traces and candidate-specific runtime effects are unavailable.",
+    "Cumulative queue and TTFT snapshots do not establish causality; the baseline sample is small.",
+    "The startup failure does not establish that changing the token budget would fail or succeed. No trial was executed."
+  ]
+}

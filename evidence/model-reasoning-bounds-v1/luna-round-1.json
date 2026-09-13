@@ -1,0 +1,15 @@
+{
+  "action": "trial",
+  "changed_lever": "max_num_batched_tokens",
+  "proposed_value": 2048,
+  "observed_facts": [
+    "Baseline p95 latency is 774.18 ms with 96/96 successful requests (metrics.p95_latency_ms; metrics.successful_requests).",
+    "Baseline verified quality is 1.0, above the 0.99 floor (measured_facts.baseline.quality).",
+    "2048 is the only supported untested change (supported_changes.max_num_batched_tokens).",
+    "The prior max_model_len=256 trial failed at startup, with root cause not established; absent measurements are not quality or speed results (measured_facts.trials[0]; inspection_records[0].diagnosis)."
+  ],
+  "hypothesis": "Reducing max_num_batched_tokens to 2048 will reduce scheduling and batching latency while preserving the verified quality floor.",
+  "predicted_metric_change": "At least 5% lower p95 latency, from 774.18 ms to approximately 735.47 ms or less; throughput may decrease.",
+  "falsification_condition": "Reject the trial if startup fails, quality is below 0.99, workload constraints are violated, or p95 latency is above 735.47 ms.",
+  "limitations": "No candidate latency or quality measurement exists yet; the prior startup failure does not establish a cause for this candidate."
+}

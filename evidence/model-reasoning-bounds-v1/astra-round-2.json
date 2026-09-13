@@ -1,0 +1,19 @@
+{
+  "action": "keep-baseline",
+  "changed_lever": null,
+  "proposed_value": null,
+  "observed_facts": [
+    "Saved trial-2 changed max_num_batched_tokens to 2048. Its p95_latency_ms was 773.763191 versus baseline 774.183015: improvement_fraction 0.00054228, or 0.054228%, below the required 5% [source_call_id: 01a09a88-f56f-77a8-9ca1-3c163ae0191c; diagnosis.observed.objective].",
+    "Trial-2 completed all 96 requests with zero generation_errors and matched baseline input_tokens=9060 and output_tokens=660 [measured_facts.trials[1].reduced; source_call_id: 01a09a88-f569-701d-83ae-4521dcb75bce]. Its verified quality.mean=1 passed floor=0.99 [source_call_id: 01a09a88-f56f-77a8-9ca1-3c163ae0191c; diagnosis.observed.quality].",
+    "Trial-1 failed during startup with cutlass-internal-error; its root cause remains not-established, with no quality or latency result [source_call_id: 01a09a88-7f33-7d2b-9a90-3e8a01b13ef4; diagnosis.observed.runtime_failure, diagnosis.root_cause, diagnosis.observed.objective.candidate_value]."
+  ],
+  "hypothesis": "The saved result supports my earlier prediction of approximately unchanged latency when lowering the token budget to 2048. It does not establish the proposed explanation that both budgets exceed scheduling demand. Keep the baseline because the measured candidate misses the improvement requirement, and remaining_trials=0 with no supported_changes permits no further trial.",
+  "predicted_metric_change": "No configuration change is proposed. The candidate's observed p95 reduction was approximately 0.420 ms, far below the approximately 38.709 ms required. Future baseline latency is not guaranteed to equal the saved measurement.",
+  "falsification_condition": "The earlier prediction would be refuted by a comparable valid evaluation showing at least 5% lower p95_latency_ms while preserving quality at or above 0.99 and all workload constraints. This saved result does not meet that condition; no further evaluation is authorized by the supplied budget.",
+  "limitations": [
+    "A small saved sample does not establish a causal gain or prove that the token budget never binds.",
+    "Cumulative queue and TTFT snapshots cannot establish the scheduling mechanism.",
+    "The successful trial-2 does not explain trial-1's startup failure.",
+    "Trial-2 is independent historical evidence. Neither I nor this exercise executed it."
+  ]
+}

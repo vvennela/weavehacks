@@ -6,6 +6,13 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 ### Latest swarm recording
 
+The [Astra/Luna comparison](evidence/model-reasoning-bounds-v1/README.md)
+completed two saved-evidence decisions per model. Astra predicted little benefit;
+Luna proposed the legal trial, then withdrew its prediction after the measured
+gain missed the target. Both stopped at zero budget. Their responses are saved
+in an explicitly labeled Weave import trace. This demonstrates decision-making
+on one case, not a new live swarm or a production-provider integration.
+
 The [compact-prompt replay](evidence/failure-replay-v3/README.md) now passes all loop-control checks: all three agents read evidence in both rounds and stop at zero budget. Factual reasoning still fails: some explanations rule out unknown causes, use an incorrect latency target, or deny a supplied memory change. This is saved-evidence replay with real hosted agents and Weave reads, not a new GPU result. Investigator model selection is now configurable without changing gates.
 
 The [corrected-evidence replay](evidence/failure-replay-v2/README.md) still fails reasoning acceptance. All three investigators read evidence in both rounds. Their inputs now include the actual 85–109-token prompt lengths and 94.375-token average, but they still claim 2,265 tokens per request. Round one selected a legal batching proposal; round two proposed unavailable FP8 KV with no trial budget, and validation rejected every proposal. No GPU trial ran. Clearer data did not solve the peer-copying problem. The [readiness audit](docs/demo-readiness.md) keeps the full goal open.

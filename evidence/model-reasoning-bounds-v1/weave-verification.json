@@ -1,0 +1,45 @@
+{
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09aa1-af1a-7c53-b26e-e91f6abc3622",
+  "trace_id": "01a09aa1-af19-72da-b78a-0565990363d3",
+  "mode": "imported-codex-saved-evidence-comparison",
+  "call_count": 5,
+  "imported_response_count": 4,
+  "local_remote_input_hashes_match": true,
+  "local_remote_response_hashes_match": true,
+  "gpu_trials_executed": 0,
+  "model_latency_measured": false,
+  "responses": [
+    {
+      "id": "01a09aa1-af1e-7ddb-9497-ea65f23da155",
+      "model": "gpt-6-astra",
+      "round": 1,
+      "input_sha256": "7099e33ae308e0919e4e475da1e77245c2f014a10c40a06edb7f8a537da7f7f3",
+      "response_sha256": "485a6100478beb5654f8a6bf6942aa44d4c2648a5f026d1587c59cbfa0bf9c74",
+      "exception": null
+    },
+    {
+      "id": "01a09aa1-af23-7f42-8f20-065cb8fff70b",
+      "model": "gpt-5.6-luna",
+      "round": 1,
+      "input_sha256": "7099e33ae308e0919e4e475da1e77245c2f014a10c40a06edb7f8a537da7f7f3",
+      "response_sha256": "44c30c49c7b95dfeb53eb10846cc30d2c79ff4d7726a9d22350bd27c9efccee8",
+      "exception": null
+    },
+    {
+      "id": "01a09aa1-af26-72d0-9e86-7f1e64b0b35c",
+      "model": "gpt-6-astra",
+      "round": 2,
+      "input_sha256": "ca28d21e4ebad7ec904f39e52390bb857e87b78e6447e0384e85d49a77d64a4e",
+      "response_sha256": "03a4dc4e5f582d54f62f637a72eabe4bcb5f2eb4b16b11bb3021a4f5aeb11f7b",
+      "exception": null
+    },
+    {
+      "id": "01a09aa1-af28-7580-9079-408b60b4aad3",
+      "model": "gpt-5.6-luna",
+      "round": 2,
+      "input_sha256": "ca28d21e4ebad7ec904f39e52390bb857e87b78e6447e0384e85d49a77d64a4e",
+      "response_sha256": "d40baf6fb3af43eb686ec9cf4f208b9a2c2e8b9aac15c53fbc7115fc88b01082",
+      "exception": null
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "action": "keep-baseline",
+  "changed_lever": null,
+  "proposed_value": null,
+  "observed_facts": [
+    "The saved max_num_batched_tokens=2048 trial completed with 96/96 successful requests and zero generation errors (measured_facts.trials[1].reduced).",
+    "Its p95 latency was 773.763 ms versus the 774.183 ms baseline, only a 0.054% improvement, below the required 5% (metrics.trial_2_p95_latency_ms; inspection_records[1].diagnosis.observed.objective).",
+    "Trial quality was verified at 1.0 and passed the 0.99 floor (measured_facts.trials[1].quality).",
+    "No trials remain and no supported changes are available (remaining_trials; supported_changes)."
+  ],
+  "hypothesis": "The earlier hypothesis that reducing max_num_batched_tokens would produce at least a 5% latency improvement is not supported; under this workload it had negligible effect.",
+  "predicted_metric_change": "Keeping baseline should retain approximately 774 ms p95 latency and verified quality of 1.0; no further improvement is expected from the tested lever.",
+  "falsification_condition": "Not applicable because the budget is exhausted; any future legal trial would falsify this conclusion only if it achieves at least 5% lower p95 latency while maintaining quality at or above 0.99.",
+  "limitations": "The conclusion covers only the tested 2048 value. p99 latency is marked unreliable, and no additional candidate can be tested under the supplied budget."
+}
