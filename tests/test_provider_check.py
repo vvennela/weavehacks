@@ -117,6 +117,45 @@ def test_request_explains_output_schema_to_model_as_well_as_decoder(monkeypatch)
     assert agent.history[0]['schema_hash'] == content_hash(expected)
 
 
+def test_swarm_sends_focused_question_but_preserves_full_audit_evidence(monkeypatch):
+    import sys
+    from sera.agent import WandbAgent, request_schema
+    from sera.investigation_prompt import build_investigation_prompt, PROMPT_PROJECTION_VERSION
+    case = provider_cases()[0]
+    source = deepcopy(case['evidence']) | dict(swarm_phase='refine', investigator_id='scheduling',
+        previous_rounds=[{'untrusted_old_proposal': 'not the answer'}])
+    compact = build_investigation_prompt(source)
+    captured = {}
+
+    def create(**payload):
+        captured.update(payload)
+        return SimpleNamespace(model_dump=lambda **_: {'choices': [{
+            'finish_reason': 'stop', 'message': {'content': json.dumps(valid_response(case))}}]})
+
+    class Client:
+        def __init__(self, **kwargs):
+            self.chat = SimpleNamespace(completions=SimpleNamespace(create=create))
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setenv('WANDB_API_KEY', 'not-a-real-test-key')
+    monkeypatch.setitem(sys.modules, 'openai', SimpleNamespace(OpenAI=Client))
+    agent = WandbAgent(project='test/project')
+    parsed = agent.request('proposal', source, 'Investigate independently.')
+    assert parsed is not None
+    assert json.loads(captured['messages'][1]['content']) == compact
+    assert 'fresh decision' in captured['messages'][0]['content']
+    entry = agent.history[0]
+    assert entry['evidence'] == source
+    assert entry['prompt_evidence'] == compact
+    assert entry['prompt_projection_version'] == PROMPT_PROJECTION_VERSION
+    assert entry['source_evidence_sha256'] == content_hash(source)
+    assert entry['prompt_evidence_sha256'] == content_hash(compact)
+    assert entry['request_schema'] == request_schema('proposal', source)
+
+
 def test_old_static_certificate_cannot_enable_dynamic_protocol(tmp_path):
     from sera.agent import SCHEMAS
     record = certificate()
