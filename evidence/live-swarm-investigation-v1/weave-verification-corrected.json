@@ -1,0 +1,108 @@
+{
+  "schema_version": "sera-swarm-evidence-verification-v1",
+  "execution_passed": false,
+  "issues": [
+    {
+      "check": "inspection-provenance",
+      "detail": "scheduling has no completed remote inspection.",
+      "round": 2
+    },
+    {
+      "check": "inspection-provenance",
+      "detail": "memory_context has no completed remote inspection.",
+      "round": 2
+    },
+    {
+      "check": "inspection-provenance",
+      "detail": "output_quality has no completed remote inspection.",
+      "round": 2
+    }
+  ],
+  "decision_rounds": 2,
+  "candidate_trials": 2,
+  "saved_profile": {
+    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+    "model_revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+    "evaluation_cases_sha256": "2f3c6687cf2a19bde4c3f5b60ab56cb24ac67c6755e999ad98227b04e42d95a7",
+    "task_count": 8,
+    "constraints": {
+      "quality_floor": 0.99,
+      "p95_latency_ms": null,
+      "max_memory_mib": null
+    },
+    "workload": {
+      "prompt_count": 8,
+      "concurrency": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "warmup_requests_per_load": 8,
+      "measured_requests_per_load": 24,
+      "quality_requests": 8,
+      "quality_concurrency": 1,
+      "latency_reduction": "worst-per-load-percentile",
+      "throughput_reduction": "total-tokens-over-total-measured-window-seconds"
+    },
+    "baseline_configuration": {
+      "dtype": "bfloat16",
+      "quantization": "fp8_per_tensor",
+      "kv_cache_dtype": "auto",
+      "tensor_parallel_size": 1,
+      "max_model_len": 4096,
+      "max_num_seqs": 8,
+      "max_num_batched_tokens": 4096,
+      "gpu_memory_utilization": 0.9,
+      "enable_prefix_caching": false,
+      "enable_chunked_prefill": true,
+      "enforce_eager": true
+    }
+  },
+  "source_hashes": {
+    "result": "3f3e6a532ac4d5bb26d4c000873bf4dd7c490d75507ee97550003595a4e6da98",
+    "calls": "13cc03f2e0ec72239be9a02c75ed350e3e4bb45e7dcb50a7eb8f30948c5c688c"
+  },
+  "root_call_id": "01a09a31-ec01-7c30-86cd-c51337b414a9",
+  "trace_id": "01a09a31-ec00-7428-a02b-80e40adcc79f",
+  "normalized_call_references": 650,
+  "feedback": {
+    "observed_trial_feedback": true,
+    "measured_candidate_feedback": false,
+    "startup_failure_feedback": true,
+    "rejected_raw_reviews": [
+      "trial-1"
+    ],
+    "limitation": "A recorded startup failure is feedback, not a measured quality or performance result. Rejected raw reviews are preserved, not relabeled as validated or delivered to later agents."
+  },
+  "failure_diagnosis": {
+    "established": true,
+    "missing_trial_ids": [],
+    "root_cause_established": false,
+    "scope": "Observed failures and consequences only; no model or hardware cause is inferred. Matching diagnosis records do not prove the agents understood or used them."
+  },
+  "proposal_diversity": {
+    "initial_distinct_candidates": [
+      2,
+      1
+    ],
+    "refined_distinct_candidates": [
+      1,
+      1
+    ],
+    "initial_alternatives_observed": true,
+    "refined_alternatives_observed": false
+  },
+  "improvement": {
+    "priority": "latency",
+    "required_gain_fraction": 0.05,
+    "best_observed_gain_fraction": 0.0005422800439980201,
+    "established": false
+  },
+  "limitations": [
+    "Consistency audit of supplied artifacts, not cryptographic proof of origin.",
+    "The saved profile is reported, not certification against an external benchmark or hardware profile.",
+    "No search-superiority or failure-cause claim follows from execution or proposal diversity.",
+    "Cached inspections retain remote source provenance; they are not fresh network requests."
+  ]
+}
