@@ -67,7 +67,10 @@ button:hover,select:hover{border-color:var(--mint)}
 [data-theme=dark] #play:hover{background:#c7e8c9}
 #scrub{flex:1;min-width:170px;accent-color:var(--mint);cursor:pointer}
 #clock{font:13px var(--mono);color:var(--muted)}
-.note{color:var(--muted);font-size:12px;line-height:1.7;margin:0 0 4px}
+.note{color:var(--muted);font-size:12px;line-height:1.7;margin:0 0 6px}
+.note strong{color:var(--text);font-weight:550}
+.note a{color:var(--mint)}
+.note a:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* Loop steps, as the site's pill row. */
 .flow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:26px 0 30px}
@@ -165,10 +168,11 @@ svg{display:block;width:100%;height:auto;margin-top:20px}
   <p class="subtitle">Replay a completed Qwen2.5 72B optimization run. Agents propose and review; the arbiter selects one GPU experiment per round. Measurements shape the next round.</p>
 </div>
 <div class="controls"><button id="play" type="button">▶ Play</button><button id="restart" type="button">Restart</button><label for="speed">Speed</label><select id="speed"><option value="1">1×</option><option value="4">4×</option><option value="8" selected>8×</option><option value="16">16×</option></select><input id="scrub" type="range" min="0" max="838.1639053689978" step="0.1" value="0" aria-label="Replay position in schematic run seconds"><output id="clock"></output></div>
-<p class="note">Schematic pacing: the measured full run took 838.164 seconds (about 1:45 at 8×). Phase boundaries below are illustrative, not measured GPU spans. All proposals and results come from the completed run. Press Play to begin.</p>
+<p class="note">Measured run: 13:58 · playback: 1:45 at 8× · schematic stage timing. Recorded proposals and results. Press Play to begin.</p>
+<p class="note"><strong>Weave:</strong> investigators read trace evidence; the run records model outputs, measurements, and decisions. <strong>ARIA:</strong> reviewed the completed run through W&B chat and recommended randomized repeat measurements. <a href="../docs/aria-final-run-review.md">Read the ARIA review ↗</a></p>
 <nav class="flow" id="flow" aria-label="Optimization loop"></nav>
 <div class="layout"><section aria-label="Current replay step"><div class="stage-head"><h2 id="headline" aria-live="polite"></h2><span class="round" id="round"></span></div><div class="agents" id="agents"></div><div class="detail" id="detail" aria-live="polite"></div></section><aside><h2>Best measured latency</h2><div class="best" id="best"></div><div id="gain"></div><svg id="chart" viewBox="0 0 270 200" role="img" aria-label="Measured latency by configuration; lower is better"></svg><p class="legend">Worst p95 across loads 1, 2, 4, 8. Each configuration: 96 timed requests and 8/8 strict-JSON quality checks passed.</p></aside></div>
-<footer class="footer"><div><strong>Recorded setup</strong>Qwen/Qwen2.5-72B-Instruct · FP8 weights · BF16 KV cache<br>1 × RTX PRO 6000 Blackwell · investigators: gpt-6-astra<div class="links"><a href="https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09c11-ca49-7d43-94cf-e56c54f98ac4" target="_blank" rel="noopener">Source trace ↗</a> · <a href="../evidence/openai-example-v2/audit-summary.json">Audit JSON</a> · <a href="../evidence/openai-example-v2/replay-timings.json">Proposal history</a></div></div><div><strong>Scope of the result</strong>Eight easy tasks, warmed repeated prompts. This does not establish cold-cache performance, broad model quality, or a global optimum. Peer feedback below is paraphrased from recorded reasoning. This page runs offline; it makes no model or GPU calls.</div></footer>
+<footer class="footer"><div><strong>Recorded setup</strong>Qwen/Qwen2.5-72B-Instruct · FP8 weights · BF16 KV cache<br>1 × RTX PRO 6000 Blackwell · investigators: gpt-6-astra<div class="links"><a href="https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09c11-ca49-7d43-94cf-e56c54f98ac4" target="_blank" rel="noopener">Source trace ↗</a> · <a href="../evidence/openai-example-v2/audit-summary.json">Audit JSON</a> · <a href="../evidence/openai-example-v2/replay-timings.json">Proposal history</a></div></div><div><strong>Measured workload</strong>8 tasks · warm cache · repeated prompts.<br>Agent feedback: summaries of recorded reasoning.<br>Offline playback: zero GPU or API calls.</div></footer>
 </main>
 </div><script>
 'use strict';
@@ -255,7 +259,7 @@ function render() {
   else if (stage.phase === 'arbiter') detail = `<strong>${round.experiment}</strong><p>${round.decision}</p>`;
   else if (stage.phase === 'gpu') detail = `<strong>One actual experiment: trial-${stage.round+1}</strong><p>${round.experiment}. The GPU runner loads this configuration, warms the workload, checks quality, and measures the fixed loads. Agents do not run separate GPU trials. The result is revealed next.</p>`;
   else if (stage.phase === 'result') detail = `<strong>Recorded trial-${stage.round+1} outcome</strong><p>${round.result}</p>`;
-  else if (stage.phase === 'stop') detail = '<strong>Stop: objective-plateau-confirmed</strong><p>Round 2 made no qualifying progress. Round 3 was the additional confirmation round, and its 0.992% gain over the prior best stayed below 5%. Return the best quality-valid result: cache + graphs. This stopping rule does not prove a global optimum.</p>';
+  else if (stage.phase === 'stop') detail = '<strong>Stop: objective-plateau-confirmed</strong><p>Round 2 made no qualifying progress. Round 3 confirmed the plateau: its 0.992% gain over the prior best stayed below the 5% target. Return the best quality-valid result: cache + graphs.</p>';
   else detail = '<strong>Completed run: cache + graphs selected</strong><p>771.046 → 618.588 ms (19.773% lower latency). The returned runner passed a fresh probe: {"answer": 5}. Cleanup passed; the post-cleanup GPU reading was 0 MiB used. Full invocation, including provider checks: 838.164 seconds.</p>';
   element('detail').innerHTML = detail;
   const revealed = stage.round < 0 ? 0 : ['result','stop','cleanup','complete'].includes(stage.phase) ? stage.round+2 : stage.round+1;
