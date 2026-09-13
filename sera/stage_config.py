@@ -1,6 +1,7 @@
 """Stage ordering and hard limits inherited from completed measured stages."""
 
 from dataclasses import dataclass
+from fractions import Fraction
 import math
 
 from .config import Constraints
@@ -12,8 +13,8 @@ SUPPORTED_STAGES = frozenset({'latency', 'memory', 'quantization'})
 @dataclass(frozen=True)
 class StagePlan:
     stages: tuple[str, ...]
-    k_fraction: float
-    latency_regression_fraction: float
+    regression_fraction: float
+    min_improvement_fraction: float
 
 
 def _finite_number(value, name):
@@ -28,14 +29,14 @@ def _finite_number(value, name):
     return number
 
 
-def _regression_fraction(value):
-    percentage = _finite_number(value, 'max_latency_regression_pct')
-    if percentage < 0:
-        raise ValueError('max_latency_regression_pct must be nonnegative')
+def _percentage_fraction(value, name):
+    percentage = _finite_number(value, name)
+    if not 0 <= percentage < 100:
+        raise ValueError(f'{name} must satisfy 0 <= {name} < 100 percent')
     return percentage / 100
 
 
-def validate_stage_options(stages, k, max_latency_regression_pct=0):
+def validate_stage_options(stages, k, min_improvement_pct=0.0):
     """Validate percent inputs; retain stage order and deliberate repetitions.
 
     Throughput remains a standalone objective until an inherited throughput
@@ -51,23 +52,21 @@ def validate_stage_options(stages, k, max_latency_regression_pct=0):
         if stage not in SUPPORTED_STAGES:
             raise ValueError(f'Unsupported stage: {stage}')
         canonical.append(stage)
-    percentage = _finite_number(k, 'k')
-    if not 0 <= percentage < 100:
-        raise ValueError('k must satisfy 0 <= k < 100 percent')
-    return StagePlan(tuple(canonical), percentage / 100,
-                     _regression_fraction(max_latency_regression_pct))
+    return StagePlan(tuple(canonical), _percentage_fraction(k, 'k'),
+                     _percentage_fraction(min_improvement_pct, 'min_improvement_pct'))
 
 
-def inherited_constraints(original: Constraints, checkpoints: list[dict],
-                          max_latency_regression_pct=0):
-    """Apply completed stages' frozen measurements without relaxing any limit.
+def inherited_constraints(original: Constraints, checkpoints: list[dict], k=0.0):
+    """Allow k percent regression from frozen measurements, within hard limits.
 
     Checkpoints use stage, status='completed', and p95_latency_ms. The measured
     value is not a previously derived ceiling: allowances must never compound.
-    Memory and quantization stages freeze positive integer sampled_peak_memory_mib
-    with no regression allowance. Caller checkpoints must use canonical names.
+    Memory and quantization stages freeze positive integer sampled_peak_memory_mib.
+    Their ceilings are rounded down using exact decimal percentage arithmetic.
+    Caller checkpoints must use canonical names. Quality is never relaxed.
     """
-    regression = _regression_fraction(max_latency_regression_pct)
+    regression = _percentage_fraction(k, 'k')
+    memory_multiplier = 1 + Fraction(str(k)) / 100
     ceiling = original.p95_latency_ms
     memory_ceiling = original.max_memory_mib
     for checkpoint in checkpoints:
@@ -77,8 +76,9 @@ def inherited_constraints(original: Constraints, checkpoints: list[dict],
             measured_memory = checkpoint.get('sampled_peak_memory_mib')
             if type(measured_memory) is not int or measured_memory <= 0:
                 raise ValueError('Completed memory stages require positive integer sampled_peak_memory_mib')
-            memory_ceiling = (measured_memory if memory_ceiling is None
-                              else min(memory_ceiling, measured_memory))
+            stage_memory_ceiling = math.floor(measured_memory * memory_multiplier)
+            memory_ceiling = (stage_memory_ceiling if memory_ceiling is None
+                              else min(memory_ceiling, stage_memory_ceiling))
         if checkpoint.get('stage') != 'latency':
             continue
         measured = _finite_number(checkpoint.get('p95_latency_ms'), 'checkpoint p95_latency_ms')
