@@ -209,7 +209,8 @@ def render_summary(report, output_dir):
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
              objective=None, evaluation=None, evaluation_version=None, constraints=None,
              workload=None, baseline_configuration=None, budget=None, investigation_space=None,
-             automatic_space=False, swarm=False, trace_reader=None, _runtime_factory=None):
+             automatic_space=False, swarm=False, trace_reader=None, _runtime_factory=None,
+             investigation_controls=None):
     """One candidate, or an opt-in bounded agent investigation; no joint placement.
 
     Uses at most 32 supplied prompts, declared loads, up to 16 warm-ups, three
@@ -229,6 +230,13 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     budget = Budget.model_validate(budget) if budget is not None else None
     if budget is not None and (agent is None or candidate is not None):
         raise ValueError("An investigation budget requires an agent and no fixed candidate")
+    investigation_options = {}
+    if investigation_controls is not None:
+        from .search_policy import validate_investigation_controls
+        investigation_controls = validate_investigation_controls(investigation_controls)
+        if budget is None or agent is None:
+            raise ValueError('investigation_controls requires an agent investigation budget')
+        investigation_options['investigation_controls'] = investigation_controls
     if investigation_space is not None and budget is None:
         raise ValueError("An explicit investigation space requires an agent investigation budget")
     if evaluation is None:
@@ -277,7 +285,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                             evaluation=evaluation, evaluation_version=evaluation_version,
                             constraints=constraints, agent=agent, provider_check=provider_check,
                             workload=workload, budget=budget, investigation_space=investigation_space,
-                            automatic_space=automatic_space, swarm=swarm, trace_reader=trace_reader)
+                            automatic_space=automatic_space, swarm=swarm, trace_reader=trace_reader,
+                            **investigation_options)
     baseline_config = (_runtime_factory.baseline_configuration(baseline_configuration) if _runtime_factory is not None else
                        RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(
                            baseline_configuration.model_dump() if isinstance(baseline_configuration, RuntimeConfig)
@@ -358,6 +367,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     elif baseline_configuration is not None and baseline_config != RuntimeConfig(
             quantization='fp8_per_tensor' if model_id == LARGE_MODEL_ID else None):
         report['baseline_name'] = 'sera-explicit-runtime-reference-v1'
+    if investigation_controls is not None:
+        report['investigation_controls'] = list(investigation_controls)
     result = SeraResult(models=[], report=report, output_dir=folder)
     active = None
     result._save()
@@ -383,7 +394,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             return investigate(result=result, active=investigation_runner, agent=agent,
                 history_start=history_start, budget=budget, objective=objective, constraints=constraints,
                 evaluation=evaluation, evaluation_version=evaluation_version, workload=workload,
-                swarm=swarm, trace_reader=trace_reader, runtime_factory=runtime_factory)
+                swarm=swarm, trace_reader=trace_reader, runtime_factory=runtime_factory,
+                **investigation_options)
         if agent is not None and baseline["status"] == "collected" and can_compare:
             from .agent import validate_proposal
             evidence = agent_evidence(baseline, objective, constraints, prompts=prompts)

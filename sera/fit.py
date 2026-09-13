@@ -39,7 +39,8 @@ def recommend_fit_plan(agent, evidence):
 
 def continue_fit_investigation(result, active, *, agent, history_start, budget,
                               investigation_space, objective, constraints,
-                              evaluation, evaluation_version, workload, swarm=False, trace_reader=None):
+                              evaluation, evaluation_version, workload, swarm=False, trace_reader=None,
+                              investigation_controls=None):
     """Promote a measured, eligible deployment to the search reference without reloading."""
     report = result.report
     try:
@@ -76,7 +77,8 @@ def continue_fit_investigation(result, active, *, agent, history_start, budget,
     return investigate(result=result, active=active, agent=agent,
         history_start=history_start, budget=budget, initial_trials_used=1,
         objective=objective, constraints=constraints, evaluation=evaluation,
-        evaluation_version=evaluation_version, workload=workload, swarm=swarm, trace_reader=trace_reader)
+        evaluation_version=evaluation_version, workload=workload, swarm=swarm, trace_reader=trace_reader,
+        **({'investigation_controls': investigation_controls} if investigation_controls is not None else {}))
 
 
 def plan_fit(*, gpu_memory_mib, workspace_bytes=4 * 1024**3):
@@ -129,11 +131,17 @@ def fit_review_evidence(plan, trial, decision):
 
 def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_version,
                  constraints, agent, provider_check, workload=None, budget=None,
-                 investigation_space=None, automatic_space=False, swarm=False, trace_reader=None):
+                 investigation_space=None, automatic_space=False, swarm=False, trace_reader=None,
+                 investigation_controls=None):
     from .pipeline import SeraResult
     from .provider_check import require_provider_check
     from .swarm import validate_swarm_options
     validate_swarm_options(swarm, budget, agent, trace_reader)
+    if investigation_controls is not None:
+        from .search_policy import validate_investigation_controls
+        investigation_controls = validate_investigation_controls(investigation_controls)
+        if budget is None or agent is None:
+            raise ValueError('investigation_controls requires an agent investigation budget')
     workload = Workload() if workload is None else Workload.model_validate(workload)
 
     if evaluation is None or constraints is None:
@@ -171,6 +179,8 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
               "limits": ["one model", "one fit candidate", "no measured BF16 baseline",
                          "no speedup or search superiority claim", "no multi-GPU placement"],
               "rejected": [], "returned_runner_closed": True}
+    if investigation_controls is not None:
+        report['investigation_controls'] = list(investigation_controls)
     result = SeraResult(models=[], report=report, output_dir=folder)
     active = None
     result._save()
@@ -273,7 +283,8 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
             return continue_fit_investigation(result, runner, agent=agent,
                 history_start=history_start, budget=budget, investigation_space=investigation_space,
                 objective=objective, constraints=constraints, evaluation=evaluation,
-                evaluation_version=evaluation_version, workload=workload, swarm=swarm, trace_reader=trace_reader)
+                evaluation_version=evaluation_version, workload=workload, swarm=swarm, trace_reader=trace_reader,
+                **({'investigation_controls': investigation_controls} if investigation_controls is not None else {}))
         return result
     except BaseException as failure:
         report.update(status="failed", error=f"{type(failure).__name__}: {failure}")

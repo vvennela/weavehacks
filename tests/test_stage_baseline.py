@@ -89,3 +89,68 @@ def test_existing_small_fp8_kv_control_can_be_remeasured_without_enabling_fp8_we
         assert result.report['baseline']['config_hash'] == configuration.config_hash
         assert result.models[0].configuration.quantization is None
     assert not any(runner.ready for runner in runners)
+
+
+@pytest.mark.parametrize('fit_first', [False, True])
+@pytest.mark.parametrize('controls', [[], ['max_num_batched_tokens', 'max_num_batched_tokens']])
+def test_stage_control_filter_reaches_direct_and_fit_investigation(tmp_path, monkeypatch, fit_first, controls):
+    if fit_first:
+        from test_fit_investigation import boundaries
+        runners, _, agent = boundaries(monkeypatch)
+    else:
+        runners, _, agent = install_fakes(monkeypatch, abstain=True)
+    captured = []
+    def investigate(**arguments):
+        captured.append(arguments['investigation_controls'])
+        result = arguments['result']
+        result.models = [arguments['active']]
+        result.report['decision'] = dict(selected='baseline', outcome='baseline', reason='test-handoff')
+        return result
+    monkeypatch.setattr('sera.investigation.investigate', investigate)
+    expected = tuple(dict.fromkeys(controls))
+    with pipeline.optimize(models=[LARGE_MODEL_ID if fit_first else MODEL_ID], prompts=['question'],
+            output_dir=tmp_path/'filtered', evaluation=lambda prompt, output: True,
+            evaluation_version='stage-controls-v1', constraints=Constraints(quality_floor=.99),
+            agent=agent, provider_check='fixture', budget=Budget(max_candidate_trials=2),
+            investigation_controls=controls) as result:
+        assert captured == [expected]
+        assert result.report['investigation_controls'] == list(expected)
+        assert result.models[0].ready
+    assert not any(runner.ready for runner in runners)
+
+
+@pytest.mark.parametrize('controls', [['unknown'], 'kv_cache_dtype', {'kv_cache_dtype'}])
+def test_invalid_stage_control_filter_fails_before_runtime(tmp_path, monkeypatch, controls):
+    _, _, agent = install_fakes(monkeypatch)
+    monkeypatch.setattr(pipeline, 'SeraModel', lambda **kwargs: pytest.fail('runtime constructed'))
+    with pytest.raises(ValueError, match='investigation_controls'):
+        pipeline.optimize(models=[MODEL_ID], prompts=['question'], output_dir=tmp_path/'bad-filter',
+            agent=agent, provider_check='fixture', budget=Budget(max_candidate_trials=1),
+            investigation_controls=controls)
+    assert not (tmp_path/'bad-filter').exists()
+
+
+def test_stage_control_filter_without_investigation_cannot_be_silently_ignored(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipeline, 'SeraModel', lambda **kwargs: pytest.fail('runtime constructed'))
+    with pytest.raises(ValueError, match='investigation'):
+        pipeline.optimize(models=[MODEL_ID], prompts=['question'], output_dir=tmp_path/'unused-filter',
+                          investigation_controls=[])
+    assert not (tmp_path/'unused-filter').exists()
+
+
+def test_fit_first_quantization_stage_does_not_invent_another_precision_trial(tmp_path, monkeypatch):
+    from test_fit_investigation import boundaries
+    runners, calls, agent = boundaries(monkeypatch)
+    with pipeline.optimize(models=[LARGE_MODEL_ID], prompts=['question'], output_dir=tmp_path/'fit-quant',
+            evaluation=lambda prompt, output: True, evaluation_version='fit-quant-v1',
+            constraints=Constraints(quality_floor=.99), agent=agent, provider_check='fixture',
+            budget=Budget(max_candidate_trials=2), automatic_space=True,
+            investigation_controls=['kv_cache_dtype']) as result:
+        assert result.report['deployment']['candidate_trial']['task_quality']['passed'] is True
+        assert result.models[0].configuration.quantization == 'fp8_per_tensor'
+        assert result.models[0].configuration.kv_cache_dtype == 'auto'
+        assert result.report['search_trials'] == []
+        assert result.report['search']['trials_used'] == 1
+        assert len(runners) == 1
+        assert len(calls) == 2  # One fit recommendation and its independent arbiter.
+    assert not runners[0].ready
