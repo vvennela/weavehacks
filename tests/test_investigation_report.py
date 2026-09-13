@@ -40,6 +40,14 @@ def test_non_investigation_report_returns_empty_section():
     assert render_investigation({'status': 'ready'}) == ''
 
 
+def test_unfinished_synthetic_run_is_labeled_before_final_provenance_is_added():
+    report = {'status': 'failed', 'provider_validation': {'provenance': 'synthetic'},
+              'search': {'rounds': []}}
+    text = render_investigation(report)
+    assert 'SYNTHETIC offline rehearsal' in text
+    assert 'This is not measured model performance' in text
+
+
 def test_report_links_scoped_arbitration_id_to_original_proposal():
     report = {'search': {'rounds': [{'round': 1, 'specialists': [
         {'role': 'batching', 'status': 'accepted', 'arbiter_proposal_id': 'batching:one',

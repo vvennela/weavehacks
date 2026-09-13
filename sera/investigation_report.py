@@ -68,7 +68,8 @@ def render_investigation(report):
     search = report.get('search') or {}
     trials = {trial['trial_id']: trial for trial in report.get('search_trials', []) if 'trial_id' in trial}
     lines = ['## Agent investigation', '']
-    if (report.get('provenance') or {}).get('kind') == 'synthetic':
+    if ((report.get('provenance') or {}).get('kind') == 'synthetic'
+            or (report.get('provider_validation') or {}).get('provenance') == 'synthetic'):
         lines.extend(['SYNTHETIC offline rehearsal. Agents, outputs, timing, and memory are fixtures.',
                       'No LM or GPU calls ran. This is not measured model performance.', ''])
     lines.extend(['Agents propose experiments. Deterministic checks decide which results are eligible.',
