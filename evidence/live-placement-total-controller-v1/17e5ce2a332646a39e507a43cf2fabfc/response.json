@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"ce12ce3d0586bf045759ce2e4e69b265cfc76e73c0fa6021a018f298d6c28a23\"],\"reason\":\"Select the sole legal proposal for a useful memory-focused trial: both services have measured isolated quality of 1.0, zero generation errors, and the configured allocations fit the recorded isolated peaks. Weight quantization is used for GLM-4-9B (fp8_per_tensor) under this allocation, while Qwen3-0.6B uses no quantization. Joint contention and the 5% memory improvement remain unmeasured, so this is a trial recommendation rather than final approval.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18108,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 310,
+    "reasoning_output_tokens": 148
+  }
+}

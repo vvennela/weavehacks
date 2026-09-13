@@ -1,0 +1,20 @@
+{
+  "source_commit": "6130d9e60a91e558c9dff6130ed608066dbe818f",
+  "execution": "Molab source checkout; not installed-wheel GPU execution",
+  "remote_repository": "/marimo/sera-capacity-v1",
+  "remote_result_directory": "/marimo/sera-evidence/live-placement-total-v1",
+  "archive_sha256": "f60f58a84f14f92369779c748c950cc9c4b156fbac25136ba71b8bb5464d312c",
+  "archive_bytes": 129684,
+  "process_exit_code": 0,
+  "agent_model": "gpt-5.6-luna",
+  "agent_transport": "local Codex relay to hosted model",
+  "agent_role": "placement frontier reader and arbiter",
+  "memory_accounting": "total-device",
+  "declared_device_budget_gib": 24,
+  "service_caps_independently_verified": false,
+  "weave_root_call_id": "01a09bce-654d-71f2-aaf4-3accd0872b4e",
+  "weave_cleanup_call_id": "01a09bd0-92e6-7761-af4d-5f10478acf07",
+  "exported_root_trace_calls": 279,
+  "exported_typed_agent_outputs": 1,
+  "scope": "Approved fixed allocations, unchanged isolated references and acceptance gates; no sustained-load or outage test"
+}
