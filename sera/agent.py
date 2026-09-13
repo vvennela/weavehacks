@@ -186,4 +186,8 @@ class WandbAgent:
         return self.request("frontier", evidence,
             "Select only from eligible_trial_ids. Explain whether the proposal's prediction held, "
             "was refuted, or was not tested. Respect the supplied deterministic quality and selection "
-            "result; a fast quality failure is not an improvement.")
+            "result; a fast quality failure is not an improvement. When prediction.kind is "
+            "deployment-feasibility, assess that stated prediction, not an unmeasured speedup. "
+            "A completed deployment meeting constraints confirms feasibility; a failed deployment "
+            "or failed gate refutes it. Missing baseline measurements do not make an executed "
+            "deployment trial untested and cannot support a speedup claim.")

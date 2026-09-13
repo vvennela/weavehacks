@@ -1,14 +1,16 @@
 # Sera
 
-Sera measures a model configuration, rejects quality failures, and returns a live runner.
+Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
 
 ## Current implementation
 
-The single-model path has completed a live agent-guided quick check on the supplied RTX PRO 6000: baseline → agent proposal → FP8 KV candidate → quality rejection → returned baseline runner → saved report and Weave trace. It supports one pinned Qwen3-0.6B model on Linux with vLLM 0.26.0. See [the result and limits](evidence/mvp-agent-v1/README.md).
+The large-model deployment path passed on the supplied RTX PRO 6000: reject the non-fitting BF16 plan → agent selects FP8 weights → load original Qwen2.5-72B weights with online quantization → pass all eight strict tasks → return a runner → pass a fresh request → save report and Weave trace → clean up. Measured p95 was 573 ms and peak total GPU memory was 86.38 GiB. See [the result and limits](evidence/large-fit-v1/README.md). The original final-agent review exposed an ambiguous prediction contract; that record is preserved and the review question has been corrected.
+
+The smaller Qwen3-0.6B path also completed a live agent-guided rejection and baseline-return check. Both models are pinned; the runtime is Linux with vLLM 0.26.0. See [the small-model result](evidence/mvp-agent-v1/README.md).
 
 The returned baseline runner answered `1` for `1 + 1`. Its runtime worked, but its answer was wrong. Do not treat runtime success or token agreement as model correctness.
 
-The live check used eight easy prompts and 24 measured requests per configuration, not the full 32-prompt/96-request acceptance workload. The agent recommended the baseline after its candidate failed. No optimization win or search advantage is established. Task-correctness acceptance, joint placement, and the search benchmark remain unfinished. Weave tracing ran through the experiment wrapper, not automatic package instrumentation.
+The live checks used eight easy prompts and 24 measured requests per configuration, not the full 32-prompt/96-request acceptance workload. The large-model run proves feasible deployment through weight quantization, not a measured speedup or search advantage. Joint placement and the search benchmark remain unfinished. Weave tracing ran through the experiment wrapper, not automatic package instrumentation.
 
 The W&B client, typed proposal/ranking/final-selection schemas, and bounded provider check are implemented. The client reads `WANDB_API_KEY` from the process environment; it never saves the key or request headers. Agent-controlled GPU execution stays disabled until the provider check passes.
 
@@ -106,7 +108,7 @@ Pass `objective=sera.Objective(priority="throughput")` to `optimize` to maximize
 
 The agent receives the priority, and the deterministic selector applies it. `result.frontier` retains quality-valid latency/throughput/memory trade-offs; it is no longer only the fastest trial. Missing metrics remain missing and cannot prove that one trial dominates another. The report includes the objective, frontier IDs, latency, throughput, and peak memory. No dollar-cost model is implemented.
 
-This wiring passes local synthetic checks, including different recommendations from the same measurements when the priority changes. It has not yet passed a new live objective-guided run. The saved FP8 candidate remains rejected under every priority in quick mode because token agreement failed. This change does not enable arbitrary models, weight quantization, multi-GPU placement, or loading without a feasible baseline.
+This wiring passes local synthetic checks, including different recommendations from the same measurements when the priority changes. The saved FP8 KV candidate remains rejected under every priority in quick mode because token agreement failed. The separate fit-first path below enables online weight quantization for the pinned 72B model without a feasible BF16 baseline. Arbitrary models and multi-GPU placement remain unsupported.
 
 ## Verified task requirements
 
@@ -140,7 +142,19 @@ The same `optimize` entry point now accepts `models=["Qwen/Qwen2.5-72B-Instruct"
 
 It estimates BF16 and online FP8 weight plans before loading. The estimate includes full-context BF16 KV for eight sequences, unquantized embedding/head/norm/bias parameters, 16 MiB of quantization metadata, and an explicit 4 GiB workspace allowance. The 0.90 service fraction leaves physical headroom. Workspace and startup behavior still require measurement.
 
-With an agent, the arbiter selects at most one estimated-feasible plan. Sera then loads the original weights with `fp8_per_tensor`, measures the workload, applies task and resource limits, and returns the live runner only on a pass. The unquantized baseline is marked infeasible, never fabricated. A pass establishes feasible deployment, not a speedup over a baseline that did not run. This path is locally validated; the large-model live check is pending. No multi-GPU allocation or wider search is implemented.
+With an agent, the arbiter selects at most one estimated-feasible plan. Sera then loads the original weights with `fp8_per_tensor`, measures the workload, applies task and resource limits, and returns the live runner only on a pass. The unquantized baseline is marked infeasible, never fabricated. This path passed the live eight-task check. It establishes feasible deployment, not a speedup over a baseline that did not run. No multi-GPU allocation or wider search is implemented.
+
+To run the same eight-task demo from this repository on the supplied GPU, install the `agent` extra and Weave in the existing environment, supply `WANDB_API_KEY`, and use the saved matching provider check:
+
+```sh
+python -m experiments.run_fit_demo \
+  --project vvennela-n-a/wandb_agent_default_project \
+  --provider-check evidence/provider-v2/result.json \
+  --output-dir sera-runs/large-fit-demo \
+  --priority throughput --interactive
+```
+
+Prepare the pinned original weights before presenting; the download is about 135.4 GiB and server startup is separate from request latency. The interactive option keeps a passing returned runner available for new prompts until blank input or EOF. Those extra prompts do not change the saved acceptance score. Without that option, the command probes the returned runner once and closes it. A failed deployment or failed post-return probe exits nonzero. This eight-task demo is not the full search benchmark.
 
 ## Cache-pressure pilot
 

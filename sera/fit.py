@@ -47,6 +47,19 @@ def plan_fit(*, gpu_memory_mib, workspace_bytes=4 * 1024**3):
                             "Original BF16 files are downloaded; linear weights are quantized during loading."]}
 
 
+def fit_review_evidence(plan, trial, decision):
+    """Keep deployment feasibility separate from an unavailable BF16 comparison."""
+    return {"decision": decision, "fit_plan": plan,
+            "prediction": {"kind": "deployment-feasibility",
+                           "statement": "Online FP8 weights let the requested model run on this GPU and meet the supplied task and resource constraints."},
+            "baseline_measured": False, "speedup_claim_allowed": False,
+            "candidate_tested": True, "candidate_status": trial["status"],
+            "candidate_metrics": trial.get("reduced"),
+            "candidate_task_quality": trial.get("task_quality"),
+            "candidate_peak_memory_mib": trial.get("runtime", {}).get("sampled_peak_memory_mib"),
+            "eligible_trial_ids": [decision["selected"] or "no-safe-configuration"]}
+
+
 def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_version,
                  constraints, agent, provider_check):
     from .pipeline import SeraResult
@@ -98,7 +111,9 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
             ranking = agent.request("arbiter", evidence,
                 "Rank at most one plan from legal_plan_ids for a real trial. These are memory estimates, "
                 "not latency or quality measurements. Explain the fit trade-off and why a trial is useful. "
-                "Do not rank an infeasible plan or claim that quality has passed. An empty ranking declines the trial.")
+                "Do not rank an infeasible plan or claim that quality has passed. The prediction is deployment "
+                "feasibility, not a throughput gain: no BF16 baseline will run, so speedup cannot be measured. "
+                "An empty ranking declines the trial.")
             report["planning_decision"] = ranking.model_dump() if ranking is not None else None
             report["agent_calls"] = agent.history[history_start:]
             ids = ranking.ranked_proposal_ids if ranking is not None else []
@@ -129,10 +144,7 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
                                                objective=objective, constraints=constraints)
         if agent is not None and chosen is not None:
             selected = report["decision"]["selected"] or "no-safe-configuration"
-            feedback = {"decision": report["decision"], "fit_plan": chosen,
-                        "candidate_tested": True, "candidate_status": report["candidate_trial"]["status"],
-                        "candidate_metrics": report["candidate_trial"].get("reduced"),
-                        "eligible_trial_ids": [selected]}
+            feedback = fit_review_evidence(chosen, report["candidate_trial"], report["decision"])
             report["agent_feedback"] = feedback
             try:
                 final = agent.review(feedback)

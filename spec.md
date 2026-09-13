@@ -1,6 +1,6 @@
 # Sera Technical Specification
 
-Status: Hackathon specification; the eight-prompt live agent rejection/fallback path and provider schema check passed. User-priority selection is locally validated. Full workload acceptance, task-quality acceptance, FP8 weights, GLM, fit-first loading, and broader search remain unfinished.
+Status: The narrow large-model deployment MVP passed: pinned Qwen72B online FP8 loading, eight strict tasks, a usable returned runner, and saved measurements. See evidence/large-fit-v1/README.md for evidence and the preserved final-agent review contract issue. The small-model rejection/fallback path and provider schema check also passed. Full 32-prompt acceptance, GLM, multi-model placement, and broader search remain unfinished.
 
 ## 1. Purpose
 

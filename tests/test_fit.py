@@ -2,7 +2,7 @@ import pytest
 
 from sera import Constraints
 from sera.config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, RuntimeConfig
-from sera.fit import plan_fit
+from sera.fit import fit_review_evidence, plan_fit
 from sera.measurement import measured_frontier, select_candidate
 from sera.runtime import SeraModel
 
@@ -51,3 +51,20 @@ def test_verified_candidate_needs_no_output_reference_from_an_infeasible_baselin
     assert decision['outcome'] == 'feasible'
     assert decision['p95_improvement_fraction'] is None
     assert measured_frontier(baseline, candidate, constraints=constraints) == [candidate]
+
+
+@pytest.mark.parametrize('selected,status', [('candidate', 'collected'), (None, 'startup-failed')])
+def test_fit_review_assesses_deployment_not_an_unmeasured_speedup(selected, status):
+    decision = {'selected': selected, 'outcome': 'feasible' if selected else 'no-safe-configuration'}
+    trial = {'status': status, 'runtime': {'sampled_peak_memory_mib': 88449},
+             'task_quality': {'mean': 1.0 if selected else 0.0, 'passed': bool(selected)},
+             'reduced': {'p95_latency_ms': 573.0} if selected else None}
+    feedback = fit_review_evidence({'plan_id': 'weight-fp8'}, trial, decision)
+    assert feedback['prediction']['kind'] == 'deployment-feasibility'
+    assert feedback['candidate_tested'] is True
+    assert feedback['candidate_status'] == status
+    assert feedback['candidate_task_quality'] == trial['task_quality']
+    assert feedback['candidate_peak_memory_mib'] == 88449
+    assert feedback['baseline_measured'] is False
+    assert feedback['speedup_claim_allowed'] is False
+    assert feedback['eligible_trial_ids'] == [selected or 'no-safe-configuration']

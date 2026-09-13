@@ -60,7 +60,7 @@ Each surviving candidate is loaded, warmed up, tested with representative work, 
 
 The user can prioritize latency, throughput, or memory. Latency remains the default. The selected priority reaches the agents and the deterministic selector, and is saved with the evidence. Cost optimization requires explicit resource prices and accounting; Sera must not infer a dollar cost from memory use alone.
 
-A model that cannot fit before optimization needs a separate fit-first path: reject impossible loading plans before execution, propose supported weight quantization and placement, then verify a feasible plan against the user's task requirements. An unavailable unquantized baseline cannot supply local latency or token-agreement evidence. This path is not yet implemented; the working prototype still requires the pinned Qwen baseline to start.
+A model that cannot fit before optimization needs a separate fit-first path: reject impossible loading plans before execution, propose supported weight quantization and placement, then verify a feasible plan against the user's task requirements. An unavailable unquantized baseline cannot supply local latency or token-agreement evidence. The prototype implements this path for pinned Qwen2.5-72B using online FP8 weights on one GPU. It requires a task evaluator and explicit quality floor. The live eight-task deployment and returned-runner check passed; see evidence/large-fit-v1/README.md. Multi-GPU placement and best-plan search are not implemented.
 
 ### Phase 2: optimize the models together
 
