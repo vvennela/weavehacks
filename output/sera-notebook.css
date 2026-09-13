@@ -39,3 +39,42 @@
 }
 .substrate-tabs button:disabled{opacity:.45;cursor:not-allowed}
 .substrate-tabs button:focus-visible{outline:2px solid var(--lilac);outline-offset:2px}
+
+/* molab launch panel. A session cannot be embedded, so this opens one instead. */
+.molab-panel{
+  border:1px solid var(--line);border-radius:14px;background:var(--bg);
+  padding:1.6rem 1.7rem;box-shadow:0 1px 2px rgba(34,58,53,.04);
+}
+.molab-panel h2{margin:0 0 .45rem;font-size:1.3rem;letter-spacing:-.01em}
+.molab-panel > p{margin:0 0 1.1rem;color:var(--muted);max-width:62ch;line-height:1.55}
+.molab-steps{margin:0 0 1.3rem;padding:0;list-style:none;counter-reset:step}
+.molab-steps li{
+  counter-increment:step;position:relative;padding:.34rem 0 .34rem 2.1rem;
+  color:var(--text);font-size:.92rem;line-height:1.5;
+}
+.molab-steps li::before{
+  content:counter(step);position:absolute;left:0;top:.34rem;
+  width:1.45rem;height:1.45rem;border-radius:50%;
+  display:grid;place-items:center;font-size:.72rem;font-weight:600;
+  background:rgba(40,101,85,.1);color:var(--mint);
+}
+.molab-steps code{
+  font-size:.85em;padding:.08em .35em;border-radius:4px;
+  background:rgba(40,101,85,.08);color:var(--mint);
+}
+.molab-panel .primary{display:inline-block;text-decoration:none}
+.molab-warn{
+  margin:0 0 1.1rem;padding:.8rem 1rem;border-radius:10px;
+  border:1px solid var(--line);border-left:3px solid var(--warn,#b0553f);
+  color:var(--muted);font-size:.87rem;line-height:1.5;
+}
+.molab-warn code{font-size:.85em}
+details.molab-preview{margin-top:1.4rem;border-top:1px solid var(--line);padding-top:1rem}
+details.molab-preview summary{
+  cursor:pointer;color:var(--muted);font-size:.87rem;
+}
+details.molab-preview summary:hover{color:var(--text)}
+details.molab-preview iframe{
+  width:100%;height:460px;margin-top:.9rem;
+  border:1px solid var(--line);border-radius:12px;background:var(--bg);
+}

@@ -24,10 +24,16 @@ retain route protection and account endpoints. This server binds only to loopbac
 `/notebook` is the first page after sign-in. It has two tabs, and both run Sera's
 real optimization loop — they differ only in what is underneath it.
 
-**molab — Blackwell GPU.** Embeds a molab notebook, where marimo provides a free
+**molab — Blackwell GPU.** Opens a molab notebook, where marimo provides a free
 RTX Pro 6000 Blackwell (96GB, 125 TFLOPS) in a CoreWeave sandbox. Sera runs real
 vLLM there, so every row is measured on hardware. This is what `specs/molab.yaml`
 was written against.
+
+It opens rather than embeds, deliberately. molab's embeddable `/app` view is a
+read-only WebAssembly preview with no GPU and no session — iframing it would show
+"Fork to edit and run your own code" and defeat the reason for using molab at all.
+The tab is a launch panel with the setup steps; the read-only preview is available
+behind a disclosure, and loads only when opened so nothing sits spinning.
 
 Setting it up, once:
 

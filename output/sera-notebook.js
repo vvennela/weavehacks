@@ -1,48 +1,60 @@
 (() => {
   const $ = id => document.getElementById(id);
-  const frame = $('notebook-frame'), note = $('notebook-status');
+  const frame = $('notebook-frame'), panel = $('molab-panel'), note = $('notebook-status');
   const tabs = [...document.querySelectorAll('[data-substrate]')];
+  const link = $('molab-open'), missing = $('molab-missing'), preview = $('molab-preview');
   if (!frame || !tabs.length) return;
 
   let molabUrl = '';
-  const LOCAL = '/notebook-app/';
 
-  // Remember the last choice so a reload does not drop you back on a tab you were
-  // not using. Wrapped because storage throws in some privacy modes.
-  const remember = value => { try { localStorage.setItem('sera-substrate', value); } catch {} };
+  const remember = v => { try { localStorage.setItem('sera-substrate', v); } catch {} };
   const remembered = () => { try { return localStorage.getItem('sera-substrate'); } catch { return null; } };
 
   function select(substrate) {
     const gpu = substrate === 'gpu';
-    if (gpu && !molabUrl) {
-      note.textContent = 'No molab notebook is configured. Start the server with '
-        + 'SERA_MOLAB_URL set to your notebook’s /app URL, then reload.';
-      note.hidden = false;
-      return;
-    }
     tabs.forEach(t => {
       const on = t.dataset.substrate === substrate;
       t.classList.toggle('active', on);
       t.setAttribute('aria-selected', String(on));
     });
-    frame.src = gpu ? molabUrl : LOCAL;
-    frame.title = gpu ? 'Sera Lab on molab' : 'Sera Lab, local simulator';
-    note.textContent = gpu
-      ? 'Running on molab. Attach an RTX Pro 6000 Blackwell with the notebook specs button inside the notebook, then press Run for measured vLLM numbers.'
-      : 'Running locally in your browser through WebAssembly, on Sera’s analytic simulator. No GPU, no weights, and no network once loaded.';
+    panel.hidden = !gpu;
+    frame.hidden = gpu;
+    if (gpu) {
+      // Never leave a cross-origin frame loading behind a hidden panel.
+      frame.removeAttribute('src');
+      if (preview) preview.open = false;
+      note.textContent = molabUrl
+        ? 'molab runs on a real RTX Pro 6000 Blackwell, but a session cannot be embedded — open it in its own tab.'
+        : 'No molab notebook is configured yet.';
+    } else {
+      frame.src = '/notebook-app/';
+      note.textContent = 'Running locally in your browser through WebAssembly, on Sera’s '
+        + 'analytic simulator. Seconds rather than minutes, no GPU, and no network once loaded.';
+    }
     note.hidden = false;
     remember(substrate);
   }
 
   tabs.forEach(t => t.addEventListener('click', () => select(t.dataset.substrate)));
 
+  // The read-only preview is opt-in: it is a WebAssembly render of the notebook's
+  // code, it takes a while, and a spinner sitting on the page reads as breakage.
+  if (preview) {
+    preview.addEventListener('toggle', () => {
+      const box = $('molab-preview-frame');
+      if (preview.open && box && !box.src && molabUrl) box.src = molabUrl;
+    });
+  }
+
   fetch('/api/config')
     .then(r => (r.ok ? r.json() : {}))
     .then(data => { molabUrl = data.molab_url || ''; })
     .catch(() => {})
     .finally(() => {
-      const gpuTab = tabs.find(t => t.dataset.substrate === 'gpu');
-      if (gpuTab) gpuTab.disabled = !molabUrl;
-      select(molabUrl && remembered() !== 'local' ? 'gpu' : 'local');
+      if (link && molabUrl) link.href = molabUrl.replace(/\/app$/, '');
+      if (link) link.hidden = !molabUrl;
+      if (missing) missing.hidden = !!molabUrl;
+      if (preview) preview.hidden = !molabUrl;
+      select(remembered() === 'local' ? 'local' : 'gpu');
     });
 })();
