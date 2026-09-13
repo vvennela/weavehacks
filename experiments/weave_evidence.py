@@ -200,6 +200,8 @@ class WeaveEvidenceReader:
                     or not isinstance(payload, Mapping) or _identity(payload) not in allowed
                     or not isinstance(identifier, str) or not identifier or identifier in seen):
                 continue
+            # BoxedStr carries SDK references that would rewrite IDs in traced peer inputs.
+            identifier = str(identifier)
             seen.add(identifier)
             records.append(dict(call_id=identifier, op_name=name, output=deepcopy(dict(payload)),
                                 output_sha256=content_hash(payload)))

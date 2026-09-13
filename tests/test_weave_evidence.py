@@ -399,3 +399,20 @@ def test_persisted_diagnosis_exposes_specific_safe_runtime_failure_with_log_refe
     assert failure['source']['sha256'] == 'a' * 64
     assert failure['root_cause_status'] == 'not-established'
     assert 'must-not-export' not in json.dumps(result)
+
+
+def test_returned_call_ids_are_native_strings_without_sdk_reference_metadata():
+    class BoxedStr(str):
+        ref = 'fixture-sdk-call-reference'
+
+    records = calls()
+    for record in records:
+        record.id = BoxedStr(record.id)
+    reader = WeaveEvidenceReader(Client(records), 'this-run')
+    for query_id in ('quality_outputs', 'latency_outliers', 'load_metrics'):
+        result = reader(query_id, evidence())
+        assert result['records']
+        for item in result['records']:
+            assert type(item['call_id']) is str
+            assert not hasattr(item['call_id'], 'ref')
+    assert isinstance(records[0].id, BoxedStr)
