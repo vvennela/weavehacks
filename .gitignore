@@ -4,3 +4,6 @@ __pycache__/
 *.egg-info/
 dist/
 sera-runs/
+.env
+.env.*
+!.env.example

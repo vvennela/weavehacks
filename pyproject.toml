@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sera-inference"
+version = "0.1.0"
+description = "Measured inference configuration experiments"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.12,<3", "prometheus-client>=0.21,<1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["sera"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -791,6 +791,23 @@ The milestone is complete when a real run:
 
 Check the rejection branch manually with an explicitly labeled empty or altered output fixture; it must select the baseline. Fixture results do not count as measured model quality. A safe baseline return completes the milestone even when the candidate does not improve performance.
 
+### 23.1a Minimum agent-pipeline acceptance
+
+The fixed-candidate first milestone proves runtime infrastructure, not Sera's agent recommendation claim. The smallest demonstration of that claim adds one real recommendation agent; it does not require all five roles, joint placement, or a search-efficiency win.
+
+Accept the core pipeline when one saved real run shows:
+
+1. Sera measures a pinned baseline and supplies its actual metrics, supported settings, and budget to the agent.
+2. The agent returns a schema-valid recommendation with a reason tied to supplied evidence. It proposes one supported change or explicitly recommends keeping the baseline. A hard-coded candidate is not evidence of agent recommendation.
+3. Deterministic code validates the recommendation before execution. The agent cannot approve its own proposal, quality result, or final selection.
+4. For a proposed change, Sera measures that candidate with the same workload and applies the configured quality gate. The agent receives the measured outcome and produces a final recommendation that records whether its prediction held. A keep-baseline decision avoids an unnecessary candidate trial and is recorded as such.
+5. The existing improvement rule governs application: zero generation errors, a passing quality gate, and at least 5% lower measured p95. Otherwise Sera returns the baseline with the rejection reason. An agent recommendation is not automatic permission to apply a change.
+6. Sera returns a working runner, answers one fresh request, saves the report, and closes successfully. Preserve the agent input/output, validation, trial outcome, and final decision in the run record and in Weave when connected.
+
+A rejected recommendation with a usable baseline is a successful pipeline outcome. It does not establish an optimization win or evidence-driven search superiority. Provider reliability and the full benchmark claims remain separate checks; do not manufacture them from one agent call.
+
+Use the simpler questions in benchmarks/easy_cases.json when preparing the next task-quality workload. Their results are currently unmeasured. The first milestone's existing measurement contract and conservative gate are not silently replaced by this eight-case dataset. A task-based evaluator must report absolute baseline/candidate correctness and newly failed cases separately from format compliance; a candidate must not be accepted merely because it matches an incorrect baseline answer.
+
 ### 23.2 Full MVP target
 
 The full MVP is complete when:

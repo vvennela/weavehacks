@@ -180,7 +180,10 @@ vllm:request_generation_tokens_bucket{engine="0",le="2.0",model_name="sera-smoke
 vllm:request_generation_tokens_bucket{engine="0",le="5.0",model_name="sera-smoke"} 0.0
 vllm:request_generation_tokens_bucket{engine="0",le="10.0",model_name="sera-smoke"} 0.0
 vllm:request_generation_tokens_bucket{engine="0",le="20.0",model_name="sera-smoke"} 0.0
-vllm:request_generation_tokens_bucket{engine="0",…78 tokens truncated…="sera-smoke"} 3.0
+vllm:request_generation_tokens_bucket{engine="0",le="50.0",model_name="sera-smoke"} 3.0
+vllm:request_generation_tokens_bucket{engine="0",le="100.0",model_name="sera-smoke"} 3.0
+vllm:request_generation_tokens_bucket{engine="0",le="200.0",model_name="sera-smoke"} 3.0
+vllm:request_generation_tokens_bucket{engine="0",le="500.0",model_name="sera-smoke"} 3.0
 vllm:request_generation_tokens_bucket{engine="0",le="1000.0",model_name="sera-smoke"} 3.0
 vllm:request_generation_tokens_bucket{engine="0",le="2000.0",model_name="sera-smoke"} 3.0
 vllm:request_generation_tokens_bucket{engine="0",le="+Inf",model_name="sera-smoke"} 3.0

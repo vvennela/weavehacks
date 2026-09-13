@@ -1,6 +1,6 @@
 # Sera: incremental delivery plan
 
-Status: Qwen BF16 and FP8 KV runtime checks passed. The 24-case task-quality pilot is complete; see evidence/tasks-v1-comparison/README.md. The measured first milestone is not complete. Its quality contract needs a decision before implementation continues.
+Status: Qwen BF16 and FP8 KV runtime checks passed. The 24-case task-quality pilot is complete; see evidence/tasks-v1-comparison/README.md. The Sera package now implements the fixed-candidate runner, serial measurements, conservative gate, baseline rollback, and saved report. Local tests and labeled manual fixtures pass. Live package acceptance and agent-pipeline acceptance remain incomplete.
 
 ## First milestone
 
@@ -52,4 +52,6 @@ SQLite recovery, multi-GPU support, full frontier search, and notebook polish fo
 
 The user requested objective task vectors instead of relying on output similarity. An Astra subagent created and independently checked the frozen 24-case sera-task-v1 pilot. BF16 scored 3/24 and FP8 KV scored 1/24 under its strict JSON contract. Formatting dominates these scores; the report preserves them and separately identifies four correct fenced payloads per run. Both configurations also make task errors. Median latency is effectively tied; a retained 54.626-second BF16 outlier prevents a clean speed claim.
 
-Next decision: should answer correctness and JSON-format compliance be separate gates? Do not silently replace the existing 99% token-agreement rule or promote FP8 based on this pilot. The pilot's 128-token limit and single 24-case pass are not the first milestone's workload. FP8 weights, GLM, agent selection, and a returned Sera runner remain unverified or unfinished.
+Next validation: check the packaged runner with the one authorized live test, then add one real recommendation agent under section 23.1a after provider validation. The fixed-candidate path alone does not establish the product's agent claim. Keep answer correctness and format compliance separate when wiring a task evaluator; do not silently replace the existing 99% proxy or promote FP8 from the pilot. Eight easier, unmeasured questions are prepared in benchmarks/easy_cases.json. FP8 weights, GLM, agent selection, and a live optimize return remain unverified or unfinished.
+
+Implementation checkpoint: 65 local tests pass. Manual synthetic checks exercised candidate acceptance, empty-output rejection and baseline reload, candidate startup failure and baseline reload, and cleanup failure stopping the run. These checks are control-flow evidence, not GPU measurements. The metrics parser also exposed a truncated line in the older BF16 export; the original line range was recovered from the saved Molab file without rerunning the model. W&B credentials were absent when checked; the user is adding the key. No provider calls have run.
