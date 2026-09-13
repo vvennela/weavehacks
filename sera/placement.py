@@ -190,13 +190,24 @@ class PlacementResult:
         self.close()
 
 
-def place(*, plan, workloads, memory_estimates, output_dir, weave_project=None):
+def place(*, plan, workloads, memory_estimates, output_dir, weave_project=None, isolated_reference=None):
     """Measure one caller-selected pair. Never silently return only one model.
 
     Failed quality returns an empty result with evidence. Cleanup errors raise and
     remain saved. The caller owns both successful runners and must close them.
     """
-    arguments = dict(plan=plan, workloads=workloads, memory_estimates=memory_estimates, output_dir=output_dir)
+    arguments = dict(plan=plan, workloads=workloads, memory_estimates=memory_estimates,
+                     output_dir=output_dir, _isolated_reference=isolated_reference)
+    return _run_placement(arguments, weave_project)
+
+
+def measure_placement_references(*, plan, workloads, memory_estimates, output_dir, weave_project=None):
+    """Measure and close both isolated services; never start a joint pair."""
+    return _run_placement(dict(plan=plan, workloads=workloads, memory_estimates=memory_estimates,
+        output_dir=output_dir, _references_only=True), weave_project)
+
+
+def _run_placement(arguments, weave_project):
     if weave_project is None:
         return _place(**arguments)
     if not isinstance(weave_project, str) or not weave_project.strip():
@@ -205,7 +216,8 @@ def place(*, plan, workloads, memory_estimates, output_dir, weave_project=None):
     return run_traced_placement(_place, arguments, weave_project)
 
 
-def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=None):
+def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=None,
+           _references_only=False, _isolated_reference=None):
     plan = validate_placement_plan(plan)
     model_ids = {service.model_id for service in plan.services}
     if set(workloads) != model_ids or set(memory_estimates) != model_ids:
@@ -219,6 +231,10 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
     for service in plan.services:
         if max(profiles[service.model_id].workload.concurrency) > service.configuration.max_num_seqs:
             raise ValueError('Workload concurrency exceeds a service sequence limit')
+    bound = None
+    if _isolated_reference is not None:
+        from .placement_reference import bind_placement_reference
+        bound = bind_placement_reference(_isolated_reference, plan, profiles)
     folder = Path(output_dir).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     manifest = {model: profile.manifest() for model, profile in profiles.items()}
@@ -229,6 +245,10 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
         isolated={}, isolated_gates={}, isolated_runtimes=[], decision=dict(outcome='not-attempted', reason='pending'),
         quantization_enabled_placement=False, returned_runner_closed=True)
     result = PlacementResult([], report, folder)
+    if bound is not None:
+        report.update(isolated=bound['isolated'], isolated_gates=bound['gates'],
+                      isolated_reference=bound['provenance'],
+                      isolated_runtimes=[trial['runtime'] for trial in bound['isolated'].values()])
     if _result_observer is not None:
         _result_observer(result)
     result._save()
@@ -239,7 +259,7 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
             return result
 
     try:
-        for index, service in enumerate(plan.services):
+        for index, service in enumerate(plan.services if bound is None else []):
             profile = profiles[service.model_id]
             model = SeraModel(model_id=service.model_id, revision=service.revision,
                 configuration=service.configuration, artifact_dir=folder/f'isolated-{index}')
@@ -267,6 +287,12 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
                 report.update(status='rejected', decision=dict(outcome='not-attempted', reason='isolated-requirements-failed'))
                 result._save()
                 return result
+
+        if _references_only:
+            report.update(status='references-ready',
+                decision=dict(outcome='references-ready', reason='both-isolated-models-pass'))
+            result._save()
+            return result
 
         owner = SharedGPUOwner(plan)
         result.owner = owner

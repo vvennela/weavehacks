@@ -35,7 +35,9 @@ class FakeModel:
         self.closed = False
         self.record = dict(model_id=model_id, revision=revision,
             configuration=configuration.model_dump(), sampled_peak_memory_mib=100,
-            telemetry_errors=0, gpu=dict(uuid='test-gpu', total_mib=1000), status='ready')
+            telemetry_errors=0, gpu=dict(uuid='test-gpu', total_mib=1000), status='ready',
+            versions={'vllm':'0.26.0', 'torch':'test', 'transformers':'test', 'flashinfer-python':'test'},
+            memory_before_mib=0)
         self.instances.append(self)
 
     def start(self):
