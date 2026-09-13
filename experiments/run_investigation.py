@@ -2,6 +2,8 @@
 
 Run from the repository root with python -m experiments.run_investigation.
 This command uses GPU time. Importing the module does not run an experiment.
+Declare at least one control explicitly. FP8 KV is opt-in for Qwen3-0.6B only;
+Qwen72B uses FP8 weights, so its combined FP8 weights/KV path stays disabled.
 """
 
 import argparse
@@ -22,9 +24,18 @@ CASES_PATH = Path(__file__).resolve().parents[1]/'benchmarks'/'easy_cases.json'
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model', required=True, choices=[MODEL_ID, LARGE_MODEL_ID])
-    parser.add_argument('--budget', required=True, type=int, help='Maximum candidate trials, 1 to 8')
-    parser.add_argument('--batching-values', required=True, type=int, nargs='+',
+    parser.add_argument('--budget', required=True, type=int,
+                        help='Maximum candidate trials, 1 to 8; includes deployment with --fit-first')
+    parser.add_argument('--fit-first', action='store_true',
+                        help='Qwen72B only: first measure FP8 deployment, then investigate within the same budget')
+    parser.add_argument('--batching-values', type=int, nargs='+',
                         help='Explicit candidate max_num_batched_tokens values; baseline is 4096')
+    parser.add_argument('--sequence-values', type=int, nargs='+',
+                        help='Explicit candidate max_num_seqs values; baseline is 8')
+    parser.add_argument('--context-values', type=int, nargs='+',
+                        help='Explicit candidate max_model_len values; baseline is 4096')
+    parser.add_argument('--fp8-kv', action='store_true',
+                        help='Include the FP8 KV candidate for the small Qwen BF16 baseline')
     parser.add_argument('--project', required=True)
     parser.add_argument('--provider-check', required=True, help='Current passing 30-case certificate')
     parser.add_argument('--output-dir', required=True, help='A new evidence directory')
@@ -40,12 +51,21 @@ def main(argv=None):
             raise ValueError('output-dir must be a new directory')
         if not args.project.strip():
             raise ValueError('project must be nonempty')
+        if args.fit_first and args.model != LARGE_MODEL_ID:
+            raise ValueError('--fit-first is supported only for Qwen72B')
         budget = sera.Budget(max_candidate_trials=args.budget)
         workload = sera.Workload(concurrency=args.concurrency)
         objective = sera.Objective(priority=args.priority)
-        baseline = sera.RuntimeConfig(quantization='fp8_per_tensor') if args.model == LARGE_MODEL_ID else None
-        space = sera.InvestigationSpace(supported_changes={'max_num_batched_tokens': args.batching_values})
-        frozen_space = resolve_investigation_space(space, baseline=baseline or sera.RuntimeConfig(),
+        reference = (sera.RuntimeConfig(quantization='fp8_per_tensor')
+                     if args.model == LARGE_MODEL_ID else sera.RuntimeConfig())
+        baseline = reference if args.model == LARGE_MODEL_ID and not args.fit_first else None
+        changes = {lever: values for lever, values in (
+            ('max_num_batched_tokens', args.batching_values), ('max_num_seqs', args.sequence_values),
+            ('max_model_len', args.context_values)) if values is not None}
+        if args.fp8_kv:
+            changes['kv_cache_dtype'] = ['fp8']
+        space = sera.InvestigationSpace(supported_changes=changes)
+        frozen_space = resolve_investigation_space(space, baseline=reference,
                                                    model_id=args.model, workload=workload)
         cases = load_cases(CASES_PATH)
         agent = sera.WandbAgent(project=args.project)
@@ -64,6 +84,7 @@ def main(argv=None):
 
     invocation = {'schema_version': 'sera-live-investigation-invocation-v1', 'passed': False,
                   'model_id': args.model, 'budget': budget.model_dump(),
+                  'fit_first': args.fit_first,
                   'objective': objective.model_dump(), 'workload': workload.model_dump(),
                   'investigation_space': frozen_space, 'provider_validation': certificate,
                   'evaluation_cases_sha256': dataset_hash(cases),

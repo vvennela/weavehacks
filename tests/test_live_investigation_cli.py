@@ -202,3 +202,103 @@ def test_import_has_no_execution_side_effects(cli, monkeypatch):
 
     monkeypatch.setattr(cli.sera, 'optimize', unexpected)
     importlib.reload(cli)
+
+
+def arguments_without_batching(tmp_path, model=MODEL_ID):
+    args = arguments(tmp_path, model)
+    start = args.index('--batching-values')
+    del args[start:start + 3]
+    return args
+
+
+def test_small_model_explicit_multi_specialist_scope_reaches_optimizer(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    assert cli.main(arguments(tmp_path) + ['--sequence-values', '4', '--context-values', '2048',
+                                         '--fp8-kv']) == 0
+    expected = {'max_num_batched_tokens': [2048, 1024], 'max_num_seqs': [4],
+                'max_model_len': [2048], 'kv_cache_dtype': ['fp8']}
+    kwargs = observed['kwargs']
+    assert kwargs['investigation_space'].supported_changes == expected
+    assert kwargs['baseline_configuration'] is None
+    assert kwargs['budget'].max_candidate_trials == 2
+    assert kwargs['constraints'].quality_floor == .99
+    invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
+    assert {key: set(values) for key, values in invocation['investigation_space']['supported_changes'].items()} == {
+        key: set(values) for key, values in expected.items()}
+    assert len(invocation['investigation_space']['candidate_hashes']) == 5
+
+
+@pytest.mark.parametrize('flags,expected', [
+    (['--sequence-values', '4'], {'max_num_seqs': [4]}),
+    (['--context-values', '2048'], {'max_model_len': [2048]}),
+    (['--fp8-kv'], {'kv_cache_dtype': ['fp8']}),
+])
+def test_batching_values_are_not_invented_for_other_explicit_controls(cli, monkeypatch, tmp_path, flags, expected):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    assert cli.main(arguments_without_batching(tmp_path) + flags) == 0
+    assert observed['kwargs']['investigation_space'].supported_changes == expected
+
+
+@pytest.mark.parametrize('flags', [
+    ['--sequence-values', '0'], ['--sequence-values', '257'], ['--sequence-values', '8'],
+    ['--sequence-values', '4', '4'], ['--sequence-values', '2', '--concurrency', '4'],
+    ['--context-values', '64'], ['--context-values', '4097'], ['--context-values', '4096'],
+    ['--context-values', '2048', '2048'],
+])
+def test_invalid_new_control_values_stop_before_provider_trace_or_artifacts(cli, monkeypatch, tmp_path, flags):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit) as error:
+        cli.main(arguments(tmp_path) + flags)
+    assert error.value.code == 2
+    assert observed['calls'] == []
+    assert not (tmp_path/'run').exists()
+
+
+def test_no_explicit_controls_stop_before_provider_trace_or_artifacts(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit) as error:
+        cli.main(arguments_without_batching(tmp_path))
+    assert error.value.code == 2
+    assert observed['calls'] == []
+    assert not (tmp_path/'run').exists()
+
+
+def test_large_model_fp8_kv_is_rejected_before_starting_anything(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit) as error:
+        cli.main(arguments(tmp_path, LARGE_MODEL_ID) + ['--fp8-kv'])
+    assert error.value.code == 2
+    assert observed['calls'] == []
+    assert not (tmp_path/'run').exists()
+
+
+def test_large_model_can_use_explicit_batch_sequence_and_context_controls(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    assert cli.main(arguments(tmp_path, LARGE_MODEL_ID) + ['--sequence-values', '4',
+                                                        '--context-values', '2048']) == 0
+    assert observed['kwargs']['investigation_space'].supported_changes == {
+        'max_num_batched_tokens': [2048, 1024], 'max_num_seqs': [4], 'max_model_len': [2048]}
+    assert observed['kwargs']['baseline_configuration'] == RuntimeConfig(quantization='fp8_per_tensor')
+
+
+def test_fit_first_is_explicit_and_freezes_followup_controls_against_fp8_reference(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    assert cli.main(arguments(tmp_path, LARGE_MODEL_ID) + ['--fit-first']) == 0
+    kwargs = observed['kwargs']
+    assert kwargs['baseline_configuration'] is None
+    assert kwargs['budget'].max_candidate_trials == 2  # Includes the deployment trial; never add a trial.
+    invocation = json.loads((tmp_path/'run'/'invocation.json').read_text())
+    assert invocation['fit_first'] is True
+    assert set(invocation['investigation_space']['candidate_hashes']) == {
+        RuntimeConfig(quantization='fp8_per_tensor', max_num_batched_tokens=value).config_hash
+        for value in (2048, 1024)}
+
+
+@pytest.mark.parametrize('model,extra', [(MODEL_ID, []), (LARGE_MODEL_ID, ['--fp8-kv'])])
+def test_unsupported_fit_first_profile_stops_before_provider_trace_or_gpu(cli, monkeypatch, tmp_path, model, extra):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit) as error:
+        cli.main(arguments(tmp_path, model) + ['--fit-first', *extra])
+    assert error.value.code == 2
+    assert observed['calls'] == []
+    assert not (tmp_path/'run').exists()
