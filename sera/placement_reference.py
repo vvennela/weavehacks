@@ -107,7 +107,9 @@ def bind_placement_reference(path, plan, profiles):
         _check_requests(trial.get('quality'), list(range(count)), tokens)
         _require(trial.get('self_check', []) == [] and trial.get('generation_errors') == 0, 'isolated protocol')
         gate = _gate(trial, profile, service)
-        _require(gate['passed'], 'absolute task or latency requirements')
+        _require(gate['passed'], f"{model_id}: task or latency requirements; "
+            f"serial_quality={trial['task_quality']['mean']}; measured_quality={trial['measured_task_quality']['mean']}; "
+            f"p95_latency_ms={gate['p95_latency_ms']}")
         gates[model_id] = gate | dict(memory_pass=True)
     _require(fingerprints[0] == fingerprints[1], 'isolated GPU/runtime identities differ')
     return dict(isolated=isolated, gates=gates,

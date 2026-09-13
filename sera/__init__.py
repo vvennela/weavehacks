@@ -10,9 +10,11 @@ from .hardware import HardwareAssignment, ModelDescriptor
 from .portable_runtime import PortableSeraModel, optimize_on_hardware
 from .placement import place, measure_placement_references, PlacementResult, PlacementWorkload, PlacementMemoryEstimate
 from .placement_config import PlacementPlan, PlacementService, PlacementConstraints
+from .placement_search import optimize_placement, PlacementSearchResult
 
 __all__ = ["Budget", "Candidate", "Constraints", "InvestigationSpace", "Objective", "RuntimeConfig", "Workload", "SeraModel", "SeraResponse", "SeraResult", "WandbAgent", "optimize"]
 __all__ += ["HardwareAssignment", "ModelDescriptor", "PortableSeraModel", "optimize_on_hardware"]
 __all__ += ["inspect_recovery", "resume"]
 __all__ += ["place", "PlacementResult", "PlacementWorkload", "PlacementMemoryEstimate",
             "PlacementPlan", "PlacementService", "PlacementConstraints", "measure_placement_references"]
+__all__ += ["optimize_placement", "PlacementSearchResult"]

@@ -253,3 +253,16 @@ def test_joint_wrong_measured_answers_fail_even_when_serial_quality_passes(envir
     assert gate['quality_pass'] is True
     assert gate['measured_quality_pass'] is False
     assert result.models == []
+
+
+def test_final_isolated_memory_sample_is_gated_after_monitor_stops(environment, monkeypatch, tmp_path):
+    original = FakeModel.close
+    def close(self):
+        if self.owner is None and self.model_id == MODEL_ID:
+            self.record['sampled_peak_memory_mib'] = 201
+        return original(self)
+    monkeypatch.setattr(FakeModel, 'close', close)
+    result = environment.place(**inputs(environment), output_dir=tmp_path/'run')
+    assert result.models == []
+    assert result.report['isolated_gates'][MODEL_ID]['memory_pass'] is False
+    assert len(FakeModel.instances) == 1

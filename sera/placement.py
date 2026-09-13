@@ -97,7 +97,7 @@ def _gate(trial, profile, service, *, isolated_p95_ms=None, joint=False):
                 isolated_p95_ms=isolated_p95_ms, max_p95_slowdown_fraction=slowdown)
 
 
-def collect_joint(models, profiles):
+def collect_joint(models, profiles, *, trial_id='joint'):
     """Synchronize each measured load and quality phase; retain unequal windows."""
     barrier = threading.Barrier(2, timeout=300)
 
@@ -106,7 +106,7 @@ def collect_joint(models, profiles):
         def phase_hook(phase, concurrency):
             barrier.wait()
         try:
-            trial = collect_trial(model, profile.prompts, 'joint', workload=profile.workload,
+            trial = collect_trial(model, profile.prompts, trial_id, workload=profile.workload,
                                   phase_hook=phase_hook)
             if trial['status'] not in {'collected', 'request-errors'}:
                 barrier.abort()
@@ -200,14 +200,15 @@ class PlacementResult:
         self.close()
 
 
-def place(*, plan, workloads, memory_estimates, output_dir, weave_project=None, isolated_reference=None):
+def place(*, plan, workloads, memory_estimates, output_dir, weave_project=None, isolated_reference=None,
+          trial_namespace=None):
     """Measure one caller-selected pair. Never silently return only one model.
 
     Failed quality returns an empty result with evidence. Cleanup errors raise and
     remain saved. The caller owns both successful runners and must close them.
     """
     arguments = dict(plan=plan, workloads=workloads, memory_estimates=memory_estimates,
-                     output_dir=output_dir, _isolated_reference=isolated_reference)
+                     output_dir=output_dir, _isolated_reference=isolated_reference, _trial_namespace=trial_namespace)
     return _run_placement(arguments, weave_project)
 
 
@@ -227,7 +228,11 @@ def _run_placement(arguments, weave_project):
 
 
 def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=None,
-           _references_only=False, _isolated_reference=None):
+           _references_only=False, _isolated_reference=None, _trial_namespace=None):
+    import re
+    if _trial_namespace is not None and (not isinstance(_trial_namespace, str)
+            or re.fullmatch(r'[A-Za-z0-9_-]{1,64}', _trial_namespace) is None):
+        raise ValueError('trial_namespace must be a short stable identifier')
     plan = validate_placement_plan(plan)
     model_ids = {service.model_id for service in plan.services}
     if set(workloads) != model_ids or set(memory_estimates) != model_ids:
@@ -279,20 +284,22 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
                 trial = collect_trial(model, profile.prompts, 'isolated', workload=profile.workload)
                 report['isolated'][service.model_id] = trial
                 gate = _gate(trial, profile, service)
-                gpu = model.record.get('gpu', {})
-                peak = model.record.get('sampled_peak_memory_mib')
-                gate['memory_pass'] = (type(peak) is int and peak*1024**2 <= service.allocation_bytes
-                    and gpu.get('total_mib', 0)*1024**2 == plan.physical_gpu_bytes
-                    and model.record.get('telemetry_errors') == 0)
-                gate['passed'] = gate['passed'] and gate['memory_pass']
-                report['isolated_gates'][service.model_id] = gate
-                result._event('placement_quality_gate', dict(
-                    plan_hash=plan.plan_hash, phase='isolated', model_id=service.model_id,
-                    revision=service.revision, config_hash=trial['config_hash'], gate=gate,
-                    task_quality=trial['task_quality'], measured_task_quality=trial['measured_task_quality']))
             finally:
                 model.close()
                 result._save()
+            # close() stops and joins the memory monitor. Gate its final sample,
+            # not a snapshot that can change while quality evaluation finishes.
+            gpu = model.record.get('gpu', {})
+            peak = model.record.get('sampled_peak_memory_mib')
+            gate['memory_pass'] = (type(peak) is int and 0 < peak*1024**2 <= service.allocation_bytes
+                and gpu.get('total_mib', 0)*1024**2 == plan.physical_gpu_bytes
+                and model.record.get('telemetry_errors') == 0)
+            gate['passed'] = gate['passed'] and gate['memory_pass']
+            report['isolated_gates'][service.model_id] = gate
+            result._event('placement_quality_gate', dict(
+                plan_hash=plan.plan_hash, phase='isolated', model_id=service.model_id,
+                revision=service.revision, config_hash=trial['config_hash'], gate=gate,
+                task_quality=trial['task_quality'], measured_task_quality=trial['measured_task_quality']))
             if not gate['passed']:
                 report.update(status='rejected', decision=dict(outcome='not-attempted', reason='isolated-requirements-failed'))
                 result._save()
@@ -335,7 +342,7 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
             owner.models.append(model)
             models.append(model)
             model.start()
-        joint = collect_joint(models, profiles)
+        joint = collect_joint(models, profiles, **(dict(trial_id=_trial_namespace+'/joint') if _trial_namespace else {}))
         report['joint'] = joint
         joint['gates'] = {service.model_id:_gate(joint['trials'][service.model_id],
             profiles[service.model_id], service, joint=True,

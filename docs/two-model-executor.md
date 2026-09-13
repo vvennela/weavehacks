@@ -51,10 +51,10 @@ with place(plan=frozen_plan, workloads=profiles,
         print(result.report["decision"])
 ```
 
-This is separate from `sera.optimize`: it executes a supplied plan, not a new
-placement-agent schema. An autonomous plan selector and its provider check remain
-future integration work. The single-model swarm does not gain untested placement
-tools by importing this module.
+This is separate from `sera.optimize`: `place` executes one supplied plan.
+`optimize_placement` now selects and tests a menu of measured legal plans with the
+existing typed arbiter. See [automatic placement](automatic-placement.md). The
+single-model swarm does not silently change its tools when this module is imported.
 
 ## What is checked and saved
 
@@ -113,21 +113,20 @@ caller. Cleanup failure remains a failure even when trace export also fails.
 These tracing paths have offline tests with a fake Weave service. No live
 placement trace is claimed until a GPU run passes the existing prerequisites.
 
-## Remaining agent selection contract
+## Agent selection contract
 
-The existing `ArbiterDecision` can name one legal proposal ID or abstain. That
-shape can also reference a caller-supplied placement plan ID, but it does not
-itself supply placement evidence or establish eligibility. The current provider
-certificate explicitly exercises single-model cases, with placement unsupported.
-It is not a placement-context certification.
+`ArbiterDecision` names one legal plan ID or abstains. `optimize_placement` binds
+every offered plan to matching isolated requests, task/workload hashes, GPU and
+runtime identity, configuration, cleanup, and memory limits. It recomputes quality
+and latency gates instead of trusting saved pass flags. The existing provider
+certificate is still a schema-format check, not proof of placement reasoning.
+Every actual placement response is checked again for a legal, untested plan ID.
 
-Before enabling automatic selection, bind every offered plan to its matching
-isolated measurements, task/workload hash, physical GPU identity, configuration,
-and memory limits. Define the user's placement objective and stopping/trial
-contract, then check the provider against those placement contexts. The
-deterministic executor must remain the final gate after selection. No new schema,
-certificate claim, trial budget, allocation, or latency threshold is invented by
-the tracing addition.
+The default objective and stop rule follow the specification: latency first,
+memory tie-break, and one no-progress round plus one confirmation. An explicit
+memory or throughput objective and optional trial limit are supported. No
+allocation or quality threshold is invented. The deterministic executor remains
+the final authority, including after restoring a previously passing winner.
 
 ## Live gates still open
 

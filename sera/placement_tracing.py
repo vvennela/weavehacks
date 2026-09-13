@@ -30,14 +30,8 @@ def _trial_failures(result):
             if export.get('status') == 'failed']
 
 
-def run_traced_placement(execute, arguments, project):
-    try:
-        import weave
-    except ImportError:
-        raise ImportError('Install sera-inference[swarm] for optional placement tracing') from None
-    client = weave.init(project)
-    result = None
-
+def placement_event_sink(weave):
+    """Shared event vocabulary for explicit trials and the placement search."""
     def operation(name):
         def record(payload):
             return payload
@@ -48,6 +42,17 @@ def run_traced_placement(execute, arguments, project):
 
     def sink(name, payload):
         operations[name](payload)
+    return sink
+
+
+def run_traced_placement(execute, arguments, project):
+    try:
+        import weave
+    except ImportError:
+        raise ImportError('Install sera-inference[swarm] for optional placement tracing') from None
+    client = weave.init(project)
+    result = None
+    sink = placement_event_sink(weave)
 
     def flush():
         try:
