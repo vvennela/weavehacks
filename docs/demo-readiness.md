@@ -1,0 +1,39 @@
+# Demo readiness: full goal remains incomplete
+
+Read-only audit of main `17255ae`, the product/specification, implementation, and saved evidence. No new tests, provider requests, or GPU trials were run for this note.
+
+**The available fallback is a recorded demonstration of working single-model deployment and guarded experiments. The requested autonomous swarm is not yet accepted. The full product is not complete.** A successful earlier milestone does not close the renewed goal.
+
+The latest user priority is the single-model investigative swarm before joint placement. This sets work order; it does not silently remove the broader product requirements. [Product](../product.md), [specification sections 23.1a–23.3](../spec.md), and the latest user direction govern acceptance. The older checkpoints in [plan.md](../plan.md) and [vishnu.md](../vishnu.md) are historical, not proof that the current goal is complete.
+
+## What can be shown truthfully
+
+| Requirement | Authoritative evidence | Status and limit |
+| --- | --- | --- |
+| Make a large model fit, verify answers, return a runner | [Large-model deployment](../evidence/large-fit-v1/README.md), [interactive rehearsal](../evidence/demo-rehearsal-v1/README.md) | Proven for pinned Qwen72B online FP8 on the supplied GPU and eight fixed tasks. BF16 did not fit; there is no measured BF16 speedup comparison. The saved runner is closed. |
+| Agent recommendation, measurement, gate, later decision, runner | [Staged team investigation](../evidence/live-team-investigation-v1/README.md) | Proven in one connected run. The 0.0397357% latency gain missed 5%; the next specialist abstained. Quantization and batching acted in separate stages; agents used local records, not remote Weave reads. |
+| Concurrent investigators, shared findings, real Weave reads, two decisions | [Live swarm](../evidence/live-swarm-investigation-v1/README.md), [corrected audit](../evidence/live-swarm-investigation-v1/weave-verification-corrected.json) | Partly proven. Independent initial proposals and real overlap are verified. Startup recovery, second candidate, returned probe, and cleanup worked. All three investigators skipped round-two reads, repeated false token explanations, and did not establish useful failure-driven investigation. |
+| Correct interpretation after reading failure evidence | [Failure replay](../evidence/failure-replay-v1/README.md), [audit](../evidence/failure-replay-v1/verification.json) | Failed. Six investigator/round pairs completed reads, but all six refined reasons repeated the false truncation claim. This was coached, leaked a later outcome category, used zero new GPU trials, and constrained round-two abstention by budget. |
+| Better search than fixed order/random/ablation | [Saved benchmark audit](../evidence/release-benchmark-audit/README.md), [search harness](../benchmarks/SEARCH.md) | Not established. There is no complete frozen Qwen0.6B oracle universe or passing measured comparison. The Qwen72B pair of configurations is not a substitute. |
+| Two quality-valid models sharing a constrained GPU | [Placement plan](placement-plan.md) | Not implemented or demonstrated. GLM's structured profile passed 8/8; Qwen0.6B remained at 7/8. Plan validation alone is not shared execution or two returned runners. |
+
+The live swarm's batch candidate passed 8/8 but gained only 0.054228%, below 5%. Its context candidate failed at startup and has **no measured quality or latency**. The observed CUTLASS signature does not establish an underlying cause. These outcomes must not become a speedup, quality-loss, or successful-diagnosis claim.
+
+## Full-target implementation and release gaps
+
+- [The public entry point](../sera/pipeline.py) accepts one of two pinned Qwen models. The specification's two-model example is rejected. Arbitrary model resolution, shared service ownership, pair measurement/rollback, and multi-GPU execution are absent.
+- Automatic settings are opt-in and generated from the initial measured reference. Supported controls remain bounded single-setting changes; combination trials, wider precision search, and session-time budgeting are unfinished. The minimum call does not automatically invoke the swarm.
+- The current defaults retain one concurrency level and the fixed-candidate path unless callers opt in. They are not the specification's complete default eight-trial/four-load/two-phase workflow. SQLite and interruption recovery are not implemented; JSON persistence is the accepted first-milestone subset.
+- The eight-task evidence does not replace the original 32-prompt acceptance contract. The cache-pressure scenario remains [not established](../evidence/pressure-v1/README.md). Missing queue/first-token percentile or in-flight pressure measurements cannot be inferred from cumulative snapshots or reserved memory.
+- [Packaging](../pyproject.toml) builds the `sera` library; demo commands also require the repository's `experiments` and evidence files. Saved runtime fingerprints and earlier rehearsals are not a clean-install acceptance of the latest source. A tested source/version, matching provider certificate, installation instructions, and a fresh selected-path rehearsal must agree before release sign-off.
+- The specification includes multi-GPU execution and resume while Vishnu's explicit hackathon cuts exclude them. Resolve that scope conflict explicitly before full-product sign-off; do not count either interpretation as completed work.
+
+## Critical path and gates
+
+1. **Correct the existing evidence-unit defect first.** Retain the eight tasks, 0.99 floor, measured 5% rule, and saved failures. The proposed new fact-check gate still needs the user's decision; this audit does not approve or require that design.
+2. **Validate the requested swarm, not just its trace transport.** All three investigators must make correctly scoped reads, compare shared findings, and return reasons supported by the records. A startup failure must stay distinct from a measured quality failure. Later choices must use actual prior outcomes without repeating rejected configurations or inventing memory effects. Separate execution, factual reasoning, proposal diversity, and performance verdicts. Do not force another trial, disagreement, abstention, or a win.
+3. **Use new evidence only for what it proves.** A saved-evidence replay can validate transport and interpretation, not new GPU performance or a fresh returned runner. Any further live trial needs an approved bounded profile. A current live acceptance run must preserve validation, quality, budgets, returned-runner use, and cleanup. Reliable factual reasoning is still unproven after the recorded replay.
+4. **Rehearse the selected presentation from one pinned release.** [demo.py](../demo.py) currently prefers the saved live-swarm record. Explain its failure, then show the earlier successful deployment/staged path as separate evidence. Correct stale README claims that the demo still prefers the team record or that the old provider gate is still pending. Never combine measurements from different runs into one success story.
+5. **Keep the rest of the goal open.** After the priority swarm path, full-target sign-off still needs the declared benchmark result, eligible two-model execution and returned runners, and agreed API/platform/release contracts. Placement needs explicit profile, memory allocations, latency limits, and trial-budget decisions. Benchmark work needs a valid frozen experiment, not post-result tuning.
+
+The specification permits shipping a clearly labeled single-model or replay fallback. That is a partial delivery choice, not evidence that the full requested product is done.
