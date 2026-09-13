@@ -23,6 +23,22 @@ def arguments(tmp_path, model=MODEL_ID):
             '--output-dir', str(tmp_path/'run')]
 
 
+def test_until_plateau_is_explicit_alternative_to_fixed_budget(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    args = arguments(tmp_path)
+    index = args.index('--budget')
+    args[index:index + 2] = ['--until-plateau']
+    assert cli.main(args) == 0
+    assert observed['kwargs']['budget'].max_candidate_trials is None
+
+
+def test_until_plateau_rejects_simultaneous_fixed_budget(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    with pytest.raises(SystemExit):
+        cli.main(arguments(tmp_path) + ['--until-plateau'])
+    assert observed['calls'] == []
+
+
 def install_boundaries(cli, monkeypatch, tmp_path, *, no_runner=False, probe_error=False,
                        close_error=False, invalid_probe=False):
     observed = {'calls': [], 'flushed': False, 'closed': False}

@@ -170,7 +170,8 @@ def build_investigation_prompt(evidence):
     result = _pick(evidence, ('swarm_phase', 'investigator_id', 'trial_id', 'model_id', 'revision',
         'configuration', 'objective', 'constraints', 'remaining_trials', 'supported_changes',
         'frozen_candidate_hashes', 'legal_proposal_ids', 'required_inspection', 'failure_inspection_required',
-        'degraded', 'inspection_status', 'quality_mode', 'decision_scope'))
+        'degraded', 'inspection_status', 'quality_mode', 'decision_scope',
+        'search_policy', 'total_trial_cap', 'round_trial_capacity', 'plateau'))
     result['metrics'] = {key: deepcopy(value) for key, value in evidence.get('metrics', {}).items() if value is not None}
     summaries, records, sources = projection.inspections(evidence)
     diagnosed = {row['trial_id']: row['source_call_id'] for row in records if row['record_type'] == 'trial_diagnosis'}

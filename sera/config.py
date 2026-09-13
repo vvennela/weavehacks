@@ -53,10 +53,10 @@ class Workload(BaseModel):
 
 
 class Budget(BaseModel):
-    """Opt-in candidate-trial budget; baseline setup does not consume it."""
+    """A fixed trial cap, or None for objective plateau plus one confirmation round."""
 
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid")
-    max_candidate_trials: int = Field(default=8, ge=1, le=8)
+    max_candidate_trials: int | None = Field(default=8, ge=1, le=8)
 
 
 class RuntimeConfig(BaseModel):

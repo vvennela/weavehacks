@@ -1,6 +1,7 @@
 """Bounded live feedback loop. Agents propose; measurements and gates decide."""
 
 from copy import deepcopy
+import math
 
 from .agent import ArbiterDecision, Proposal, validate_proposal
 from .config import CONTROL_ROLES, Candidate, RuntimeConfig, validate_candidate
@@ -58,6 +59,9 @@ def round_evidence(initial, search, trials, remaining, *, prompts=()):
 
     evidence = deepcopy(initial)
     evidence['remaining_trials'] = remaining
+    if 'plateau' in search:
+        evidence.update(remaining_trials=None, total_trial_cap=None, round_trial_capacity=1,
+                        search_policy='until-plateau', plateau=deepcopy(search['plateau']))
     evidence.setdefault('trace_scope', []).extend(trial_trace_scope(trial) for trial in trials)
     evidence['history'] = [dict(trial={key: deepcopy(trial[key]) for key in
         ('trial_id', 'status', 'config_hash', 'reduced', 'task_quality', 'decision', 'error',
@@ -91,6 +95,32 @@ def round_evidence(initial, search, trials, remaining, *, prompts=()):
         for key, value in metrics.items():
             evidence['metrics'][f'trial_{index}_{key}'] = value
     return evidence
+
+
+def objective_progress(plateau, baseline, trials, *, objective, constraints, round_number):
+    """Compare this round only against the prior best quality-valid objective."""
+    before = plateau['best_quality_valid_value']
+    after = before
+    for trial in trials:
+        eligible = measured_frontier(baseline, trial, constraints=constraints)
+        value = objective_value(trial, objective.priority)
+        if value is None or not any(item is trial for item in eligible):
+            continue
+        if after is None or (value > after if objective.priority == 'throughput' else value < after):
+            after = value
+    gain = None if before is None or after is None else (
+        (after - before) / before if objective.priority == 'throughput' else (before - after) / before)
+    progressed = after is not None and (before is None or (
+        gain > 0 and (gain >= objective.min_improvement_fraction
+                     or math.isclose(gain, objective.min_improvement_fraction, rel_tol=1e-12))))
+    plateau['best_quality_valid_value'] = after
+    plateau['consecutive_no_progress_rounds'] = 0 if progressed else plateau['consecutive_no_progress_rounds'] + 1
+    plateau['confirmation_round_pending'] = plateau['consecutive_no_progress_rounds'] == 1
+    record = dict(round=round_number, trial_ids=[trial['trial_id'] for trial in trials],
+                  prior_best_quality_valid_value=before, best_quality_valid_value=after,
+                  objective_improvement_fraction=gain, qualifying_progress=progressed)
+    plateau['history'].append(record)
+    return deepcopy(record)
 
 
 def specialist_participation(evidence, legal):
@@ -225,8 +255,9 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
         validate_swarm_options(swarm, budget, agent, trace_reader)
         # Ownership has already transferred from optimize. Even setup failures
         # must close the running baseline.
-        if (type(initial_trials_used) is not int
-                or not 0 <= initial_trials_used <= budget.max_candidate_trials):
+        until_plateau = budget.max_candidate_trials is None
+        if (type(initial_trials_used) is not int or initial_trials_used < 0
+                or (not until_plateau and initial_trials_used > budget.max_candidate_trials)):
             raise ValueError('Initial trials used must be an integer within the candidate budget')
         baseline = report['baseline']
         baseline_config = RuntimeConfig.model_validate(report['baseline_configuration'])
@@ -266,6 +297,12 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 initial['frozen_candidate_hashes'] = list(space['candidate_hashes'])
         seen = {baseline_config.config_hash}
         best = baseline if select_candidate(baseline, None, objective=objective, constraints=constraints)['selected'] else None
+        if until_plateau:
+            eligible = measured_frontier(baseline, None, constraints=constraints)
+            search['plateau'] = dict(priority=objective.priority,
+                min_improvement_fraction=objective.min_improvement_fraction,
+                best_quality_valid_value=objective_value(baseline, objective.priority) if eligible else None,
+                consecutive_no_progress_rounds=0, confirmation_round_pending=False, history=[])
         stagnant_rounds = 0
         active_trial_id = 'baseline'
         if baseline['status'] != 'collected':
@@ -274,7 +311,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             search['stop_reason'] = 'unstable-reference'
             best = None
         while search['stop_reason'] is None:
-            remaining = budget.max_candidate_trials - search['trials_used']
+            remaining = 1 if until_plateau else budget.max_candidate_trials - search['trials_used']
             if not remaining:
                 search['stop_reason'] = 'budget-exhausted'
                 break
@@ -283,6 +320,8 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 search['stop_reason'] = 'no-legal-untested-candidate'
                 break
             record = dict(round=len(search['rounds']) + 1, specialists=[], trial_ids=[])
+            if until_plateau:
+                record['confirmation_round'] = search['plateau']['confirmation_round_pending']
             evidence = round_evidence(initial, search, report['search_trials'], remaining,
                                       prompts=report['prompts'])
             search['rounds'].append(record)
@@ -387,10 +426,17 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                     report['rejected'].append(dict(stage='review-validation', trial_id=trial_id,
                                                    error=trial['review_error']))
                 save()
-            after_frontier = frontier_points()
-            stagnant_rounds = stagnant_rounds + 1 if after_frontier == before_frontier else 0
-            if stagnant_rounds >= 2:
-                search['stop_reason'] = 'two-rounds-without-frontier-improvement'
+            if until_plateau:
+                trials = [trial for trial in report['search_trials'] if trial['trial_id'] in record['trial_ids']]
+                record['objective_progress'] = objective_progress(search['plateau'], baseline, trials,
+                    objective=objective, constraints=constraints, round_number=record['round'])
+                if search['plateau']['consecutive_no_progress_rounds'] >= 2:
+                    search['stop_reason'] = 'objective-plateau-confirmed'
+            else:
+                after_frontier = frontier_points()
+                stagnant_rounds = stagnant_rounds + 1 if after_frontier == before_frontier else 0
+                if stagnant_rounds >= 2:
+                    search['stop_reason'] = 'two-rounds-without-frontier-improvement'
         if best is None:
             close_active()
             report.update(status='no-safe-configuration', returned_runner_closed=True,

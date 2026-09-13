@@ -169,7 +169,7 @@ def choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_re
             changes[lever].append(value)
     common = deepcopy(evidence) | dict(supported_changes=changes,
         frozen_candidate_hashes=[entry[3].config.config_hash for entry in legal],
-        remaining_trials=remaining, failure_inspection_required=bool(evidence.get('failure_diagnoses')))
+        remaining_trials=evidence['remaining_trials'], failure_inspection_required=bool(evidence.get('failure_diagnoses')))
     evidences = [deepcopy(common) | {'investigator_id': name} for name in INVESTIGATORS]
     checks = [dict(investigator_id=name, role=None, status='rejected', inspections=[], phase_timings={})
               for name in INVESTIGATORS]

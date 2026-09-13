@@ -216,3 +216,18 @@ def test_controller_publishes_safe_error_without_exception_details(tmp_path, mon
     monkeypatch.setattr(controller, 'run_request', fail)
     controller.serve(Relay(), tmp_path, max_requests=1)
     assert published == [dict(error='timeout')]
+
+
+def test_uncapped_controller_exceeds_hundred_requests_and_stops_when_idle(tmp_path, monkeypatch):
+    published = []
+    class Relay:
+        def connect(self): pass
+        def pending(self, limit):
+            if len(published) >= 102:
+                return []
+            return [request() | {'request_id': f'{len(published):032x}'}]
+        def publish(self, request_id, **response): published.append(request_id)
+    monkeypatch.setattr(controller, 'run_request', lambda item, output_dir: {'model': item['model']})
+    tick = iter(range(10000))
+    monkeypatch.setattr(controller.time, 'monotonic', lambda: next(tick))
+    assert controller.serve(Relay(), tmp_path, max_requests=None, idle_timeout=.1) == 102

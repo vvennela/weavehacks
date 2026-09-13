@@ -173,10 +173,12 @@ def render_summary(report, output_dir):
         lines.append(f"Hard limits: {report['constraints']}; failures: {decision.get('constraint_failures', {})}.")
     if report.get("search"):
         search = report["search"]
-        lines.extend(["", f"Investigation trials: {search['trials_used']}/{search['budget']['max_candidate_trials']}; "
+        cap = search['budget']['max_candidate_trials']
+        trial_count = f"{search['trials_used']}/{cap}" if cap is not None else f"{search['trials_used']}; no total trial cap"
+        lines.extend(["", f"Investigation trials: {trial_count}; "
                       f"stop: {search.get('stop_reason', 'running')}.",
                       "Each round records proposals, arbitration, measurements, gates, and prediction review.",
-                      "This bounded investigation is not proof of a search advantage."])
+                      "This investigation is not proof of a search advantage."])
     lines.extend(["", f"Workload: {report.get('workload')}",
                   f"Generation: {report.get('generation')}",
                   f"Record: {output_dir / 'result.json'}", ""])

@@ -213,14 +213,14 @@ def run_request(request, output_dir):
 
 
 def serve(relay, output_dir, *, max_requests=100, idle_timeout=120):
-    if not 1 <= max_requests <= 100 or idle_timeout <= 0:
+    if (max_requests is not None and (type(max_requests) is not int or not 1 <= max_requests <= 100)) or idle_timeout <= 0:
         raise ValueError('invalid controller limits')
     relay.connect()
     seen = set()
     last_activity = time.monotonic()
     with ThreadPoolExecutor(max_workers=3) as workers:
-        while len(seen) < max_requests:
-            batch = relay.pending(min(3, max_requests - len(seen)))
+        while max_requests is None or len(seen) < max_requests:
+            batch = relay.pending(3 if max_requests is None else min(3, max_requests - len(seen)))
             for request in batch:
                 validate_request(request)
             batch = [request for request in batch if request['request_id'] not in seen]
@@ -258,7 +258,8 @@ def main(argv=None):
     parser.add_argument('--relay-dir', required=True)
     parser.add_argument('--pair-script', required=True, type=Path)
     parser.add_argument('--output-dir', required=True, type=Path)
-    parser.add_argument('--max-requests', type=int, default=100)
+    parser.add_argument('--max-requests', type=lambda value: None if value == 'none' else int(value),
+                        default=100, help='1 to100, or none for no total call cap; idle timeout still applies')
     parser.add_argument('--idle-timeout', type=float, default=120)
     args = parser.parse_args(argv)
     relay = MarimoRelay(args.url, args.pair_script, args.relay_dir)

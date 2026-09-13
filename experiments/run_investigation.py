@@ -180,8 +180,11 @@ def trial_trace_failures(report):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model', required=True, choices=[MODEL_ID, LARGE_MODEL_ID])
-    parser.add_argument('--budget', required=True, type=int,
+    stopping = parser.add_mutually_exclusive_group(required=True)
+    stopping.add_argument('--budget', type=int,
                         help='Maximum candidate trials, 1 to 8; includes deployment with --fit-first')
+    stopping.add_argument('--until-plateau', action='store_true',
+                         help='No total trial cap; stop after an objective plateau and one confirmation round')
     parser.add_argument('--fit-first', action='store_true',
                         help='Qwen72B only: first measure FP8 deployment, then investigate within the same budget')
     parser.add_argument('--auto-space', action='store_true',
@@ -221,7 +224,7 @@ def main(argv=None):
             raise ValueError('--swarm requires Weave; remove --no-weave')
         if args.fit_first and args.model != LARGE_MODEL_ID:
             raise ValueError('--fit-first is supported only for Qwen72B')
-        budget = sera.Budget(max_candidate_trials=args.budget)
+        budget = sera.Budget(max_candidate_trials=None if args.until_plateau else args.budget)
         workload = sera.Workload(concurrency=args.concurrency)
         objective = sera.Objective(priority=args.priority)
         reference = (sera.RuntimeConfig(quantization='fp8_per_tensor')
@@ -266,7 +269,7 @@ def main(argv=None):
                   'investigation_space': frozen_space, 'provider_validation': certificate,
                   'evaluation_cases_sha256': dataset_hash(cases),
                   'weave_url': None, 'returned_runner_closed': False,
-                  'limits': 'A bounded live investigation is not proof of search superiority.'}
+                  'limits': 'A live investigation is not proof of search superiority.'}
     client = None
     weave = None
     sink = None

@@ -127,7 +127,12 @@ def validate_proposal(proposal, evidence):
         raise ValueError("Proposal cites missing or unavailable evidence")
     if proposal.action == "keep-baseline":
         return None
-    if evidence["remaining_trials"] < proposal.expected_trial_cost:
+    remaining = evidence["remaining_trials"]
+    if remaining is None:
+        if evidence.get('search_policy') != 'until-plateau' or evidence.get('round_trial_capacity') != 1:
+            raise ValueError('Uncapped search requires an explicit one-trial round capacity')
+        remaining = evidence['round_trial_capacity']
+    if remaining < proposal.expected_trial_cost:
         raise ValueError("Proposal exceeds the remaining trial budget")
     baseline = evidence.get("configuration")
     candidate = proposal.to_candidate(baseline)

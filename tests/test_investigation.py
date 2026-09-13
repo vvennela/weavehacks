@@ -241,6 +241,143 @@ def test_budget_is_strict_and_bounded(value):
         sera.Budget(max_candidate_trials=value)
 
 
+def plateau_run(tmp_path, monkeypatch, latencies, *, wrong=(), missing=(), failed=()):
+    runners, seen, agent = install_fakes(monkeypatch)
+    original_collect = pipeline.collect_trial
+    def collect(model, prompts, trial_id, **kwargs):
+        record = original_collect(model, prompts, trial_id, **kwargs)
+        if trial_id != 'baseline':
+            number = int(trial_id.split('-')[1])
+            if number in failed:
+                raise RuntimeError('fixture measurement failed')
+            record['reduced']['p95_latency_ms'] = None if number in missing else latencies[number - 1]
+            record['runtime']['sampled_peak_memory_mib'] = 2000 - number
+            if number in wrong:
+                record['quality'][0]['text'] = 'wrong'
+        return record
+    monkeypatch.setattr(pipeline, 'collect_trial', collect)
+    use_investigation_space(monkeypatch, {'max_num_batched_tokens': list(range(128, 128 + len(latencies)))})
+    return run(tmp_path, agent, budget=sera.Budget(max_candidate_trials=None)), seen, runners
+
+
+def test_plateau_mode_can_improve_more_than_eight_times_then_confirms_once(tmp_path, monkeypatch):
+    improving = [100 * .9 ** index for index in range(1, 10)]
+    result, seen, runners = plateau_run(tmp_path, monkeypatch, improving + [improving[-1]] * 3)
+    with result:
+        search = result.report['search']
+        assert search['trials_used'] == 11
+        assert search['stop_reason'] == 'objective-plateau-confirmed'
+        assert search['budget']['max_candidate_trials'] is None
+        assert len(search['rounds']) == 11
+        assert all(len(row['trial_ids']) == 1 for row in search['rounds'])
+        assert search['rounds'][-1]['confirmation_round'] is True
+        # Existing equal-latency memory tie-break can pick the latest valid trial;
+        # that memory change must not count as latency progress.
+        assert result.report['decision']['selected'] == 'trial-11'
+        evidence = [e for role, e in seen if role == 'proposal']
+        assert evidence[-1]['remaining_trials'] is None
+        assert evidence[-1]['round_trial_capacity'] == 1
+        assert evidence[-1]['plateau']['confirmation_round_pending'] is True
+        assert len(evidence[-1]['plateau']['history']) == 10
+        prose = (tmp_path / 'run' / 'report.md').read_text()
+        assert 'no total trial cap' in prose
+        assert 'confirmation round' in prose
+        assert '11/None' not in prose
+    assert not any(r.ready for r in runners)
+
+
+def test_qualifying_progress_resets_pending_confirmation(tmp_path, monkeypatch):
+    result, _, _ = plateau_run(tmp_path, monkeypatch, [100, 90, 90, 90, 70])
+    with result:
+        search = result.report['search']
+        assert search['trials_used'] == 4
+        assert [row['confirmation_round'] for row in search['rounds']] == [False, True, False, True]
+        assert [row['objective_progress']['qualifying_progress'] for row in search['rounds']] == [False, True, False, False]
+
+
+@pytest.mark.parametrize('wrong,missing,failed', [((1, 2), (), ()), ((), (1, 2), ()), ((), (), (1, 2))])
+def test_quality_failure_or_missing_objective_cannot_reset_plateau(tmp_path, monkeypatch, wrong, missing, failed):
+    result, _, _ = plateau_run(tmp_path, monkeypatch, [10, 5, 1], wrong=wrong, missing=missing, failed=failed)
+    with result:
+        assert result.report['search']['trials_used'] == 2
+        assert result.report['search']['stop_reason'] == 'objective-plateau-confirmed'
+        assert result.report['decision']['selected'] == 'baseline'
+
+
+@pytest.mark.parametrize('latencies,expected', [([95, 95, 95, 90], 3), ([95.001, 95.001, 80], 2)])
+def test_plateau_uses_five_percent_boundary_not_memory_noise(tmp_path, monkeypatch, latencies, expected):
+    result, _, _ = plateau_run(tmp_path, monkeypatch, latencies)
+    with result:
+        assert result.report['search']['trials_used'] == expected
+        assert result.report['search']['stop_reason'] == 'objective-plateau-confirmed'
+
+
+def test_exhaustion_during_confirmation_is_not_claimed_as_confirmed(tmp_path, monkeypatch):
+    result, _, _ = plateau_run(tmp_path, monkeypatch, [100])
+    with result:
+        assert result.report['search']['trials_used'] == 1
+        assert result.report['search']['stop_reason'] == 'no-legal-untested-candidate'
+        assert result.report['search']['plateau']['confirmation_round_pending'] is True
+
+
+def test_plateau_compares_prior_best_not_original_baseline(tmp_path, monkeypatch):
+    result, _, _ = plateau_run(tmp_path, monkeypatch, [96, 92, 70])
+    with result:
+        assert result.report['search']['trials_used'] == 2
+        progress = result.report['search']['rounds'][1]['objective_progress']
+        assert progress['prior_best_quality_valid_value'] == 96
+        assert progress['qualifying_progress'] is False
+
+
+@pytest.mark.parametrize('priority,value', [('latency', 95), ('throughput', 105), ('memory', 95)])
+def test_objective_plateau_respects_metric_direction_and_boundary(priority, value):
+    from sera.investigation import objective_progress
+    def trial(name, metric):
+        return dict(trial_id=name, status='collected', input_token_ids=[[1]],
+            task_quality=dict(mean=1, valid_outputs=True),
+            reduced=dict(p95_latency_ms=metric if priority == 'latency' else 100,
+                         output_tokens_per_second=metric if priority == 'throughput' else 100),
+            runtime=dict(sampled_peak_memory_mib=metric if priority == 'memory' else 100))
+    plateau = dict(best_quality_valid_value=100, consecutive_no_progress_rounds=1,
+                   confirmation_round_pending=True, history=[])
+    result = objective_progress(plateau, trial('baseline', 100), [trial('candidate', value)],
+        objective=sera.Objective(priority=priority), constraints=sera.Constraints(quality_floor=.99), round_number=2)
+    assert result['qualifying_progress'] is True
+    assert plateau['confirmation_round_pending'] is False
+    assert plateau['consecutive_no_progress_rounds'] == 0
+
+
+def test_compact_prompt_preserves_uncapped_policy_and_plateau_history(tmp_path, monkeypatch):
+    from sera.investigation_prompt import build_investigation_prompt
+    result, seen, _ = plateau_run(tmp_path, monkeypatch, [100, 100, 80])
+    with result:
+        evidence = [e for role, e in seen if role == 'proposal'][-1]
+        projected = build_investigation_prompt(evidence)
+        if isinstance(projected, tuple):
+            projected = projected[0]
+        for key in ('remaining_trials', 'total_trial_cap', 'round_trial_capacity', 'search_policy', 'plateau'):
+            assert projected[key] == evidence[key]
+
+
+def test_uncapped_proposal_requires_explicit_round_capacity():
+    from sera.agent import parse_response, validate_proposal
+    from sera.provider_check import provider_cases
+    evidence = deepcopy(provider_cases()[0]['evidence'])
+    evidence.update(remaining_trials=None, search_policy='until-plateau', round_trial_capacity=1)
+    value = dict(action='trial', proposal_id='p1', agent_role='quantization',
+        parent_trial_id=evidence['trial_id'], model_id=evidence['model_id'],
+        changed_lever='kv_cache_dtype', proposed_value='fp8', expected_trial_cost=1,
+        evidence_used=['p95_latency_ms'], predicted_metric_change='Test memory', confidence=.5,
+        falsification_condition='No measured gain', reason='Test')
+    proposal = parse_response('proposal', json.dumps(value), evidence)
+    assert validate_proposal(proposal, evidence) is not None
+    for field in ('search_policy', 'round_trial_capacity'):
+        invalid = deepcopy(evidence)
+        invalid.pop(field)
+        with pytest.raises(ValueError, match='round capacity'):
+            validate_proposal(proposal, invalid)
+
+
 def test_one_trial_budget_returns_original_after_quality_rejection(tmp_path, monkeypatch):
     runners, seen, agent = install_fakes(monkeypatch)
     with run(tmp_path, agent, budget=sera.Budget(max_candidate_trials=1)) as result:

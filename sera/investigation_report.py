@@ -250,10 +250,17 @@ def render_investigation(report):
         if trial_id not in rendered:
             lines.extend([f"Trial has no saved round link: {trial_id}."] + _trial_lines(trial) + [''])
     decision = report.get('decision') or {}
+    cap = (search.get('budget') or {}).get('max_candidate_trials')
+    trial_count = (f"{_value(search.get('trials_used'))}; no total trial cap" if 'plateau' in search
+                   else f"{_value(search.get('trials_used'))}/{_value(cap)}")
+    if 'plateau' in search:
+        plateau = search['plateau']
+        lines.extend(['Stopping policy: objective plateau plus one confirmation round.',
+            f"Pending confirmation round: {plateau['confirmation_round_pending']}; "
+            f"consecutive rounds without qualifying progress: {plateau['consecutive_no_progress_rounds']}. "])
     lines.extend([f"Final selection: {_value(decision.get('selected'))}.",
                   f"Stop reason: {search.get('stop_reason') or MISSING}.",
-                  f"Trials used: {_value(search.get('trials_used'))}/"
-                  f"{_value((search.get('budget') or {}).get('max_candidate_trials'))}.",
+                  f"Trials used: {trial_count}.",
                   f"Runner status: {report.get('status', MISSING)}; "
                   f"closed={_value(report.get('returned_runner_closed'))}.",
                   'Raw evidence: result.json — search.rounds, search_trials, and agent_calls.', ''])
