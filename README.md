@@ -113,47 +113,44 @@ shipping a configuration that breaks both SLOs.
 
 ## Honest comparison against a conventional tuner
 
-`src/loop/baseline.py` sweeps the identical lever space with the identical budget
-through the identical gates, choosing randomly instead of by reasoning.
+`src/sera/baseline.py` sweeps the identical candidate universe with the identical
+budget through the identical gates, choosing by fixed order or at random instead of by
+reasoning. The metric is the one the specification asks for: **trials to reach a valid
+configuration within 5% of the oracle**, where the oracle is the best viable p95 in the
+whole universe, found by running all 288 configurations once.
 
-**Random search matches or beats this loop on trials-to-target.**
+On `specs/tight.yaml`:
 
-| | model_a | model_b |
-|---|---|---|
-| Agent loop | trial 4 | trial 3 |
-| Random search (30 seeds) | median 3, range 1–7 | median 3, range 1–7 |
+| | oracle | Sera | fixed-order grid | random (30 seeds) |
+|---|---|---|---|---|
+| model_a — 6.2% of legal configs qualify | 362ms | **trial 6, reaches 362ms** | never in 12 | median 4.5, **fails 16/30** |
+| model_b — 25% qualify | 352ms | **trial 4, reaches 352ms** | never in 12 | median 3.0, fails 0/30 |
 
-The reason is measurable rather than mysterious: at the demo SLOs, **62–75% of legal
-configurations already pass**, and even at the tightened SLOs in `specs/tight.yaml` it
-is still 25%. When most answers are correct, guessing is an excellent strategy, and
-this matches the known result that random search is very hard to beat in
-low-dimensional discrete spaces.
+Read that carefully, because the headline is not "we win."
 
-We are reporting this rather than tuning the scenario until the agents win. A
-benchmark adjusted until it flatters the system under test measures nothing.
+**Sera beats fixed-order grid search outright** — grid never reaches the threshold
+within budget on either model. That is condition 1 of the spec's §19.4.
 
-**So the claim is not trial efficiency.** What this loop does that a sweep cannot:
+**Sera does not beat random search on median trials**, and we are not going to claim it
+does. But the median hides the thing that matters: on the hard model, random search
+**fails outright in 53% of seeds**, while Sera reaches the oracle deterministically.
+Comparing a median-over-successes against a result that always succeeds is survivorship
+bias. The defensible claim is reliability on hard search problems, not speed on easy
+ones — and on the easy model, random genuinely wins.
 
-1. **Phase 2 is not a search problem.** A sweep has no notion of re-reading its own
-   history under a new objective, no fit check, no joint trial, and no way to
-   attribute a co-tenancy failure to bandwidth rather than memory. Consolidation is
-   the product; Phase 1 is the evidence it runs on.
-2. **It explains itself.** Per-lever effect sizes and a stated mechanism. A sweep
-   returns a config and no understanding of why it works — which is what you need when
-   it stops working.
-3. **Dead levers are transferable facts.** "Batching is irrelevant for this traffic
-   shape" is true of the workload, not of one config, and it holds for the next model
-   on the same traffic.
-4. **Constraints propagate.** When Phase 2 needed a single-device config, the loop
-   re-derived one under that constraint instead of restarting blind.
-5. **It tracks whether it was right.** Predictions are scored against measurements and
-   the arbiter reallocates budget accordingly.
+### A negative result we are keeping in the repo
 
-Where trial efficiency *should* matter is a larger lever space with a sparser solution
-set, and continuous rather than discrete values. That is a claim we have not tested,
-so we are not making it.
+The specification's §13 calls for an exploration trial, to stop the arbiter spending
+every slot on the lever it already trusts. It is implemented and unit-tested.
 
----
+**It fires zero times in every scenario we ship.** With three lever groups and two
+slots, the selected set already covers every live lever, so there is no unselected
+lever to promote. The code is correct and currently inert.
+
+What actually improved the search was unrelated: letting a specialist offer **two**
+candidates instead of one, per §13's "zero to two proposals". That alone moved model_a
+from *never reaching the target* to *reaching the oracle exactly*. We found that by
+ablating the feature we expected to matter and measuring no difference.
 
 ## Substrate
 

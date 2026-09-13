@@ -275,7 +275,7 @@ class Phase1:
                 ledger=self.ledger, available_gpus=self.available_gpus,
                 round=rnd, tried=tried,
             )
-            verdicts = [s().propose(ctx) for s in ALL_SPECIALISTS]
+            verdicts = [v for s in ALL_SPECIALISTS for v in s().propose(ctx)]
 
             self.log("")
             for v in verdicts:
@@ -285,7 +285,9 @@ class Phase1:
                     self.log(f"    {v.specialist:14} proposes {v.label()}")
                     self.log(f"                   {v.rationale}")
 
-            arb = self.arbiter.arbitrate(verdicts, best_cfg)
+            arb = self.arbiter.arbitrate(
+                verdicts, best_cfg, remaining_budget=allowance - self.trials_spent
+            )
             if not arb.selected:
                 self.log("\n    every lever is dead or already spent — stopping early")
                 break

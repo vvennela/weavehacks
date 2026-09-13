@@ -111,7 +111,7 @@ def test_every_phase1_trial_changes_exactly_one_lever_group(tmp_path):
         )
 
 
-def test_specialists_return_exactly_one_verdict_type(tmp_path):
+def test_specialists_return_between_zero_and_two_proposals(tmp_path):
     spec = load_spec(SPEC)
     model = spec.model("model_a")
     cfg = baseline_config(model)
@@ -124,12 +124,18 @@ def test_specialists_return_exactly_one_verdict_type(tmp_path):
     ctx = Context(digest=digest, config=cfg, model=model, gpu=gpu,
                   ledger=Ledger(tmp_path / "l.jsonl"), available_gpus=2)
     for cls in ALL_SPECIALISTS:
-        v = cls().propose(ctx)
-        assert isinstance(v, (Proposal, Dead))
-        if isinstance(v, Dead):
-            assert v.reason, f"{cls.__name__} declared dead without a reason"
-        else:
-            assert v.rationale and v.delta
+        verdicts = cls().propose(ctx)
+        assert isinstance(verdicts, list) and verdicts, f"{cls.__name__} returned nothing"
+        # A dead lever is reported alone; it is never mixed with live proposals.
+        deads = [v for v in verdicts if isinstance(v, Dead)]
+        props = [v for v in verdicts if isinstance(v, Proposal)]
+        assert not (deads and props), f"{cls.__name__} mixed Dead with proposals"
+        assert len(props) <= 2, f"{cls.__name__} proposed more than two candidates"
+        for d in deads:
+            assert d.reason, f"{cls.__name__} declared dead without a reason"
+        for pr in props:
+            assert pr.rationale and pr.delta
+            assert len(pr.apply_to(cfg).levers_touched(cfg)) <= 1
 
 
 def test_dead_lever_is_reported_when_no_devices_are_free(tmp_path):
@@ -147,8 +153,8 @@ def test_dead_lever_is_reported_when_no_devices_are_free(tmp_path):
                   ledger=Ledger(tmp_path / "l.jsonl"), available_gpus=1)
     from sera.specialists import ParallelismSpecialist
 
-    v = ParallelismSpecialist().propose(ctx)
-    assert isinstance(v, Dead)
+    verdicts = ParallelismSpecialist().propose(ctx)
+    assert len(verdicts) == 1 and isinstance(verdicts[0], Dead)
 
 
 def test_simulator_is_deterministic(tmp_path):

@@ -32,7 +32,7 @@ class QuantizationSpecialist(Specialist):
     name = "quantization"
     lever = "quantization"
 
-    def propose(self, ctx: Context) -> Verdict:
+    def propose(self, ctx: Context) -> list[Verdict]:
         d = ctx.digest
         cfg = ctx.config
 
@@ -69,15 +69,24 @@ class QuantizationSpecialist(Specialist):
                 )
             elif compute_bound and d.p95_slo_ratio <= 1.0:
                 why += "; prefill dominates but latency is already inside SLO"
-            return Dead(self.name, self.lever, why + " — shrinking tensors buys little here")
+            return [Dead(self.name, self.lever, why + " — shrinking tensors buys little here")]
 
-        # KV pressure is the more specific signal: if the cache is what is full,
-        # shrink the cache before touching weights.
-        if kv_pressured and cfg.kv_cache_dtype in KV_LADDER[:-1]:
+        out: list[Verdict] = []
+
+        # Cache precision and weight precision are separate bets with separate risks,
+        # so when both are live they are offered as two candidates rather than one
+        # merged config. The arbiter decides which is worth a slot.
+        # Offered whenever the lever is live at all, not only under cache pressure.
+        # Halving KV element size is cheap, independent of what the weights are doing,
+        # and carries a different quality risk — it degrades attention history rather
+        # than the parameters. Withholding it until the cache is nearly full meant this
+        # specialist only ever had one thing to say, which left the arbiter nothing to
+        # rank and nothing to explore.
+        if cfg.kv_cache_dtype in KV_LADDER[:-1]:
             nxt = KV_LADDER[KV_LADDER.index(cfg.kv_cache_dtype) + 1]
             delta = {"kv_cache_dtype": nxt}
             if not ctx.already_tried(delta):
-                return Proposal(
+                out.append(Proposal(
                     specialist=self.name,
                     lever=self.lever,
                     delta=delta,
@@ -89,19 +98,23 @@ class QuantizationSpecialist(Specialist):
                         rationale=f"KV at {d.kv_occupancy:.0%}; halving cache element size",
                     ),
                     rationale=(
-                        f"KV occupancy is {d.kv_occupancy:.1%}, so the cache is the thing "
-                        f"under pressure. Moving KV to {nxt} halves per-token cost and "
-                        "raises the concurrency ceiling without touching weights."
+                        f"KV occupancy is {d.kv_occupancy:.1%}. Moving the cache to {nxt} "
+                        "halves per-token cost and raises the concurrency ceiling without "
+                        "touching the weights, so it is a separate bet from weight "
+                        "precision and carries a different quality risk — degraded "
+                        "attention history rather than degraded parameters."
                     ),
-                )
+                ))
 
         idx = idx_now
         if idx >= len(WEIGHT_LADDER) - 1:
-            return Dead(
+            if out:
+                return out
+            return [Dead(
                 self.name,
                 self.lever,
                 f"already at {cfg.weight_dtype}, the most aggressive supported precision",
-            )
+            )]
 
         nxt = WEIGHT_LADDER[idx + 1]
         delta = {"weight_dtype": nxt}
@@ -111,9 +124,13 @@ class QuantizationSpecialist(Specialist):
                 nxt = WEIGHT_LADDER[idx + 2]
                 delta = {"weight_dtype": nxt}
                 if ctx.already_tried(delta):
-                    return Dead(self.name, self.lever, "every precision step has been tried")
+                    return out or [Dead(
+                        self.name, self.lever, "every precision step has been tried"
+                    )]
             else:
-                return Dead(self.name, self.lever, "every precision step has been tried")
+                return out or [Dead(
+                    self.name, self.lever, "every precision step has been tried"
+                )]
 
         # The argument differs by which bottleneck is actually live, and so does the
         # size of the claim. Saying "45% off" when the mechanism does not apply is how
@@ -137,7 +154,7 @@ class QuantizationSpecialist(Specialist):
             )
             expected, confidence = 40.0, 0.6
 
-        return Proposal(
+        out.append(Proposal(
             specialist=self.name,
             lever=self.lever,
             delta=delta,
@@ -156,4 +173,5 @@ class QuantizationSpecialist(Specialist):
                 + f" Expect roughly {expected:.0f}% off p95, and expect the eval to decide "
                 "whether it is keepable."
             ),
-        )
+        ))
+        return out

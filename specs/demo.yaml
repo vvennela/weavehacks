@@ -90,5 +90,5 @@ quality_floors:
 budget:
   phase1_trials: 12
   phase2_trials: 4
-  concurrent_slots: 3
+  concurrent_slots: 2
   max_rounds: 3

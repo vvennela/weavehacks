@@ -174,25 +174,93 @@ class Ledger:
 
     # ---- the two queries that matter ---------------------------------------
 
+    def viable(self, model: str) -> list[TrialRecord]:
+        """Phase-1 rows for `model` that ran and cleared every gate."""
+        return [
+            r
+            for r in self.for_model(model)
+            if r.verdict.viable and r.measurement is not None and r.phase == 1
+        ]
+
+    @staticmethod
+    def _dominates(a: Measurement, b: Measurement) -> bool:
+        """Does `a` beat `b` outright on every axis that matters?
+
+        Per the Sera specification a configuration is dominated when another is at
+        least as fast, at least as memory efficient, AND at least as high throughput,
+        with a strict improvement in at least one. Ties on all three dominate nothing,
+        so identical configurations both survive rather than one arbitrarily winning.
+        """
+        at_least_as_good = (
+            a.p95_latency_ms <= b.p95_latency_ms
+            and a.footprint_gb <= b.footprint_gb
+            and a.throughput_rps >= b.throughput_rps
+        )
+        strictly_better = (
+            a.p95_latency_ms < b.p95_latency_ms
+            or a.footprint_gb < b.footprint_gb
+            or a.throughput_rps > b.throughput_rps
+        )
+        return at_least_as_good and strictly_better
+
+    def pareto_frontier(self, model: str) -> list[TrialRecord]:
+        """The non-dominated viable configurations, sorted smallest first.
+
+        This is the set worth keeping. Sorting by one axis — which is what this used
+        to do — throws away the configuration that is slightly larger but markedly
+        faster, and that is frequently the one Phase 2 needs. A frontier is the answer
+        to "what are the real choices", not "what won on my favourite metric".
+        """
+        rows = self.viable(model)
+        front = [
+            r
+            for r in rows
+            if not any(
+                self._dominates(o.measurement, r.measurement)  # type: ignore[arg-type]
+                for o in rows
+                if o is not r
+            )
+        ]
+        front.sort(key=lambda r: r.measurement.footprint_gb)  # type: ignore[union-attr]
+        return front
+
     def frontier(
         self,
         model: str,
         objective: str = "footprint_gb",
         limit: int | None = None,
     ) -> list[TrialRecord]:
-        """Viable configs for `model`, ordered by `objective` ascending.
+        """Non-dominated viable configs, ordered by `objective` ascending.
 
         Phase 1 optimizes for speed. Phase 2 calls this with the default objective and
-        gets a different answer out of the same history — the smallest config that still
-        clears SLO, which is what frees a GPU. Quality failures never appear here.
+        gets a different answer out of the same history — the smallest configuration
+        that still clears SLO. Quality failures never appear here.
         """
-        viable = [
-            r
-            for r in self.for_model(model)
-            if r.verdict.viable and r.measurement is not None and r.phase == 1
-        ]
-        viable.sort(key=lambda r: getattr(r.measurement, objective))
-        return viable[:limit] if limit else viable
+        front = self.pareto_frontier(model)
+        front.sort(key=lambda r: getattr(r.measurement, objective))
+        return front[:limit] if limit else front
+
+    def recommend(self, model: str, p95_budget_ms: float | None = None) -> TrialRecord | None:
+        """Pick one configuration to recommend, per the specification's ordering.
+
+        Quality is already guaranteed — nothing reaches the frontier without passing
+        it. So: honour the latency requirement when there is one, then minimise p95,
+        then use footprint as the tie-breaker.
+        """
+        front = self.pareto_frontier(model)
+        if not front:
+            return None
+        if p95_budget_ms is not None:
+            within = [
+                r for r in front
+                if r.measurement.p95_latency_ms <= p95_budget_ms  # type: ignore[union-attr]
+            ]
+            if within:
+                front = within
+        return min(
+            front,
+            key=lambda r: (r.measurement.p95_latency_ms, r.measurement.footprint_gb),  # type: ignore[union-attr]
+        )
 
     def calibration(self, specialist: str) -> float:
         """Fraction of this specialist's ran-trial predictions that held.

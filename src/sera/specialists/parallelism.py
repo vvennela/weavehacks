@@ -21,50 +21,50 @@ class ParallelismSpecialist(Specialist):
     name = "parallelism"
     lever = "parallelism"
 
-    def propose(self, ctx: Context) -> Verdict:
+    def propose(self, ctx: Context) -> list[Verdict]:
         d = ctx.digest
         cfg = ctx.config
         model = ctx.model
 
         if d.tp_headroom < 1:
-            return Dead(
+            return [Dead(
                 self.name,
                 self.lever,
                 f"tp={cfg.tensor_parallel_size} already uses every available device; "
                 "no spare hardware to shard onto",
-            )
+            )]
 
         target = cfg.tensor_parallel_size * 2
         # Legality is cheap to check and expensive to discover on deployment.
         if model.num_kv_heads % target != 0:
-            return Dead(
+            return [Dead(
                 self.name,
                 self.lever,
                 f"tp={target} does not divide num_kv_heads={model.num_kv_heads}; "
                 "the next legal degree needs more devices than are free",
-            )
+            )]
         if model.num_attn_heads % target != 0:
-            return Dead(
+            return [Dead(
                 self.name,
                 self.lever,
                 f"tp={target} does not divide num_attn_heads={model.num_attn_heads}",
-            )
+            )]
         if target > ctx.available_gpus:
-            return Dead(
+            return [Dead(
                 self.name,
                 self.lever,
                 f"tp={target} needs {target} devices, {ctx.available_gpus} available",
-            )
+            )]
 
         delta = {"tensor_parallel_size": target}
         if ctx.already_tried(delta):
-            return Dead(self.name, self.lever, f"tp={target} has already been trialled")
+            return [Dead(self.name, self.lever, f"tp={target} has already been trialled")]
 
         # The win is a bandwidth division; the cost is a synchronization per step.
         gross = 50.0
         net = gross - (TP_SYNC_COST_PER_RANK * 100 * (target - 1))
 
-        return Proposal(
+        return [Proposal(
             specialist=self.name,
             lever=self.lever,
             delta=delta,
@@ -83,4 +83,4 @@ class ParallelismSpecialist(Specialist):
                 "Unlike quantization this keeps the numerics intact — but it consumes "
                 f"{target} devices, which constrains anything we do about co-tenancy later."
             ),
-        )
+        )]

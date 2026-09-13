@@ -98,5 +98,5 @@ budget:
   # Sera spec §7: eight trials across both phases, two reserved for phase two.
   phase1_trials: 6
   phase2_trials: 2
-  concurrent_slots: 3
+  concurrent_slots: 2
   max_rounds: 3

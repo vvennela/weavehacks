@@ -23,6 +23,11 @@ from .ledger import Ledger
 from .specialists.base import Dead, Proposal, Verdict
 
 
+# Below this many remaining trials, stop exploring and spend what is left on the
+# strongest known direction.
+EXPLORATION_MIN_BUDGET = 3
+
+
 @dataclass
 class Arbitration:
     """What the arbiter decided and why, kept for the trace."""
@@ -48,7 +53,12 @@ class Arbiter:
         magnitude = (p.prediction.magnitude_pct or 10.0) / 100.0
         return p.prediction.confidence * magnitude * (0.5 + calibration)
 
-    def arbitrate(self, verdicts: list[Verdict], baseline: InferenceConfig) -> Arbitration:
+    def arbitrate(
+        self,
+        verdicts: list[Verdict],
+        baseline: InferenceConfig,
+        remaining_budget: int | None = None,
+    ) -> Arbitration:
         """Choose which proposals get trial slots this round."""
         proposals = [v for v in verdicts if isinstance(v, Proposal)]
         dead = [v for v in verdicts if isinstance(v, Dead)]
@@ -77,6 +87,39 @@ class Arbiter:
 
         selected = legal[: self.slots]
         declined = legal[self.slots :]
+
+        # Exploration. Ranking alone is pure exploitation: the highest-scoring lever
+        # keeps winning, its calibration keeps rising, and the arbiter stops learning
+        # anything about the levers it never spends a slot on.
+        #
+        # So when the budget can afford it, one slot is reserved for the best proposal
+        # from a lever group that ranking did NOT already select. It is spent only when
+        # at least EXPLORATION_MIN_BUDGET trials remain, so exploring never consumes
+        # the last trials that should be closing out a known-good direction.
+        #
+        # MEASURED CAVEAT: with three lever groups and two-to-three slots, this branch
+        # does not fire in any shipped scenario — the selected set almost always already
+        # covers every live lever, so there is no unselected lever to promote. It is
+        # unit-tested and correct when it triggers, and it is inert in practice today.
+        # What actually improved search was letting a specialist offer two candidates
+        # instead of one. Do not cite this as a working mechanism until a scenario
+        # exists where `grep 'exploration slot'` finds something.
+        if remaining_budget is not None and remaining_budget >= EXPLORATION_MIN_BUDGET:
+            chosen_levers = {p.lever for p in selected}
+            candidates = [p for p in declined if p.lever not in chosen_levers]
+            if candidates and selected:
+                explorer = candidates[0]
+                displaced = selected[-1]
+                selected = selected[:-1] + [explorer]
+                declined = [p for p in declined if p is not explorer] + [displaced]
+                explorer.exploration = True
+                notes.append(
+                    f"exploration slot -> {explorer.specialist} ({explorer.label()}): "
+                    f"score {explorer.priority:.3f} is below "
+                    f"{displaced.specialist}'s {displaced.priority:.3f}, but "
+                    f"{displaced.lever} is already being tested this round and "
+                    f"{explorer.lever} has not been. {remaining_budget} trials remain."
+                )
 
         for p in selected:
             cal = self.ledger.calibration(p.specialist)

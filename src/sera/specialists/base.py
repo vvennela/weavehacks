@@ -33,6 +33,10 @@ class Proposal:
     rationale: str
     # Set by the arbiter, not the specialist.
     priority: float = 0.0
+    # True when this proposal won its slot by being unexplored rather than by
+    # outranking the alternatives. Recorded so the ledger can separate a win the
+    # arbiter predicted from one it only found by looking.
+    exploration: bool = False
 
     def apply_to(self, cfg: InferenceConfig) -> InferenceConfig:
         return cfg.with_delta(self.delta)
@@ -72,14 +76,22 @@ class Context:
 
 
 class Specialist(ABC):
-    """One lever group, one opinion."""
+    """One lever group, up to two opinions."""
 
     name: str
     lever: Lever
 
     @abstractmethod
-    def propose(self, ctx: Context) -> Verdict:
-        """Read the shared digest and either propose a change or declare the lever dead."""
+    def propose(self, ctx: Context) -> list[Verdict]:
+        """Read the shared digest and return proposals, or a single Dead.
+
+        Returning up to two proposals is deliberate. With one proposal per specialist
+        and one slot per specialist, the arbiter never declines anything — ranking has
+        no effect and there is nothing left over to explore. More candidates than slots
+        is what makes the arbiter's job real.
+
+        A dead lever is returned as a single Dead, never mixed with proposals.
+        """
 
     def __repr__(self) -> str:
         return f"<{self.name}>"
