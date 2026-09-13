@@ -90,6 +90,37 @@ def test_required_inspection_and_zero_budget_tasks_do_not_force_a_trial():
     assert result['constraints']['quality_floor']==.99
 
 
+@pytest.mark.parametrize('phase', ['propose', 'refine'])
+@pytest.mark.parametrize('remaining', [1, None])
+def test_proposal_authority_is_distinct_from_gpu_execution(phase, remaining):
+    supplied = evidence(phase)
+    supplied.update(remaining_trials=remaining, round_trial_capacity=1)
+    task = build_investigation_prompt(supplied)['your_task']
+    assert 'You may recommend one legal untested trial' in task
+    assert 'current round capacity' in task
+    assert 'not a reason to abstain' in task
+    assert 'No per-trial human approval is required' in task
+    assert 'arbiter selects' in task and 'deterministic validator' in task
+    assert 'keep-baseline' in task
+    assert 'This request does not authorize a GPU trial' not in task
+
+
+def test_read_only_instruction_is_limited_to_inspection_phase():
+    task = build_investigation_prompt(evidence('inspect'))['your_task']
+    assert 'this inspection phase' in task
+    assert 'read-only' in task
+    assert 'proposal phase may recommend' in task
+    assert 'You may recommend one legal untested trial' not in task
+
+
+def test_zero_budget_never_gets_trial_recommendation_authority():
+    supplied = evidence('refine')
+    supplied.update(remaining_trials=0)
+    task = build_investigation_prompt(supplied)['your_task']
+    assert 'keep-baseline' in task
+    assert 'You may recommend one legal untested trial' not in task
+
+
 def test_empty_reader_quality_shape_does_not_turn_startup_failure_into_a_measurement():
     supplied=evidence()
     for inspection in [supplied['inspections'][0],supplied['shared_findings'][0]['inspections'][0]]:

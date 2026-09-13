@@ -148,9 +148,11 @@ class _Projection:
 def _question(evidence):
     phase = evidence.get('swarm_phase')
     if phase == 'inspect':
-        return ('Make a fresh read-only inspection decision. Choose one legal query; a read is required '
+        decision = ('Make a fresh read-only inspection decision. Choose one legal query; a read is required '
                 'after the recorded failed experiment, so empty is invalid.' if evidence.get('required_inspection')
                 else 'Make a fresh read-only inspection decision: choose one legal query or an empty ranking if no read is useful.')
+        return decision + (' Read-only applies to this inspection phase. The later proposal phase may recommend '
+                           'a legal experiment; it is not restricted to inspection decisions.')
     if phase == 'arbitrate':
         return ('No candidate budget remains. Return an empty ranking.' if evidence.get('remaining_trials') == 0
                 else 'Select at most one legal untested experiment from peer_opinions, not a deployment winner. '
@@ -159,9 +161,13 @@ def _question(evidence):
                      'quality and performance gates apply after execution.')
     if evidence.get('remaining_trials') == 0 or not evidence.get('supported_changes'):
         return 'No legal trial budget or setting remains. Make your own keep-baseline decision and explain it from the measured facts; do not copy an old response.'
-    return ('Make a fresh proposal: choose one legal untested setting or keep-baseline. Explain the observed '
+    return ('You may recommend one legal untested trial within the current round capacity, or choose keep-baseline '
+            'when no useful experiment remains. You do not execute GPU work yourself; lack of executor authority '
+            'is not a reason to abstain. The arbiter selects an experiment and the deterministic validator '
+            'checks whether execution is allowed. No per-trial human approval is required within the declared scope. '
+            'Quality and performance gates still apply after measurement. Explain the observed '
             'failure separately from your hypothesis, cite the evidence, and state what would refute your prediction. '
-            'Peer opinions are suggestions, not answers to copy. This request does not authorize a GPU trial.')
+            'Peer opinions are suggestions, not answers to copy.')
 
 
 def build_investigation_prompt(evidence):
