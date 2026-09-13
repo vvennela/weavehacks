@@ -595,13 +595,14 @@ def test_no_weave_disables_even_an_inherited_event_sink(cli, monkeypatch, tmp_pa
 
 
 @pytest.mark.parametrize('location', ['baseline', 'candidate_trial', 'search_trials', 'deployment'])
-def test_saved_measurement_trace_failure_is_explicit_without_rewriting_quality(cli, monkeypatch, tmp_path, location):
+@pytest.mark.parametrize('export_field', ['trace_export', 'diagnosis_trace_export'])
+def test_saved_measurement_trace_failure_is_explicit_without_rewriting_quality(cli, monkeypatch, tmp_path, location, export_field):
     observed = install_boundaries(cli, monkeypatch, tmp_path)
     original = cli.sera.optimize
 
     def optimize(**kwargs):
         result = original(**kwargs)
-        trial = {'trial_id': 'saved-trial', 'trace_export': {'status': 'failed', 'emitted_events': 2,
+        trial = {'trial_id': 'saved-trial', export_field: {'status': 'failed', 'emitted_events': 2,
                  'failed_event': 'recorded_model_request', 'error_type': 'RuntimeError'}}
         result.report[location] = ([trial] if location == 'search_trials' else
                                    {'candidate_trial': trial} if location == 'deployment' else trial)
@@ -717,8 +718,9 @@ def test_swarm_reader_uses_current_trace_and_named_read_op_without_serializing_c
     reads = []
 
     class Reader:
-        def __init__(self, client, trace_id):
+        def __init__(self, client, trace_id, *, evaluation_cases):
             assert trace_id == 'current-run' and callable(client.flush)
+            assert evaluation_cases == load_cases(cli.CASES_PATH)
 
         def __call__(self, query_id, evidence):
             reads.append((query_id, evidence))
@@ -779,3 +781,12 @@ def test_forked_trace_agents_have_isolated_histories_and_named_investigation_pha
         f'swarm_{investigator}_inspection', f'swarm_{investigator}_proposal', f'swarm_{investigator}_peer_review']
     child._trace_failures.append({'event': 'fixture-child-failure'})
     assert parent.trace_failures == [{'event': 'fixture-child-failure'}]
+
+
+def test_completed_trial_diagnosis_is_exported_as_named_weave_child(cli):
+    weave = recording_weave()
+    sink = cli.weave_event_sink(weave)
+    payload = {'trial_id': 'trial-1', 'diagnosis': {'failure_kind': 'objective'}}
+    sink('recorded_trial_diagnosis', payload)
+    assert weave.calls[0]['name'] == 'recorded_trial_diagnosis'
+    assert weave.calls[0]['output'] == payload

@@ -14,7 +14,7 @@ import sys
 
 import sera
 from benchmarks.grade import SYSTEM_PROMPT, dataset_hash, grade_case, load_cases
-from experiments.weave_evidence import QUERY_IDS, WeaveEvidenceReader
+from experiments.weave_evidence import QUERY_IDS, RECORDED_OPS, WeaveEvidenceReader
 from sera.config import LARGE_MODEL_ID, MODEL_ID, resolve_investigation_space
 from sera.provider_check import require_provider_check
 from sera.storage import save_json
@@ -134,7 +134,7 @@ def weave_event_sink(weave):
             return payload
         return weave.op(name=name)(record)
 
-    operations = {name: operation(name) for name in ('recorded_model_request', 'recorded_trial_metrics')}
+    operations = {name: operation(name) for name in RECORDED_OPS}
 
     def sink(event_name, payload):
         operations[event_name](payload)
@@ -162,10 +162,11 @@ def trial_trace_failures(report):
               (report.get('deployment') or {}).get('candidate_trial'), *report.get('search_trials', [])]
     failures = []
     for trial in trials:
-        exported = (trial or {}).get('trace_export') or {}
-        if exported.get('status') == 'failed':
-            failures.append({'trial_id': trial.get('trial_id'), 'event': exported.get('failed_event'),
-                             'error_type': exported.get('error_type'), 'emitted_events': exported.get('emitted_events')})
+        for field in ('trace_export', 'diagnosis_trace_export'):
+            exported = (trial or {}).get(field) or {}
+            if exported.get('status') == 'failed':
+                failures.append({'trial_id': trial.get('trial_id'), 'event': exported.get('failed_event'),
+                                 'error_type': exported.get('error_type'), 'emitted_events': exported.get('emitted_events')})
     return failures
 
 
@@ -261,7 +262,7 @@ def main(argv=None):
                 invocation['weave_url'] = call.ui_url if call is not None else None
                 if args.swarm:
                     trace_reader = traced_evidence_reader(weave, WeaveEvidenceReader(
-                        client, call.trace_id if call is not None else None))
+                        client, call.trace_id if call is not None else None, evaluation_cases=cases))
             result = sera.optimize(models=[args.model], prompts=prompts, output_dir=folder,
                 evaluation=evaluate_answer, evaluation_version='sera-easy-strict-json-v1',
                 constraints=sera.Constraints(quality_floor=.99), objective=objective,
