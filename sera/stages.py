@@ -1,12 +1,12 @@
 """Ordered, measured stages with frozen checkpoints and one live owner at a time."""
 
+import inspect
+import uuid
 from copy import deepcopy
 from dataclasses import dataclass, field
-import inspect
 from pathlib import Path
-import uuid
 
-from .config import Constraints, LARGE_MODEL_ID, MODEL_ID, Objective, RuntimeConfig, Workload
+from .config import LARGE_MODEL_ID, MODEL_ID, Constraints, Objective, RuntimeConfig, Workload
 from .measurement import constraint_failures, objective_value
 from .stage_config import inherited_constraints, validate_stage_options
 from .storage import content_hash, save_json
@@ -37,7 +37,8 @@ class StagedResult:
     def _save(self):
         save_json(self.output_dir / 'result.json', self.report)
         rows = ['# Sera ordered stages', '', f"Status: {self.report['status']}",
-                f"Required improvement per stage: {self.report['k_percent']}%", '',
+                f"Allowed regression in earlier objectives: {self.report['k_percent']}%",
+                f"Minimum improvement per stage: {self.report['min_improvement_percent']}% (strictly positive)", '',
                 'Each stage remeasures its starting configuration. Quality and inherited limits remain hard gates.', '']
         for stage in self.report['stages']:
             rows.append(f"Stage {stage['index']}: {stage['stage']}; {stage['status']}; "
@@ -111,13 +112,15 @@ def _checkpoint(current, row, constraints, previous, models):
     if config.config_hash != trial['config_hash'] or current.models[0].configuration != config:
         raise RuntimeError('Stage runner differs from its measured configuration')
     runtime = trial['runtime']
+    if type(runtime.get('telemetry_errors')) is not int or runtime['telemetry_errors'] != 0:
+        raise RuntimeError('Stage memory telemetry is incomplete or failed')
     if runtime.get('model_id') != models[0]:
         raise RuntimeError('Stage model identity changed')
     tokens = trial.get('input_token_ids')
     if not isinstance(tokens, list) or not tokens or any(not row for row in tokens):
         raise RuntimeError('Stage input token evidence is missing')
-    identity = dict(model_id=runtime['model_id'], revision=runtime.get('revision'),
-                    gpu_uuid=runtime.get('gpu', {}).get('uuid'), versions=runtime.get('versions'))
+    identity = {'model_id': runtime['model_id'], 'revision': runtime.get('revision'),
+                    'gpu_uuid': runtime.get('gpu', {}).get('uuid'), 'versions': runtime.get('versions')}
     if not all(identity.values()):
         raise RuntimeError('Stage runtime identity is incomplete')
     if previous and (identity != previous[0]['runtime_identity'] or
@@ -126,28 +129,29 @@ def _checkpoint(current, row, constraints, previous, models):
     latency, memory = objective_value(trial, 'latency'), objective_value(trial, 'memory')
     if latency is None or type(memory) is not int or memory <= 0:
         raise RuntimeError('Stage winner is missing measured latency or memory')
-    record = dict(stage=row['stage'], status='completed', index=row['index'],
-        configuration=config.model_dump(), config_hash=config.config_hash,
-        p95_latency_ms=latency, sampled_peak_memory_mib=memory,
-        source_trial_id=selected, source_trial_hash=content_hash(trial),
-        input_token_ids_hash=content_hash(tokens), runtime_identity=identity,
-        output_dir=str(current.output_dir), weave_url=current.weave_url,
-        constraints=constraints.model_dump())
+    record = {'stage': row['stage'], 'status': 'completed', 'index': row['index'],
+        'configuration': config.model_dump(), 'config_hash': config.config_hash,
+        'p95_latency_ms': latency, 'sampled_peak_memory_mib': memory,
+        'source_trial_id': selected, 'source_trial_hash': content_hash(trial),
+        'source_trial_snapshot_path': f"checkpoints/{row['index']:03d}-trial.json",
+        'input_token_ids_hash': content_hash(tokens), 'runtime_identity': identity,
+        'output_dir': str(current.output_dir), 'weave_url': current.weave_url,
+        'constraints': constraints.model_dump()}
     record['checkpoint_hash'] = content_hash(record)
     return record
 
 
-def run_stages(*, models, prompts, stages, k, max_latency_regression_pct, mode, options, run_stage):
-    plan = validate_stage_options(stages, k, max_latency_regression_pct)
+def run_stages(*, models, prompts, stages, k, min_improvement_pct, mode, options, run_stage):
+    plan = validate_stage_options(stages, k, min_improvement_pct)
     original, workload = _validate_call(models, prompts, mode, options)
     options = dict(options)
     folder = Path(options.pop('output_dir', None) or Path('sera-runs') / uuid.uuid4().hex).resolve()
     folder.mkdir(parents=True, exist_ok=False)
-    result = StagedResult(dict(schema_version='sera-ordered-stages-v1', status='running',
-        requested_stages=list(plan.stages), k_percent=plan.k_fraction * 100,
-        max_latency_regression_pct=max_latency_regression_pct, original_constraints=original.model_dump(),
-        prompts=deepcopy(prompts), workload=workload.model_dump(),
-        checkpoints=[], stages=[], returned_runner_closed=True), folder)
+    result = StagedResult({'schema_version': 'sera-ordered-stages-v1', 'status': 'running',
+        'requested_stages': list(plan.stages), 'k_percent': plan.regression_fraction * 100,
+        'min_improvement_percent': plan.min_improvement_fraction * 100, 'original_constraints': original.model_dump(),
+        'prompts': deepcopy(prompts), 'workload': workload.model_dump(),
+        'checkpoints': [], 'stages': [], 'returned_runner_closed': True}, folder)
     options.update(workload=workload, automatic_space=True, swarm=True)
     baseline = options.pop('baseline_configuration', None)
     if baseline is not None:
@@ -157,21 +161,21 @@ def run_stages(*, models, prompts, stages, k, max_latency_regression_pct, mode, 
         (folder / 'checkpoints').mkdir()
         result._save()
         for index, stage in enumerate(plan.stages, 1):
-            limits = inherited_constraints(original, result.report['checkpoints'], max_latency_regression_pct)
+            limits = inherited_constraints(original, result.report['checkpoints'], k)
             if result._current is not None:
                 # Do not start another server if release of the prior owner fails.
                 result._current.close()
                 result._current = None
                 result.report['returned_runner_closed'] = True
             stage_folder = folder / f'{index:03d}-{stage}'
-            row = dict(index=index, stage=stage, status='running', output_dir=str(stage_folder),
-                       constraints=limits.model_dump())
+            row = {'index': index, 'stage': stage, 'status': 'running', 'output_dir': str(stage_folder),
+                       'constraints': limits.model_dump()}
             result.report['stages'].append(row)
             result._save()
             arguments = dict(options, models=deepcopy(models), prompts=deepcopy(prompts),
                 mode='swarm', output_dir=stage_folder, constraints=limits,
                 objective=Objective(priority='memory' if stage == 'quantization' else stage,
-                                    min_improvement_fraction=plan.k_fraction))
+                                    min_improvement_fraction=plan.min_improvement_fraction))
             if baseline is not None:
                 arguments['baseline_configuration'] = baseline
             if stage == 'quantization':
@@ -188,6 +192,9 @@ def run_stages(*, models, prompts, stages, k, max_latency_regression_pct, mode, 
             if baseline is not None and current.report.get('baseline_configuration') != baseline.model_dump():
                 raise RuntimeError('Stage did not start from the saved configuration')
             checkpoint = _checkpoint(current, row, limits, result.report['checkpoints'], models)
+            source = deepcopy(next(trial for trial in current.trials
+                                   if trial['trial_id'] == checkpoint['source_trial_id']))
+            save_json(folder / checkpoint['source_trial_snapshot_path'], source)
             save_json(folder / 'checkpoints' / f'{index:03d}.json', checkpoint)
             result.report['checkpoints'].append(checkpoint)
             row.update(status='completed', checkpoint_hash=checkpoint['checkpoint_hash'])
@@ -198,13 +205,13 @@ def run_stages(*, models, prompts, stages, k, max_latency_regression_pct, mode, 
         return result
     except BaseException as error:
         result.report.update(status='failed', error_type=type(error).__name__)
-        if result.report['stages']:
+        if result.report['stages'] and result.report['stages'][-1]['status'] != 'completed':
             result.report['stages'][-1]['status'] = 'failed'
         try:
             if result._current is not None:
                 result._current.close()
             result.report['returned_runner_closed'] = True
-        except BaseException as cleanup_error:
+        except BaseException as cleanup_error:  # noqa: BLE001 -- cleanup must also handle interruption
             result.report.update(cleanup_error=type(cleanup_error).__name__, returned_runner_closed=False)
             error.add_note('Stage cleanup failed: ' + type(cleanup_error).__name__)
         finally:

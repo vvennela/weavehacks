@@ -4,6 +4,10 @@ The public API now prepares the same swarm components used by the saved live
 loops: three investigators, scoped Weave reads, shared findings, an arbiter,
 measured candidates, fixed quality gates, and a returned live runner.
 
+For ordered goals, use [staged optimization](staged-optimization.md):
+`stages=['latency', 'quantization'], k=3.0`. The new objective must improve,
+while earlier measured objectives may regress by at most 3%. Quality stays fixed.
+
 The default search has **no total trial cap**. It stops on the existing objective
 plateau plus one confirmation rule, or when no legal experiment can proceed.
 Each specialist sees up to eight legal options per round. These are overlapping

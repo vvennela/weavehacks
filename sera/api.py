@@ -35,7 +35,7 @@ def _configured_agent():
 
 
 def optimize(*, models, prompts, mode='auto', stages=None, k=None,
-             max_latency_regression_pct=0.0, **options):
+             min_improvement_pct=None, **options):
     """Run the full configured swarm and return a caller-owned live result.
 
     With no explicit low-level search options, ``auto`` selects a Weave-backed
@@ -51,19 +51,26 @@ def optimize(*, models, prompts, mode='auto', stages=None, k=None,
     Quick mode checks token agreement, not task correctness. Fit-first Qwen72B
     still requires evaluation, evaluation_version, and Constraints. Always close
     the returned result, preferably with ``with sera.optimize(...) as result``.
+
+    ``stages=['latency', 'quantization']`` chains task-verified swarm runs.
+    ``k=3.0`` permits at most 3% regression in earlier measured objectives.
+    The new objective must improve; ``min_improvement_pct`` optionally requires
+    a larger gain. Quality and original hard limits remain unchanged. Each stage remeasures its
+    baseline; unsupported precision changes are not enabled by stage selection.
     """
     if mode not in ('auto', 'swarm', 'fixed'):
         raise ValueError('mode must be auto, swarm, or fixed')
     if stages is not None:
         from .stages import run_stages
         return run_stages(models=models, prompts=prompts, stages=stages,
-            k=5.0 if k is None else k, max_latency_regression_pct=max_latency_regression_pct,
+            k=0.0 if k is None else k,
+            min_improvement_pct=0.0 if min_improvement_pct is None else min_improvement_pct,
             mode=mode, options=options, run_stage=optimize)
-    if max_latency_regression_pct != 0.0:
-        raise ValueError('max_latency_regression_pct requires stages')
     if k is not None:
+        raise ValueError('k requires stages with earlier objectives to preserve')
+    if min_improvement_pct is not None:
         from .stage_config import validate_stage_options
-        threshold = validate_stage_options(['latency'], k).k_fraction
+        threshold = validate_stage_options(['latency'], 0.0, min_improvement_pct).min_improvement_fraction
         objective = Objective.model_validate(options.get('objective') or Objective())
         options['objective'] = Objective(priority=objective.priority, min_improvement_fraction=threshold)
     arguments = dict(models=models, prompts=prompts, **options)

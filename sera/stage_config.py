@@ -1,11 +1,10 @@
 """Stage ordering and hard limits inherited from completed measured stages."""
 
+import math
 from dataclasses import dataclass
 from fractions import Fraction
-import math
 
 from .config import Constraints
-
 
 SUPPORTED_STAGES = frozenset({'latency', 'memory', 'quantization'})
 
@@ -47,7 +46,7 @@ def validate_stage_options(stages, k, min_improvement_pct=0.0):
     canonical = []
     for stage in stages:
         if not isinstance(stage, str):
-            raise ValueError('Each stage must be a supported stage name')
+            raise ValueError('Each stage must be a supported stage name')  # noqa: TRY004 -- configuration contract
         stage = 'quantization' if stage == 'quant' else stage
         if stage not in SUPPORTED_STAGES:
             raise ValueError(f'Unsupported stage: {stage}')
