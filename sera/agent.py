@@ -136,8 +136,18 @@ def validate_proposal(proposal, evidence):
                               frozen_candidate_hashes=evidence.get("frozen_candidate_hashes"))
 
 
+class ProviderTransportError(Exception):
+    """A transport failure containing only a safe error label and HTTP status."""
+
+    def __init__(self, label, *, http_status=None):
+        super().__init__(label)
+        self.http_status = http_status
+
+
 class WandbAgent:
     """W&B structured-output client with one explicit retry and a secret-free log."""
+
+    provider = "wandb"
 
     def __init__(self, *, project, model=AGENT_MODEL):
         self.project = project
@@ -150,9 +160,6 @@ class WandbAgent:
 
     def request(self, role, evidence, instruction):
         wire_schema = request_schema(role, evidence)
-        api_key = os.environ.get("WANDB_API_KEY")
-        if not api_key:
-            raise RuntimeError("WANDB_API_KEY is not set in this process")
         schema = SCHEMAS[role]
         prompt_evidence = evidence
         prompt_metadata = {}
@@ -177,7 +184,7 @@ class WandbAgent:
              + "\nOutput JSON schema:\n" + json.dumps(wire_schema, allow_nan=False)},
             {"role": "user", "content": json.dumps(prompt_evidence, allow_nan=False)},
         ]
-        entry = {"role": role, "model": self.model, "project": self.project,
+        entry = {"role": role, "provider": self.provider, "model": self.model, "project": self.project,
                  "schema_hash": content_hash(wire_schema), "request_schema": wire_schema,
                  "evidence": evidence, "messages": messages, "attempts": [], **prompt_metadata}
         self.history.append(entry)
@@ -185,17 +192,11 @@ class WandbAgent:
             payload = {"model": self.model, "messages": messages, "temperature": 0, "max_tokens": 2048,
                        "response_format": {"type": "json_schema", "json_schema": {
                            "name": schema.__name__, "strict": True, "schema": wire_schema}}}
-            # The documented SDK transport works through the provider's edge service.
-            # Python urllib's default client was rejected there with error 1010.
-            import openai
             attempt = {"attempt": attempt_index + 1, "schema_valid": False}
             started = time.perf_counter()
             parsed = None
             try:
-                with openai.OpenAI(base_url=PROVIDER_URL.rsplit("/chat/completions", 1)[0],
-                                   api_key=api_key, project=self.project, timeout=90,
-                                   max_retries=0) as client:
-                    body = client.chat.completions.create(**payload).model_dump(mode="json")
+                body = self._complete(payload)
                 choice = body["choices"][0]
                 attempt.update(raw_response=body, finish_reason=choice.get("finish_reason"))
                 if choice.get("finish_reason") != "stop":
@@ -203,12 +204,10 @@ class WandbAgent:
                 parsed = parse_response(role, choice["message"]["content"], evidence)
                 attempt["schema_valid"] = True
                 attempt["parsed"] = parsed.model_dump()
-            except openai.APIStatusError as error:
-                # Do not record request headers, credentials, or arbitrary server error bodies.
-                attempt["http_status"] = error.status_code
-                attempt["error"] = f"Provider HTTP {error.status_code}"
-            except openai.APIConnectionError as error:
-                attempt["error"] = type(error).__name__
+            except ProviderTransportError as error:
+                attempt["error"] = str(error)
+                if error.http_status is not None:
+                    attempt["http_status"] = error.http_status
             except ValidationError as error:
                 attempt["error"] = str(error.errors(include_input=False, include_url=False))
             except (OSError, ValueError, KeyError, TypeError, IndexError) as error:
@@ -221,6 +220,25 @@ class WandbAgent:
             if attempt.get("http_status") in {401, 403, 404}:
                 break
         return None
+
+    def _complete(self, payload):
+        """Transport seam; every provider uses the same prompts and response validation."""
+        api_key = os.environ.get("WANDB_API_KEY")
+        if not api_key:
+            raise RuntimeError("WANDB_API_KEY is not set in this process")
+        # The SDK works through the provider edge; urllib was rejected with error 1010.
+        import openai
+        try:
+            with openai.OpenAI(base_url=PROVIDER_URL.rsplit("/chat/completions", 1)[0],
+                               api_key=api_key, project=self.project, timeout=90,
+                               max_retries=0) as client:
+                return client.chat.completions.create(**payload).model_dump(mode="json")
+        except openai.APIStatusError as error:
+            # Never expose request headers, credentials, or arbitrary server error bodies.
+            raise ProviderTransportError(f"Provider HTTP {error.status_code}",
+                                         http_status=error.status_code) from None
+        except openai.APIConnectionError as error:
+            raise ProviderTransportError(type(error).__name__) from None
 
     def propose(self, evidence):
         return self.request("proposal", evidence,
