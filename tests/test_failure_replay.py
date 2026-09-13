@@ -130,6 +130,30 @@ def test_required_read_failure_is_saved_not_claimed_success(source,tmp_path,monk
     assert all(not round['proposed_config_hashes'] for round in result['rounds'])
 
 
+def test_round_one_full_evidence_contains_no_unrevealed_trial_name_outcome_or_metric(source,tmp_path,monkeypatch):
+    loaded=replay.load_source(source)
+    loaded['trials'][1]['reduced']['p95_latency_ms']=123456.789123
+    loaded['trials'][1]['decision']['reason']='future-outcome-marker'
+    loaded['trials'][1]['diagnosis']['failure_kind']='objective-not-improved'
+    _,weave=boundaries(monkeypatch)
+    result=replay.run_replay(loaded,Agent(),object(),weave,tmp_path/'output')
+    first_calls=[call for call in result['agent_calls'] if call['evidence']['remaining_trials']==1]
+    assert first_calls
+    first=json.dumps({'round':result['rounds'][0],'calls':first_calls}).lower()
+    leaked=[hidden for hidden in ('trial-2','objective-threshold miss','objective-not-improved',
+                                  'future-outcome-marker','123456.789123') if hidden in first]
+    assert leaked==[]
+    for call in first_calls:
+        evidence=call['evidence']
+        assert evidence['replay_source']['replay'] is True
+        assert 'NO quality or latency measurement' in evidence['failure_interpretation']
+        assert 'not 0/8 model accuracy' in evidence['failure_interpretation']
+    later=[call for call in result['agent_calls'] if call['evidence']['remaining_trials']==0]
+    assert any('future-outcome-marker' in json.dumps(call) for call in later)
+    assert all('Saved trial-2 is independent historical evidence' in
+               call['evidence']['replay_revelation']['note'] for call in later)
+
+
 def test_changed_gate_or_missing_saved_metrics_is_rejected_before_service_calls(source):
     report=json.loads((source/'result.json').read_text())
     report['constraints']['quality_floor']=.5

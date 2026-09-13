@@ -123,8 +123,7 @@ def run_replay(source, agent, client, weave, output_dir):
     initial['failure_interpretation'] = (
         'Trial-1 failed during startup: there is NO quality or latency measurement. '
         'Its missing-output gate zeros are not 0/8 model accuracy. Use the persisted CUTLASS '
-        'signature as the observed error, not proof of OOM or an established root cause. '
-        'Trial-2, once revealed, is a saved objective-threshold miss, not a new measurement.')
+        'signature as the observed error, not proof of OOM or an established root cause.')
     base = RuntimeConfig.model_validate(original['baseline_configuration'])
     try:
         publish('baseline')
@@ -143,7 +142,8 @@ def run_replay(source, agent, client, weave, output_dir):
                                           prompts=original['prompts'])
                 supplied['replay_revelation'] = dict(new_gpu_measurement=False,
                     revealed_saved_trial_ids=[t['trial_id'] for t in visible],
-                    note='Saved trial-2 is independent historical evidence, not execution of a replay proposal.')
+                    note=('Saved trial-2 is independent historical evidence, not execution of a replay proposal.'
+                          if index else 'Only revealed saved evidence is available; replay executes no GPU trial.'))
                 seen = {base.config_hash, *(t['config_hash'] for t in visible)}
                 legal = remaining_candidates(supplied, base, seen,
                     Workload(concurrency=original['workload']['concurrency']), original['baseline']) if remaining else []
