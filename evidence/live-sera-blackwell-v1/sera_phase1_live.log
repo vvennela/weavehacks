@@ -1,0 +1,55 @@
+spec=/tmp/sera-src/live_qwen3_8b_blackwell.yaml substrate=vllm ledger=/tmp/sera-runs/ledger.jsonl
+start_utc=2026-09-13T18:34:50Z
+
+==========================================================================
+  qwen3_8b  (Qwen/Qwen3-8B)
+==========================================================================
+
+  [baseline]
+      ACCEPTED             p95=    2142ms  tput= 1.05  fp=16.57GB  q=1.000
+
+  [round 1]
+    . KV cache occupancy is 0.3%.
+    . Memory bandwidth utilization is 69.3% (derived).
+    . Sequence slot utilization is 0.7% of max_num_seqs.
+    . Preemptions per request: 0.000.
+    . Measured p95 is 0.76x the SLO (within budget).
+    . Prefill accounts for 88.9% of tokens processed; each request decodes 128 steps.
+    . Weights are 99.0% of the memory footprint at 2.0 bytes/param.
+    . No spare devices; tensor parallelism cannot grow.
+
+    quantization   proposes kv_cache_dtype=fp8
+                   KV occupancy is 0.3%. Moving the cache to fp8 halves per-token cost and raises the concurrency ceiling without touching the weights, so it is a separate bet from weight precision and carries a different quality risk — degraded attention history rather than degraded parameters.
+    quantization   proposes weight_dtype=fp8
+                   Bandwidth utilization is 69.3% (derived) and weights are 99% of the footprint at 2 bytes/param. Every decode step re-reads the full weight tensor, so bf16 to fp8 cuts the bytes that step must move. That utilization was not read from a counter — no serving engine exposes one — but derived from measured throughput against the declared weight and cache shapes, so it is a floor on the real figure. Confidence is discounted accordingly; the expected magnitude is not, because the mechanism is unchanged. Expect roughly 45% off p95, and expect the eval to decide whether it is keepable.
+    batching       LEVER DEAD — sequence slots are 1% utilized with 0.000 preemptions/request — the batch is not the constraint here
+    parallelism    LEVER DEAD — tp=1 already uses every available device; no spare hardware to shard onto
+
+    [arbiter]
+      slot -> quantization (kv_cache_dtype=fp8): confidence 0.70, calibration 0.50, score 0.280
+      no slot for quantization (weight_dtype=fp8): score 0.270
+
+    [trial] quantization: kv_cache_dtype=fp8
+      TRIAL FAILED  qwen3_8b: server never became healthy
+
+  [result] qwen3_8b: p95 2142ms -> 2142ms (+0.0%), footprint 16.57 -> 16.57GB
+           best config: qwen3_8b[w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=1]
+{
+  "total_rows": 2,
+  "trials_run": 2,
+  "paper_rejections": 0,
+  "accepted": 1,
+  "reverts": 0,
+  "by_verdict": {
+    "accepted": 1,
+    "reverted_slo": 0,
+    "reverted_quality": 0,
+    "rejected_paper": 0,
+    "failed": 1
+  },
+  "calibration": {
+    "quantization": 0.5
+  }
+}
+end_utc=2026-09-13T18:41:52Z
+PHASE1_DONE

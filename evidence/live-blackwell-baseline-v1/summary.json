@@ -1,0 +1,105 @@
+{
+  "headline": "Measured on a live NVIDIA RTX PRO 6000 Blackwell Server Edition: Qwen3-8B on vLLM 0.29.0 sustained 450 output tokens/s at concurrency 8 with p95 end-to-end latency of 2.28 s (1024-token prompt, 128-token completion).",
+  "measured": true,
+  "substrate": "vllm",
+  "simulated": false,
+  "model": "Qwen/Qwen3-8B",
+  "engine": "vLLM 0.29.0",
+  "vllm_flags": {
+    "--max-model-len": 4096,
+    "--gpu-memory-utilization": 0.85,
+    "--dtype": "bfloat16",
+    "env": {
+      "VLLM_USE_FLASHINFER_SAMPLER": "0"
+    }
+  },
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "nvidia_smi_csv": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 81935 MiB, 595.71.05, 12.0, 0 %, 29, 78.08 W",
+  "driver_version": "595.71.05",
+  "compute_capability": "12.0 (sm_120)",
+  "started_utc": "2026-09-13T18:31:40Z",
+  "finished_utc": "2026-09-13T18:32:39Z",
+  "workload": {
+    "input_tokens_per_request": 1024,
+    "target_input_tokens": 1024,
+    "max_tokens": 128,
+    "min_tokens": 128,
+    "ignore_eos": true,
+    "temperature": 0.0,
+    "requests_per_level": 16,
+    "concurrency_levels": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "unique_uuid_prefix_per_request": true,
+    "prefix_cache_note": "Each request is prefixed with a fresh uuid so vLLM prefix caching cannot serve it from cache; these are cold-prefill numbers.",
+    "warmup_requests_excluded": 1
+  },
+  "scaling_claim": {
+    "statement": "Concurrency 1 -> 8 raised output throughput 6.46x while p95 end-to-end latency rose only 24.0%.",
+    "throughput_ratio": 6.457,
+    "p95_increase_pct": 23.95
+  },
+  "per_concurrency": [
+    {
+      "concurrency": 1,
+      "requests": 16,
+      "wall_s": 29.3769,
+      "e2e_p50_ms": 1837.17,
+      "e2e_p95_ms": 1837.99,
+      "e2e_p99_ms": 1838.24,
+      "ttft_p50_ms": 60.37,
+      "ttft_p95_ms": 61.88,
+      "throughput_rps": 0.5446,
+      "output_tokens_per_s": 69.71,
+      "total_tokens_per_s": 645.27,
+      "preemptions_total_after": 0.0
+    },
+    {
+      "concurrency": 2,
+      "requests": 16,
+      "wall_s": 15.3761,
+      "e2e_p50_ms": 1921.0,
+      "e2e_p95_ms": 1923.39,
+      "e2e_p99_ms": 1925.12,
+      "ttft_p50_ms": 87.79,
+      "ttft_p95_ms": 108.21,
+      "throughput_rps": 1.0406,
+      "output_tokens_per_s": 133.19,
+      "total_tokens_per_s": 1233.08,
+      "preemptions_total_after": 0.0
+    },
+    {
+      "concurrency": 4,
+      "requests": 16,
+      "wall_s": 8.1013,
+      "e2e_p50_ms": 2022.94,
+      "e2e_p95_ms": 2031.54,
+      "e2e_p99_ms": 2031.59,
+      "ttft_p50_ms": 191.94,
+      "ttft_p95_ms": 197.84,
+      "throughput_rps": 1.975,
+      "output_tokens_per_s": 252.8,
+      "total_tokens_per_s": 2338.38,
+      "preemptions_total_after": 0.0
+    },
+    {
+      "concurrency": 8,
+      "requests": 16,
+      "wall_s": 4.5496,
+      "e2e_p50_ms": 2269.91,
+      "e2e_p95_ms": 2278.19,
+      "e2e_p99_ms": 2278.78,
+      "ttft_p50_ms": 360.55,
+      "ttft_p95_ms": 368.2,
+      "throughput_rps": 3.5168,
+      "output_tokens_per_s": 450.15,
+      "total_tokens_per_s": 4161.91,
+      "preemptions_total_after": 0.0
+    }
+  ],
+  "raw_evidence_file": "evidence/live-blackwell-baseline-v1/vllm_qwen3_8b_latency_20260913T183140Z.json",
+  "generator": "scripts/live_bench_vllm.py"
+}
