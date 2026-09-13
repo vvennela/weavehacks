@@ -3,6 +3,7 @@
 from copy import deepcopy
 from types import SimpleNamespace
 from concurrent.futures import ThreadPoolExecutor
+import json
 
 import pytest
 
@@ -366,3 +367,35 @@ def test_transport_errors_are_not_visibility_retried(monkeypatch):
     with pytest.raises(WeaveEvidenceError) as error:
         WeaveEvidenceReader(client, 'this-run')('quality_outputs', evidence())
     assert error.value.reason_code == 'query-failed' and len(attempts) == 1
+
+
+def test_per_request_input_length_is_not_confused_with_load_token_totals():
+    records = calls()
+    records[1].output['usage'] = {'prompt_tokens': 151, 'completion_tokens': 3}
+    records[-1].output['loads'][0]['reduced'].update(input_tokens=2265, request_count=15)
+    reader = WeaveEvidenceReader(Client(records), 'this-run')
+    slow = reader('latency_outliers', evidence())
+    assert slow['records'][0]['prompt_tokens'] == 151
+    loads = reader('load_metrics', evidence())
+    assert loads['records'][0]['reduced']['input_tokens'] == 2265
+    assert loads['records'][0]['reduced']['request_count'] == 15
+    assert any('totals over request_count' in note for note in loads['limitations'])
+
+
+def test_persisted_diagnosis_exposes_specific_safe_runtime_failure_with_log_references():
+    diagnosed = diagnosis_call()
+    diagnosed.output['diagnosis']['observed']['runtime_failure'] = {
+        'category': 'cutlass-internal-error', 'stage': 'startup', 'callsite': 'cutlass_gemm_caller',
+        'kernel_source': 'cutlass_gemm_caller.cuh', 'kernel_line': 62,
+        'known_message': 'untrusted extra text must-not-export', 'root_cause_status': 'guessed-cause',
+        'source': {'path': 'server.log', 'sha256': 'a' * 64,
+            'line_numbers': [443, 578], 'matched_line_sha256': ['b' * 64, 'c' * 64]},
+        'raw_env': {'API_KEY': 'must-not-export'}}
+    result = WeaveEvidenceReader(Client([diagnosed]), 'this-run')('load_metrics', evidence())
+    failure = result['records'][0]['diagnosis']['observed']['runtime_failure']
+    assert failure['category'] == 'cutlass-internal-error'
+    assert failure['known_message'] == 'cutlass_gemm_caller reported Error Internal.'
+    assert failure['kernel_line'] == 62 and failure['source']['line_numbers'] == [443, 578]
+    assert failure['source']['sha256'] == 'a' * 64
+    assert failure['root_cause_status'] == 'not-established'
+    assert 'must-not-export' not in json.dumps(result)
