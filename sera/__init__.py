@@ -1,7 +1,8 @@
 """Small, measured inference experiments."""
 
 from .config import Budget, Candidate, Constraints, InvestigationSpace, Objective, RuntimeConfig, Workload
-from .pipeline import SeraResult, optimize
+from .pipeline import SeraResult
+from .api import optimize
 from .runtime import SeraModel, SeraResponse
 from .agent import WandbAgent
 

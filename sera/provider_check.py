@@ -215,7 +215,8 @@ def main(argv=None):
         agent = RelayAgent(project=args.project, model=args.model, relay_dir=args.relay_dir)
     report = check_provider(project=args.project, output_dir=args.output_dir, model=args.model, agent=agent)
     print({key: report[key] for key in ("passed", "first_pass_valid", "valid_with_one_retry")})
+    return 0 if report['passed'] else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -14,7 +14,7 @@ from experiments.weave_evidence import WeaveEvidenceReader, WeaveEvidenceError
 
 @pytest.fixture(autouse=True)
 def no_visibility_delay(monkeypatch):
-    monkeypatch.setattr('experiments.weave_evidence.sleep', lambda seconds: None, raising=False)
+    monkeypatch.setattr('sera.weave_evidence.sleep', lambda seconds: None, raising=False)
 
 
 IDENTITY = dict(trial_id='candidate', model_id='fixture-model', revision='pinned', config_hash='config-1')
@@ -334,7 +334,7 @@ def test_completed_records_can_become_visible_without_flushing_open_parent(monke
         return iter(next(snapshots))
 
     client.get_calls = query
-    monkeypatch.setattr('experiments.weave_evidence.sleep', delays.append)
+    monkeypatch.setattr('sera.weave_evidence.sleep', delays.append)
     reader = WeaveEvidenceReader(client, 'this-run')
     result = reader('quality_outputs', evidence())
     assert len(client.events) == 3 and delays == [1.0, 1.0]
@@ -346,7 +346,7 @@ def test_completed_records_can_become_visible_without_flushing_open_parent(monke
 def test_visibility_retries_stop_after_three_reads_without_caching_partial_data(monkeypatch):
     client = Client([])
     delays = []
-    monkeypatch.setattr('experiments.weave_evidence.sleep', delays.append)
+    monkeypatch.setattr('sera.weave_evidence.sleep', delays.append)
     reader = WeaveEvidenceReader(client, 'this-run')
     with pytest.raises(WeaveEvidenceError) as error:
         reader('quality_outputs', evidence())
@@ -365,7 +365,7 @@ def test_transport_errors_are_not_visibility_retried(monkeypatch):
         raise RuntimeError('sensitive service message')
 
     client.get_calls = query
-    monkeypatch.setattr('experiments.weave_evidence.sleep', lambda _: pytest.fail('Unexpected retry'))
+    monkeypatch.setattr('sera.weave_evidence.sleep', lambda _: pytest.fail('Unexpected retry'))
     with pytest.raises(WeaveEvidenceError) as error:
         WeaveEvidenceReader(client, 'this-run')('quality_outputs', evidence())
     assert error.value.reason_code == 'query-failed' and len(attempts) == 1

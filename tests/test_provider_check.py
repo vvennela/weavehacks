@@ -12,6 +12,15 @@ from sera.provider_check import provider_cases, require_provider_check
 from sera.storage import content_hash
 
 
+@pytest.mark.parametrize('passed, expected', [(True, 0), (False, 1)])
+def test_packaged_provider_command_returns_check_status(monkeypatch, tmp_path, passed, expected):
+    from sera import provider_check
+    monkeypatch.setattr(provider_check, 'check_provider', lambda **kwargs: {
+        'passed': passed, 'first_pass_valid': 34 if passed else 0,
+        'valid_with_one_retry': 34 if passed else 0})
+    assert provider_check.main(['--project', 'test/project', '--output-dir', str(tmp_path/'check')]) == expected
+
+
 def valid_response(case):
     evidence = case['evidence']
     if case['role'] == 'proposal':

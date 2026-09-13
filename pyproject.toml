@@ -4,14 +4,19 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sera-inference"
-version = "0.1.0"
+version = "0.2.0"
 description = "Measured inference configuration experiments"
+readme = "docs/simple-release.md"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.12,<3", "prometheus-client>=0.21,<1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10"]
 agent = ["openai>=2,<4"]
+swarm = ["weave==0.53.2", "openai>=2,<4"]
+
+[project.scripts]
+sera-provider-check = "sera.provider_check:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["sera"]
