@@ -1,0 +1,355 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.24.2",
+    "script_metadata_hash": "02011b444b226433a1b17a0648927778"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "34ea143bc7e67635a5ce4d595ea21a71",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"an-agentic-inference-optimization-team\">An agentic inference optimization team</h1>\n<span class=\"paragraph\">Three specialists tune a model's serving configuration, argue over a bounded\ntrial budget, and write every result to a ledger \u2014 including the failures.\nA second phase re-reads that ledger asking a <em>different</em> question and finds\nout whether two models can share one GPU.</span>\n<span class=\"paragraph\"><strong>Phase 1: how should each model run?</strong>\n<strong>Phase 2: how should they share the hardware?</strong></span>\n<span class=\"paragraph\">Everything here executes live. Nothing is a recording.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "14b323d9052434f0567fa3ac2767fb26",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "ff197baa9717059c23d043e251b20ae9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><em>Package loaded from: </em><em>local checkout</em>**</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "1eafb4b4d802405b489e59e3239d847c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "3fd89870a92a8c2c933afc09d417af39",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"the-spec\">The spec</h2>\n<span class=\"paragraph\">Nothing downstream infers these. If a number matters to a decision, it is declared.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "827e27a3da04abd96b764d61a29f47e0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "81fc6aadc3800406b0d9bec6a717eb53",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-ui-element object-id='SFPL-0' random-id='0153fbff-b646-ae61-2160-2337050efe13'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;hf_id&#92;&quot;:&#92;&quot;Qwen/Qwen2.5-1.5B-Instruct&#92;&quot;,&#92;&quot;params_B&#92;&quot;:1.54,&#92;&quot;kv_heads&#92;&quot;:2,&#92;&quot;rps&#92;&quot;:14.0,&#92;&quot;input_len&#92;&quot;:1024,&#92;&quot;output_len&#92;&quot;:64,&#92;&quot;p99_SLO_ms&#92;&quot;:4000.0,&#92;&quot;quality_floor&#92;&quot;:0.98},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;hf_id&#92;&quot;:&#92;&quot;meta-llama/Llama-3.2-1B-Instruct&#92;&quot;,&#92;&quot;params_B&#92;&quot;:1.24,&#92;&quot;kv_heads&#92;&quot;:8,&#92;&quot;rps&#92;&quot;:8.0,&#92;&quot;input_len&#92;&quot;:192,&#92;&quot;output_len&#92;&quot;:192,&#92;&quot;p99_SLO_ms&#92;&quot;:3000.0,&#92;&quot;quality_floor&#92;&quot;:0.975}]&quot;' data-total-rows='2' data-total-columns='9' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;model&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;hf_id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;params_B&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;kv_heads&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;rps&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;input_len&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;output_len&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;p99_SLO_ms&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;quality_floor&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Hardware:</strong> 2 x A10G, 24GB, 600 GB/s. <strong>Budget:</strong> 12 phase-1 trials, 3 slots per round.</span>\n<span class=\"paragraph\">Note the pairing: <strong>model_a</strong> takes long prompts and short answers (prefill heavy); <strong>model_b</strong> takes short prompts and long answers (decode heavy). They stress different parts of the device, which is what makes the consolidation question interesting rather than obvious.</span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "c3d1b73cecb95d7101504fef94b00fda",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"phase-1-tune-each-model-alone\">Phase 1 \u2014 tune each model alone</h2>\n<span class=\"paragraph\">A deterministic reduction turns serving metrics into a shared digest. Three\nspecialists read it and each either proposes a single-lever change or declares\nits lever <strong>dead</strong>. The arbiter spends the slots, weighted by whose predictions\nhave been holding up. Every outcome is recorded.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "aae03c5176a1088abcab2593c70e8d94",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "80b20db34d98e430f862371daee9c1a3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "daa77b178d351f49028e1ac672739144",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Every trial, including the reverts.</strong> Dashed line is the SLO. Log scale.</span></span><marimo-ui-element object-id='emfo-0' random-id='0b032c83-f207-f154-8f7d-6ca03e32c3fc'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300,&quot;strokeWidth&quot;:0},&quot;axis&quot;:{&quot;domainColor&quot;:&quot;#c3c2b7&quot;,&quot;grid&quot;:true,&quot;gridColor&quot;:&quot;#e1e0d9&quot;,&quot;gridWidth&quot;:1,&quot;labelColor&quot;:&quot;#52514e&quot;,&quot;labelFontSize&quot;:11,&quot;tickColor&quot;:&quot;#c3c2b7&quot;,&quot;titleColor&quot;:&quot;#52514e&quot;,&quot;titleFontSize&quot;:11,&quot;titleFontWeight&quot;:&quot;normal&quot;},&quot;legend&quot;:{&quot;labelColor&quot;:&quot;#52514e&quot;,&quot;labelFontSize&quot;:11,&quot;symbolSize&quot;:110,&quot;symbolStrokeWidth&quot;:0,&quot;symbolType&quot;:&quot;square&quot;,&quot;titleColor&quot;:&quot;#52514e&quot;,&quot;titleFontSize&quot;:11,&quot;titleFontWeight&quot;:&quot;normal&quot;}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/csv;base64,bixtb2RlbCxyb3VuZCxwcm9wb3NlZF9ieSxsZXZlcixjb25maWcscDk5X21zLGZvb3RwcmludF9HQixxdWFsaXR5LHZlcmRpY3QscHJlZGljdGlvbl9oZWxkLHNsb19tcwoxLG1vZGVsX2EsMCxiYXNlbGluZSzigJQsInc9YmYxNixrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MSIsMjM0NTIuMSw1LjU1LDEuMCxyZXZlcnRlZF9zbG8sLDQwMDAuMAoyLG1vZGVsX2EsMSxwYXJhbGxlbGlzbSxwYXJhbGxlbGlzbSwidz1iZjE2LGt2PWJmMTYsc2Vxcz0yNTYsdG9rPTgxOTIsY3A9MCx0cD0yIiwxMzY4LjYsMS42NSwxLjAsYWNjZXB0ZWQsVHJ1ZSw0MDAwLjAKMyxtb2RlbF9hLDEscXVhbnRpemF0aW9uLHF1YW50aXphdGlvbiwidz1mcDgsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTEiLDE2MDcuMiwxLjc3LDAuOTk2LGFjY2VwdGVkLFRydWUsNDAwMC4wCjQsbW9kZWxfYSwxLGJhdGNoaW5nLGJhdGNoaW5nLCJ3PWJmMTYsa3Y9YmYxNixzZXFzPTI1Nix0b2s9MTAyNCxjcD0xLHRwPTEiLDg5OTcuNCw0LjUzLDEuMCxyZXZlcnRlZF9zbG8sVHJ1ZSw0MDAwLjAKNSxtb2RlbF9hLDEsYXJiaXRlcixjb21iaW5hdGlvbiwidz1mcDgsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTIiLDQ2Ni4xLDAuODIsMC45OTYsYWNjZXB0ZWQsVHJ1ZSw0MDAwLjAKNixtb2RlbF9hLDIscXVhbnRpemF0aW9uLHF1YW50aXphdGlvbiwidz1pbnQ4LGt2PWJmMTYsc2Vxcz0yNTYsdG9rPTgxOTIsY3A9MCx0cD0yIiw1MjAuMSwwLjgzLDAuOTg4LGFjY2VwdGVkLEZhbHNlLDQwMDAuMAo3LG1vZGVsX2EsMyxxdWFudGl6YXRpb24scXVhbnRpemF0aW9uLCJ3PWludDQsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTIiLDk1Mi40LDAuNDQsMC45NDUscmV2ZXJ0ZWRfcXVhbGl0eSxGYWxzZSw0MDAwLjAKOCxtb2RlbF9iLDAsYmFzZWxpbmUs4oCULCJ3PWJmMTYsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTEiLDE1NDEuOCwyLjU2LDEuMCxhY2NlcHRlZCwsMzAwMC4wCjksbW9kZWxfYiwxLHBhcmFsbGVsaXNtLHBhcmFsbGVsaXNtLCJ3PWJmMTYsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTIiLDc3MC45LDEuMjYsMS4wLGFjY2VwdGVkLFRydWUsMzAwMC4wCjEwLG1vZGVsX2IsMSxxdWFudGl6YXRpb24scXVhbnRpemF0aW9uLCJ3PWZwOCxrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MSIsNzQ1LjUsMS4yOCwwLjk5NixhY2NlcHRlZCxUcnVlLDMwMDAuMAoxMSxtb2RlbF9iLDEsYXJiaXRlcixjb21iaW5hdGlvbiwidz1mcDgsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTIiLDM3OC4zLDAuNjMsMC45OTYsYWNjZXB0ZWQsVHJ1ZSwzMDAwLjAKMTIsbW9kZWxfYiwyLHF1YW50aXphdGlvbixxdWFudGl6YXRpb24sInc9aW50OCxrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MiIsMzc5LjMsMC42MywwLjk4OCxhY2NlcHRlZCxGYWxzZSwzMDAwLjAKMTMsbW9kZWxfYiwzLHF1YW50aXphdGlvbixxdWFudGl6YXRpb24sInc9aW50NCxrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MiIsMjAzLjksMC4zMiwwLjk0NSxyZXZlcnRlZF9xdWFsaXR5LFRydWUsMzAwMC4wCg==&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;csv&quot;}},&quot;facet&quot;:{&quot;column&quot;:{&quot;field&quot;:&quot;model&quot;,&quot;header&quot;:{&quot;labelColor&quot;:&quot;#0b0b0b&quot;,&quot;labelFontSize&quot;:12},&quot;title&quot;:null,&quot;type&quot;:&quot;nominal&quot;}},&quot;spec&quot;:{&quot;layer&quot;:[{&quot;mark&quot;:{&quot;type&quot;:&quot;bar&quot;,&quot;cornerRadiusTopLeft&quot;:4,&quot;cornerRadiusTopRight&quot;:4,&quot;size&quot;:26},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;verdict&quot;,&quot;scale&quot;:{&quot;domain&quot;:[&quot;accepted&quot;,&quot;reverted_slo&quot;,&quot;reverted_quality&quot;,&quot;rejected_paper&quot;,&quot;failed&quot;],&quot;range&quot;:[&quot;#0ca30c&quot;,&quot;#d03b3b&quot;,&quot;#ec835a&quot;,&quot;#898781&quot;,&quot;#898781&quot;]},&quot;title&quot;:&quot;verdict&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;model&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;proposed_by&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;lever&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;config&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;p99_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;footprint_GB&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;quality&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;verdict&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;prediction_held&quot;,&quot;type&quot;:&quot;nominal&quot;}],&quot;x&quot;:{&quot;axis&quot;:{&quot;labelAngle&quot;:0},&quot;field&quot;:&quot;n&quot;,&quot;title&quot;:&quot;trial&quot;,&quot;type&quot;:&quot;ordinal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;p99_ms&quot;,&quot;scale&quot;:{&quot;type&quot;:&quot;log&quot;},&quot;title&quot;:&quot;p99 latency (ms)&quot;,&quot;type&quot;:&quot;quantitative&quot;}}},{&quot;mark&quot;:{&quot;type&quot;:&quot;rule&quot;,&quot;color&quot;:&quot;#52514e&quot;,&quot;strokeDash&quot;:[4,3],&quot;strokeWidth&quot;:2},&quot;encoding&quot;:{&quot;y&quot;:{&quot;field&quot;:&quot;slo_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;}}}]},&quot;resolve&quot;:{&quot;scale&quot;:{&quot;x&quot;:&quot;independent&quot;}},&quot;height&quot;:280,&quot;width&quot;:&quot;container&quot;,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v6.4.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "[W 260912 17:00:10 altair_transformer:82] Failed to convert data to arrow format, falling back to CSV: No module named 'pyarrow'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "dac5a823b3d276a45e6126f6619bbf54",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Full ledger \u2014 the artifact the whole system exists to produce:</span></span><marimo-ui-element object-id='Hstk-0' random-id='bca70f54-1744-8088-960f-869c27017ca9'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;n&#92;&quot;:1,&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;round&#92;&quot;:0,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;baseline&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;&#92;&#92;u2014&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=1&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:23452.1,&#92;&quot;footprint_GB&#92;&quot;:5.55,&#92;&quot;quality&#92;&quot;:1.0,&#92;&quot;verdict&#92;&quot;:&#92;&quot;reverted_slo&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:null,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;n&#92;&quot;:2,&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;round&#92;&quot;:1,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;parallelism&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;parallelism&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:1368.6,&#92;&quot;footprint_GB&#92;&quot;:1.65,&#92;&quot;quality&#92;&quot;:1.0,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;n&#92;&quot;:3,&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;round&#92;&quot;:1,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=1&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:1607.2,&#92;&quot;footprint_GB&#92;&quot;:1.77,&#92;&quot;quality&#92;&quot;:0.996,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;n&#92;&quot;:4,&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;round&#92;&quot;:1,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;batching&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;batching&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=1024,cp=1,tp=1&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:8997.4,&#92;&quot;footprint_GB&#92;&quot;:4.53,&#92;&quot;quality&#92;&quot;:1.0,&#92;&quot;verdict&#92;&quot;:&#92;&quot;reverted_slo&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;n&#92;&quot;:5,&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;round&#92;&quot;:1,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;arbiter&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;combination&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:466.1,&#92;&quot;footprint_GB&#92;&quot;:0.82,&#92;&quot;quality&#92;&quot;:0.996,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;n&#92;&quot;:6,&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;round&#92;&quot;:2,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=int8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:520.1,&#92;&quot;footprint_GB&#92;&quot;:0.83,&#92;&quot;quality&#92;&quot;:0.988,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:false,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;n&#92;&quot;:7,&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;round&#92;&quot;:3,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=int4,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:952.4,&#92;&quot;footprint_GB&#92;&quot;:0.44,&#92;&quot;quality&#92;&quot;:0.945,&#92;&quot;verdict&#92;&quot;:&#92;&quot;reverted_quality&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:false,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;n&#92;&quot;:8,&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;round&#92;&quot;:0,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;baseline&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;&#92;&#92;u2014&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=1&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:1541.8,&#92;&quot;footprint_GB&#92;&quot;:2.56,&#92;&quot;quality&#92;&quot;:1.0,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:null,&#92;&quot;slo_ms&#92;&quot;:3000.0},{&#92;&quot;n&#92;&quot;:9,&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;round&#92;&quot;:1,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;parallelism&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;parallelism&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:770.9,&#92;&quot;footprint_GB&#92;&quot;:1.26,&#92;&quot;quality&#92;&quot;:1.0,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:3000.0},{&#92;&quot;n&#92;&quot;:10,&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;round&#92;&quot;:1,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=1&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:745.5,&#92;&quot;footprint_GB&#92;&quot;:1.28,&#92;&quot;quality&#92;&quot;:0.996,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:3000.0},{&#92;&quot;n&#92;&quot;:11,&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;round&#92;&quot;:1,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;arbiter&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;combination&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:378.3,&#92;&quot;footprint_GB&#92;&quot;:0.63,&#92;&quot;quality&#92;&quot;:0.996,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:3000.0},{&#92;&quot;n&#92;&quot;:12,&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;round&#92;&quot;:2,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=int8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:379.3,&#92;&quot;footprint_GB&#92;&quot;:0.63,&#92;&quot;quality&#92;&quot;:0.988,&#92;&quot;verdict&#92;&quot;:&#92;&quot;accepted&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:false,&#92;&quot;slo_ms&#92;&quot;:3000.0},{&#92;&quot;n&#92;&quot;:13,&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;round&#92;&quot;:3,&#92;&quot;proposed_by&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;lever&#92;&quot;:&#92;&quot;quantization&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=int4,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:203.9,&#92;&quot;footprint_GB&#92;&quot;:0.32,&#92;&quot;quality&#92;&quot;:0.945,&#92;&quot;verdict&#92;&quot;:&#92;&quot;reverted_quality&#92;&quot;,&#92;&quot;prediction_held&#92;&quot;:true,&#92;&quot;slo_ms&#92;&quot;:3000.0}]&quot;' data-total-rows='13' data-total-columns='12' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='20' data-field-types='[[&quot;n&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;model&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;round&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;proposed_by&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;lever&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;config&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;p99_ms&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;footprint_GB&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;quality&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;verdict&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;prediction_held&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;slo_ms&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "dd50189bf3cf05aacac9dfd8061b460a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"phase-1-result\">Phase 1 result</h3>\n<ul>\n<li><strong>model_a</strong>: p99 23,452ms \u2192 466ms (+98%), footprint 5.55 \u2192 0.82GB<br />\n<code>model_a[w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2]</code></li>\n<li><strong>model_b</strong>: p99 1,542ms \u2192 378ms (+75%), footprint 2.56 \u2192 0.63GB<br />\n<code>model_b[w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2]</code></li>\n</ul>\n<span class=\"paragraph\"><strong>Specialist calibration</strong> \u2014 the fraction of each agent's predictions that held, which is what the arbiter weights the next round by:</span>\n<ul>\n<li><code>arbiter</code>: 1.00</li>\n<li><code>batching</code>: 1.00</li>\n<li><code>parallelism</code>: 1.00</li>\n<li><code>quantization</code>: 0.50</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "8abbcc56273e0029647b67e8f0253d67",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"phase-2-can-they-share-a-card\">Phase 2 \u2014 can they share a card?</h2>\n<span class=\"paragraph\">The frontier reader re-reads the <strong>same ledger</strong> with a different objective:\nnot the fastest config, but the smallest one still clearing SLO. That produces\nnew knowledge without running a single new trial.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "521ab90a5408d005d354baaec6817700",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "33e70dc7a6208aebcb6e8cad1dfe0b3d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>The fastest config is the wrong answer here.</strong> Every point cleared SLO and quality in Phase 1. The ones marked <em>2 devices</em> occupy both GPUs \u2014 which is the opposite of what freeing a GPU requires, however fast they are.</span></span><marimo-ui-element object-id='ROlb-0' random-id='80a97774-a086-9856-92c6-fefd030d8dbc'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300,&quot;strokeWidth&quot;:0},&quot;axis&quot;:{&quot;domainColor&quot;:&quot;#c3c2b7&quot;,&quot;grid&quot;:true,&quot;gridColor&quot;:&quot;#e1e0d9&quot;,&quot;gridWidth&quot;:1,&quot;labelColor&quot;:&quot;#52514e&quot;,&quot;labelFontSize&quot;:11,&quot;tickColor&quot;:&quot;#c3c2b7&quot;,&quot;titleColor&quot;:&quot;#52514e&quot;,&quot;titleFontSize&quot;:11,&quot;titleFontWeight&quot;:&quot;normal&quot;},&quot;legend&quot;:{&quot;labelColor&quot;:&quot;#52514e&quot;,&quot;labelFontSize&quot;:11,&quot;symbolSize&quot;:110,&quot;symbolStrokeWidth&quot;:0,&quot;symbolType&quot;:&quot;square&quot;,&quot;titleColor&quot;:&quot;#52514e&quot;,&quot;titleFontSize&quot;:11,&quot;titleFontWeight&quot;:&quot;normal&quot;}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/csv;base64,bW9kZWwsZm9vdHByaW50X0dCLHA5OV9tcyxkZXZpY2VzLHBsYWNlbWVudCxjb25maWcKbW9kZWxfYSwwLjgyLDQ2Ni4xLDIsMiBkZXZpY2VzLCJ3PWZwOCxrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MiIKbW9kZWxfYSwwLjgzLDUyMC4xLDIsMiBkZXZpY2VzLCJ3PWludDgsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTIiCm1vZGVsX2EsMS42NSwxMzY4LjYsMiwyIGRldmljZXMsInc9YmYxNixrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MiIKbW9kZWxfYSwxLjc3LDE2MDcuMiwxLDEgZGV2aWNlLCJ3PWZwOCxrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MSIKbW9kZWxfYiwwLjYzLDM3OC4zLDIsMiBkZXZpY2VzLCJ3PWZwOCxrdj1iZjE2LHNlcXM9MjU2LHRvaz04MTkyLGNwPTAsdHA9MiIKbW9kZWxfYiwwLjYzLDM3OS4zLDIsMiBkZXZpY2VzLCJ3PWludDgsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTIiCm1vZGVsX2IsMS4yNiw3NzAuOSwyLDIgZGV2aWNlcywidz1iZjE2LGt2PWJmMTYsc2Vxcz0yNTYsdG9rPTgxOTIsY3A9MCx0cD0yIgptb2RlbF9iLDEuMjgsNzQ1LjUsMSwxIGRldmljZSwidz1mcDgsa3Y9YmYxNixzZXFzPTI1Nix0b2s9ODE5MixjcD0wLHRwPTEiCm1vZGVsX2IsMi41NiwxNTQxLjgsMSwxIGRldmljZSwidz1iZjE2LGt2PWJmMTYsc2Vxcz0yNTYsdG9rPTgxOTIsY3A9MCx0cD0xIgo=&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;csv&quot;}},&quot;facet&quot;:{&quot;column&quot;:{&quot;field&quot;:&quot;model&quot;,&quot;header&quot;:{&quot;labelColor&quot;:&quot;#0b0b0b&quot;,&quot;labelFontSize&quot;:12},&quot;title&quot;:null,&quot;type&quot;:&quot;nominal&quot;}},&quot;spec&quot;:{&quot;layer&quot;:[{&quot;mark&quot;:{&quot;type&quot;:&quot;point&quot;,&quot;filled&quot;:true,&quot;size&quot;:150,&quot;stroke&quot;:&quot;#fcfcfb&quot;,&quot;strokeWidth&quot;:2},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;placement&quot;,&quot;scale&quot;:{&quot;domain&quot;:[&quot;1 device&quot;,&quot;2 devices&quot;],&quot;range&quot;:[&quot;#2a78d6&quot;,&quot;#eb6834&quot;]},&quot;title&quot;:&quot;placement&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;shape&quot;:{&quot;field&quot;:&quot;placement&quot;,&quot;title&quot;:&quot;placement&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;model&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;config&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;footprint_GB&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;p99_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;placement&quot;,&quot;type&quot;:&quot;nominal&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;footprint_GB&quot;,&quot;title&quot;:&quot;memory footprint (GB)&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;p99_ms&quot;,&quot;title&quot;:&quot;p99 latency (ms)&quot;,&quot;type&quot;:&quot;quantitative&quot;}}},{&quot;mark&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;align&quot;:&quot;left&quot;,&quot;color&quot;:&quot;#52514e&quot;,&quot;dx&quot;:10,&quot;dy&quot;:-6,&quot;fontSize&quot;:10},&quot;encoding&quot;:{&quot;text&quot;:{&quot;field&quot;:&quot;placement&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;x&quot;:{&quot;field&quot;:&quot;footprint_GB&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;p99_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;}}}]},&quot;resolve&quot;:{&quot;scale&quot;:{&quot;x&quot;:&quot;independent&quot;,&quot;y&quot;:&quot;independent&quot;}},&quot;height&quot;:280,&quot;width&quot;:&quot;container&quot;,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v6.4.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element><marimo-ui-element object-id='ROlb-1' random-id='14a757a5-92a8-b441-f8e5-24e002fc930e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:0.82,&#92;&quot;p99_ms&#92;&quot;:466.1,&#92;&quot;devices&#92;&quot;:2,&#92;&quot;placement&#92;&quot;:&#92;&quot;2 devices&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:0.83,&#92;&quot;p99_ms&#92;&quot;:520.1,&#92;&quot;devices&#92;&quot;:2,&#92;&quot;placement&#92;&quot;:&#92;&quot;2 devices&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=int8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:1.65,&#92;&quot;p99_ms&#92;&quot;:1368.6,&#92;&quot;devices&#92;&quot;:2,&#92;&quot;placement&#92;&quot;:&#92;&quot;2 devices&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:1.77,&#92;&quot;p99_ms&#92;&quot;:1607.2,&#92;&quot;devices&#92;&quot;:1,&#92;&quot;placement&#92;&quot;:&#92;&quot;1 device&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=1&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:0.63,&#92;&quot;p99_ms&#92;&quot;:378.3,&#92;&quot;devices&#92;&quot;:2,&#92;&quot;placement&#92;&quot;:&#92;&quot;2 devices&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:0.63,&#92;&quot;p99_ms&#92;&quot;:379.3,&#92;&quot;devices&#92;&quot;:2,&#92;&quot;placement&#92;&quot;:&#92;&quot;2 devices&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=int8,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:1.26,&#92;&quot;p99_ms&#92;&quot;:770.9,&#92;&quot;devices&#92;&quot;:2,&#92;&quot;placement&#92;&quot;:&#92;&quot;2 devices&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=2&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:1.28,&#92;&quot;p99_ms&#92;&quot;:745.5,&#92;&quot;devices&#92;&quot;:1,&#92;&quot;placement&#92;&quot;:&#92;&quot;1 device&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=fp8,kv=bf16,seqs=256,tok=8192,cp=0,tp=1&#92;&quot;},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;footprint_GB&#92;&quot;:2.56,&#92;&quot;p99_ms&#92;&quot;:1541.8,&#92;&quot;devices&#92;&quot;:1,&#92;&quot;placement&#92;&quot;:&#92;&quot;1 device&#92;&quot;,&#92;&quot;config&#92;&quot;:&#92;&quot;w=bf16,kv=bf16,seqs=256,tok=8192,cp=0,tp=1&#92;&quot;}]&quot;' data-total-rows='9' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;model&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;footprint_GB&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;p99_ms&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;devices&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;placement&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;config&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "[W 260912 17:00:10 altair_transformer:82] Failed to convert data to arrow format, falling back to CSV: No module named 'pyarrow'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "a2b1e82fea06050e6efaf44c3d1ed2d0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "65d780f9b4cc5d5ce186361ae33bf26b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "d4280879125d1be3137374dac0112b41",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>The fit check passed with 18.7GB to spare.</strong> Total 2.87GB against 21.6GB usable. Memory was never the question. Red line is the SLO.</span></span><marimo-ui-element object-id='Vxnm-0' random-id='ab82ef86-840d-90ee-4ca7-697f10671b8a'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300,&quot;strokeWidth&quot;:0},&quot;axis&quot;:{&quot;domainColor&quot;:&quot;#c3c2b7&quot;,&quot;grid&quot;:true,&quot;gridColor&quot;:&quot;#e1e0d9&quot;,&quot;gridWidth&quot;:1,&quot;labelColor&quot;:&quot;#52514e&quot;,&quot;labelFontSize&quot;:11,&quot;tickColor&quot;:&quot;#c3c2b7&quot;,&quot;titleColor&quot;:&quot;#52514e&quot;,&quot;titleFontSize&quot;:11,&quot;titleFontWeight&quot;:&quot;normal&quot;},&quot;legend&quot;:{&quot;labelColor&quot;:&quot;#52514e&quot;,&quot;labelFontSize&quot;:11,&quot;symbolSize&quot;:110,&quot;symbolStrokeWidth&quot;:0,&quot;symbolType&quot;:&quot;square&quot;,&quot;titleColor&quot;:&quot;#52514e&quot;,&quot;titleFontSize&quot;:11,&quot;titleFontWeight&quot;:&quot;normal&quot;}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/csv;base64,bW9kZWwsY29uZGl0aW9uLHA5OV9tcyxzbG9fbXMKbW9kZWxfYSxhbG9uZSwxNjA3LjIsNDAwMC4wCm1vZGVsX2Esc2hhcmluZyBhIEdQVSwyNTAxLjIsNDAwMC4wCm1vZGVsX2IsYWxvbmUsNzQ1LjUsMzAwMC4wCm1vZGVsX2Isc2hhcmluZyBhIEdQVSw0NDI2LjAsMzAwMC4wCg==&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;csv&quot;}},&quot;facet&quot;:{&quot;column&quot;:{&quot;field&quot;:&quot;model&quot;,&quot;header&quot;:{&quot;labelColor&quot;:&quot;#0b0b0b&quot;,&quot;labelFontSize&quot;:12},&quot;title&quot;:null,&quot;type&quot;:&quot;nominal&quot;}},&quot;spec&quot;:{&quot;layer&quot;:[{&quot;mark&quot;:{&quot;type&quot;:&quot;bar&quot;,&quot;cornerRadiusTopLeft&quot;:4,&quot;cornerRadiusTopRight&quot;:4,&quot;size&quot;:44},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;condition&quot;,&quot;scale&quot;:{&quot;domain&quot;:[&quot;alone&quot;,&quot;sharing a GPU&quot;],&quot;range&quot;:[&quot;#2a78d6&quot;,&quot;#eb6834&quot;]},&quot;title&quot;:&quot;condition&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;model&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;condition&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;p99_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;slo_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;axis&quot;:{&quot;labelAngle&quot;:0},&quot;field&quot;:&quot;condition&quot;,&quot;title&quot;:null,&quot;type&quot;:&quot;nominal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;p99_ms&quot;,&quot;title&quot;:&quot;p99 latency (ms)&quot;,&quot;type&quot;:&quot;quantitative&quot;}}},{&quot;mark&quot;:{&quot;type&quot;:&quot;text&quot;,&quot;color&quot;:&quot;#52514e&quot;,&quot;dy&quot;:-8,&quot;fontSize&quot;:11},&quot;encoding&quot;:{&quot;text&quot;:{&quot;field&quot;:&quot;p99_ms&quot;,&quot;format&quot;:&quot;,.0f&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;x&quot;:{&quot;field&quot;:&quot;condition&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;p99_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;}}},{&quot;mark&quot;:{&quot;type&quot;:&quot;rule&quot;,&quot;color&quot;:&quot;#d03b3b&quot;,&quot;strokeDash&quot;:[4,3],&quot;strokeWidth&quot;:2},&quot;encoding&quot;:{&quot;y&quot;:{&quot;field&quot;:&quot;slo_ms&quot;,&quot;type&quot;:&quot;quantitative&quot;}}}]},&quot;resolve&quot;:{&quot;scale&quot;:{&quot;y&quot;:&quot;independent&quot;}},&quot;height&quot;:290,&quot;width&quot;:&quot;container&quot;,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v6.4.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element><marimo-ui-element object-id='Vxnm-1' random-id='94660df4-8dcd-bfb8-1294-353d98828321'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;condition&#92;&quot;:&#92;&quot;alone&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:1607.2,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;condition&#92;&quot;:&#92;&quot;sharing a GPU&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:2501.2,&#92;&quot;slo_ms&#92;&quot;:4000.0},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;condition&#92;&quot;:&#92;&quot;alone&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:745.5,&#92;&quot;slo_ms&#92;&quot;:3000.0},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;condition&#92;&quot;:&#92;&quot;sharing a GPU&#92;&quot;,&#92;&quot;p99_ms&#92;&quot;:4426.0,&#92;&quot;slo_ms&#92;&quot;:3000.0}]&quot;' data-total-rows='4' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;model&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;condition&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;p99_ms&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;slo_ms&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "[W 260912 17:00:10 altair_transformer:82] Failed to convert data to arrow format, falling back to CSV: No module named 'pyarrow'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "12a71cce29669248aca349671b38bb07",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"verdict-reverted\">Verdict: reverted</h3>\n<span class=\"paragraph\">model_b breached SLO (4426ms vs 3000ms)</span>\n<span class=\"paragraph\"><strong>Memory fit was never the binding constraint</strong> \u2014 the fit check cleared with 18.7GB spare. Device-time contention was: <code>model_b</code>'s p99 inflated <strong>+494%</strong> beside <code>model_a</code>, whose traffic is 94% prefill.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "20d90018c8cc67191af504e76bdd5e16",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"the-control-arm\">The control arm</h2>\n<span class=\"paragraph\">Claiming the agents are better requires something to be better <em>than</em>. This\nsweeps the identical lever space, spends the identical budget, and passes the\nidentical gates \u2014 choosing randomly instead of by reasoning.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "d0337ae9b245351e8d2289e9618f9261",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "266553fc2d75fd53001e6ce2ff061d0d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-ui-element object-id='Pvdt-0' random-id='476d0ad0-6a30-086b-decf-17f0cab4c649'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;model&#92;&quot;:&#92;&quot;model_a&#92;&quot;,&#92;&quot;agent loop (trials to SLO)&#92;&quot;:1,&#92;&quot;random search &#92;&#92;u2014 median&#92;&quot;:1.0,&#92;&quot;random search &#92;&#92;u2014 best&#92;&quot;:1,&#92;&quot;random search &#92;&#92;u2014 worst&#92;&quot;:2,&#92;&quot;seeds where random never reached SLO&#92;&quot;:0},{&#92;&quot;model&#92;&quot;:&#92;&quot;model_b&#92;&quot;,&#92;&quot;agent loop (trials to SLO)&#92;&quot;:1,&#92;&quot;random search &#92;&#92;u2014 median&#92;&quot;:1.0,&#92;&quot;random search &#92;&#92;u2014 best&#92;&quot;:1,&#92;&quot;random search &#92;&#92;u2014 worst&#92;&quot;:2,&#92;&quot;seeds where random never reached SLO&#92;&quot;:0}]&quot;' data-total-rows='2' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;model&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;agent loop (trials to SLO)&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;random search \u2014 median&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;random search \u2014 best&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;random search \u2014 worst&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;seeds where random never reached SLO&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Random search matches or beats this loop on trials-to-target.</strong></span>\n<span class=\"paragraph\">The cause is measurable rather than mysterious: at these SLOs, most legal\nconfigurations already pass, and when most answers are correct, guessing is\nan excellent strategy. This matches the known result that random search is\nvery hard to beat in low-dimensional discrete spaces.</span>\n<span class=\"paragraph\">We report this rather than tuning the scenario until the agents win. A\nbenchmark adjusted until it flatters the system under test measures nothing.</span>\n<span class=\"paragraph\"><strong>So the claim is not trial efficiency.</strong> It is that Phase 2 is not a search\nproblem at all: a sweep has no notion of re-reading its own history under a\nnew objective, no fit check, no joint trial, and no way to attribute a\nco-tenancy failure to bandwidth rather than memory.</span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "f95658029b8e740eaac799c7bd391a43",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"what-this-demo-does-not-show\">What this demo does not show</h2>\n<span class=\"paragraph\">Stated plainly, because a demo that hides its limits is worth less than one\nthat names them.</span>\n<ul>\n<li><strong>The trials are simulated.</strong> There is no GPU in this run. The simulator models\n  continuous batching directly \u2014 bandwidth-bound decode, compute-bound prefill,\n  KV-capped concurrency, preemption \u2014 but it is not a claim to predict absolute\n  H100 latency. Every ledger row records which substrate produced it.</li>\n<li><strong>The specialists are deterministic heuristics, not LLM agents.</strong> Their\n  rationales read well because they were written, not reasoned. Swapping in\n  LLM-backed specialists is a drop-in at <code>Specialist.propose</code>.</li>\n<li><strong>The quality gate is a lookup table.</strong> Accuracy is a function of dtype only,\n  so \"int4 breaks the floor\" is arithmetic rather than a discovery. On real\n  hardware this is a real eval.</li>\n<li><strong>Co-tenant step times are summed.</strong> Two tenants therefore cost roughly 2x,\n  so the direction and mechanism of the contention finding are trustworthy while\n  its magnitude is structural.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
