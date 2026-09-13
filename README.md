@@ -196,6 +196,8 @@ Use `--swarm --auto-space --budget 2` with the live command below. Weave is requ
 
 Each inspection records its source call IDs and output hashes. Missing or incomplete remote evidence is marked as a failed inspection; it is not replaced by local outputs. Model answers and peer findings are data, not instructions. These analysis roles do not add multi-GPU controls or enable unverified precision settings.
 
+Failed experiments have a saved diagnosis: the observed error stage or rejected gate, quality scores, measured gain versus the required gain, and constraints on the next proposal. Weave inspections include that diagnosis and relevant failed requests. Quality inspections can show the original answer, fixed expected answer, and strict evaluator result. The agents must separate those facts from a suspected cause, cite available evidence, and explain the next experiment or decision to stop. A failed start with no outputs is not reported as a quality result. No gain does not prove a batching or memory problem.
+
 The live swarm rehearsal is still being checked. The earlier team recording below proves the staged loop, not this concurrent mode.
 
 ### Existing staged loop
