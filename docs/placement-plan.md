@@ -46,6 +46,8 @@ Use the same frozen limits for unquantized and quantized configurations, both al
 
 Touch `sera/config.py` and `sera/memory.py` for a validated plan containing exactly two pinned configurations, one GPU assignment, per-service allocations, per-model constraints, and the declared total budget.
 
+The structural portion is now implemented in `sera/placement_config.py`: `validate_placement_plan` requires the pinned pair, explicit allocations and per-model limits, matching physical-memory fractions, and the exact 10% shared reserve. It rejects unverified precision combinations and revalidates nested values. This does not prove fit, bind passing isolated evidence, choose allocations, or activate a shared runner. The remaining fit/evidence and runtime work below is still required.
+
 Touch `sera/runtime.py` to give one owner control of both service process groups. Permit only registered peer services; continue rejecting unrelated GPU use. Record per-service memory and total device memory separately. Device-wide memory samples cannot identify each service's use.
 
 Do not implement sharing by simply disabling the idle-GPU check. Current startup checks, memory monitoring, and cleanup also assume exclusive ownership. Cleanup must attempt to stop both services even when one close operation fails, then verify that all owned resources were released.

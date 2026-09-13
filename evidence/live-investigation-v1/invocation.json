@@ -1,0 +1,1351 @@
+{
+  "schema_version": "sera-live-investigation-invocation-v1",
+  "passed": true,
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "budget": {
+    "max_candidate_trials": 2
+  },
+  "objective": {
+    "priority": "latency",
+    "min_improvement_fraction": 0.05
+  },
+  "workload": {
+    "concurrency": [
+      1,
+      2,
+      4,
+      8
+    ]
+  },
+  "investigation_space": {
+    "supported_changes": {
+      "max_num_batched_tokens": [
+        1024,
+        2048
+      ]
+    },
+    "candidate_hashes": [
+      "20c7195f57b099ad6bfe356b7a9ecaeabdb6c0d6f5bef4ddde75bc245316ce8f",
+      "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f"
+    ],
+    "space_hash": "ab974a4dc0ee06a0a8c1c05895bab43cc02afa028fc65f9a4b382b48422c2b02"
+  },
+  "provider_validation": {
+    "path": "/marimo/sera-evidence/provider-v5/result.json",
+    "schema_hash": "e80de32d65eef75c3821f06d27dccd8fd7fd7f58b63b513a9dd6637478a83813",
+    "model": "openai/gpt-oss-20b",
+    "first_pass_valid": 30,
+    "valid_with_one_retry": 30
+  },
+  "evaluation_cases_sha256": "2f3c6687cf2a19bde4c3f5b60ab56cb24ac67c6755e999ad98227b04e42d95a7",
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a099cb-eb93-7ae1-aa16-b453793a3058",
+  "returned_runner_closed": true,
+  "limits": "A bounded live investigation is not proof of search superiority.",
+  "search": {
+    "budget": {
+      "max_candidate_trials": 2
+    },
+    "trials_used": 1,
+    "rounds": [
+      {
+        "round": 1,
+        "specialists": [
+          {
+            "role": "batching",
+            "evidence": {
+              "trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+              "objective": {
+                "priority": "latency",
+                "min_improvement_fraction": 0.05
+              },
+              "constraints": {
+                "quality_floor": 0.99,
+                "p95_latency_ms": null,
+                "max_memory_mib": null
+              },
+              "quality_mode": "verified",
+              "task_quality": {
+                "version": "sera-easy-strict-json-v1",
+                "floor": 0.99,
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 1,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 2,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 3,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 4,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 5,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 6,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 7,
+                    "score": 1.0,
+                    "error": null
+                  }
+                ]
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": "fp8_per_tensor",
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "metrics": {
+                "request_count": 96,
+                "successful_requests": 96,
+                "generation_errors": 0,
+                "request_wall_seconds": 25.25288087099989,
+                "output_tokens": 660,
+                "input_tokens": 9060,
+                "p50_latency_ms": 705.6611190000694,
+                "p95_latency_ms": 773.5430580000866,
+                "p99_latency_ms": 834.738021000021,
+                "output_tokens_per_second": 26.135631945182787,
+                "input_tokens_per_second": 358.7709476111455,
+                "p99_reliable": false,
+                "p95_ttft_ms": null,
+                "p95_queue_ms": null,
+                "p95_time_per_output_token_ms": null,
+                "mean_queue_ms": null,
+                "mean_ttft_ms": null,
+                "preemptions": null,
+                "sampled_peak_memory_mib": 88687
+              },
+              "remaining_trials": 2,
+              "supported_changes": {
+                "max_num_batched_tokens": [
+                  1024,
+                  2048
+                ]
+              },
+              "baseline_self_check": {
+                "version": "token-agreement-v1",
+                "floor": 0.99,
+                "scores": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": false
+              },
+              "limitations": [
+                "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+                "Token agreement does not establish task correctness.",
+                "Sampled peak memory includes runtime reservation, not just model weights.",
+                "This small sample cannot establish statistical significance."
+              ],
+              "frozen_candidate_hashes": [
+                "20c7195f57b099ad6bfe356b7a9ecaeabdb6c0d6f5bef4ddde75bc245316ce8f",
+                "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f"
+              ],
+              "history": [],
+              "previous_rounds": [],
+              "specialist_role": "batching"
+            },
+            "status": "accepted",
+            "proposal": {
+              "action": "trial",
+              "proposal_id": "trial-001",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 2048,
+              "evidence_used": [
+                "input_tokens",
+                "output_tokens",
+                "p95_latency_ms",
+                "request_wall_seconds"
+              ],
+              "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+              "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 may lower GPU memory pressure and reduce queueing delays, potentially improving the 95th percentile latency."
+            },
+            "arbiter_proposal_id": "batching:trial-001"
+          }
+        ],
+        "trial_ids": [
+          "trial-1"
+        ],
+        "arbiter_evidence": {
+          "trial_id": "baseline",
+          "model_id": "Qwen/Qwen2.5-72B-Instruct",
+          "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "quality_mode": "verified",
+          "task_quality": {
+            "version": "sera-easy-strict-json-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 1,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 2,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 3,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 4,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 5,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 6,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 7,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "configuration": {
+            "dtype": "bfloat16",
+            "quantization": "fp8_per_tensor",
+            "kv_cache_dtype": "auto",
+            "tensor_parallel_size": 1,
+            "max_model_len": 4096,
+            "max_num_seqs": 8,
+            "max_num_batched_tokens": 4096,
+            "gpu_memory_utilization": 0.9,
+            "enable_prefix_caching": false,
+            "enable_chunked_prefill": true,
+            "enforce_eager": true
+          },
+          "metrics": {
+            "request_count": 96,
+            "successful_requests": 96,
+            "generation_errors": 0,
+            "request_wall_seconds": 25.25288087099989,
+            "output_tokens": 660,
+            "input_tokens": 9060,
+            "p50_latency_ms": 705.6611190000694,
+            "p95_latency_ms": 773.5430580000866,
+            "p99_latency_ms": 834.738021000021,
+            "output_tokens_per_second": 26.135631945182787,
+            "input_tokens_per_second": 358.7709476111455,
+            "p99_reliable": false,
+            "p95_ttft_ms": null,
+            "p95_queue_ms": null,
+            "p95_time_per_output_token_ms": null,
+            "mean_queue_ms": null,
+            "mean_ttft_ms": null,
+            "preemptions": null,
+            "sampled_peak_memory_mib": 88687
+          },
+          "remaining_trials": 2,
+          "supported_changes": {
+            "max_num_batched_tokens": [
+              1024,
+              2048
+            ]
+          },
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "limitations": [
+            "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+            "Token agreement does not establish task correctness.",
+            "Sampled peak memory includes runtime reservation, not just model weights.",
+            "This small sample cannot establish statistical significance."
+          ],
+          "frozen_candidate_hashes": [
+            "20c7195f57b099ad6bfe356b7a9ecaeabdb6c0d6f5bef4ddde75bc245316ce8f",
+            "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f"
+          ],
+          "history": [],
+          "previous_rounds": [],
+          "legal_proposal_ids": [
+            "batching:trial-001"
+          ],
+          "proposals": [
+            {
+              "action": "trial",
+              "proposal_id": "batching:trial-001",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 2048,
+              "evidence_used": [
+                "input_tokens",
+                "output_tokens",
+                "p95_latency_ms",
+                "request_wall_seconds"
+              ],
+              "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+              "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 may lower GPU memory pressure and reduce queueing delays, potentially improving the 95th percentile latency."
+            }
+          ],
+          "proposal_id_map": {
+            "batching:trial-001": {
+              "agent_role": "batching",
+              "original_proposal_id": "trial-001"
+            }
+          }
+        },
+        "arbiter": {
+          "ranked_proposal_ids": [
+            "batching:trial-001"
+          ],
+          "reason": "The proposal aims to reduce the 95th‑percentile latency by halving the maximum number of batched tokens, which directly addresses the latency objective (5% improvement). It does not affect the quality floor (baseline quality is 1.0). With a moderate confidence of 0.5 and a low expected cost (1 trial), and two trials remaining, the proposal offers a reasonable trade‑off between potential latency gain and risk, making it the best candidate to test next."
+        }
+      },
+      {
+        "round": 2,
+        "specialists": [
+          {
+            "role": "batching",
+            "evidence": {
+              "trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+              "objective": {
+                "priority": "latency",
+                "min_improvement_fraction": 0.05
+              },
+              "constraints": {
+                "quality_floor": 0.99,
+                "p95_latency_ms": null,
+                "max_memory_mib": null
+              },
+              "quality_mode": "verified",
+              "task_quality": {
+                "version": "sera-easy-strict-json-v1",
+                "floor": 0.99,
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 1,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 2,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 3,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 4,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 5,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 6,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 7,
+                    "score": 1.0,
+                    "error": null
+                  }
+                ]
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": "fp8_per_tensor",
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "metrics": {
+                "request_count": 96,
+                "successful_requests": 96,
+                "generation_errors": 0,
+                "request_wall_seconds": 25.25288087099989,
+                "output_tokens": 660,
+                "input_tokens": 9060,
+                "p50_latency_ms": 705.6611190000694,
+                "p95_latency_ms": 773.5430580000866,
+                "p99_latency_ms": 834.738021000021,
+                "output_tokens_per_second": 26.135631945182787,
+                "input_tokens_per_second": 358.7709476111455,
+                "p99_reliable": false,
+                "p95_ttft_ms": null,
+                "p95_queue_ms": null,
+                "p95_time_per_output_token_ms": null,
+                "mean_queue_ms": null,
+                "mean_ttft_ms": null,
+                "preemptions": null,
+                "sampled_peak_memory_mib": 88687,
+                "trial_1_request_count": 96,
+                "trial_1_successful_requests": 96,
+                "trial_1_generation_errors": 0,
+                "trial_1_request_wall_seconds": 25.274789101000124,
+                "trial_1_output_tokens": 660,
+                "trial_1_input_tokens": 9060,
+                "trial_1_p50_latency_ms": 705.6901109999671,
+                "trial_1_p95_latency_ms": 773.4389649999684,
+                "trial_1_p99_latency_ms": 834.4860270001391,
+                "trial_1_output_tokens_per_second": 26.11297753514722,
+                "trial_1_input_tokens_per_second": 358.4599643461118,
+                "trial_1_p99_reliable": false,
+                "trial_1_p95_ttft_ms": null,
+                "trial_1_p95_queue_ms": null,
+                "trial_1_p95_time_per_output_token_ms": null,
+                "trial_1_sampled_peak_memory_mib": 88561
+              },
+              "remaining_trials": 1,
+              "supported_changes": {
+                "max_num_batched_tokens": [
+                  1024
+                ]
+              },
+              "baseline_self_check": {
+                "version": "token-agreement-v1",
+                "floor": 0.99,
+                "scores": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": false
+              },
+              "limitations": [
+                "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+                "Token agreement does not establish task correctness.",
+                "Sampled peak memory includes runtime reservation, not just model weights.",
+                "This small sample cannot establish statistical significance."
+              ],
+              "frozen_candidate_hashes": [
+                "20c7195f57b099ad6bfe356b7a9ecaeabdb6c0d6f5bef4ddde75bc245316ce8f"
+              ],
+              "history": [
+                {
+                  "trial": {
+                    "trial_id": "trial-1",
+                    "status": "collected",
+                    "config_hash": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+                    "reduced": {
+                      "request_count": 96,
+                      "successful_requests": 96,
+                      "generation_errors": 0,
+                      "request_wall_seconds": 25.274789101000124,
+                      "output_tokens": 660,
+                      "input_tokens": 9060,
+                      "p50_latency_ms": 705.6901109999671,
+                      "p95_latency_ms": 773.4389649999684,
+                      "p99_latency_ms": 834.4860270001391,
+                      "output_tokens_per_second": 26.11297753514722,
+                      "input_tokens_per_second": 358.4599643461118,
+                      "p99_reliable": false,
+                      "p95_ttft_ms": null,
+                      "p95_queue_ms": null,
+                      "p95_time_per_output_token_ms": null
+                    },
+                    "task_quality": {
+                      "version": "sera-easy-strict-json-v1",
+                      "floor": 0.99,
+                      "mean": 1.0,
+                      "valid_outputs": true,
+                      "passed": true,
+                      "task_quality_verified": true,
+                      "per_prompt": [
+                        {
+                          "prompt_index": 0,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 1,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 2,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 3,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 4,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 5,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 6,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 7,
+                          "score": 1.0,
+                          "error": null
+                        }
+                      ]
+                    },
+                    "decision": {
+                      "selected": "baseline",
+                      "outcome": "no-safe-improvement",
+                      "baseline_self_check": {
+                        "version": "token-agreement-v1",
+                        "floor": 0.99,
+                        "scores": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0
+                        ],
+                        "mean": 1.0,
+                        "valid_outputs": true,
+                        "passed": true,
+                        "task_quality_verified": false
+                      },
+                      "candidate_quality": {
+                        "version": "sera-easy-strict-json-v1",
+                        "floor": 0.99,
+                        "mean": 1.0,
+                        "valid_outputs": true,
+                        "passed": true,
+                        "task_quality_verified": true,
+                        "per_prompt": [
+                          {
+                            "prompt_index": 0,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 1,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 2,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 3,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 4,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 5,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 6,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 7,
+                            "score": 1.0,
+                            "error": null
+                          }
+                        ]
+                      },
+                      "p95_improvement_fraction": 0.00013456652353294185,
+                      "objective": {
+                        "priority": "latency",
+                        "min_improvement_fraction": 0.05
+                      },
+                      "objective_improvement_fraction": 0.0001345665235329969,
+                      "constraints": {
+                        "quality_floor": 0.99,
+                        "p95_latency_ms": null,
+                        "max_memory_mib": null
+                      },
+                      "constraint_failures": {
+                        "baseline": [],
+                        "candidate": []
+                      },
+                      "baseline_quality": {
+                        "version": "sera-easy-strict-json-v1",
+                        "floor": 0.99,
+                        "mean": 1.0,
+                        "valid_outputs": true,
+                        "passed": true,
+                        "task_quality_verified": true,
+                        "per_prompt": [
+                          {
+                            "prompt_index": 0,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 1,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 2,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 3,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 4,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 5,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 6,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 7,
+                            "score": 1.0,
+                            "error": null
+                          }
+                        ]
+                      },
+                      "reason": "p95-improvement-below-five-percent"
+                    }
+                  },
+                  "configuration": {
+                    "dtype": "bfloat16",
+                    "quantization": "fp8_per_tensor",
+                    "kv_cache_dtype": "auto",
+                    "tensor_parallel_size": 1,
+                    "max_model_len": 4096,
+                    "max_num_seqs": 8,
+                    "max_num_batched_tokens": 2048,
+                    "gpu_memory_utilization": 0.9,
+                    "enable_prefix_caching": false,
+                    "enable_chunked_prefill": true,
+                    "enforce_eager": true
+                  },
+                  "proposal": {
+                    "action": "trial",
+                    "proposal_id": "trial-001",
+                    "agent_role": "batching",
+                    "parent_trial_id": "baseline",
+                    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+                    "changed_lever": "max_num_batched_tokens",
+                    "proposed_value": 2048,
+                    "evidence_used": [
+                      "input_tokens",
+                      "output_tokens",
+                      "p95_latency_ms",
+                      "request_wall_seconds"
+                    ],
+                    "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+                    "confidence": 0.5,
+                    "expected_trial_cost": 1,
+                    "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+                    "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 may lower GPU memory pressure and reduce queueing delays, potentially improving the 95th percentile latency."
+                  },
+                  "review": {
+                    "selected_trial_id": "baseline",
+                    "prediction_outcome": "refuted",
+                    "reason": "The candidate trial achieved a marginal 0.013% reduction in p95_latency_ms (from 773.543058 ms to 773.438965 ms), far below the 5% improvement threshold required by the falsification condition. Therefore the prediction that p95_latency_ms would decrease relative to baseline was refuted."
+                  },
+                  "review_error": null
+                }
+              ],
+              "previous_rounds": [
+                {
+                  "round": 1,
+                  "trial_ids": [
+                    "trial-1"
+                  ],
+                  "arbiter": {
+                    "ranked_proposal_ids": [
+                      "batching:trial-001"
+                    ],
+                    "reason": "The proposal aims to reduce the 95th‑percentile latency by halving the maximum number of batched tokens, which directly addresses the latency objective (5% improvement). It does not affect the quality floor (baseline quality is 1.0). With a moderate confidence of 0.5 and a low expected cost (1 trial), and two trials remaining, the proposal offers a reasonable trade‑off between potential latency gain and risk, making it the best candidate to test next."
+                  },
+                  "arbiter_error": null,
+                  "specialists": [
+                    {
+                      "role": "batching",
+                      "status": "accepted",
+                      "proposal": {
+                        "action": "trial",
+                        "proposal_id": "trial-001",
+                        "agent_role": "batching",
+                        "parent_trial_id": "baseline",
+                        "model_id": "Qwen/Qwen2.5-72B-Instruct",
+                        "changed_lever": "max_num_batched_tokens",
+                        "proposed_value": 2048,
+                        "evidence_used": [
+                          "input_tokens",
+                          "output_tokens",
+                          "p95_latency_ms",
+                          "request_wall_seconds"
+                        ],
+                        "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+                        "confidence": 0.5,
+                        "expected_trial_cost": 1,
+                        "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+                        "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 may lower GPU memory pressure and reduce queueing delays, potentially improving the 95th percentile latency."
+                      },
+                      "arbiter_proposal_id": "batching:trial-001"
+                    }
+                  ]
+                }
+              ],
+              "specialist_role": "batching"
+            },
+            "status": "accepted",
+            "proposal": {
+              "action": "trial",
+              "proposal_id": "trial-002",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 1024,
+              "evidence_used": [
+                "input_tokens",
+                "output_tokens",
+                "p95_latency_ms",
+                "request_wall_seconds"
+              ],
+              "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+              "confidence": 0.4,
+              "expected_trial_cost": 1,
+              "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+              "reason": "Reducing the maximum number of batched tokens from 2048 to 1024 may further lower GPU memory pressure and queueing delays, potentially improving the 95th‑percentile latency."
+            },
+            "arbiter_proposal_id": "batching:trial-002"
+          }
+        ],
+        "trial_ids": [],
+        "arbiter_evidence": {
+          "trial_id": "baseline",
+          "model_id": "Qwen/Qwen2.5-72B-Instruct",
+          "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "quality_mode": "verified",
+          "task_quality": {
+            "version": "sera-easy-strict-json-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 1,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 2,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 3,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 4,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 5,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 6,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 7,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "configuration": {
+            "dtype": "bfloat16",
+            "quantization": "fp8_per_tensor",
+            "kv_cache_dtype": "auto",
+            "tensor_parallel_size": 1,
+            "max_model_len": 4096,
+            "max_num_seqs": 8,
+            "max_num_batched_tokens": 4096,
+            "gpu_memory_utilization": 0.9,
+            "enable_prefix_caching": false,
+            "enable_chunked_prefill": true,
+            "enforce_eager": true
+          },
+          "metrics": {
+            "request_count": 96,
+            "successful_requests": 96,
+            "generation_errors": 0,
+            "request_wall_seconds": 25.25288087099989,
+            "output_tokens": 660,
+            "input_tokens": 9060,
+            "p50_latency_ms": 705.6611190000694,
+            "p95_latency_ms": 773.5430580000866,
+            "p99_latency_ms": 834.738021000021,
+            "output_tokens_per_second": 26.135631945182787,
+            "input_tokens_per_second": 358.7709476111455,
+            "p99_reliable": false,
+            "p95_ttft_ms": null,
+            "p95_queue_ms": null,
+            "p95_time_per_output_token_ms": null,
+            "mean_queue_ms": null,
+            "mean_ttft_ms": null,
+            "preemptions": null,
+            "sampled_peak_memory_mib": 88687,
+            "trial_1_request_count": 96,
+            "trial_1_successful_requests": 96,
+            "trial_1_generation_errors": 0,
+            "trial_1_request_wall_seconds": 25.274789101000124,
+            "trial_1_output_tokens": 660,
+            "trial_1_input_tokens": 9060,
+            "trial_1_p50_latency_ms": 705.6901109999671,
+            "trial_1_p95_latency_ms": 773.4389649999684,
+            "trial_1_p99_latency_ms": 834.4860270001391,
+            "trial_1_output_tokens_per_second": 26.11297753514722,
+            "trial_1_input_tokens_per_second": 358.4599643461118,
+            "trial_1_p99_reliable": false,
+            "trial_1_p95_ttft_ms": null,
+            "trial_1_p95_queue_ms": null,
+            "trial_1_p95_time_per_output_token_ms": null,
+            "trial_1_sampled_peak_memory_mib": 88561
+          },
+          "remaining_trials": 1,
+          "supported_changes": {
+            "max_num_batched_tokens": [
+              1024,
+              2048
+            ]
+          },
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "limitations": [
+            "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+            "Token agreement does not establish task correctness.",
+            "Sampled peak memory includes runtime reservation, not just model weights.",
+            "This small sample cannot establish statistical significance."
+          ],
+          "frozen_candidate_hashes": [
+            "20c7195f57b099ad6bfe356b7a9ecaeabdb6c0d6f5bef4ddde75bc245316ce8f",
+            "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f"
+          ],
+          "history": [
+            {
+              "trial": {
+                "trial_id": "trial-1",
+                "status": "collected",
+                "config_hash": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+                "reduced": {
+                  "request_count": 96,
+                  "successful_requests": 96,
+                  "generation_errors": 0,
+                  "request_wall_seconds": 25.274789101000124,
+                  "output_tokens": 660,
+                  "input_tokens": 9060,
+                  "p50_latency_ms": 705.6901109999671,
+                  "p95_latency_ms": 773.4389649999684,
+                  "p99_latency_ms": 834.4860270001391,
+                  "output_tokens_per_second": 26.11297753514722,
+                  "input_tokens_per_second": 358.4599643461118,
+                  "p99_reliable": false,
+                  "p95_ttft_ms": null,
+                  "p95_queue_ms": null,
+                  "p95_time_per_output_token_ms": null
+                },
+                "task_quality": {
+                  "version": "sera-easy-strict-json-v1",
+                  "floor": 0.99,
+                  "mean": 1.0,
+                  "valid_outputs": true,
+                  "passed": true,
+                  "task_quality_verified": true,
+                  "per_prompt": [
+                    {
+                      "prompt_index": 0,
+                      "score": 1.0,
+                      "error": null
+                    },
+                    {
+                      "prompt_index": 1,
+                      "score": 1.0,
+                      "error": null
+                    },
+                    {
+                      "prompt_index": 2,
+                      "score": 1.0,
+                      "error": null
+                    },
+                    {
+                      "prompt_index": 3,
+                      "score": 1.0,
+                      "error": null
+                    },
+                    {
+                      "prompt_index": 4,
+                      "score": 1.0,
+                      "error": null
+                    },
+                    {
+                      "prompt_index": 5,
+                      "score": 1.0,
+                      "error": null
+                    },
+                    {
+                      "prompt_index": 6,
+                      "score": 1.0,
+                      "error": null
+                    },
+                    {
+                      "prompt_index": 7,
+                      "score": 1.0,
+                      "error": null
+                    }
+                  ]
+                },
+                "decision": {
+                  "selected": "baseline",
+                  "outcome": "no-safe-improvement",
+                  "baseline_self_check": {
+                    "version": "token-agreement-v1",
+                    "floor": 0.99,
+                    "scores": [
+                      1.0,
+                      1.0,
+                      1.0,
+                      1.0,
+                      1.0,
+                      1.0,
+                      1.0,
+                      1.0
+                    ],
+                    "mean": 1.0,
+                    "valid_outputs": true,
+                    "passed": true,
+                    "task_quality_verified": false
+                  },
+                  "candidate_quality": {
+                    "version": "sera-easy-strict-json-v1",
+                    "floor": 0.99,
+                    "mean": 1.0,
+                    "valid_outputs": true,
+                    "passed": true,
+                    "task_quality_verified": true,
+                    "per_prompt": [
+                      {
+                        "prompt_index": 0,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 1,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 2,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 3,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 4,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 5,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 6,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 7,
+                        "score": 1.0,
+                        "error": null
+                      }
+                    ]
+                  },
+                  "p95_improvement_fraction": 0.00013456652353294185,
+                  "objective": {
+                    "priority": "latency",
+                    "min_improvement_fraction": 0.05
+                  },
+                  "objective_improvement_fraction": 0.0001345665235329969,
+                  "constraints": {
+                    "quality_floor": 0.99,
+                    "p95_latency_ms": null,
+                    "max_memory_mib": null
+                  },
+                  "constraint_failures": {
+                    "baseline": [],
+                    "candidate": []
+                  },
+                  "baseline_quality": {
+                    "version": "sera-easy-strict-json-v1",
+                    "floor": 0.99,
+                    "mean": 1.0,
+                    "valid_outputs": true,
+                    "passed": true,
+                    "task_quality_verified": true,
+                    "per_prompt": [
+                      {
+                        "prompt_index": 0,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 1,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 2,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 3,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 4,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 5,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 6,
+                        "score": 1.0,
+                        "error": null
+                      },
+                      {
+                        "prompt_index": 7,
+                        "score": 1.0,
+                        "error": null
+                      }
+                    ]
+                  },
+                  "reason": "p95-improvement-below-five-percent"
+                }
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": "fp8_per_tensor",
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 2048,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "proposal": {
+                "action": "trial",
+                "proposal_id": "trial-001",
+                "agent_role": "batching",
+                "parent_trial_id": "baseline",
+                "model_id": "Qwen/Qwen2.5-72B-Instruct",
+                "changed_lever": "max_num_batched_tokens",
+                "proposed_value": 2048,
+                "evidence_used": [
+                  "input_tokens",
+                  "output_tokens",
+                  "p95_latency_ms",
+                  "request_wall_seconds"
+                ],
+                "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+                "confidence": 0.5,
+                "expected_trial_cost": 1,
+                "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+                "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 may lower GPU memory pressure and reduce queueing delays, potentially improving the 95th percentile latency."
+              },
+              "review": {
+                "selected_trial_id": "baseline",
+                "prediction_outcome": "refuted",
+                "reason": "The candidate trial achieved a marginal 0.013% reduction in p95_latency_ms (from 773.543058 ms to 773.438965 ms), far below the 5% improvement threshold required by the falsification condition. Therefore the prediction that p95_latency_ms would decrease relative to baseline was refuted."
+              },
+              "review_error": null
+            }
+          ],
+          "previous_rounds": [
+            {
+              "round": 1,
+              "trial_ids": [
+                "trial-1"
+              ],
+              "arbiter": {
+                "ranked_proposal_ids": [
+                  "batching:trial-001"
+                ],
+                "reason": "The proposal aims to reduce the 95th‑percentile latency by halving the maximum number of batched tokens, which directly addresses the latency objective (5% improvement). It does not affect the quality floor (baseline quality is 1.0). With a moderate confidence of 0.5 and a low expected cost (1 trial), and two trials remaining, the proposal offers a reasonable trade‑off between potential latency gain and risk, making it the best candidate to test next."
+              },
+              "arbiter_error": null,
+              "specialists": [
+                {
+                  "role": "batching",
+                  "status": "accepted",
+                  "proposal": {
+                    "action": "trial",
+                    "proposal_id": "trial-001",
+                    "agent_role": "batching",
+                    "parent_trial_id": "baseline",
+                    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+                    "changed_lever": "max_num_batched_tokens",
+                    "proposed_value": 2048,
+                    "evidence_used": [
+                      "input_tokens",
+                      "output_tokens",
+                      "p95_latency_ms",
+                      "request_wall_seconds"
+                    ],
+                    "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+                    "confidence": 0.5,
+                    "expected_trial_cost": 1,
+                    "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+                    "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 may lower GPU memory pressure and reduce queueing delays, potentially improving the 95th percentile latency."
+                  },
+                  "arbiter_proposal_id": "batching:trial-001"
+                }
+              ]
+            }
+          ],
+          "legal_proposal_ids": [
+            "batching:trial-002"
+          ],
+          "proposals": [
+            {
+              "action": "trial",
+              "proposal_id": "batching:trial-002",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 1024,
+              "evidence_used": [
+                "input_tokens",
+                "output_tokens",
+                "p95_latency_ms",
+                "request_wall_seconds"
+              ],
+              "predicted_metric_change": "p95_latency_ms will decrease relative to baseline",
+              "confidence": 0.4,
+              "expected_trial_cost": 1,
+              "falsification_condition": "p95_latency_ms does not improve by at least 5% compared to baseline",
+              "reason": "Reducing the maximum number of batched tokens from 2048 to 1024 may further lower GPU memory pressure and queueing delays, potentially improving the 95th‑percentile latency."
+            }
+          ],
+          "proposal_id_map": {
+            "batching:trial-002": {
+              "agent_role": "batching",
+              "original_proposal_id": "trial-002"
+            }
+          }
+        },
+        "arbiter": {
+          "ranked_proposal_ids": [],
+          "reason": "The only legal proposal (batching:trial-002) proposes further reducing max_num_batched_tokens to 1024. The prior trial with 2048 tokens already failed to meet the 5% latency improvement target, and there is no evidence that a smaller batch size would yield a meaningful gain. Confidence is low (0.4) and the expected benefit is uncertain, so the proposal is not selected for execution."
+        }
+      }
+    ],
+    "stop_reason": "no-valid-selected-proposal"
+  }
+}

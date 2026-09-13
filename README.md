@@ -8,7 +8,7 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 Sera helps someone run an AI model on the GPU they have. A GPU is the hardware that runs the model, and its memory limits how large a model it can hold. Sera checks possible settings, asks an AI agent to recommend a plan, tests that plan, and returns a model the user can actually use. It must reject a plan when the answers fail the user's checks.
 
-Our long-term goal is like choosing a route home: the best plan depends on whether the user cares most about response time, how much work gets done, or memory use. Today we have proven one important part: making a model fit and checking that it works. We have not yet proven that Sera finds the best route among many choices.
+Our long-term goal is like choosing a route home: the best plan depends on whether the user cares most about response time, how much work gets done, or memory use. We have proven that Sera can make a model fit, check that it works, test an agent recommendation, and use the result in its next decision. We have not proven that Sera finds the best route among many choices.
 
 ### What we have proven
 
@@ -20,6 +20,14 @@ Our long-term goal is like choosing a route home: the best plan depends on wheth
 - Sera saved the evidence and released the GPU after the test. The agent's final-review wording needed a fix; a separate review of the saved evidence then passed. Both records remain available.
 
 These are small, specific checks, not proof that the model answers every question correctly. We have not demonstrated a speedup over the original model, because the original model could not fit. A later comparison tested two batching settings and correctly kept the reference because neither offered the required improvement. We have not yet demonstrated best-plan search or two models sharing the GPU.
+
+### New: show the real investigation loop
+
+Open the [live investigation report](evidence/live-investigation-v1/report.md) and [Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a099cb-eb93-7ae1-aa16-b453793a3058). Say:
+
+“The agent suggested a setting. Sera tested it, but response time improved by only 0.013%, below our 5% rule. Both settings still passed all eight questions. In the next round, the decision agent used that failed prediction to decline another trial. Sera gave back the working model and checked a new request.”
+
+This was two decision rounds and one candidate GPU trial, not two trials or a search win. The new request repeated a known question; it was not a held-out test. The run is now closed, and the notebook displays saved real evidence. Only batching was active; two-model placement is still unfinished.
 
 ### Three-minute walkthrough
 
@@ -47,13 +55,13 @@ The smaller Qwen3-0.6B path also completed a live agent-guided rejection and bas
 
 The returned baseline runner answered `1` for `1 + 1`. Its runtime worked, but its answer was wrong. Do not treat runtime success or token agreement as model correctness.
 
-The live checks used eight easy prompts and 24 measured requests per configuration, not the full 32-prompt/96-request acceptance workload. The large-model run proves feasible deployment through weight quantization, not a measured speedup or search advantage. Joint placement and the search benchmark remain unfinished. Weave tracing ran through the experiment wrapper, not automatic package instrumentation.
+The initial live checks used eight easy prompts and 24 measured requests per configuration. Later four-load comparisons used 96 measured requests per configuration, still on eight questions rather than the full 32-prompt acceptance workload. The large-model run proves feasible deployment through weight quantization, not a measured speedup or search advantage. The real two-round investigation also passed its returned-runner check. Joint placement and the search benchmark remain unfinished. Weave tracing ran through the experiment wrapper, not automatic package instrumentation.
 
 The W&B client, typed proposal/ranking/final-selection schemas, and bounded provider check are implemented. The client reads `WANDB_API_KEY` from the process environment; it never saves the key or request headers. Agent-controlled GPU execution stays disabled until the provider check passes.
 
 The first provider check failed (19/30 valid first responses; 22/30 after retries). Its records are preserved. After expressing action/cost consistency in the wire schema and bounding ranking to one candidate, the second check passed 30/30 on the first response with no retries. This establishes schema compatibility, not recommendation quality.
 
-The approved proposal expansion adds batch-token limits (1–65,536), sequence limits (1–256), and context limits (65–4,096), alongside FP8 KV. Each proposal changes one setting and must match its actual parent, the run's allowed values, and any frozen candidate list. These are schema bounds, not verified operating points. Existing live defaults remain FP8 KV or batch tokens 2,048. The older provider record does not certify the expanded schema. The new check produced 30/30 valid JSON responses, but only 26/30 valid evidence citations, so **agent-controlled runs in this new build remain blocked**. See [the saved check](evidence/provider-v4/README.md). The rehearsed live-demo revision is preserved below.
+The approved proposal expansion adds batch-token limits (1–65,536), sequence limits (1–256), and context limits (65–4,096), alongside FP8 KV. Each proposal changes one setting and must match its actual parent, the run's allowed values, and any frozen candidate list. These are schema bounds, not verified operating points. Existing live defaults remain FP8 KV or batch tokens 2,048. The older provider record does not certify the expanded schema. Provider-v4 had four invalid evidence citations; those failures remain saved. The corrected [provider-v5 check passed 30/30 first responses and all context checks](evidence/provider-v5/README.md), and the current build completed a live investigation.
 
 ## Install
 
@@ -145,7 +153,7 @@ After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `
 
 ## Bounded agent investigation
 
-The production controller now accepts `budget=sera.Budget(max_candidate_trials=2)` with an agent and a matching passed provider record. Omitting `budget` preserves the one-candidate path. This opt-in controller is implemented and tested locally; it has not run a live multi-round investigation.
+The production controller accepts `budget=sera.Budget(max_candidate_trials=2)` with an agent and a matching passed provider record. Omitting `budget` preserves the one-candidate path. It completed a [real two-round investigation](evidence/live-investigation-v1/README.md): one measured batch-token candidate, prediction review, later arbitration using that history, reference restoration, a new request, and cleanup.
 
 Each round gives the active quantization and batching specialists the baseline measurements and a short history of previous trials. An arbiter selects an experiment. Sera validates it, measures it with the existing runner, applies the unchanged quality and performance gates, and asks the agent to review its prediction. The next round receives the result, including failures. Raw measurements remain in the saved report, not in the next prompt.
 
