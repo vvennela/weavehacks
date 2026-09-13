@@ -5,6 +5,29 @@ import math
 from prometheus_client.parser import text_string_to_metric_families
 
 
+def measured_queue_time(before, after, model_name, *, expected_requests=None):
+    """Mean queue time for one measured window; resets/missing counters stay unknown."""
+    def counters(raw):
+        result = {}
+        for suffix in ('sum', 'count'):
+            name = f'vllm:request_queue_time_seconds_{suffix}'
+            values = [sample.value for family in text_string_to_metric_families(raw)
+                      for sample in family.samples
+                      if sample.name == name and sample.labels.get('model_name') == model_name]
+            if not values or any(not math.isfinite(value) or value < 0 for value in values):
+                return None
+            result[suffix] = sum(values)
+        return result
+
+    start, end = counters(before), counters(after)
+    if start is None or end is None:
+        return None
+    elapsed, count = end['sum'] - start['sum'], end['count'] - start['count']
+    if elapsed < 0 or count <= 0 or (expected_requests is not None and count != expected_requests):
+        return None
+    return elapsed / count * 1000
+
+
 def parse_vllm_metrics(text: str, model_name: str | None = None) -> dict:
     samples = [sample for family in text_string_to_metric_families(text)
                for sample in family.samples
