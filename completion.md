@@ -11,11 +11,14 @@ passing joint run below remains valid historical evidence, not a guarantee that
 the latest repeat passed. The cause of the timing difference is not established.
 
 The blank [Example run notebook](notebooks/Example%20run.ipynb) and hosted-provider
-adapters are pushed. Source `89030bd` passes 1,568 tests with one optional skip.
-Astra through the OpenAI API and LiteLLM passed a connection smoke. The first
-[full provider check](evidence/openai-example-v1/README.md) passed 33 of 34 cases
-and stopped before GPU work on a specialist-role mismatch. The direct API route
-has not yet completed a live optimization. No API keys are stored in the notebook.
+adapters are pushed. Source `f4d8fa6` passes 1,582 tests with one optional skip.
+The [full OpenAI/LiteLLM dry run](evidence/openai-example-v2/README.md) passed:
+34/34 provider cases, three autonomous search rounds, quality passing on all four
+measured configurations, 19.77% lower p95, a fresh returned-runner request, and
+zero GPU memory after cleanup. All 746 Weave calls completed without exceptions;
+eight distinct records read by the investigators match their cloud-output hashes.
+The first [failed provider check](evidence/openai-example-v1/README.md) is preserved.
+No API keys are stored in the notebook.
 
 ## What works
 
@@ -116,10 +119,11 @@ new prompt through a structured runner requires an explicit response format.
 | --- | --- | --- |
 | Repository, tests, Codex relay controller | Local Mac | Existing Git and Codex login |
 | Sera optimizer, validator, Qwen/GLM and vLLM | Molab Linux GPU | Notebook pairing token |
-| Luna/Astra investigator inference | Hosted OpenAI models, called by local controller | Existing Codex login; not local model inference |
+| Earlier Luna/Astra investigator inference | Hosted OpenAI models, called by local controller | Existing Codex login; not local model inference |
+| Latest Astra investigator inference | OpenAI API through LiteLLM, called from Molab | Runtime OpenAI API key; no Codex controller |
 | Traces and trace reads | W&B Weave cloud | `WANDB_API_KEY` in Molab |
 | W&B serverless model inference | Optional investigator route | W&B key; not the Qwen/GLM GPU runner |
-| ARIA | W&B application; not integrated | Account access still needs verification |
+| ARIA | Optional W&B browser review; not integrated into execution | Signed-in UI review passed; authenticated headless route unverified |
 
 No secret values are saved here. A Weave key does not provide control over a
 hosted model's GPU configuration. The current Codex investigator route requires
@@ -136,6 +140,7 @@ the local controller to remain connected to Molab.
 - The sampled memory limits do not guarantee that very short peaks were captured.
 - Startup/download time is separate from measured request latency.
 - The partner's demo and website files were not changed in this work.
-- ARIA remains optional. The [updated access review](docs/aria-programmatic-review.md)
-  documents a UI-configured event trigger, not a verified typed request/response
-  integration. It cannot replace the working Sera loop or bypass its validator.
+- ARIA remains optional. The [browser review](docs/aria-browser-review.md) verified
+  a signed-in review and separate headless login-page navigation. It did not
+  verify authenticated headless advice extraction or orchestration. It cannot
+  replace the working Sera loop or bypass its validator.

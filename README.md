@@ -7,6 +7,120 @@ and local/cloud setup. The rehearsal sections below preserve historical results.
 
 The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The [complete Astra loop](evidence/live-astra-expanded-v1/README.md) measured a 19.55% latency improvement, tested a combination, stopped under the progress rule, and returned a working runner.
 
+## Latest demo: a full autonomous run passed
+
+The September 13 direct-API run finished in **13 minutes 58 seconds**, including
+the provider check. Three Astra investigators used **OpenAI through LiteLLM**;
+Qwen ran on the Molab GPU. No local Codex controller was needed for this run.
+The agents read Weave records, proposed changes, reviewed each other's findings,
+and sent their recommendations to an arbiter. The arbiter chose one GPU
+experiment per round. Sera measured the result and fed it into the next round.
+
+**The winner reduced p95 response time by 19.77%, with all eight answer checks
+passing.** Here, p95 means the response time that 95% of measured requests beat;
+the table reports the worst p95 across concurrency levels 1, 2, 4, and 8.
+
+| What Sera measured | p95 response time | Answer checks |
+| --- | --- | --- |
+| Starting configuration | 771.05 ms | 8/8 |
+| Reuse cached prompt prefixes | 624.79 ms | 8/8 |
+| Use graph execution, without prefix caching | 764.07 ms | 8/8 |
+| Combine prefix caching and graph execution | **618.59 ms** | **8/8** |
+
+Each configuration completed 96 timed requests with zero generation errors.
+The 99% quality floor and 5% progress threshold stayed fixed. The test repeated
+eight short questions after warmup. **This proves a gain on that repeated-prompt
+workload, not a 20% gain for every application or unseen question.** Startup is
+separate from response latency; the model files were already cached.
+
+### What the agents actually did
+
+- **Round 1:** Agent A (scheduling) proposed prefix caching. Agent B (memory)
+  proposed a smaller memory allocation, then switched to prefix caching after
+  peer review. Agent C (output quality) proposed graph execution. The arbiter
+  chose prefix caching; its measured p95 was about 19% lower.
+- **Round 2:** Agent A first proposed changing prefill scheduling. After sharing
+  findings, all three proposed testing graph execution on its own. It passed
+  quality but did not beat the current winner. Sera kept the better result.
+- **Round 3:** Agent C proposed combining the two quality-passing changes. Agent
+  B switched from a memory-allocation proposal to that combination after peer
+  review; Agent A still proposed a scheduling change. The arbiter chose the
+  combination. It was fastest, but added only about 1% over prefix caching.
+
+Agents **propose** experiments; they do not each run a separate GPU trial. The
+runner tests the arbiter's selected configuration. Their recommendations change
+with the saved evidence. This is learning from results in the agent's working
+context, not retraining model weights.
+
+There was no total trial cap. After a round failed to improve the current best
+by 5%, Sera allowed one confirmation round and stopped. It returned the fastest
+quality-passing runner, passed a fresh request through it, then closed it.
+Cleanup left **zero GPU memory in use**. The returned runner is now closed, not
+an active demo service.
+
+### The evidence and the notebook
+
+Open the [completed Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09c11-ca49-7d43-94cf-e56c54f98ac4)
+or the [saved run and audit](evidence/openai-example-v2/README.md). The audit found
+746 completed trace calls with no exceptions and checked eight distinct cloud
+record hashes against the records supplied to the investigators. Trace calls
+are not GPU trials: this run had one baseline and three candidate trials.
+The source suite passed **1,582 tests**, with one optional skip.
+
+The blank [Example run notebook](notebooks/Example%20run.ipynb) starts with no
+configured keys or saved outputs. It checks the GPU, asks for keys with hidden
+runtime prompts, checks Weave and the investigator provider, then runs the
+baseline and optimization. The live provider check passed all 34 cases without
+a retry. See [hosted investigator setup](docs/hosted-investigators.md).
+
+Keys and compute are separate:
+
+- **OpenAI API key:** calls the Astra investigator model through LiteLLM.
+- **W&B API key:** logs and reads Weave evidence.
+- **Molab GPU:** runs and measures Qwen with vLLM. Serverless investigator calls
+  do not provide control over Qwen's GPU settings.
+
+This run starts from the known-working Qwen72B FP8-weight/BF16-cache configuration.
+The earlier [fit-first result](evidence/large-fit-v1/README.md) demonstrates making
+the oversized model fit. Do not describe this latest latency run as a new measured
+comparison against BF16 weights: that larger configuration cannot fit on the card.
+
+### How to present the loop
+
+Say: “We give Sera a model, a GPU, and our quality and speed requirements. Three
+specialists inspect the results and compare ideas. Sera tests their chosen idea,
+keeps the best valid result, and uses the measurements to choose the next test.
+It stops when another test does not justify continuing.”
+
+The separate recorded replay shows the three agents, their revised proposals,
+the arbiter's choice, and each measured outcome. Label it **recorded replay at
+8× speed**, not live inference. At 8×, the complete 13:58 run takes about 1:45.
+Phase animation is a presentation aid; use saved timestamps and latency metrics
+for measurements, not animation duration or the time spent logging a Weave span.
+The partner's existing website and demo remain separate.
+
+### ARIA: optional advice, not execution authority
+
+An [ARIA browser review](docs/aria-browser-review.md) read a real Weave trace and
+returned advice in about 49 seconds. It also exposed an incomplete parent trace:
+ARIA treated an old “not tested” field as the final joint-test status. Supply
+final results separately from historical proposals and validate any advice.
+
+Headless Selenium reached W&B's login page in an isolated browser profile.
+Authenticated headless ARIA, automatic answer extraction, and orchestrator
+handoff are **not yet verified**. A normal login in that separate profile is
+still needed. A missing, slow, or unhelpful advisor must not stop Sera. No ARIA
+recommendation can bypass the arbiter, task-quality checks, or measured gates.
+
+### What we can claim
+
+We have a measured, autonomous, three-agent loop on the tested single-GPU setup,
+with useful improvement, trace reads, peer review, stopping, a usable returned
+runner, and cleanup. We have not proved global optimality, a general advantage
+over grid search, arbitrary-model support, unattended outage recovery, or
+multi-GPU production readiness. Older results below are historical records,
+not the current demo's acceptance result.
+
 ## Quick test: does the loop work?
 
 From the repository root, with Python 3.11+ and `uv` installed:
@@ -60,8 +174,8 @@ share no code, and each has its own package, tests and documentation.
 | **Two-phase loop** | `src/sera_loop/` | `import sera_loop` | Three specialists over disjoint lever groups, an arbiter spending a fixed trial budget, an append-only ledger, and a second phase that asks whether two models can share one card. Documented in [docs/two-phase-loop.md](docs/two-phase-loop.md). |
 
 They were merged into one branch rather than one system. `import sera` and
-`import sera_loop` resolve to different code, and `pytest` runs both suites — 917 tests
-for the swarm line, 204 for the two-phase loop.
+`import sera_loop` resolve to different code, and `pytest` runs both suites.
+The latest demo above uses `import sera`.
 
 Deciding whether both should survive, and which public API the product ships behind, is
 open. Nothing here forces that choice, and the merge was arranged so it can be made
@@ -69,9 +183,9 @@ later without unpicking anything.
 
 ## Demo rehearsal: plain-English guide
 
-### Current release work
+### Earlier release checkpoint
 
-The simple API, clean-install packaging, controller recovery, and frozen benchmark collector are merged. The combined suite passes **917 tests**. Clean installation and the [installed-package GPU rehearsal](evidence/public-api-release-v1/README.md) pass: three rounds, automatic stop, returned runner, Weave trace, and clean shutdown. That quick-mode rehearsal does not establish task correctness; its wrong arithmetic answers are saved. See [release acceptance](docs/release-acceptance.md), [the simple API](docs/simple-release.md), and [benchmark collection](docs/benchmark-collection.md). Recovery fault tests are not proof of a real unattended outage, and collector implementation is not proof that Sera beats grid or random search. Two-model placement and broader hardware remain later work.
+The simple API, clean-install packaging, controller recovery, and frozen benchmark collector were merged at this earlier checkpoint. Its combined suite passed **917 tests**. Clean installation and the [installed-package GPU rehearsal](evidence/public-api-release-v1/README.md) passed: three rounds, automatic stop, returned runner, Weave trace, and clean shutdown. That quick-mode rehearsal does not establish task correctness; its wrong arithmetic answers are saved. See [release acceptance](docs/release-acceptance.md), [the simple API](docs/simple-release.md), and [benchmark collection](docs/benchmark-collection.md). Recovery fault tests are not proof of a real unattended outage, and collector implementation is not proof that Sera beats grid or random search. Current status is in the latest demo section and `completion.md`.
 
 ### Current expanded loop
 
@@ -185,7 +299,10 @@ After the command finishes, show these items in order:
 
 Request-log child spans record saved results: their span duration is logging time, not model response time. Use the recorded `latency_ms` for request timing. Queue snapshots are cumulative, not measured-window averages. Neither selected examples nor a passing trace prove a speedup or the best possible plan.
 
-The agents receive a bounded view of local saved request records—the same records exported to Weave. They do **not** query the remote Weave service or use Weave MCP to investigate. Weave makes their inputs, outputs, and decisions visible; it is not a separate evidence-retrieval step in this run.
+In this earlier team-run recording, agents received a bounded view of local saved
+request records, not remote Weave queries. The newer three-agent recordings and
+the latest direct-API run above query remote Weave records through its Python SDK.
+They do not use Weave MCP for those reads.
 
 For a repeat run, check all five items above before claiming success. A different agent choice, abstention, or rejected change is a result to report, not a reason to invent another trial. `demo.py` prefers the saved live-swarm record when available and labels its output as recorded, not live. The team and batching-only recordings are separate earlier evidence, not proof of the newer swarm's reasoning.
 

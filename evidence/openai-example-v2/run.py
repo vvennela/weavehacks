@@ -1,13 +1,13 @@
-# ruff: noqa: E402 -- import the pinned checkout, not the installed older wheel.
+# Import the pinned checkout, not the installed older wheel.
 """Explicit live rehearsal. Keys are supplied only through the runtime environment."""
 
 import importlib.metadata
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 REPOSITORY = Path('/marimo/sera-openai-example-v2')
 SOURCE_COMMIT = 'f4d8fa60c6b821ac9400b6c2cacfb048d3b21338'
@@ -15,6 +15,7 @@ OUTPUT = Path('/marimo/sera-evidence/openai-example-v2')
 
 sys.path.insert(0, str(REPOSITORY))
 import litellm
+
 import sera
 from experiments.example_run import ExampleRun
 from sera.storage import save_json
@@ -25,14 +26,14 @@ assert subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=REPOSITORY,
 assert str(REPOSITORY) in sera.__file__
 assert os.environ.get('OPENAI_API_KEY') and os.environ.get('WANDB_API_KEY')
 OUTPUT.mkdir(exist_ok=False)
-record = dict(status='started', source_commit=SOURCE_COMMIT, sera_import=sera.__file__,
-    provider='litellm-openai', agent_model='gpt-6-astra', gpu_trials_authorized=True,
-    parameters=dict(model='Qwen/Qwen2.5-72B-Instruct', quantization='fp8_per_tensor',
-        kv_cache_dtype='auto', quality_floor=.99, min_latency_improvement_fraction=.05,
-        concurrency=[1, 2, 4, 8], max_candidate_trials=None,
-        workload='unchanged eight easy strict-JSON tasks'),
-    versions={name: importlib.metadata.version(name) for name in
-              ['vllm', 'torch', 'transformers', 'litellm', 'weave', 'openai']})
+record = {'status': 'started', 'source_commit': SOURCE_COMMIT, 'sera_import': sera.__file__,
+    'provider': 'litellm-openai', 'agent_model': 'gpt-6-astra', 'gpu_trials_authorized': True,
+    'parameters': {'model': 'Qwen/Qwen2.5-72B-Instruct', 'quantization': 'fp8_per_tensor',
+        'kv_cache_dtype': 'auto', 'quality_floor': .99, 'min_latency_improvement_fraction': .05,
+        'concurrency': [1, 2, 4, 8], 'max_candidate_trials': None,
+        'workload': 'unchanged eight easy strict-JSON tasks'},
+    'versions': {name: importlib.metadata.version(name) for name in
+              ['vllm', 'torch', 'transformers', 'litellm', 'weave', 'openai']}}
 example = ExampleRun(output_root=OUTPUT)
 started = time.monotonic()
 result = None
@@ -61,18 +62,17 @@ try:
     else:
         record['returned_runner_probe_passed'] = False
     record['status'] = 'measured'
-except BaseException as error:
+except BaseException as error:  # noqa: BLE001 -- redact errors and clean up even on interruption.
     record.update(status='failed', error_type=type(error).__name__)
     # The error class is safe; arbitrary exception text can contain credentials.
 finally:
     try:
         record['gpu_after_cleanup'] = example.close()
         record['cleanup_passed'] = (record['gpu_after_cleanup'].get('used_mib') == 0)
-    except BaseException as error:
+    except BaseException as error:  # noqa: BLE001 -- preserve a safe cleanup-failure record.
         record.update(cleanup_passed=False, cleanup_error_type=type(error).__name__)
     record['elapsed_seconds'] = time.monotonic() - started
     record['passed'] = bool(record.get('returned_runner_probe_passed') and record.get('cleanup_passed'))
     save_json(OUTPUT/'invocation.json', record)
     print(json.dumps(record), flush=True)
 raise SystemExit(0 if record['passed'] else 1)
-

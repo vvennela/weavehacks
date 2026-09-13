@@ -1,0 +1,227 @@
+{
+  "created_at": "2026-09-13T18:40:06.768558+00:00",
+  "rounds": [
+    {
+      "round": 1,
+      "specialists": [
+        {
+          "id": "scheduling",
+          "timings": {
+            "initial": {
+              "started_monotonic": 24685.044570041,
+              "ended_monotonic": 24706.878730814
+            },
+            "refine": {
+              "started_monotonic": 24708.35344648,
+              "ended_monotonic": 24722.703186888
+            }
+          },
+          "initial": {
+            "changed_lever": "enable_prefix_caching",
+            "proposed_value": true,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enable_prefix_caching",
+            "proposed_value": true,
+            "parent_trial_id": "baseline"
+          }
+        },
+        {
+          "id": "memory_context",
+          "timings": {
+            "initial": {
+              "started_monotonic": 24685.045562094,
+              "ended_monotonic": 24708.349503522
+            },
+            "refine": {
+              "started_monotonic": 24708.35561068,
+              "ended_monotonic": 24721.604700007
+            }
+          },
+          "initial": {
+            "changed_lever": "gpu_memory_utilization",
+            "proposed_value": 0.85,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enable_prefix_caching",
+            "proposed_value": true,
+            "parent_trial_id": "baseline"
+          }
+        },
+        {
+          "id": "output_quality",
+          "timings": {
+            "initial": {
+              "started_monotonic": 24685.046576334,
+              "ended_monotonic": 24705.685076547
+            },
+            "refine": {
+              "started_monotonic": 24708.358333023,
+              "ended_monotonic": 24721.145644634
+            }
+          },
+          "initial": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          }
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "specialists": [
+        {
+          "id": "scheduling",
+          "timings": {
+            "initial": {
+              "started_monotonic": 24849.186046843,
+              "ended_monotonic": 24874.707887202
+            },
+            "refine": {
+              "started_monotonic": 24876.544126282,
+              "ended_monotonic": 24891.918747504
+            }
+          },
+          "initial": {
+            "changed_lever": "enable_chunked_prefill",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          }
+        },
+        {
+          "id": "memory_context",
+          "timings": {
+            "initial": {
+              "started_monotonic": 24849.188779675,
+              "ended_monotonic": 24876.537614723
+            },
+            "refine": {
+              "started_monotonic": 24876.54860631,
+              "ended_monotonic": 24890.753881548
+            }
+          },
+          "initial": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          }
+        },
+        {
+          "id": "output_quality",
+          "timings": {
+            "initial": {
+              "started_monotonic": 24849.19110096,
+              "ended_monotonic": 24874.264249992
+            },
+            "refine": {
+              "started_monotonic": 24876.552918879,
+              "ended_monotonic": 24891.485071304
+            }
+          },
+          "initial": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          }
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "specialists": [
+        {
+          "id": "scheduling",
+          "timings": {
+            "initial": {
+              "started_monotonic": 25036.143155822,
+              "ended_monotonic": 25063.76004767
+            },
+            "refine": {
+              "started_monotonic": 25065.873039995,
+              "ended_monotonic": 25083.107034473
+            }
+          },
+          "initial": {
+            "changed_lever": "enable_chunked_prefill",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enable_chunked_prefill",
+            "proposed_value": false,
+            "parent_trial_id": "baseline"
+          }
+        },
+        {
+          "id": "memory_context",
+          "timings": {
+            "initial": {
+              "started_monotonic": 25036.147416405,
+              "ended_monotonic": 25065.8622093
+            },
+            "refine": {
+              "started_monotonic": 25065.879940183,
+              "ended_monotonic": 25083.038792502
+            }
+          },
+          "initial": {
+            "changed_lever": "gpu_memory_utilization",
+            "proposed_value": 0.85,
+            "parent_trial_id": "baseline"
+          },
+          "final": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "trial-1"
+          }
+        },
+        {
+          "id": "output_quality",
+          "timings": {
+            "initial": {
+              "started_monotonic": 25036.151903819,
+              "ended_monotonic": 25061.211403676
+            },
+            "refine": {
+              "started_monotonic": 25065.887125029,
+              "ended_monotonic": 25083.299168909
+            }
+          },
+          "initial": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "trial-1"
+          },
+          "final": {
+            "changed_lever": "enforce_eager",
+            "proposed_value": false,
+            "parent_trial_id": "trial-1"
+          }
+        }
+      ]
+    }
+  ]
+}
