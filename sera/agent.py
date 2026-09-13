@@ -7,7 +7,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
-from .config import Candidate, RuntimeConfig, validate_candidate
+from .config import (CONTROL_ROLES, CONTROL_VALUE_ADAPTERS, Candidate, RuntimeConfig,
+                     validate_candidate, validate_control_candidate, validate_control_value)
 from .storage import content_hash
 
 
@@ -27,17 +28,18 @@ class Proposal(StrictRecord):
         {"properties": {"action": {"const": "trial"}, "expected_trial_cost": {"const": 1},
                         "agent_role": {"const": "quantization"}, "changed_lever": {"const": "kv_cache_dtype"},
                         "proposed_value": {"const": "fp8"}}},
-        {"properties": {"action": {"const": "trial"}, "expected_trial_cost": {"const": 1},
-                        "agent_role": {"const": "batching"}, "changed_lever": {"const": "max_num_batched_tokens"},
-                        "proposed_value": {"const": 2048}}},
+        *[{"properties": {"action": {"const": "trial"}, "expected_trial_cost": {"const": 1},
+                          "agent_role": {"const": "batching"}, "changed_lever": {"const": lever},
+                          "proposed_value": adapter.json_schema()}}
+          for lever, adapter in CONTROL_VALUE_ADAPTERS.items()],
     ]})
     action: Literal["trial", "keep-baseline"]
     proposal_id: str = Field(min_length=1)
     agent_role: Literal["quantization", "batching"]
     parent_trial_id: str = Field(min_length=1)
     model_id: str = Field(min_length=1)
-    changed_lever: Literal["kv_cache_dtype", "max_num_batched_tokens"] | None
-    proposed_value: Literal["fp8", 2048] | None
+    changed_lever: Literal["kv_cache_dtype", "max_num_batched_tokens", "max_num_seqs", "max_model_len"] | None
+    proposed_value: Literal["fp8"] | int | None
     evidence_used: list[str] = Field(min_length=1)
     predicted_metric_change: str = Field(min_length=1)
     confidence: float = Field(ge=0, le=1)
@@ -53,10 +55,10 @@ class Proposal(StrictRecord):
         else:
             if self.expected_trial_cost != 1:
                 raise ValueError("A proposed experiment costs exactly one trial")
-            roles = {"kv_cache_dtype": "quantization", "max_num_batched_tokens": "batching"}
-            if roles.get(self.changed_lever) != self.agent_role:
+            if CONTROL_ROLES.get(self.changed_lever) != self.agent_role:
                 raise ValueError("The specialist role must match the changed setting")
-            self.to_candidate()
+            # Parent-dependent no-op and coupled bounds are checked only with actual evidence.
+            validate_control_value(self.changed_lever, self.proposed_value)
         return self
 
     def to_candidate(self, baseline=None):
@@ -64,7 +66,7 @@ class Proposal(StrictRecord):
             return None
         baseline = RuntimeConfig() if baseline is None else RuntimeConfig.model_validate(baseline)
         values = baseline.model_dump() | {self.changed_lever: self.proposed_value}
-        return validate_candidate(Candidate(name=self.proposal_id, reason=self.reason,
+        return validate_control_candidate(Candidate(name=self.proposal_id, reason=self.reason,
                                              config=RuntimeConfig.model_validate(values)), baseline=baseline)
 
 
@@ -102,9 +104,11 @@ def validate_proposal(proposal, evidence):
         return None
     if evidence["remaining_trials"] < proposal.expected_trial_cost:
         raise ValueError("Proposal exceeds the remaining trial budget")
-    if proposal.proposed_value not in evidence["supported_changes"].get(proposal.changed_lever, []):
-        raise ValueError("Proposed setting is not active in this run")
-    return proposal.to_candidate(evidence.get("configuration"))
+    baseline = evidence.get("configuration")
+    candidate = proposal.to_candidate(baseline)
+    return validate_candidate(candidate, baseline=baseline,
+                              supported_changes=evidence["supported_changes"],
+                              frozen_candidate_hashes=evidence.get("frozen_candidate_hashes"))
 
 
 class WandbAgent:

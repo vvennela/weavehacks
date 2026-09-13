@@ -53,6 +53,8 @@ The W&B client, typed proposal/ranking/final-selection schemas, and bounded prov
 
 The first provider check failed (19/30 valid first responses; 22/30 after retries). Its records are preserved. After expressing action/cost consistency in the wire schema and bounding ranking to one candidate, the second check passed 30/30 on the first response with no retries. This establishes schema compatibility, not recommendation quality.
 
+The approved proposal expansion adds batch-token limits (1–65,536), sequence limits (1–256), and context limits (65–4,096), alongside FP8 KV. Each proposal changes one setting and must match its actual parent, the run's allowed values, and any frozen candidate list. These are schema bounds, not verified operating points. Existing live defaults remain FP8 KV or batch tokens 2,048. The older provider record does not certify the expanded schema; a new matching check is required before agent-controlled runs.
+
 ## Install
 
 For the recorded demo, run `uvx marimo@0.24.0 edit demo.py --sandbox` from this repository's root. It reads committed real evidence, makes no API calls, and needs no GPU. The live GPU command is in the large-model section below. The [corrected final-agent review](evidence/large-fit-review-v2/README.md) passed using the saved measurements.
@@ -137,7 +139,7 @@ provider_report = check_provider(
 )
 ```
 
-This makes 30 requests using the actual three schemas and synthetic evidence. Each failed response permits one retry. It requires 29 first-pass valid responses and all 30 valid within the retry limit. All attempts, truncation, errors, timings, and separate evidence-reference checks are saved. A pass establishes schema compatibility, not useful search or model correctness. Credential/access errors stop the check early.
+This makes 30 requests using the actual three schemas and synthetic evidence. Each failed response permits one retry. It requires 29 first-pass valid responses, all 30 valid within the retry limit, and all evidence-reference checks passing. Proposal fixtures require trial or keep-baseline shapes so a model cannot pass by avoiding the new controls. All attempts, truncation, errors, and timings are saved. A pass establishes schema compatibility, not useful search or model correctness. Credential/access errors stop the check early.
 
 After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `provider_check=".../result.json"` to `optimize`. Sera gives the agent the measured baseline, validates one proposal, measures it if legal, applies the unchanged gate, and returns the outcome for a final recommendation. A keep-baseline or invalid proposal consumes no candidate GPU trial. The final agent response cannot change the deterministic selection.
 
@@ -155,7 +157,7 @@ After the large model's FP8 weight plan works, pass `baseline_configuration=sera
 
 The approved live comparison completed at concurrency 1, 2, 4, and 8. Both plans passed all eight tasks and all 96 timed requests. The smaller batch limit improved aggregate throughput by only 0.024%, below the 5% rule. Sera kept the reference, the agent agreed, and the returned runner passed a fresh request. See [the per-load measurements](evidence/large-batch-comparison-v1/README.md). This proves measured selection between working plans, not adaptive search or a performance win.
 
-The delegated [search replay harness](benchmarks/SEARCH.md) implements a frozen universe, equal budgets, grid and seeded random controls, and narrow agent adapters. It has not established a real benchmark win. The current agent schema limits the useful universe to two changes and cannot express the full no-telemetry ablation; wider schema support requires a new provider check. No benchmark prompts or thresholds were tuned to make the batching result look better.
+The delegated [search replay harness](benchmarks/SEARCH.md) implements a frozen universe, equal budgets, grid and seeded random controls, and bounded agent adapters. It now supports multi-round batching comparisons in local tests. It has not established a real benchmark win. Context-varying benchmark universes remain blocked by the workload contract, and the full no-telemetry ablation remains blocked by required metric citations. Wider schema support requires a new matching provider check. No benchmark prompts or thresholds were tuned to make the batching result look better.
 
 ## Two-model status: blocked by task quality
 

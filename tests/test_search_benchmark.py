@@ -235,8 +235,9 @@ class StubWandbClient:
         if role == 'arbiter':
             return ArbiterDecision(ranked_proposal_ids=[evidence['legal_proposal_ids'][-1]], reason='fixture')
         specialist = evidence['specialist_role']
-        lever = 'kv_cache_dtype' if specialist == 'quantization' else 'max_num_batched_tokens'
-        value = 'fp8' if specialist == 'quantization' else 2048
+        legal = evidence['legal_candidates'][0]['configuration']
+        lever, value = next((key, value) for key, value in legal.items()
+                            if value != evidence['configuration'][key])
         return Proposal(
             action='trial', proposal_id=specialist, agent_role=specialist,
             parent_trial_id=evidence['trial_id'], model_id=MODEL_ID,
@@ -303,8 +304,11 @@ def test_round_robin_calls_one_specialist_without_arbiter(monkeypatch):
 def test_adapter_rejects_unrepresentable_universe_and_exact_telemetry_ablation(monkeypatch):
     from benchmarks.search_policies import UnsupportedPolicy, WandbSearchPolicy
     monkeypatch.setattr('benchmarks.search_policies.require_provider_check', lambda *_: {'passed': True})
+    manifest = freeze_manifest(fixture_bundle()[0]['identity'], RuntimeConfig(), [
+        RuntimeConfig(quantization='fp8_per_tensor'), RuntimeConfig(max_num_batched_tokens=2048),
+    ], budget=1, compatibility={'weights-fp8': content_hash('fixture')}, evidence_kind='test-fixture')
     with pytest.raises(UnsupportedPolicy, match='represent'):
-        WandbSearchPolicy(fixture_bundle()[0], StubWandbClient(), provider_check='fixture')
+        WandbSearchPolicy(manifest, StubWandbClient(), provider_check='fixture')
     with pytest.raises(UnsupportedPolicy, match='evidence_used'):
         WandbSearchPolicy(adapter_manifest(), StubWandbClient(), provider_check='fixture',
                          variant='no-reduced-telemetry')
@@ -405,3 +409,35 @@ def test_collection_time_includes_startup():
     artifacts[1]['artifact_hash'] = content_hash(artifacts[1]['record'])
     with pytest.raises(ValueError, match='startup'):
         replay(manifest, artifacts)
+
+
+def test_expanded_adapter_has_real_multitrial_history_removal(monkeypatch):
+    from benchmarks.search_policies import WandbSearchPolicy
+    monkeypatch.setattr('benchmarks.search_policies.require_provider_check', lambda *_: {'passed': True})
+    manifest, artifacts = fixture_bundle()
+    full_client, no_history_client = StubWandbClient(), StubWandbClient()
+    full = WandbSearchPolicy(manifest, full_client, provider_check='fixture')
+    no_history = WandbSearchPolicy(manifest, no_history_client, provider_check='fixture', variant='no-history')
+    assert replay(manifest, artifacts, policy=full)['trials_used'] == 2
+    assert replay(manifest, artifacts, policy=no_history)['trials_used'] == 2
+    proposal_calls = [call for call in full_client.history if call['role'] == 'proposal']
+    assert len(proposal_calls[0]['evidence']['history']) == 0
+    assert len(proposal_calls[1]['evidence']['history']) == 1
+    assert any(key.startswith('observed.') for key in proposal_calls[1]['evidence']['metrics'])
+    for call in no_history_client.history:
+        assert 'history' not in call['evidence']
+        assert 'proposal_log' not in call['evidence']
+        assert not any(key.startswith('observed.') for key in call['evidence']['metrics'])
+
+
+def test_specialist_scope_includes_exact_frozen_config_hashes(monkeypatch):
+    from benchmarks.search_policies import WandbSearchPolicy
+    monkeypatch.setattr('benchmarks.search_policies.require_provider_check', lambda *_: {'passed': True})
+    manifest = adapter_manifest()
+    client = StubWandbClient()
+    policy = WandbSearchPolicy(manifest, client, provider_check='fixture')
+    policy(adapter_view(manifest))
+    for call in client.history:
+        if call['role'] == 'proposal':
+            assert call['evidence']['frozen_candidate_hashes'] == [
+                item['config_hash'] for item in call['evidence']['legal_candidates']]

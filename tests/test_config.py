@@ -76,3 +76,28 @@ def test_batch_candidate_preserves_explicit_fp8_weight_reference():
     candidate = Candidate(name="batch-2048", reason="Compare batching after weights fit",
                           config=RuntimeConfig(quantization="fp8_per_tensor", max_num_batched_tokens=2048))
     assert validate_candidate(candidate, baseline=baseline) == candidate
+
+
+def test_capability_validation_does_not_broaden_default_live_scope():
+    from sera.config import SUPPORTED_CHANGES, validate_control_candidate
+    candidate = Candidate(name='seq-16', reason='Explicit benchmark control',
+                          config=RuntimeConfig(max_num_seqs=16))
+    assert validate_control_candidate(candidate) == candidate
+    with pytest.raises(ValueError):
+        validate_candidate(candidate)
+    assert validate_candidate(candidate, supported_changes={'max_num_seqs': [16]}) == candidate
+    assert SUPPORTED_CHANGES == {'kv_cache_dtype': ['fp8'], 'max_num_batched_tokens': [2048]}
+
+
+def test_capability_validator_does_not_enable_new_precision_or_multiple_controls():
+    from sera.config import validate_control_candidate
+    for config in (RuntimeConfig(quantization='fp8_per_tensor'),
+                   RuntimeConfig(kv_cache_dtype='fp8', max_num_seqs=16)):
+        with pytest.raises(ValueError):
+            validate_control_candidate(Candidate(name='invalid', reason='fixture', config=config))
+
+
+def test_scope_rejects_boolean_values_instead_of_matching_integer_one():
+    candidate = Candidate(name='seq-1', reason='fixture', config=RuntimeConfig(max_num_seqs=1))
+    with pytest.raises(ValueError):
+        validate_candidate(candidate, supported_changes={'max_num_seqs': [True]})

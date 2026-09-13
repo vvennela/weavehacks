@@ -6,7 +6,7 @@ import time
 from pydantic import ValidationError
 
 from sera.agent import Proposal, SCHEMAS, schema_hash, validate_proposal
-from sera.config import MODEL_ID
+from sera.config import CONTROL_ROLES, MODEL_ID
 from sera.provider_check import require_provider_check
 from sera.storage import content_hash
 
@@ -15,11 +15,6 @@ from .search import StopSearch, freeze_manifest
 
 VARIANTS = {'full-evidence', 'no-history', 'no-reduced-telemetry', 'round-robin'}
 ROLES = ('quantization', 'batching')
-LEVER_ROLES = {
-    'kv_cache_dtype': 'quantization', 'quantization': 'quantization',
-    'max_num_batched_tokens': 'batching', 'max_num_seqs': 'batching',
-    'max_model_len': 'batching',
-}
 SPECIALIST_INSTRUCTION = (
     'Act only as specialist_role. Propose one untested configuration from legal_candidates, '
     'using supported_changes and the supplied parent trial. Or return keep-baseline with '
@@ -89,7 +84,7 @@ def _candidate_proposal(entry, baseline):
     lever, value = next(iter(changed.items()))
     try:
         proposal = Proposal(
-            action='trial', proposal_id=entry['candidate_id'], agent_role=LEVER_ROLES.get(lever),
+            action='trial', proposal_id=entry['candidate_id'], agent_role=CONTROL_ROLES.get(lever),
             parent_trial_id='schema-preflight', model_id=MODEL_ID,
             changed_lever=lever, proposed_value=value, evidence_used=['p95_latency_ms'],
             predicted_metric_change='Schema preflight; no performance prediction', confidence=0.0,
@@ -135,7 +130,7 @@ class WandbSearchPolicy:
         self.provider_validation = require_provider_check(provider_check, client)
         self.schema_hash = schema_hash()
         settings = {
-            'adapter_version': 'sera-narrow-search-policy-v1', 'variant': variant,
+            'adapter_version': 'sera-bounded-search-policy-v2', 'variant': variant,
             'manifest_hash': manifest['manifest_hash'], 'schema_hash': self.schema_hash,
             'provider_model': client.model, 'provider_project': client.project,
             'max_provider_requests': max_provider_requests, 'roles': list(ROLES),
@@ -209,7 +204,8 @@ class WandbSearchPolicy:
                 proposal = self.representable[item['candidate_id']]
                 changes.setdefault(proposal.changed_lever, []).append(proposal.proposed_value)
             specialist_evidence = {**deepcopy(evidence), 'specialist_role': role,
-                                   'legal_candidates': legal, 'supported_changes': changes}
+                                   'legal_candidates': legal, 'supported_changes': changes,
+                                   'frozen_candidate_hashes': [item['config_hash'] for item in legal]}
             parsed = self._request('proposal', specialist_evidence, SPECIALIST_INSTRUCTION)
             check = {'role': role, 'status': 'rejected'}
             decision['validations'].append(check)

@@ -5,43 +5,46 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .agent import AGENT_MODEL, SCHEMAS, WandbAgent, schema_hash, validate_proposal
-from .config import MODEL_ID, SUPPORTED_CHANGES
+from .config import MODEL_ID, RuntimeConfig, SUPPORTED_CHANGES
 from .storage import content_hash, save_json
 
 
 def provider_cases():
     """Freeze ten evidence conditions for each of the three actual schemas."""
     cases = []
-    conditions = ["active-cache", "active-batching", "inactive", "rejection-history", "budget-exhausted",
-                  "missing-metric", "ranking", "placement-disabled", "latency-outlier", "quality-failure"]
+    conditions = ["active-cache", "active-batching", "active-sequences", "active-context", "actual-parent",
+                  "budget-exhausted", "missing-metric", "ranking", "inactive", "quality-failure"]
     for index, condition in enumerate(conditions):
         baseline = {"trial_id": "baseline", "model_id": MODEL_ID,
                     "metrics": {"p95_latency_ms": 100 + index, "mean_queue_ms": 0.1,
                                 "kv_cache_percent": 40, "generation_errors": 0},
                     "remaining_trials": 1, "supported_changes": deepcopy(SUPPORTED_CHANGES),
+                    "configuration": RuntimeConfig().model_dump(),
                     "fixture": True, "condition": condition}
         if condition == "active-cache":
             baseline["supported_changes"] = {"kv_cache_dtype": ["fp8"]}
         elif condition == "active-batching":
             baseline["supported_changes"] = {"max_num_batched_tokens": [2048]}
             baseline["metrics"]["mean_queue_ms"] = 40
-        elif condition in {"inactive", "placement-disabled"}:
+        elif condition == "active-sequences":
+            baseline["supported_changes"] = {"max_num_seqs": [4]}
+        elif condition == "active-context":
+            baseline["supported_changes"] = {"max_model_len": [2048]}
+        elif condition == "actual-parent":
+            baseline["configuration"] = RuntimeConfig(max_num_batched_tokens=2048).model_dump()
+            baseline["supported_changes"] = {"max_num_batched_tokens": [4096]}
+        elif condition == "inactive":
             baseline["supported_changes"] = {}
-        elif condition == "rejection-history":
-            baseline["supported_changes"] = {"max_num_batched_tokens": [2048]}
-            baseline["history"] = [{"change": "fp8 KV", "quality_pass": False}]
         elif condition == "budget-exhausted":
             baseline["remaining_trials"] = 0
         elif condition == "missing-metric":
             baseline["metrics"]["mean_queue_ms"] = None
-        elif condition == "latency-outlier":
-            baseline["metrics"]["p95_latency_ms"] = 54000
-            baseline["warning"] = "One outlier dominates; do not claim an established speedup."
         elif condition == "quality-failure":
             baseline["supported_changes"] = {}
             baseline["history"] = [{"trial_id": "candidate", "quality_pass": False, "p95_latency_ms": 50}]
-        cases.append({"id": f"proposal-{condition}", "role": "proposal", "evidence": baseline})
         active = bool(baseline["supported_changes"]) and baseline["remaining_trials"] > 0
+        baseline["format_check_action"] = "trial" if active else "keep-baseline"
+        cases.append({"id": f"proposal-{condition}", "role": "proposal", "evidence": baseline})
         ranking = {"fixture": True, "condition": condition, "remaining_trials": baseline["remaining_trials"],
                    "legal_proposal_ids": ["p1", "p2"] if active else [],
                    "proposals": [{"proposal_id": "p1", "estimated_cost": 1, "predicted_p95_ms": 90},
@@ -49,7 +52,7 @@ def provider_cases():
                    "placement": "not-supported-in-single-model-milestone",
                    "instruction": "Rank only legal proposals; return an empty list when none are eligible."}
         cases.append({"id": f"arbiter-{condition}", "role": "arbiter", "evidence": ranking})
-        tested = condition in {"quality-failure", "ranking", "rejection-history"}
+        tested = condition in {"quality-failure", "ranking"}
         accepted = condition == "ranking"
         frontier = {"fixture": True, "condition": condition,
                     "eligible_trial_ids": ["candidate"] if accepted else ["baseline"],
@@ -66,6 +69,8 @@ def provider_cases():
 def validate_context(role, parsed, evidence):
     if role == "proposal":
         validate_proposal(parsed, evidence)
+        if parsed.action != evidence["format_check_action"]:
+            raise ValueError("Proposal did not exercise the required format-check action")
     elif role == "arbiter":
         if not set(parsed.ranked_proposal_ids).issubset(evidence["legal_proposal_ids"]):
             raise ValueError("Ranking includes an ineligible proposal")
@@ -89,7 +94,13 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL):
     try:
         for case in cases:
             if case["role"] == "proposal":
-                parsed = agent.propose(case["evidence"])
+                parsed = agent.request("proposal", case["evidence"],
+                    "This is a synthetic format test, not a live experiment or a performance claim. "
+                    "Use the supplied format_check_action to exercise that response shape. For trial, "
+                    "choose one supported_changes value with the correct specialist role and cost one. "
+                    "For keep-baseline, use null lever/value and cost zero. Reference the supplied model "
+                    "and parent trial, cite exact available metric names, and state a testable prediction. "
+                    "Respect the actual parent configuration and remaining trial budget.")
             elif case["role"] == "frontier":
                 parsed = agent.review(case["evidence"])
             else:
@@ -116,7 +127,8 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL):
         record.update(first_pass_valid=first, valid_with_one_retry=valid,
                       completed_requests=len(agent.history),
                       retries=sum(len(entry["attempts"]) - 1 for entry in agent.history),
-                      passed=complete and first >= 29 and valid == 30,
+                      passed=complete and first >= 29 and valid == 30
+                             and all(check["passed"] for check in record["context_checks"]),
                       status="complete" if complete else "incomplete")
         save_json(path, record)
     return record
@@ -147,10 +159,15 @@ def require_provider_check(path, agent):
                 choice = attempt["raw_response"]["choices"][0]
                 if choice.get("finish_reason") != "stop":
                     raise ValueError("Incomplete provider response")
-                SCHEMAS[case["role"]].model_validate_json(choice["message"]["content"])
+                parsed = SCHEMAS[case["role"]].model_validate_json(choice["message"]["content"])
                 valid.append(True)
             except (ValueError, KeyError, TypeError, IndexError):
                 valid.append(False)
+                continue
+            try:
+                validate_context(case["role"], parsed, case["evidence"])
+            except ValueError as error:
+                raise ValueError(f"Provider check context failed: {case['id']}") from error
         first += valid[0]
         if not any(valid):
             raise ValueError("Provider check contains a request that failed both attempts")

@@ -72,7 +72,83 @@ def test_frontier_reader_cannot_add_an_approval_field():
 def test_wire_schema_expresses_action_cost_and_value_constraints():
     schema = Proposal.model_json_schema()
     branches = schema["anyOf"]
-    assert len(branches) == 3
+    assert len(branches) == 5
     assert branches[0]["properties"]["expected_trial_cost"] == {"const": 0}
     assert all(branch["properties"]["expected_trial_cost"] == {"const": 1} for branch in branches[1:])
     assert ArbiterDecision.model_json_schema()["properties"]["ranked_proposal_ids"]["maxItems"] == 1
+
+
+@pytest.mark.parametrize('lever,value', [
+    ('max_num_batched_tokens', 1), ('max_num_batched_tokens', 65536),
+    ('max_num_seqs', 1), ('max_num_seqs', 256),
+    ('max_model_len', 65), ('max_model_len', 4096),
+])
+def test_expanded_controls_have_strict_standalone_bounds(lever, value):
+    proposal = Proposal(**(proposal_data() | dict(agent_role='batching', changed_lever=lever,
+                                                proposed_value=value)))
+    assert proposal.proposed_value == value
+
+
+@pytest.mark.parametrize('lever,value', [
+    ('max_num_batched_tokens', True), ('max_num_batched_tokens', 65537),
+    ('max_num_batched_tokens', 0), ('max_num_batched_tokens', 2048.0),
+    ('max_num_seqs', 257), ('max_num_seqs', '8'), ('max_num_seqs', False),
+    ('max_model_len', 64), ('max_model_len', 4097), ('max_model_len', 'fp8'),
+    ('kv_cache_dtype', 2048), ('kv_cache_dtype', 'auto'),
+])
+def test_expanded_controls_reject_wrong_values_and_types(lever, value):
+    role = 'quantization' if lever == 'kv_cache_dtype' else 'batching'
+    with pytest.raises(ValidationError):
+        Proposal(**(proposal_data() | dict(agent_role=role, changed_lever=lever, proposed_value=value)))
+
+
+def test_parsing_does_not_assume_default_parent_and_validation_uses_actual_parent():
+    from sera.config import RuntimeConfig
+    proposal = Proposal(**(proposal_data() | dict(agent_role='batching',
+        changed_lever='max_num_batched_tokens', proposed_value=1)))
+    evidence = dict(trial_id='baseline', model_id=MODEL_ID, metrics={'p95_latency_ms': 100},
+                    remaining_trials=1, supported_changes={'max_num_batched_tokens': [1]},
+                    configuration=RuntimeConfig(max_num_seqs=1).model_dump())
+    candidate = validate_proposal(proposal, evidence)
+    assert candidate.config.max_num_batched_tokens == 1
+    with pytest.raises(ValueError):
+        validate_proposal(proposal, evidence | {'configuration': RuntimeConfig().model_dump()})
+
+
+def test_no_op_and_frozen_universe_are_checked_against_actual_parent():
+    from sera.config import RuntimeConfig
+    proposal = Proposal(**(proposal_data() | dict(agent_role='batching',
+        changed_lever='max_num_seqs', proposed_value=8)))
+    evidence = dict(trial_id='baseline', model_id=MODEL_ID, metrics={'p95_latency_ms': 100},
+                    remaining_trials=1, supported_changes={'max_num_seqs': [8]},
+                    configuration=RuntimeConfig(max_num_seqs=4).model_dump())
+    candidate = validate_proposal(proposal, evidence)
+    assert candidate.config.max_num_seqs == 8
+    assert validate_proposal(proposal, evidence | {'frozen_candidate_hashes': [candidate.config.config_hash]}) == candidate
+    with pytest.raises(ValueError, match='frozen'):
+        validate_proposal(proposal, evidence | {'frozen_candidate_hashes': []})
+    with pytest.raises(ValueError, match='one'):
+        validate_proposal(proposal, evidence | {'configuration': RuntimeConfig().model_dump()})
+
+
+def test_expansion_requires_explicit_per_run_scope_and_correct_role():
+    proposal = Proposal(**(proposal_data() | dict(agent_role='batching',
+        changed_lever='max_model_len', proposed_value=2048)))
+    evidence = dict(trial_id='baseline', model_id=MODEL_ID, metrics={'p95_latency_ms': 100},
+                    remaining_trials=1, supported_changes={'kv_cache_dtype': ['fp8']})
+    with pytest.raises(ValueError, match='active'):
+        validate_proposal(proposal, evidence)
+    with pytest.raises(ValidationError):
+        Proposal(**(proposal_data() | dict(changed_lever='max_model_len', proposed_value=2048)))
+
+
+def test_wire_schema_matches_each_integer_control_bounds_and_role():
+    from pydantic import TypeAdapter
+    from sera.config import RuntimeConfig
+    branches = Proposal.model_json_schema()['anyOf']
+    for lever in ('max_num_batched_tokens', 'max_num_seqs', 'max_model_len'):
+        branch = next(branch['properties'] for branch in branches
+                      if branch['properties']['changed_lever'].get('const') == lever)
+        assert branch['agent_role'] == {'const': 'batching'}
+        expected = TypeAdapter(RuntimeConfig.model_fields[lever].rebuild_annotation()).json_schema()
+        assert branch['proposed_value'] == expected

@@ -2,9 +2,10 @@
 
 import hashlib
 import json
+import re
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator, model_validator
 
 
 MODEL_ID = "Qwen/Qwen3-0.6B"
@@ -104,14 +105,70 @@ class Candidate(BaseModel):
 SUPPORTED_CHANGES = {"kv_cache_dtype": ["fp8"], "max_num_batched_tokens": [2048]}
 
 
-def validate_candidate(candidate: Candidate, *, baseline=None) -> Candidate:
+CONTROL_ROLES = {
+    "kv_cache_dtype": "quantization", "max_num_batched_tokens": "batching",
+    "max_num_seqs": "batching", "max_model_len": "batching",
+}
+CONTROL_VALUE_ADAPTERS = {
+    lever: TypeAdapter(RuntimeConfig.model_fields[lever].rebuild_annotation(),
+                       config=ConfigDict(strict=True))
+    for lever in CONTROL_ROLES if lever != "kv_cache_dtype"
+}
+
+
+def validate_control_value(lever, value):
+    """Legal capability only. This does not activate a setting for a live run."""
+    if lever not in CONTROL_ROLES:
+        raise ValueError("Unsupported proposal control")
+    if lever == "kv_cache_dtype":
+        if type(value) is not str or value != "fp8":
+            raise ValueError("The cache proposal control supports FP8 only")
+        return value
+    return CONTROL_VALUE_ADAPTERS[lever].validate_python(value)
+
+
+def validate_supported_changes(supported_changes):
+    """Validate the explicit per-run value set without extending live defaults."""
+    if not isinstance(supported_changes, dict):
+        raise ValueError("supported_changes must map legal controls to value lists")
+    for lever, values in supported_changes.items():
+        if lever not in CONTROL_ROLES or not isinstance(values, list):
+            raise ValueError("supported_changes must map legal controls to value lists")
+        for value in values:
+            validate_control_value(lever, value)
+    return supported_changes
+
+
+def validate_control_candidate(candidate: Candidate, *, baseline=None) -> Candidate:
+    """Check one bounded control change against the actual parent configuration."""
     candidate = Candidate.model_validate(candidate.model_dump())
-    baseline = (baseline or RuntimeConfig()).model_dump()
+    baseline = (RuntimeConfig() if baseline is None else RuntimeConfig.model_validate(baseline)).model_dump()
     changed = {key: value for key, value in candidate.config.model_dump().items()
                if value != baseline[key]}
     if len(changed) != 1:
-        raise ValueError("The first candidate must change exactly one setting")
+        raise ValueError("A candidate must change exactly one setting from its actual parent")
     lever, value = next(iter(changed.items()))
-    if lever not in SUPPORTED_CHANGES or value not in SUPPORTED_CHANGES[lever]:
-        raise ValueError("This milestone supports FP8 KV or a batch token limit of 2048 only")
+    validate_control_value(lever, value)
+    return candidate
+
+
+def validate_candidate(candidate: Candidate, *, baseline=None, supported_changes=None,
+                       frozen_candidate_hashes=None) -> Candidate:
+    """Apply active values and an optional frozen universe after capability validation."""
+    baseline = RuntimeConfig() if baseline is None else RuntimeConfig.model_validate(baseline)
+    candidate = validate_control_candidate(candidate, baseline=baseline)
+    supported_changes = validate_supported_changes(
+        SUPPORTED_CHANGES if supported_changes is None else supported_changes)
+    changed = {key: value for key, value in candidate.config.model_dump().items()
+               if value != baseline.model_dump()[key]}
+    lever, value = next(iter(changed.items()))
+    if not any(type(allowed) is type(value) and allowed == value
+               for allowed in supported_changes.get(lever, [])):
+        raise ValueError("Proposed setting is not active in this run")
+    if frozen_candidate_hashes is not None:
+        if (not isinstance(frozen_candidate_hashes, list)
+                or any(not isinstance(key, str) or re.fullmatch('[0-9a-f]{64}', key) is None
+                       for key in frozen_candidate_hashes)
+                or candidate.config.config_hash not in frozen_candidate_hashes):
+            raise ValueError("Candidate is outside the frozen configuration universe")
     return candidate
