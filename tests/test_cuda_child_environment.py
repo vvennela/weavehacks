@@ -4,6 +4,8 @@ import importlib.metadata
 import os
 from pathlib import Path
 import shlex
+import shutil
+import subprocess
 from types import SimpleNamespace
 
 import pytest
@@ -52,7 +54,7 @@ def test_split_wheel_headers_are_child_only_and_preserve_existing_flags(monkeypa
     env = _child_environment(folder, 'GPU-test')
 
     flags = shlex.split(env['NVCC_PREPEND_FLAGS'])
-    assert flags == ['-I', str(compiler / 'include'), '-I', str(extra_include),
+    assert flags == ['-isystem', str(compiler / 'include'), '-isystem', str(extra_include),
                      '-lineinfo', '-DUSER_SETTING=1']
     assert 'cu12' not in env['NVCC_PREPEND_FLAGS']
     assert env['CPATH'] == '/user/include'
@@ -95,3 +97,31 @@ def test_no_compiler_wheel_keeps_existing_fallback(monkeypatch, tmp_path):
     assert _child_environment(tmp_path, 'GPU-test') == {
         **before, 'CUDA_VISIBLE_DEVICES': 'GPU-test', 'OMP_NUM_THREADS': '2'}
     assert not (tmp_path / 'cuda-link').exists()
+
+
+def test_vllm_duplicate_system_include_does_not_let_base_headers_shadow_compiler(monkeypatch, tmp_path):
+    host_compiler = shutil.which('cc') or shutil.which('gcc') or shutil.which('clang')
+    if host_compiler is None:
+        pytest.skip('A local C preprocessor is required for the include-precedence regression')
+    compiler, base_include = installed_wheels(monkeypatch, tmp_path)
+    for include, macro in [(compiler / 'include', '#define __cudaLaunch(a,b) compiler_core'),
+                           (base_include, '#define __cudaLaunch(a) wrong_base_core')]:
+        (include / 'crt').mkdir()
+        (include / 'crt/host_runtime.h').write_text(macro + '\n')
+    (base_include / 'curand.h').write_text('curand_available\n')
+    monkeypatch.setenv('NVCC_PREPEND_FLAGS', '')
+    for name in ('CPATH', 'C_INCLUDE_PATH', 'CPLUS_INCLUDE_PATH'):
+        monkeypatch.delenv(name, raising=False)
+    folder = tmp_path / 'run'
+    folder.mkdir()
+    child_env = _child_environment(folder, 'GPU-test')
+    injected = shlex.split(child_env['NVCC_PREPEND_FLAGS'])
+    # vLLM's build already marks the checked compiler headers as system headers.
+    # A duplicate -I is ignored; any base -I then shadows that compiler directory.
+    command = [host_compiler, *injected, '-isystem', str(compiler / 'include'),
+               '-E', '-P', '-x', 'c', '-']
+    result = subprocess.run(command, input='#include <crt/host_runtime.h>\n'
+                            '#include <curand.h>\n__cudaLaunch(1,2)\n',
+                            capture_output=True, text=True, timeout=10, env=child_env)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.split() == ['curand_available', 'compiler_core']

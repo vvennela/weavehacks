@@ -90,9 +90,11 @@ def _child_environment(folder: Path, gpu_uuid: str) -> dict:
     if not library.is_file():
         raise RuntimeError("CUDA 13 compiler/runtime libraries do not match the checked setup")
     includes = _cuda13_include_dirs(cuda_root)
-    # NVCC supports these injected flags; do not copy headers into the compiler wheel.
+    # Match vLLM's system-include flags. Mixing -I and -isystem for the compiler
+    # directory discards its -I precedence and lets base-wheel headers shadow it.
     # https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/#nvcc-environment-variables
-    include_flags = shlex.join([flag for path in includes for flag in ("-I", str(path))])
+    # https://gcc.gnu.org/onlinedocs/gcc/Directory-Options.html
+    include_flags = shlex.join([flag for path in includes for flag in ("-isystem", str(path))])
     inherited_flags = env.get("NVCC_PREPEND_FLAGS", "")
     env["NVCC_PREPEND_FLAGS"] = include_flags + (" " + inherited_flags if inherited_flags else "")
     link_dir = folder / "cuda-link"
