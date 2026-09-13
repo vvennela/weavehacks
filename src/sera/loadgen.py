@@ -82,7 +82,7 @@ def summarize(
     results: list[RequestResult],
     footprint_gb: float,
     kv_occupancy: float,
-    mem_bandwidth_util: float,
+    mem_bandwidth_util: float | None,
     wall_time_s: float,
 ) -> Measurement:
     """Collapse a trace of completed requests into the numbers the gates read."""

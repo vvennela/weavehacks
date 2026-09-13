@@ -78,8 +78,15 @@ def sweep(
     ledger: Ledger,
     strategy: str = "random",
     budget: int | None = None,
+    order_seed: int | None = None,
 ) -> BaselineResult:
-    """Spend the trial budget without any notion of which lever is live."""
+    """Spend the trial budget without any notion of which lever is live.
+
+    `order_seed` varies only the order candidates are tried in. It is separate from
+    `spec.seed` on purpose: a random-search distribution has to vary the search and
+    hold the measurement fixed, or the arms are no longer measuring the same device
+    and the exhaustive oracle stops being an upper bound on any of them.
+    """
     gpu = spec.gpus[0]
     slo = spec.slo(model.name)
     floor = spec.quality_floor(model.name)
@@ -87,7 +94,7 @@ def sweep(
 
     candidates = _all_configs(model)
     if strategy == "random":
-        random.Random(spec.seed).shuffle(candidates)
+        random.Random(spec.seed if order_seed is None else order_seed).shuffle(candidates)
     # "grid" keeps itertools order, which is the other thing people actually do.
 
     trials = 0

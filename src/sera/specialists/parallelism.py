@@ -17,6 +17,13 @@ from .base import Context, Dead, Proposal, Specialist, Verdict
 TP_SYNC_COST_PER_RANK = 0.06
 
 
+def _bw(d) -> str:
+    """Bandwidth utilization as prose, including the case where there is none."""
+    if d.mem_bandwidth_util is None:
+        return "unknown on this substrate"
+    return f"{d.mem_bandwidth_util:.1%} ({d.mem_bandwidth_source})"
+
+
 class ParallelismSpecialist(Specialist):
     name = "parallelism"
     lever = "parallelism"
@@ -76,7 +83,13 @@ class ParallelismSpecialist(Specialist):
                 rationale=f"tp={target} halves per-device weight and KV bytes per step",
             ),
             rationale=(
-                f"Bandwidth utilization is {d.mem_bandwidth_util:.1%} with weights at "
+                # d.mem_bandwidth_util is None whenever the substrate could not measure
+                # it and the roofline derivation had nothing to work from. Formatting
+                # None with :.1% raises TypeError, which would have crashed this
+                # specialist on any multi-GPU vLLM run — the only situation in which
+                # this branch is reachable at all, and therefore one no simulator test
+                # could have caught.
+                f"Bandwidth utilization is {_bw(d)} with weights at "
                 f"{d.weights_share_of_footprint:.0%} of footprint. Sharding to tp={target} "
                 f"divides both the weight read and the KV cache across {target} devices, "
                 f"costing roughly {TP_SYNC_COST_PER_RANK:.0%} per extra rank in all-reduce. "

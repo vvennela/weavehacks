@@ -22,6 +22,7 @@ import zlib
 from dataclasses import dataclass, field
 
 from ..config import (
+    ACHIEVABLE_BW_FRACTION,
     DTYPE_BYTES,
     InferenceConfig,
     kv_cache_gb_per_token,
@@ -34,8 +35,9 @@ from .base import Tenant, TrialOutcome, TrialRunner
 
 # Fraction of peak tensor-core throughput a real prefill achieves.
 PREFILL_MFU = 0.45
-# Fraction of peak HBM bandwidth a real decode step achieves.
-DECODE_BW_EFFICIENCY = 0.80
+# Fraction of peak HBM bandwidth a real decode step achieves. Defined in config.py
+# so the reduction's derived-bandwidth estimate divides by the same denominator.
+DECODE_BW_EFFICIENCY = ACHIEVABLE_BW_FRACTION
 # Per-step all-reduce cost as a fraction of step time, per extra TP rank.
 TP_SYNC_OVERHEAD = 0.06
 # Compute speedup from low-precision tensor cores, by weight dtype. Weight-only
@@ -85,6 +87,9 @@ class _TenantState:
     preemptions: int = 0
     kv_occupancy_samples: list[float] = field(default_factory=list)
     bw_samples: list[float] = field(default_factory=list)
+    # Sequences resident per step. Sampled rather than inferred, because inference
+    # from p50 latency is wrong by up to 62% under saturation.
+    batch_samples: list[int] = field(default_factory=list)
 
     @property
     def kv_in_use(self) -> int:
@@ -253,6 +258,10 @@ class SimRunner(TrialRunner):
 
         if st.kv_capacity_tokens > 0:
             st.kv_occupancy_samples.append(min(1.0, st.kv_in_use / st.kv_capacity_tokens))
+        # Only steps where something was resident. Averaging in the idle tail would
+        # report a batch smaller than any batch that ever ran.
+        if st.running:
+            st.batch_samples.append(len(st.running))
 
     # -- entry point ---------------------------------------------------------
 
@@ -334,6 +343,9 @@ class SimRunner(TrialRunner):
             )
             m = summarize(st.done, footprint, occ, bw_util, wall)
             m.preemptions = st.preemptions
+            m.mean_batch_size = (
+                sum(st.batch_samples) / len(st.batch_samples) if st.batch_samples else None
+            )
             measurements[model.name] = m
 
         return TrialOutcome(

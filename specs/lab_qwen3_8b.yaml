@@ -1,0 +1,63 @@
+# Lab spec: Qwen3-8B alone on the Molab card.
+#
+# Architecture numbers are read from the published config.json, never inferred.
+# Qwen3-8B declares head_dim 128, which happens to equal hidden_size /
+# num_attn_heads here (4096 / 32). The override is stated anyway so that a future
+# Qwen3 size with a declared head_dim that does NOT match the quotient cannot
+# silently halve every KV number, which is the trap documented in specs/molab.yaml.
+
+meta:
+  name: lab_qwen3_8b
+  environment: "Molab on CoreWeave, 1x RTX Pro 6000 Blackwell 96GB, 4 CPU, 32GB host"
+  note: >-
+    Dense model with 8 KV heads over 36 layers. Weights are 16.4GB at bf16, so
+    there is ample room for cache; the constraint here is decode bandwidth.
+
+seed: 7
+
+models:
+  - name: qwen3_8b
+    hf_id: Qwen/Qwen3-8B
+    params_b: 8.2
+    num_layers: 36
+    hidden_size: 4096
+    num_attn_heads: 32
+    num_kv_heads: 8
+    head_dim_override: 128
+    max_model_len: 4096
+    base_dtype: bf16
+
+gpus:
+  - id: gpu0
+    name: RTX PRO 6000 Blackwell
+    vram_gb: 96.0
+    mem_bandwidth_gbs: 1792.0
+    tflops_bf16: 126.0
+    overhead_frac: 0.10
+
+workloads:
+  - model: qwen3_8b
+    request_rate_rps: 1.0
+    input_len_mean: 1024
+    input_len_stdev: 192
+    output_len_mean: 128
+    output_len_stdev: 24
+    duration_s: 45
+    burstiness: 1.5
+
+slos:
+  - model: qwen3_8b
+    p95_latency_ms: 2800.0
+    min_throughput_rps: 0.80
+
+quality_floors:
+  - model: qwen3_8b
+    min_score: 0.975
+    eval_name: behavior_preservation
+    smoke_min_score: 0.5
+
+budget:
+  phase1_trials: 8
+  phase2_trials: 0
+  concurrent_slots: 2
+  max_rounds: 3

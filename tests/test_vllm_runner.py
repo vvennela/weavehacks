@@ -25,7 +25,7 @@ from sera.runner.vllm_runner import (
     parse_prometheus,
     vllm_flags,
 )
-from sera.spec import load_spec
+from sera.spec import GpuSpec, ModelSpec, load_spec
 
 SPEC = "specs/molab.yaml"
 
@@ -281,3 +281,28 @@ def test_available_is_false_and_never_raises_without_a_host(monkeypatch):
     monkeypatch.delenv("SERA_VLLM_HOST", raising=False)
     monkeypatch.setenv("PATH", "/nonexistent")
     assert VllmRunner().available() is False
+
+
+def test_trust_remote_code_is_opt_in_per_model():
+    """Executing code from a model repo should never be implicit.
+
+    Moonshot's Moonlight declares an auto_map alongside DeepseekV3ForCausalLM, so
+    vLLM will not load it without the flag. Models that do not need it must not be
+    launched with it.
+    """
+    gpu = GpuSpec(id="g0", name="RTX PRO 6000 Blackwell", vram_gb=96.0,
+                  mem_bandwidth_gbs=1792.0, tflops_bf16=126.0)
+    fields = dict(name="m", hf_id="org/m", params_b=1.0, num_layers=2, hidden_size=64,
+                  num_attn_heads=4, num_kv_heads=2, max_model_len=512)
+
+    plain = ModelSpec(**fields)
+    custom = ModelSpec(**fields, trust_remote_code=True)
+
+    assert "--trust-remote-code" not in vllm_flags(plain, baseline_config(plain), gpu, 8100)
+    assert "--trust-remote-code" in vllm_flags(custom, baseline_config(custom), gpu, 8100)
+
+
+def test_moonlight_spec_requests_trust_remote_code():
+    """The shipped Kimi-family spec must carry the flag, or its run cannot start."""
+    spec = load_spec("specs/lab_moonlight_16b.yaml")
+    assert spec.models[0].trust_remote_code is True

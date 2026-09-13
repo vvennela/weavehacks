@@ -1,0 +1,63 @@
+# Lab spec: DeepSeek-R1-Distill-Qwen-14B alone on the Molab card.
+#
+# This is a distill, not DeepSeek-V3/R1 proper. The flagship models are 671B-param
+# MoE and do not fit on one 96GB device at any quantization Sera can reach, so
+# naming them here would be dishonest. The distill is a dense Qwen2.5-14B
+# architecture carrying DeepSeek's reasoning traces, and it genuinely runs on one
+# card: 29.6GB of weights at bf16.
+
+meta:
+  name: lab_deepseek_r1_14b
+  environment: "Molab on CoreWeave, 1x RTX Pro 6000 Blackwell 96GB, 4 CPU, 32GB host"
+  note: >-
+    Reasoning distill, so generations are long. Output length dominates the
+    workload, which makes this decode bound and sensitive to weight bandwidth.
+
+seed: 7
+
+models:
+  - name: deepseek_r1_14b
+    hf_id: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+    params_b: 14.8
+    num_layers: 48
+    hidden_size: 5120
+    num_attn_heads: 40
+    num_kv_heads: 8
+    head_dim_override: 128
+    max_model_len: 4096
+    base_dtype: bf16
+
+gpus:
+  - id: gpu0
+    name: RTX PRO 6000 Blackwell
+    vram_gb: 96.0
+    mem_bandwidth_gbs: 1792.0
+    tflops_bf16: 126.0
+    overhead_frac: 0.10
+
+workloads:
+  - model: deepseek_r1_14b
+    request_rate_rps: 0.8
+    input_len_mean: 512
+    input_len_stdev: 128
+    output_len_mean: 160
+    output_len_stdev: 32
+    duration_s: 45
+    burstiness: 1.0
+
+slos:
+  - model: deepseek_r1_14b
+    p95_latency_ms: 4000.0
+    min_throughput_rps: 0.50
+
+quality_floors:
+  - model: deepseek_r1_14b
+    min_score: 0.975
+    eval_name: behavior_preservation
+    smoke_min_score: 0.5
+
+budget:
+  phase1_trials: 8
+  phase2_trials: 0
+  concurrent_slots: 2
+  max_rounds: 3

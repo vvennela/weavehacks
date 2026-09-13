@@ -1,0 +1,204 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.24.2",
+    "script_metadata_hash": "53514bdda47585ebe6b450b3034bb28f"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "689b25013b77e7e4f541c4297dea2a87",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"sera-lab\">Sera Lab</h1>\n<span class=\"paragraph\">Pick an open-weight model and press <strong>Run</strong>. Sera's specialist agents propose\none configuration change at a time, every trial is measured on the GPU, and\nanything that breaks the latency target or the quality floor is reverted and\nrecorded as such.</span>\n<span class=\"paragraph\">Attach a GPU first: <strong>notebook specs</strong> in the app header \u2192 RTX Pro 6000\nBlackwell. Without one this still runs, on the analytic simulator, and says so.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "4cbc4859e45fd2684dee3c4e947f312c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"environment\">Environment</h3>\n<span class=\"paragraph\"><strong>No GPU attached.</strong> Use the notebook specs button in the app header to attach an RTX Pro 6000 Blackwell, then re-run this cell. Everything below still works on the analytic simulator meanwhile.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "79b3da36e235a6d93d6a3fe01d618cae",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='bkHC-0' random-id='e3c5adea-976c-c7d7-d6a3-5ed90224848e'><marimo-button data-initial-value='0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003e\u2699  Install Sera&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "b25cab4c725320c18679016185589067",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><em>Install once per session, then press Run below.</em></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "07097e262c38691bbb169bd7d47eacaf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "0dc92d0a0fcef8d7b477cfcefd73eb8e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-ui-element object-id='Xref-0' random-id='66c83d8e-f0c9-e16c-aa12-8e71861451d2'><marimo-dropdown data-initial-value='[&quot;Qwen3-8B  \u00b7  16GB  \u00b7  ~15-20 min&quot;]' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eModel&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-options='[&quot;Qwen3-8B  \u00b7  16GB  \u00b7  ~15-20 min&quot;,&quot;DeepSeek-R1-Distill-Qwen-14B  \u00b7  30GB  \u00b7  ~25-35 min&quot;,&quot;Moonlight-16B-A3B (Kimi)  \u00b7  31GB  \u00b7  ~25-35 min&quot;]' data-allow-select-none='false' data-searchable='false' data-full-width='false' data-disabled='false'></marimo-dropdown></marimo-ui-element><div style='display: flex;flex: 1;flex-direction: row;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 1rem'><marimo-ui-element object-id='Xref-1' random-id='3594c922-f4e6-41b2-38b0-5ccbc6686d36'><marimo-button data-initial-value='0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003e\u2b07  Download weights&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element><marimo-ui-element object-id='Xref-2' random-id='6941f7a3-979d-c373-283c-e27d88a824dd'><marimo-button data-initial-value='0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003e\u25b6  Run Sera&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element></div><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><em>No GPU attached \u2014 Run will use the analytic simulator and finish in seconds.</em></span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "5395a621ff03a51bf2b2d9decd1ac2ce",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "312d92aa39373a68ffee2d5a910b8b30",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "74a7199b75a7d11d477c87d7e27b1d4f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><table>\n<thead>\n<tr>\n<th></th>\n<th></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><strong>Model</strong></td>\n<td><code>Qwen/Qwen3-8B</code></td>\n</tr>\n<tr>\n<td><strong>Size</strong></td>\n<td>8.2B parameters, 36 layers, 8 KV heads x 128</td>\n</tr>\n<tr>\n<td><strong>Target device</strong></td>\n<td>RTX PRO 6000 Blackwell, 96 GB</td>\n</tr>\n<tr>\n<td><strong>Workload</strong></td>\n<td>1.0 req/s, 1024 in / 128 out, 45s</td>\n</tr>\n<tr>\n<td><strong>Latency target</strong></td>\n<td>p95 under 2800 ms</td>\n</tr>\n<tr>\n<td><strong>Quality floor</strong></td>\n<td>0.975</td>\n</tr>\n</tbody>\n</table></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "0d46030cd6143189a321c071c85ff509",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-callout-output data-html='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003ePress &#92;u003cstrong&#92;u003eRun Sera&#92;u003c/strong&#92;u003e to tune &#92;u003cstrong&#92;u003eQwen/Qwen3-8B&#92;u003c/strong&#92;u003e.&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;neutral&quot;'></marimo-callout-output>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "03308d01849103a30ca7f77c3cb62d03",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-callout-output data-html='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eRan &#92;u003cstrong&#92;u003e7 trials&#92;u003c/strong&#92;u003e in &#92;u003cstrong&#92;u003e0.0 min&#92;u003c/strong&#92;u003e on &#92;u003cstrong&#92;u003eanalytic simulator (no GPU attached)&#92;u003c/strong&#92;u003e.&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;info&quot;'></marimo-callout-output>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "83541cf90355419f3bbaef0c68604b09",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"every-trial-including-the-reverts\">Every trial, including the reverts</h3>\n<table>\n<thead>\n<tr>\n<th>Round</th>\n<th>Specialist</th>\n<th>Change</th>\n<th>p95 (ms)</th>\n<th>Memory (GB)</th>\n<th>Quality</th>\n<th>Verdict</th>\n<th>Prediction</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>0</td>\n<td>\u2014</td>\n<td><code>baseline</code></td>\n<td>3,680</td>\n<td>16.85</td>\n<td>1.000</td>\n<td>REVERTED \u2014 latency</td>\n<td>\u2014</td>\n</tr>\n<tr>\n<td>1</td>\n<td>quantization</td>\n<td><code>weight_dtype=fp8</code></td>\n<td>1,586</td>\n<td>8.50</td>\n<td>0.996</td>\n<td>ACCEPTED</td>\n<td>held</td>\n</tr>\n<tr>\n<td>1</td>\n<td>batching</td>\n<td><code>max_num_batched_tokens=1024, enable_chunked_prefill=True</code></td>\n<td>3,681</td>\n<td>16.85</td>\n<td>1.000</td>\n<td>REVERTED \u2014 latency</td>\n<td>missed</td>\n</tr>\n<tr>\n<td>2</td>\n<td>quantization</td>\n<td><code>weight_dtype=int8</code></td>\n<td>1,691</td>\n<td>8.51</td>\n<td>0.988</td>\n<td>ACCEPTED</td>\n<td>missed</td>\n</tr>\n<tr>\n<td>2</td>\n<td>quantization</td>\n<td><code>weight_dtype=fp8, kv_cache_dtype=fp8</code></td>\n<td>1,556</td>\n<td>8.35</td>\n<td>0.994</td>\n<td>ACCEPTED</td>\n<td>missed</td>\n</tr>\n<tr>\n<td>2</td>\n<td>arbiter</td>\n<td><code>weight_dtype=int8, kv_cache_dtype=fp8</code></td>\n<td>1,656</td>\n<td>8.35</td>\n<td>0.986</td>\n<td>ACCEPTED</td>\n<td>missed</td>\n</tr>\n<tr>\n<td>3</td>\n<td>quantization</td>\n<td><code>weight_dtype=int4, kv_cache_dtype=fp8</code></td>\n<td>1,790</td>\n<td>4.25</td>\n<td>0.943</td>\n<td>REVERTED \u2014 quality</td>\n<td>missed</td>\n</tr>\n</tbody>\n</table></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "6f5de18a0dcfa610a88da8769b05e39d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-callout-output data-html='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cdiv class=&#92;&quot;language-mysql highlight&#92;&quot;&#92;u003e&#92;u003cpre&#92;u003e&#92;u003cspan&#92;u003e&#92;u003c/span&#92;u003e&#92;u003ccode&#92;u003e&#92;u003cspan class=&#92;&quot;c1&#92;&quot;&#92;u003e### Recommended configuration&#92;u003c/span&#92;u003e&#92;n&#92;n&#92;u003cspan class=&#92;&quot;o&#92;&quot;&#92;u003e-&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;w&#92;&quot;&#92;u003e &#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;n n-Quoted&#92;&quot;&#92;u003e`weight_dtype`&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;w&#92;&quot;&#92;u003e &#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;n&#92;&quot;&#92;u003e\u2192&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;w&#92;&quot;&#92;u003e &#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;o&#92;&quot;&#92;u003e**&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;n&#92;&quot;&#92;u003efp8&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;o&#92;&quot;&#92;u003e**&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;w&#92;&quot;&#92;u003e  &#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;p&#92;&quot;&#92;u003e(&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;n&#92;&quot;&#92;u003ewas&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;w&#92;&quot;&#92;u003e &#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;n&#92;&quot;&#92;u003ebf16&#92;u003c/span&#92;u003e&#92;u003cspan class=&#92;&quot;p&#92;&quot;&#92;u003e)&#92;u003c/span&#92;u003e&#92;n&#92;u003c/code&#92;u003e&#92;u003c/pre&#92;u003e&#92;u003c/div&#92;u003e&#92;n&#92;u003cul&#92;u003e&#92;n&#92;u003cli&#92;u003e&#92;n&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003e&#92;u003ccode&#92;u003ekv_cache_dtype&#92;u003c/code&#92;u003e \u2192 &#92;u003cstrong&#92;u003efp8&#92;u003c/strong&#92;u003e  (was bf16)&#92;u003c/span&#92;u003e&#92;n&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003e&#92;u003cstrong&#92;u003ep95 latency&#92;u003c/strong&#92;u003e 3,680 \u2192 &#92;u003cstrong&#92;u003e1,556 ms&#92;u003c/strong&#92;u003e  (58% faster)&#92;n&#92;u003cstrong&#92;u003eMemory&#92;u003c/strong&#92;u003e 16.85 \u2192 &#92;u003cstrong&#92;u003e8.35 GB&#92;u003c/strong&#92;u003e  (50% smaller)&#92;n&#92;u003cstrong&#92;u003eQuality&#92;u003c/strong&#92;u003e 0.994 against a 0.975 floor&#92;u003c/span&#92;u003e&#92;n&#92;u003c/li&#92;u003e&#92;n&#92;u003c/ul&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;success&quot;'></marimo-callout-output>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "58e39758a3f13123953a2321dc28306d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-accordion data-labels='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eWhere these numbers come from&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-multiple='false'><div><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Substrate recorded in the ledger: <strong>sim</strong> (analytic simulator (no GPU attached)).</span>\n<span class=\"paragraph\"><code>vllm</code> means each row was produced by a real vLLM server on this device, with warm-up requests excluded from the measurement. <code>sim</code> means Sera's analytic model produced them \u2014 deterministic, and not a hardware benchmark. The loop, the specialists, the arbiter and the gates are identical either way; only the thing being measured changes.</span></span></div></marimo-accordion>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

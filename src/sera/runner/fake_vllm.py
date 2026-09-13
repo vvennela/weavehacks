@@ -15,6 +15,15 @@ What it fakes:
     and the measured latency responds to load instead of being a constant
   - Prometheus counters and gauges under the real vLLM metric names
 
+What it does NOT fake, and one consequence worth knowing before reading a fake run's
+numbers: this server has no physics. Its latency comes from a token budget and a sleep,
+not from weights crossing a memory bus. So the throughput it serves is not constrained
+by bandwidth, and `derive_bandwidth_util` — which asks what bandwidth *would be needed*
+to sustain the measured throughput — will read a large model here as 100% saturated.
+That is the derivation answering correctly about a server that is lying. It is fine for
+exercising the code path, and it is not evidence about a real GPU. The simulator is
+where bandwidth is modelled physically.
+
 Standard library only. Nothing here may import vllm, torch, httpx, or requests — the
 whole point is that it runs on a laptop with the base dependencies.
 """
