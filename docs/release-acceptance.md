@@ -1,37 +1,77 @@
-# Next release: acceptance checklist
+# Sera release acceptance
 
-The completed single-model recordings are saved under `evidence/expanded-swarm-comparison`. This checklist distinguishes implementation from live acceptance.
+This release covers the `import sera` backend on the pinned, tested NVIDIA
+setup. It is a controlled deployment release, not a claim of general production
+readiness. The independent `sera_loop` package and partner website remain in the
+repository; these measurements do not certify that separate implementation.
 
-Current checkpoint: items 1–4 from the work plan are merged as the three groups below. The combined suite passes 917 tests. Clean installation and the [installed public API rehearsal](../evidence/public-api-release-v1/README.md) pass; that quick-mode run explicitly does not pass task correctness. It completed three investigation rounds, returned a runner, saved a Weave trace, and cleaned up. Transport recovery has offline fault coverage, not a new demonstrated live outage. The benchmark collector and replay adapters are implemented, but no new frozen GPU collection or search-superiority result exists. See [package validation](simple-release-validation.md), [recovery scope](relay-recovery.md), and [benchmark instructions](benchmark-collection.md).
+See [completion.md](../completion.md) for the full product status. Historical
+recordings remain unchanged, including failed experiments.
 
-## 1. Simple entry point and packaging
+## Release gates
 
-- One-time provider and tracing setup is documented. Credentials stay in environment variables; missing or inconsistent setup fails before GPU execution.
-- A supported quick-mode call can invoke the full three-investigator loop without exposing inference settings in the call. It reports that task quality is unverified.
-- Fit-first deployment still requires an absolute task evaluator, its version, and a quality floor. An unfit BF16 model cannot supply a token-agreement reference.
-- Default full-loop behavior and explicit fixed-candidate or bounded modes have tested precedence. The full loop has no total trial cap unless the caller declares one.
-- The wheel includes the necessary tracing and evidence readers. Installed runtime code does not import repository-only `experiments` or `benchmarks` modules.
-- Build and install the wheel in a clean environment. Exercise imports and preflight failures outside the source checkout. A stub test is not a live GPU rehearsal.
-- Rehearse the documented selected path on the supported GPU, generate through the returned runner, close it, and record cleanup and the exact installed source version.
+| Gate | Evidence and status |
+| --- | --- |
+| Autonomous single-model loop | Passed: three investigators, shared findings, arbiter selection, measured feedback, progress-based stop, usable returned runner, and cleanup in the saved [Astra and Luna runs](../evidence/expanded-swarm-comparison/README.md). |
+| Joint model acceptance | Passed: the specified Qwen0.6B + GLM9B pair meets unchanged quality, latency, overlap, total-device memory, returned-runner, and cleanup gates. [Independent audit](../evidence/live-placement-total-v1/README.md). |
+| Source regression suite | 1,360 passed, one optional marimo skip on the backend source included in `f61e6ae`. The final package check records its exact source and dependency versions. |
+| Clean package installation | Passed for the existing [v3 wheel](../evidence/final-package-release-v3/README.md). Rebuild and verify the final documentation-bearing wheel before distribution. |
+| Installed-package live joint run | Pending final wheel rehearsal. A source-checkout run does not satisfy installed-package provenance. |
+| Credential handling | Keys stay in the environment. Reports do not contain secret values. A local Codex controller remains required for the demonstrated investigator route. |
 
-## 2. Connection recovery
+Do not promote a failed gate by lowering its threshold. Preserve the failed
+result, fix the cause, and rerun the affected check.
 
-- The controller can recover from read outages longer than its former three retries, within declared recovery and request-expiry limits.
-- A lost publish acknowledgement is reconciled against remote state. It cannot overwrite a different response or cause another model/GPU trial.
-- A controller restart reuses a completed saved response; it does not silently reissue an incomplete model request.
-- Expired requests, conflicting records, and permanent errors fail clearly. Recovery logs contain no credentials or raw exception payloads.
-- Offline fault tests and actual live recovery are reported separately. Controller reconnection does not establish resume of a killed GPU optimizer or SQLite-backed recovery.
+## Supported behavior
 
-## 3. Configuration measurement and search comparison
+- Quick mode uses deterministic token agreement, not task accuracy. Task-verified
+  and fit-first deployment require an evaluator, its version, and a quality floor.
+  No BF16 output baseline is invented for a model whose BF16 weights do not fit.
+- The default investigator search has no total trial cap. It stops under the
+  progress and confirmation rule, or when no legal experiment remains. A caller
+  can explicitly request a cap. Eight options per specialist is not a trial cap.
+- The joint run uses Qwen3-0.6B BF16 and GLM-4-9B FP8 weights/BF16 KV. Each passes
+  eight task checks and 96 timed task checks at concurrency 1/2/4/8. Each model's
+  worst-load p95 must stay within 10% of its matching isolated p95.
+- The joint device budget is deliberately 24 GiB on a 97,887 MiB physical GPU.
+  This represents smaller memory capacity, not another GPU's speed or bandwidth.
+  Approved Molab total-device accounting does not verify separate service hard
+  caps. The 3 GiB and 17 GiB allocations are configured vLLM budgets. Sampling can
+  miss short memory peaks. Strict per-service accounting remains the default.
+- Returned runners remain usable until the caller closes them. Rehearsals probe
+  both runners, then close them and verify idle-device cleanup. No open service
+  is promised after the rehearsal.
+- The main Weave trace ends when optimization returns. Later caller requests and
+  cleanup must not be presented as children of that completed trace.
 
-- A configuration survey reports latency, memory, quality, errors, and startup separately for each tested full configuration.
-- The frozen Qwen0.6B benchmark remains separate from normal expanding search. Each profile has at most twelve nonbaseline configurations, not a claimed 24 independent runnable techniques.
-- Eight options per specialist can overlap. The catalog has twenty technique families; unsupported techniques remain unavailable.
-- Collect exactly the frozen baseline and candidate outcomes. Failed candidates remain in the result. An incomplete collection has no oracle.
-- Grid, twenty seeded random runs, and adaptive policies receive the same outcomes. Each adaptive policy sees only the results it selected.
-- Report per-trial latency and trials to the near-oracle threshold. Do not claim Sera beats random search or an ablation until the comparison rule was fixed before observing results and actually passes.
-- No new GPU sweep is implied by implementing the collector. Its workload, eligible baseline, memory profile, and quality rules must be fixed before collection.
+## Repeatable checks
 
-## Later work, not removed from the product
+From the release checkout:
 
-Two-model allocation and broader hardware/model support follow this pass. Full optimizer resume and SQLite persistence also remain separate from controller transport recovery. The spec's multi-GPU and resume requirements conflict with the historical hackathon cuts; do not call the full spec complete based on the narrower release.
+```sh
+uv run --frozen --extra dev pytest -q
+PYTHONPATH=. uv run --frozen python evidence/live-placement-total-v1/audit.py
+```
+
+The first command checks source behavior. The second rechecks saved measurements
+without GPU or provider calls. Neither is a new live performance measurement.
+Use the [README quick check](../README.md#quick-test-does-the-loop-work) for a
+short offline loop rehearsal. Clean installation and live execution must record
+their wheel hash, imported package location, exact configurations, and cleanup.
+
+## Deferred acceptance, not completed work
+
+- Live outage recovery and sustained-load testing are deferred by user request.
+  Single-model SQLite resume and controller recovery have offline fault tests;
+  placement resume is not implemented.
+- Arbitrary models, other GPU/runtime combinations, and real 2/4/8-GPU execution
+  are not validated. A dependency range is not a hardware support claim.
+- Full grid/random/ablation search superiority and both required pressure
+  scenarios remain unproven. The passing joint run has only one eligible plan;
+  it does not prove a multi-plan search advantage.
+- The same-allocation BF16 joint counterfactual fails an estimate, not a measured
+  joint run. No measured BF16 memory savings or global optimum is claimed.
+- ARIA is optional and is not in the validated autonomous execution path.
+
+These limits do not block the documented controlled deployment. They do block a
+claim that the complete specification or unattended production support is done.
