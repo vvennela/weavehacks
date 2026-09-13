@@ -7,6 +7,8 @@ import json
 
 import pytest
 
+from sera.storage import content_hash
+
 from experiments.weave_evidence import WeaveEvidenceReader, WeaveEvidenceError
 
 
@@ -380,6 +382,30 @@ def test_per_request_input_length_is_not_confused_with_load_token_totals():
     assert loads['records'][0]['reduced']['input_tokens'] == 2265
     assert loads['records'][0]['reduced']['request_count'] == 15
     assert any('totals over request_count' in note for note in loads['limitations'])
+
+
+def test_load_token_average_uses_successful_requests_and_cites_original_metrics():
+    records = calls()
+    records[-1].output['loads'][0]['reduced'].update(
+        input_tokens=180, request_count=3, successful_requests=2, generation_errors=1)
+    original = deepcopy(records[-1].output)
+    result = WeaveEvidenceReader(Client(records), 'this-run')('load_metrics', evidence())
+    load = result['records'][0]
+    assert load['input_token_summary'] == dict(
+        total_input_tokens=180, successful_request_count=2, mean_tokens_per_successful_request=90.0,
+        source_paths=['loads/0/reduced/input_tokens', 'loads/0/reduced/successful_requests'],
+        scope='Successful measured requests in this load; not a maximum prompt length.')
+    assert load['call_id'] == records[-1].id
+    assert load['output_sha256'] == content_hash(original)
+    assert records[-1].output == original
+
+
+@pytest.mark.parametrize('count,total', [(None,180), (0,0), (-1,180), (True,180), (2,None), (2,-1)])
+def test_invalid_load_token_counts_have_no_derived_average(count, total):
+    records = calls()
+    records[-1].output['loads'][0]['reduced'].update(input_tokens=total, successful_requests=count)
+    result = WeaveEvidenceReader(Client(records), 'this-run')('load_metrics', evidence())
+    assert result['records'][0]['input_token_summary'] is None
 
 
 def test_persisted_diagnosis_exposes_specific_safe_runtime_failure_with_log_references():

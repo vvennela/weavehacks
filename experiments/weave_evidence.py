@@ -40,6 +40,18 @@ def _number(value):
     return value if type(value) in (int, float) and math.isfinite(value) else None
 
 
+def _load_input_token_summary(load, index):
+    reduced = load.get('reduced') or {}
+    total, count = reduced.get('input_tokens'), reduced.get('successful_requests')
+    if type(total) is not int or total < 0 or type(count) is not int or count <= 0:
+        return None
+    return dict(total_input_tokens=total, successful_request_count=count,
+                mean_tokens_per_successful_request=total / count,
+                source_paths=[f'loads/{index}/reduced/input_tokens',
+                              f'loads/{index}/reduced/successful_requests'],
+                scope='Successful measured requests in this load; not a maximum prompt length.')
+
+
 def _prompt(value):
     if isinstance(value, str):
         return _text(value), len(value) > 1000
@@ -268,8 +280,9 @@ class WeaveEvidenceReader:
             loads = []
             for record in records:
                 if record['op_name'] == 'recorded_trial_metrics':
-                    for load in record['output'].get('loads', [])[:4]:
+                    for index, load in enumerate(record['output'].get('loads', [])[:4]):
                         loads.append(base(record) | dict(record_type='load_metrics', concurrency=load.get('concurrency'),
+                            input_token_summary=_load_input_token_summary(load, index),
                             reduced={key: _number(value) for key, value in (load.get('reduced') or {}).items()
                                      if key in METRIC_FIELDS}))
             return diagnoses + loads[-12:], len(diagnoses) + len(loads)

@@ -16,6 +16,19 @@ def _input(prompt):
     return None
 
 
+def _prepared_prompt_tokens(trial):
+    tokenized = trial.get('input_token_ids')
+    if not isinstance(tokenized, list) or not tokenized or any(
+            not isinstance(tokens, list) or not tokens or any(
+                type(token) is not int or token < 0 for token in tokens)
+            for tokens in tokenized):
+        return None
+    lengths = [len(tokens) for tokens in tokenized]
+    return dict(source_path='input_token_ids', unit='tokens per prepared prompt',
+                prompt_count=len(lengths), minimum=min(lengths), maximum=max(lengths),
+                mean=sum(lengths) / len(lengths))
+
+
 def request_evidence(trial, prompts=()):
     """Select failures and latency outliers; never infer causes or change gates."""
     scores = {item['prompt_index']: item for item in
@@ -36,6 +49,7 @@ def request_evidence(trial, prompts=()):
                     output_truncated=isinstance(output, str) and len(output) > 1000,
                     error=_text(error.split(':', 1)[0]) if isinstance(error, str) else None,
                     finish_reason=response.get('finish_reason'), latency_ms=response.get('latency_ms'),
+                    prompt_tokens=(response.get('usage') or {}).get('prompt_tokens'),
                     completion_tokens=(response.get('usage') or {}).get('completion_tokens'))
 
     def failed(response):
@@ -63,6 +77,7 @@ def request_evidence(trial, prompts=()):
     slowest = sorted(timed, key=lambda item: item[0]['latency_ms'], reverse=True)[:2]
     return dict(source='saved trial request records; also used for optional Weave export',
                 trial_id=trial.get('trial_id'), config_hash=trial.get('config_hash'),
+                prepared_prompt_tokens=_prepared_prompt_tokens(trial),
                 quality_examples=quality_examples, quality_omitted=max(0, len(quality) - 4),
                 failed_task_count=sum(item.get('score', 1) < 1 or bool(item.get('error'))
                                       for item in scores.values()) if scores else None,

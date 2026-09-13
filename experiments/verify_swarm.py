@@ -62,6 +62,10 @@ def _historical_record_matches(actual, expected):
     """Allow only known additive fields absent from older saved projections."""
     if isinstance(actual, dict) and isinstance(expected, dict):
         optional = {'prompt_tokens'}
+        if expected.get('record_type') == 'load_metrics':
+            optional.add('input_token_summary')
+        if expected.get('source') == 'saved trial request records; also used for optional Weave export':
+            optional.add('prepared_prompt_tokens')
         if expected.get('runtime_failure') is None:
             optional.add('runtime_failure')
         return (not actual.keys() - expected.keys() and not expected.keys() - actual.keys() - optional
@@ -289,7 +293,8 @@ class Audit:
                         valid &= (entry.get('configuration') == trial.get('runtime', {}).get('configuration')
                                   and entry.get('review') == trial.get('review')
                                   and entry.get('review_error') == trial.get('review_error')
-                                  and entry.get('request_evidence') == request_evidence(trial, self.report.get('prompts', [])))
+                                  and _historical_record_matches(entry.get('request_evidence'),
+                                      request_evidence(trial, self.report.get('prompts', []))))
                         self.require(valid, 'measured-feedback',
                                      f'{trial_id} actual outcome, available metrics, gate and review disposition must reach every next-round investigator.',
                                      record.get('round'))

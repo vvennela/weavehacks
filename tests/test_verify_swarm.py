@@ -7,7 +7,18 @@ import pytest
 
 from sera.storage import content_hash
 from sera.trace_evidence import request_evidence
-from experiments.verify_swarm import verify_swarm, main
+from experiments.verify_swarm import _historical_record_matches, verify_swarm, main
+
+
+def test_historical_token_summaries_can_be_absent_but_not_falsified():
+    expected = {'record_type': 'load_metrics', 'input_token_summary': {'mean_tokens_per_successful_request': 90}}
+    assert _historical_record_matches({'record_type': 'load_metrics'}, expected)
+    falsified = dict(expected, input_token_summary={'mean_tokens_per_successful_request': 180})
+    assert not _historical_record_matches(falsified, expected)
+    expected = {'source': 'saved trial request records; also used for optional Weave export',
+                'prepared_prompt_tokens': {'maximum': 109}}
+    assert _historical_record_matches({'source': expected['source']}, expected)
+    assert not _historical_record_matches(dict(expected, prepared_prompt_tokens={'maximum': 2265}), expected)
 
 
 ROLES = ('scheduling', 'memory_context', 'output_quality')

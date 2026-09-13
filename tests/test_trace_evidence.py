@@ -2,6 +2,8 @@
 
 from copy import deepcopy
 
+import pytest
+
 from sera.trace_evidence import request_evidence
 
 
@@ -56,3 +58,22 @@ def test_errors_are_bounded_and_prompts_are_only_role_content():
     assert item['input'] == [{'role': 'user', 'content': 'question'}]
     assert item['task_score'] is None
     assert 'secret' not in str(evidence)
+
+
+def test_prepared_prompt_lengths_are_separate_from_repeated_measured_loads():
+    trial = dict(input_token_ids=[[1] * 85, [2] * 109],
+                 reduced=dict(input_tokens=582, request_count=6),
+                 quality=[dict(prompt_index=0, text='ok', usage=dict(prompt_tokens=85))])
+    original = deepcopy(trial)
+    evidence = request_evidence(trial)
+    assert evidence['prepared_prompt_tokens'] == dict(
+        source_path='input_token_ids', unit='tokens per prepared prompt',
+        prompt_count=2, minimum=85, maximum=109, mean=97.0)
+    assert evidence['quality_examples'][0]['prompt_tokens'] == 85
+    assert trial == original
+
+
+@pytest.mark.parametrize('tokens', [None, [], [[]], [[True]], [[1], None], [[-1]], ['text']])
+def test_missing_or_invalid_prepared_tokens_do_not_invent_lengths(tokens):
+    evidence = request_evidence(dict(input_token_ids=tokens, status='startup-failed'))
+    assert evidence['prepared_prompt_tokens'] is None

@@ -72,7 +72,7 @@ Request-log child spans record saved results: their span duration is logging tim
 
 The agents receive a bounded view of local saved request records—the same records exported to Weave. They do **not** query the remote Weave service or use Weave MCP to investigate. Weave makes their inputs, outputs, and decisions visible; it is not a separate evidence-retrieval step in this run.
 
-For a repeat run, check all five items above before claiming success. A different agent choice, abstention, or rejected change is a result to report, not a reason to invent another trial. `demo.py` prefers the named team-run record when available and labels its output as recorded, not live. The older batching-only recording is not evidence of the newer features.
+For a repeat run, check all five items above before claiming success. A different agent choice, abstention, or rejected change is a result to report, not a reason to invent another trial. `demo.py` prefers the saved live-swarm record when available and labels its output as recorded, not live. The team and batching-only recordings are separate earlier evidence, not proof of the newer swarm's reasoning.
 
 ### Three-minute walkthrough
 
@@ -328,7 +328,7 @@ It estimates BF16 and online FP8 weight plans before loading. The estimate inclu
 
 With an agent, the arbiter selects at most one estimated-feasible plan. Sera then loads the original weights with `fp8_per_tensor`, measures the workload, applies task and resource limits, and returns the live runner only on a pass. The unquantized baseline is marked infeasible, never fabricated. This path passed the live eight-task check. It establishes feasible deployment, not a speedup over a baseline that did not run. No multi-GPU allocation or wider search is implemented.
 
-The rehearsed code and its matching provider certificate are at commit `8dcfb00`. Until the new build passes its citation gate, use that revision in a separate checkout for the live demo. Do not use the old provider certificate to bypass validation in the new build. On the supplied GPU, with Weave installed and `WANDB_API_KEY` in the environment:
+The original interactive rehearsal used commit `8dcfb00` and its matching provider certificate. Later provider-v5 passed the expanded citation contract and was used by the saved staged and swarm runs. A schema certificate is not proof of useful reasoning or a clean-install release. Use the certificate that matches the checked-out code; do not bypass validation with an older one. On the supplied GPU, with Weave installed and `WANDB_API_KEY` in the environment:
 
 ```sh
 git worktree add --detach ../sera-rehearsed-demo 8dcfb00
