@@ -21,6 +21,53 @@ from sera.storage import save_json
 CASES_PATH = Path(__file__).resolve().parents[1]/'benchmarks'/'easy_cases.json'
 
 
+class TracedInvestigationAgent:
+    """Experiment-local tracing; the underlying agent owns requests and raw history."""
+
+    def __init__(self, agent, weave):
+        self._agent = agent
+
+        def traced_request(name):
+            def request(role, evidence, instruction):
+                return agent.request(role, evidence, instruction)
+            return weave.op(name=name)(request)
+
+        def review(evidence):
+            # Its internal request must not re-enter this adapter.
+            return agent.review(evidence)
+
+        # Official op naming API: https://docs.wandb.ai/weave/guides/tracking/ops
+        self._requests = {name: traced_request(name) for name in (
+            'fit_quantization_advisor', 'quantization_specialist', 'batching_specialist',
+            'search_specialist', 'arbiter', 'frontier_reviewer', 'agent_request')}
+        self._review = weave.op(name='frontier_reviewer')(review)
+
+    @property
+    def model(self):
+        return self._agent.model
+
+    @property
+    def project(self):
+        return self._agent.project
+
+    @property
+    def history(self):
+        return self._agent.history
+
+    def request(self, role, evidence, instruction):
+        specialist = evidence.get('specialist_role')
+        if role == 'arbiter' and 'fit_plan' in evidence and specialist == 'quantization':
+            name = 'fit_quantization_advisor'
+        elif role == 'proposal':
+            name = f'{specialist}_specialist' if specialist in {'quantization', 'batching'} else 'search_specialist'
+        else:
+            name = {'arbiter': 'arbiter', 'frontier': 'frontier_reviewer'}.get(role, 'agent_request')
+        return self._requests[name](role, evidence, instruction)
+
+    def review(self, evidence):
+        return self._review(evidence)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model', required=True, choices=[MODEL_ID, LARGE_MODEL_ID])
@@ -131,6 +178,7 @@ def main(argv=None):
         if not args.no_weave:
             import weave
             client = weave.init(args.project)
+            agent = TracedInvestigationAgent(agent, weave)
             run_investigation = weave.op(run_investigation)
         run_investigation()
     except Exception as error:

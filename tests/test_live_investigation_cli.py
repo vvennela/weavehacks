@@ -37,7 +37,7 @@ def install_boundaries(cli, monkeypatch, tmp_path, *, no_runner=False, probe_err
         return SimpleNamespace(flush=lambda: observed.update(flushed=True))
 
     monkeypatch.setitem(sys.modules, 'weave', SimpleNamespace(
-        init=init, op=lambda fn: fn,
+        init=init, op=lambda fn=None, **_: fn if fn is not None else lambda actual: actual,
         get_current_call=lambda: SimpleNamespace(ui_url='https://wandb.ai/fixture/call')))
 
     class Runner:
@@ -161,6 +161,7 @@ def test_no_weave_is_explicit_and_keeps_local_evidence(cli, monkeypatch, tmp_pat
     report = json.loads((tmp_path/'run'/'result.json').read_text())
     assert report['weave_url'] is None
     assert report['trace_status'] == 'disabled-explicitly'
+    assert type(observed['kwargs']['agent']) is cli.sera.WandbAgent
 
 
 def test_existing_output_is_not_overwritten(cli, monkeypatch, tmp_path):
@@ -301,4 +302,118 @@ def test_unsupported_fit_first_profile_stops_before_provider_trace_or_gpu(cli, m
         cli.main(arguments(tmp_path, model) + ['--fit-first', *extra])
     assert error.value.code == 2
     assert observed['calls'] == []
+    assert not (tmp_path/'run').exists()
+
+
+def recording_weave():
+    from functools import wraps
+    calls = []
+    active = []
+
+    def op(fn=None, *, name=None):
+        def decorate(function):
+            @wraps(function)
+            def wrapped(*args, **kwargs):
+                call = {'name': name or function.__name__, 'parent': active[-1]['name'] if active else None,
+                        'args': args, 'kwargs': kwargs}
+                calls.append(call)
+                active.append(call)
+                try:
+                    call['output'] = function(*args, **kwargs)
+                    return call['output']
+                except Exception as error:
+                    call['error_type'] = type(error).__name__
+                    raise
+                finally:
+                    active.pop()
+            return wrapped
+        return decorate(fn) if fn is not None else decorate
+
+    return SimpleNamespace(op=op, calls=calls)
+
+
+def test_child_trace_names_and_history_preserve_single_provider_invocations(cli):
+    calls = []
+
+    class Agent:
+        model = 'fixture-model'
+        project = 'test/project'
+        history = []
+
+        def request(self, role, evidence, instruction):
+            entry = {'role': role, 'evidence': evidence, 'instruction': instruction}
+            self.history.append(entry)
+            calls.append(entry)
+            return entry
+
+        def review(self, evidence):
+            return self.request('frontier', evidence, 'unchanged review instruction')
+
+    agent = Agent()
+    weave = recording_weave()
+    traced = cli.TracedInvestigationAgent(agent, weave)
+    assert traced.history is agent.history
+    assert (traced.model, traced.project) == (agent.model, agent.project)
+
+    @weave.op
+    def experiment():
+        traced.request('arbiter', {'fit_plan': {}, 'specialist_role': 'quantization'}, 'fit advice')
+        traced.request('proposal', {'specialist_role': 'quantization'}, 'cache advice')
+        traced.request('proposal', {'specialist_role': 'batching'}, 'batch advice')
+        traced.request('arbiter', {'legal_proposal_ids': ['p1']}, 'rank')
+        return traced.review({'eligible_trial_ids': ['baseline']})
+
+    assert experiment() is agent.history[-1]
+    assert len(calls) == len(agent.history) == 5
+    children = weave.calls[1:]
+    assert [call['name'] for call in children] == [
+        'fit_quantization_advisor', 'quantization_specialist', 'batching_specialist', 'arbiter', 'frontier_reviewer']
+    assert all(call['parent'] == 'experiment' for call in children)
+    assert [call['output'] for call in children] == calls
+    assert 'fixture-not-a-real-key' not in repr(weave.calls)
+
+
+@pytest.mark.parametrize('method', ['request', 'review'])
+def test_child_trace_preserves_agent_failure_without_retry_or_history_repair(cli, method):
+    class Agent:
+        model = 'fixture-model'
+        project = 'test/project'
+        history = []
+
+        def request(self, role, evidence, instruction):
+            self.history.append({'role': role, 'raw_failure': True})
+            raise RuntimeError('fixture provider failure')
+
+        def review(self, evidence):
+            return self.request('frontier', evidence, 'review')
+
+    base = Agent()
+    weave = recording_weave()
+    traced = cli.TracedInvestigationAgent(base, weave)
+    with pytest.raises(RuntimeError, match='fixture provider failure'):
+        if method == 'request':
+            traced.request('arbiter', {}, 'rank')
+        else:
+            traced.review({})
+    assert len(base.history) == len(weave.calls) == 1
+    assert weave.calls[0]['error_type'] == 'RuntimeError'
+    assert traced.history is base.history
+
+
+def test_tracing_cli_uses_local_agent_adapter(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+    assert cli.main(arguments(tmp_path)) == 0
+    assert isinstance(observed['kwargs']['agent'], cli.TracedInvestigationAgent)
+
+
+def test_child_trace_setup_failure_does_not_start_optimizer_and_flushes_client(cli, monkeypatch, tmp_path):
+    observed = install_boundaries(cli, monkeypatch, tmp_path)
+
+    def fail_trace(*args, **kwargs):
+        raise RuntimeError('fixture trace setup failure')
+
+    sys.modules['weave'].op = fail_trace
+    assert cli.main(arguments(tmp_path)) == 1
+    assert observed['calls'] == ['provider-check', 'weave-init']
+    assert observed['flushed']
     assert not (tmp_path/'run').exists()
