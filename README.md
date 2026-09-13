@@ -181,6 +181,16 @@ python -m experiments.run_investigation \
 
 This example uses GPU time and requires the large model files. It declares two batch-token alternatives against the proven FP8-weight reference with BF16 KV. It is not a recorded run or a speedup claim. The command checks the provider certificate before loading, keeps the eight strict tasks and 99% quality floor, saves the investigation and trace link, tests the returned runner, and closes it. An agent can decline a trial. Read the recorded trial count before claiming a full round ran. Use a new output directory.
 
+### Connect deployment and the agent team in one run
+
+Add `--fit-first` for Qwen72B to start from the model that does not fit. A quantization advisor recommends a legal memory plan, an independent arbiter decides whether to test it, and the measured deployment must pass the task gate. That same running model then becomes the reference for the batching investigation. There is no reload between those stages.
+
+The budget includes the deployment trial: `--fit-first --budget 3` allows one deployment and at most two tuning trials, not three additional trials. The rest of the command and its task requirements stay the same. This connected path passes local tests; its live rehearsal is pending. An explicit FP8 reference without `--fit-first` retains the previous behavior.
+
+The command also accepts explicit `--sequence-values`, `--context-values`, and `--fp8-kv` controls. Values are checked before execution, and unsupported combinations remain rejected. FP8 KV is not enabled on the Qwen72B FP8-weight reference. The report shows which specialists had legal work and why others were inactive. Parallelism is inactive on this single-GPU runtime.
+
+For a nontechnical partner: “One advisor finds a way to load the model. Another investigates how to serve requests. A decision agent chooses which experiment to run, and a reviewer checks the prediction against what happened.” This is a staged multi-agent workflow, not proof of simultaneous competing specialists or better search than grid search.
+
 ### Rehearse the decision loop without a GPU
 
 ```sh

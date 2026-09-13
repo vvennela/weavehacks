@@ -2,6 +2,12 @@
 
 ## Current checkpoint
 
+The current implementation has a real Qwen72B deployment, a returned-runner rehearsal, and a two-round live batching investigation. Provider-v5 passed 30/30 first responses and citation checks. The new connected fit-first path adds a quantization advisor before independent arbitration, then reuses the measured deployment as the live investigation reference. Explicit CLI controls and active/inactive specialist reports are merged. The combined local suite passed 433 tests before the final integration review; the new connected path has not yet been rehearsed live.
+
+Priority is the single-model multi-agent product. Joint placement and the search-superiority benchmark remain unfinished. GLM passed the structured eight-task profile; Qwen0.6B passed 7/8 with both BF16 and FP8 weights. Do not lower the task gate or describe either Qwen result as eligible. The sections below preserve the original broader work scope; old checkpoint text is historical, not current release status.
+
+## Historical checkpoints
+
 Parallel agent-loop work is merged from three isolated worktrees. The controller now handles lifecycle errors, budgets, scoped proposal IDs, failure history, measured-frontier stopping, and explicit frozen candidate spaces. A plain-English report and a synthetic offline rehearsal are available. The integrated suite passes 271 tests and the wheel builds. The provider citation constraint is fixed locally; its new hosted check and a real multi-round GPU investigation have not run. No live search advantage is claimed.
 
 The narrow Qwen72B deployment and interactive rehearsal passed. A live four-load FP8-reference batching comparison also passed quality and returned the unchanged reference because the alternative did not meet the improvement threshold. Load sweeps, deterministic selection, raw evidence, and the delegated saved-outcome benchmark harness are implemented; 221 tests pass.
