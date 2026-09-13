@@ -1,5 +1,17 @@
 # Demo readiness: full goal remains incomplete
 
+## Current checkpoint: single-model expanding swarm demonstrated
+
+The [Astra full loop](../evidence/live-astra-expanded-v1/README.md) passes the saved execution audit with no issues. Three concurrent investigators read Weave in each of three rounds. Four GPU trials include the FP8 deployment and three optimization candidates. The final candidate combines measured prefix caching and graph execution, passes all eight tasks, and reduces worst-load p95 from 770.49 to 619.85 ms (19.55%). A measured confirmation completes the no-progress-plus-one policy without a total trial cap. The returned runner passes a fresh request and closes with GPU memory released.
+
+This is repeated-prompt traffic after warmup, not cold or unseen traffic. It proves one complete adaptive search, not global optimality, search superiority, or generally reliable agent reasoning. The [first expanded Luna run](../evidence/live-luna-expanded-v1/README.md) also measured a caching gain but lost its controller connection before confirmation. A repeat is in progress and also needed a manual controller reconnection. Long-outage unattended recovery remains open.
+
+The expanded implementation and current demo view pass 851 local tests. Both investigator providers passed the current 34-case schema check. Eight options per specialist and eight typed controls are implemented; the 20-entry research catalog includes blocked or adapter-required techniques, not 20 executable optimizations. `demo.py` now prefers the saved expanded Astra run and labels measured results separately from agent explanations.
+
+Remaining full-product gaps: two quality-valid models under joint load, multi-GPU execution, broader model/backend support, interruption recovery, the frozen search-comparison benchmark, and clean-install release acceptance. The sections below preserve the earlier audit and its failures; they are not the current single-model status.
+
+## Historical audit: before expanded search
+
 Latest checkpoint: 724 local tests pass. The [compact-prompt replay](../evidence/failure-replay-v3/README.md) passes reading, legal selection, and budget stopping, but still fails factual reasoning. The [three-Astra diagnostic](../evidence/astra-swarm-diagnostic-v1/README.md) reached correct central conclusions but was not blind and did not run inside Sera. Neither result closes autonomous-swarm acceptance. Hosted investigator selection is now explicit and requires a certificate for that model.
 
 Read-only audit of main `17255ae`, the product/specification, implementation, and saved evidence. No new tests, provider requests, or GPU trials were run for this note.

@@ -2,7 +2,9 @@
 
 ## Current checkpoint
 
-The current implementation has a real Qwen72B deployment, a returned-runner rehearsal, and a two-round live batching investigation. Provider-v5 passed 30/30 first responses and citation checks. The new connected fit-first path adds a quantization advisor before independent arbitration, then reuses the measured deployment as the live investigation reference. Explicit CLI controls and active/inactive specialist reports are merged. The combined local suite passed 433 tests before the final integration review; the new connected path has not yet been rehearsed live.
+The current implementation has a verified full Qwen72B swarm loop. Astra completed three investigation rounds and four GPU trials: FP8 deployment, prefix caching, graph execution, and their combination. All four passed the eight-task quality gate. The returned combination lowered p95 by 19.55% on repeated prompts after warmup, passed a fresh request, and released the GPU. Its full-loop audit passes with no issues; see [the saved run](evidence/live-astra-expanded-v1/README.md).
+
+Normal-mode candidates refresh after results. Each specialist gets up to eight legal options across the active typed controls; combinations retain their measured parents and are re-tested. Luna and Astra both passed 34/34 current schema cases without retries. The first expanded Luna run measured an 18.85% caching gain but lost its controller connection before confirmation; its evidence is preserved. A fresh Luna run is in progress and also needed a manual controller reconnection. The local suite passes 851 tests. Unattended long-outage recovery remains unproven.
 
 Priority is the single-model multi-agent product. Joint placement and the search-superiority benchmark remain unfinished. GLM passed the structured eight-task profile; Qwen0.6B passed 7/8 with both BF16 and FP8 weights. Do not lower the task gate or describe either Qwen result as eligible. The sections below preserve the original broader work scope; old checkpoint text is historical, not current release status.
 

@@ -2,15 +2,17 @@
 
 Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
 
-The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The expanded search has measured a caching improvement; complete Luna/Astra stopping-sequence validation is in progress.
+The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The [complete Astra loop](evidence/live-astra-expanded-v1/README.md) measured a 19.55% latency improvement, tested a combination, stopped under the progress rule, and returned a working runner.
 
 ## Demo rehearsal: plain-English guide
 
 ### Current expanded loop
 
-The implementation and connection-retry fix pass 849 local tests. [Luna](evidence/provider-luna-expanded-v1/README.md) and [Astra](evidence/provider-astra-expanded-v1/README.md) each passed all 34 current schema cases without a retry.
+The implementation, connection retries, and current demo view pass 851 local tests. [Luna](evidence/provider-luna-expanded-v1/README.md) and [Astra](evidence/provider-astra-expanded-v1/README.md) each passed all 34 current schema cases without a retry.
 
-The [first expanded Luna run](evidence/live-luna-expanded-v1/README.md) found **18.85% lower p95 latency** by enabling prefix caching, with all eight tasks still passing. A second experiment reduced the batch-token budget and did not improve latency. The generator then offered a combination, but a controller connection failure interrupted the confirmation round. Sera returned the measured caching winner and passed a fresh request. The result and failure are preserved; Astra and a fresh Luna run are checking the complete sequence.
+Lead with the [verified Astra run](evidence/live-astra-expanded-v1/README.md), which is now the main view in `demo.py`. Three investigators read Weave evidence in each of three rounds. Sera measured prefix caching, graph execution, and their combination. All four configurations, including the reference, passed all eight tasks. The winner reduced worst-load p95 from **770.49 ms to 619.85 ms**, a **19.55%** improvement. Sera stopped after one no-progress round and its measured confirmation, passed a request through the winning runner, and closed it cleanly. The saved trace has 662 calls and 45 typed agent responses; these are not GPU trial counts.
+
+The [first expanded Luna run](evidence/live-luna-expanded-v1/README.md) found **18.85% lower p95 latency** by enabling prefix caching, with all eight tasks still passing. A second experiment reduced the batch-token budget and did not improve latency. The generator then offered a combination, but a controller connection failure interrupted the confirmation round. Sera returned the measured caching winner and passed a fresh request. The result and failure are preserved. A fresh Luna run is in progress; its controller also needed a manual reconnection. Unattended recovery from a longer connection outage is not yet proven.
 
 For a nontechnical partner: “Three specialists inspect the measurements and model answers. Each gets up to eight legal options. They share findings, then a decision agent chooses one experiment. Sera runs it, checks answer quality and speed, and gives the result back to the specialists. The menu changes as results arrive. Two changes that passed separately can be combined, but the combination must be tested too. The loop can keep running while it makes useful progress; after no progress, it permits one confirmation before stopping.”
 
@@ -51,7 +53,7 @@ Sera helps someone run an AI model on the GPU they have. A GPU is the hardware t
 
 Our long-term goal is like choosing a route home: the best plan depends on whether the user cares most about response time, how much work gets done, or memory use. We have proven that Sera can make a model fit, check that it works, test an agent recommendation, and use the result in its next decision. We have not proven that Sera finds the best route among many choices.
 
-### What we have proven
+### Earlier staged milestone: what it proved
 
 - The original Qwen72B model needs about 135 GiB just for its saved weights. Those weights cannot fit in our GPU's roughly 96 GB of memory.
 - A quantization advisor recommended FP8 weights, and an independent arbiter chose to test that plan. In plain English, this stores most model weights using fewer bits. That saves memory, but can change answers, so it needs a quality check.
@@ -63,7 +65,7 @@ Our long-term goal is like choosing a route home: the best plan depends on wheth
 
 These are small, specific checks, not proof that the model answers every question correctly. We have not demonstrated a speedup over the original model, because that model could not fit. We have demonstrated a staged multi-agent workflow that measures a recommendation and stops when the evidence does not justify another trial. We have not demonstrated the best possible plan, three competing specialists, or two models sharing the GPU.
 
-### Show the completed multi-agent investigation
+### Earlier staged milestone: how to show it
 
 Open the [team investigation report](evidence/live-team-investigation-v1/report.md) and [verified Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a0f-065b-7fcd-b076-d419fd5ae02d). Say:
 
@@ -75,21 +77,34 @@ The run used **2 of 3 total trials**: one FP8 deployment and one batching trial.
 
 **Live rehearsal passed** from commit `27f877d`. The saved [team-run evidence](evidence/live-team-investigation-v1/README.md) covers automatic settings, measured feedback, the returned runner, and cleanup. The Weave API verified **297 trace calls**, including **273 recorded model requests** and **7 provider responses** with their exact stored reasoning and content; it reported no call errors. These are trace records, not 297 agent API requests.
 
-For a nontechnical partner: “One advisor recommends how to make the model fit. Sera loads it and checks the answers. Then Sera uses the actual input lengths, request load, and available measurements to choose a small set of settings to investigate. A second advisor recommends an experiment. The decision agent can approve it or stop, and every tested change must pass the same answer checks.”
+For a nontechnical partner: “Sera makes the model fit, checks its answers, and asks three specialists what to test next. They inspect results and compare ideas. Sera measures the chosen change, keeps the best accepted runner, and stops under the declared progress rule.” The Molab comparison cell is a read-only result view; it does not launch another run.
 
-Run from the repository root on the supported Linux GPU, after preparing the model files and setting `WANDB_API_KEY` in the environment. Use the build whose `python -m experiments.run_investigation --help` lists `--auto-space`:
+To repeat the current Codex-backed loop, first run the controller on the local machine with Codex logged in and marimo-pair installed. Set `SERA_MOLAB_URL` and `MARIMO_TOKEN` in that machine's environment. The notebook must be open. Use a fresh controller output directory:
+
+```sh
+python -m experiments.codex_relay_controller \
+  --url "$SERA_MOLAB_URL" \
+  --relay-dir /tmp/sera-relay-demo \
+  --pair-script .agents/skills/marimo-pair/scripts/execute-code.sh \
+  --output-dir sera-runs/luna-demo-controller-001 \
+  --max-requests none --idle-timeout 1800
+```
+
+Then run from the current repository root on the supported Molab Linux GPU, after preparing model files and setting `WANDB_API_KEY` in the environment:
 
 ```sh
 python -m experiments.run_investigation \
   --model Qwen/Qwen2.5-72B-Instruct \
-  --fit-first --auto-space --budget 3 \
+  --fit-first --swarm --auto-space --until-plateau \
+  --agent-provider codex-relay --agent-model gpt-5.6-luna \
+  --relay-dir /tmp/sera-relay-demo \
   --priority latency --concurrency 1 2 4 8 \
   --project vvennela-n-a/wandb_agent_default_project \
-  --provider-check evidence/provider-v5/result.json \
-  --output-dir sera-runs/fit-auto-investigation
+  --provider-check evidence/provider-luna-expanded-v1/result.json \
+  --output-dir sera-runs/luna-demo-001
 ```
 
-This starts real GPU and agent work. Use a new output directory. Do not combine `--auto-space` with explicit batching, sequence, context, or FP8-KV flags. The budget permits **one deployment and at most two later candidate trials**, not three extra trials. Advisors may stop sooner. Questions and the 99% quality floor remain unchanged; automatic settings do not add another precision mode.
+This starts real GPU and agent work, with no fixed total trial cap. Use fresh output directories for each run. Keep the controller connected until the GPU command finishes. Do not combine `--auto-space` with explicit control-value flags. For an independent Astra run, use `gpt-6-astra`, `evidence/provider-astra-expanded-v1/result.json`, and separate relay/output directories on both machines. Run GPU comparisons sequentially on one card. The questions, 99% quality floor, and 5% progress threshold remain fixed. Historical 30-case certificates shown in older sections below are not valid for the expanded schema.
 
 After the command finishes, show these items in order:
 

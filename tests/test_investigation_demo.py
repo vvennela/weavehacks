@@ -210,3 +210,36 @@ def test_unreadable_core_loop_does_not_fall_back_to_old_success(tmp_path):
     assert view['source'] == 'evidence/live-core-loop-v1/result.json'
     assert 'could not be read' in view['banner']
     assert view['rows'] == []
+
+
+def test_expanded_run_shows_winner_lineage_and_uncapped_stop(tmp_path):
+    write_record(tmp_path, 'live-core-loop-v1', saved_report())
+    report = json.loads((ROOT / 'evidence/live-astra-expanded-v1/result.json').read_text())
+    write_record(tmp_path, 'live-astra-expanded-v1', report)
+    view = load(tmp_path)
+    assert view['source'] == 'evidence/live-astra-expanded-v1/result.json'
+    assert view['budget'] == '4; no total cap'
+    assert view['stop_reason'] == 'objective-plateau-confirmed'
+    assert 'trial-4' in view['runner']
+    assert 'prefix caching on' in view['runner']
+    assert 'graph execution enabled' in view['runner']
+    assert '619.85 ms' in view['runner']
+    assert '19.55%' in view['runner']
+    selected = [row for row in view['rows'] if '619.85 ms' in row['Measured gates']]
+    assert len(selected) == 1
+    assert selected[0]['Parent trial'] == 'trial-2'
+    assert selected[0]['Component trials'] == 'trial-2, trial-3'
+    assert 'Repeated prompts after warmup' in view['limits']
+    assert 'not cold or unseen traffic' in view['limits']
+    assert 'No best-plan or speedup claim' not in view['limits']
+    assert 'does not prove a search advantage' in view['limits']
+
+
+def test_expanded_partial_record_does_not_invent_winner_or_uncapped_budget(tmp_path):
+    write_record(tmp_path, 'live-astra-expanded-v1', {'status': 'running'})
+    view = load(tmp_path)
+    assert 'not a completed result' in view['banner']
+    assert 'not recorded' in view['runner']
+    assert 'gain' not in view['runner']
+    assert view['budget'] == 'not recorded/not recorded'
+    assert view['stop_reason'] == 'not recorded'
