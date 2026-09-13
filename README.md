@@ -163,7 +163,7 @@ python -m experiments.rehearse_investigation --output-dir sera-runs/offline-loop
 
 Use a new output directory. This runs the production controller with **synthetic agents, answers, latency, and memory**. It makes no LM or GPU calls. The scripted first trial is fast but wrong, so Sera rejects it. The next round receives that failed prediction and chooses a passing alternative. The rehearsal checks a fresh returned-runner request and cleanup, then saves `result.json`, `report.md`, and `investigation.md`.
 
-For a nontechnical partner: use this to explain how the decision loop works. Say that the inputs and agents are scripted. Use the separate Qwen72B recording to show real GPU results. The offline rehearsal proves software control flow, not agent intelligence or a speedup. The normal result summary now shows specialist predictions, cited evidence, arbitration, trial gates, later history, and the final runner.
+For a nontechnical partner: use this to explain how the decision loop works. Say that the inputs and agents are scripted. Use the separate Qwen72B recording to show real GPU results. The offline rehearsal proves software control flow, not agent intelligence or a speedup. The normal result summary now shows specialist predictions, cited evidence, arbitration, trial gates, later history, and the final runner. See the [saved synthetic walkthrough](evidence/synthetic-investigation-v1/README.md).
 
 ## User priorities
 

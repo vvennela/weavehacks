@@ -1,0 +1,2820 @@
+{
+  "schema_version": "sera-single-model-v1",
+  "status": "closed",
+  "created_at": "2026-09-13T05:00:42.853724+00:00",
+  "mode": "agent-investigation",
+  "model_id": "Qwen/Qwen3-0.6B",
+  "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "baseline_name": "sera-baseline-v1",
+  "baseline_configuration": {
+    "dtype": "bfloat16",
+    "quantization": null,
+    "kv_cache_dtype": "auto",
+    "tensor_parallel_size": 1,
+    "max_model_len": 4096,
+    "max_num_seqs": 8,
+    "max_num_batched_tokens": 4096,
+    "gpu_memory_utilization": 0.9,
+    "enable_prefix_caching": false,
+    "enable_chunked_prefill": true,
+    "enforce_eager": true
+  },
+  "candidate": null,
+  "prompts": [
+    "What is 2 + 3?"
+  ],
+  "workload_hash": "f81d84b7e988318e4fc26ad2e1ba713e930d5933605564db16627c93ce89b379",
+  "generation": {
+    "temperature": 0,
+    "top_p": 1,
+    "top_k": -1,
+    "seed": 0,
+    "max_tokens": 64,
+    "enable_thinking": false
+  },
+  "workload": {
+    "prompt_count": 1,
+    "concurrency": [
+      1
+    ],
+    "warmup_requests_per_load": 1,
+    "measured_requests_per_load": 3,
+    "quality_requests": 1,
+    "quality_concurrency": 1,
+    "latency_reduction": "worst-per-load-percentile",
+    "throughput_reduction": "total-tokens-over-total-measured-window-seconds"
+  },
+  "task_quality_verified": true,
+  "constraints": {
+    "quality_floor": 0.99,
+    "p95_latency_ms": null,
+    "max_memory_mib": null
+  },
+  "evaluation": {
+    "version": "synthetic-rehearsal-v1",
+    "signature": "evaluation(prompt, output) -> score in [0, 1]"
+  },
+  "objective": {
+    "priority": "latency",
+    "min_improvement_fraction": 0.05
+  },
+  "agent_selection": "enabled",
+  "provider_validation": {
+    "provenance": "synthetic",
+    "provider_verified": false
+  },
+  "investigation_space": null,
+  "limits": [
+    "single model",
+    "already-active single-setting controls",
+    "no combination trials",
+    "no live search-advantage claim"
+  ],
+  "rejected": [],
+  "returned_runtimes": [
+    {
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": null,
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 2048,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "model_id": "Qwen/Qwen3-0.6B",
+      "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+      "sampled_peak_memory_mib": 2000,
+      "provenance": "synthetic",
+      "closed": true
+    }
+  ],
+  "frontier_trial_ids": [
+    "trial-2"
+  ],
+  "baseline": {
+    "trial_id": "baseline",
+    "status": "collected",
+    "runtime": {
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": null,
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "model_id": "Qwen/Qwen3-0.6B",
+      "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+      "sampled_peak_memory_mib": 2000,
+      "provenance": "synthetic",
+      "closed": true
+    },
+    "config_hash": "9753f8db399fcf16336961bff61184383da95c3960b1d937f2f44e90090f2216",
+    "input_token_ids": [
+      [
+        1
+      ]
+    ],
+    "quality": [
+      {
+        "prompt_index": 0,
+        "text": "{\"answer\": 5}",
+        "token_ids": [
+          5
+        ],
+        "prompt_token_ids": [
+          1
+        ],
+        "error": null
+      }
+    ],
+    "self_check": [
+      {
+        "prompt_index": 0,
+        "text": "{\"answer\": 5}",
+        "token_ids": [
+          5
+        ],
+        "prompt_token_ids": [
+          1
+        ],
+        "error": null
+      }
+    ],
+    "metrics": {},
+    "provenance": "synthetic",
+    "reduced": {
+      "p95_latency_ms": 100.0,
+      "output_tokens_per_second": 100.0,
+      "generation_errors": 0,
+      "request_count": 3
+    },
+    "task_quality": {
+      "version": "synthetic-rehearsal-v1",
+      "floor": 0.99,
+      "mean": 1.0,
+      "valid_outputs": true,
+      "passed": true,
+      "task_quality_verified": true,
+      "per_prompt": [
+        {
+          "prompt_index": 0,
+          "score": 1.0,
+          "error": null
+        }
+      ]
+    }
+  },
+  "search": {
+    "budget": {
+      "max_candidate_trials": 2
+    },
+    "trials_used": 2,
+    "rounds": [
+      {
+        "round": 1,
+        "specialists": [
+          {
+            "role": "quantization",
+            "evidence": {
+              "trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+              "objective": {
+                "priority": "latency",
+                "min_improvement_fraction": 0.05
+              },
+              "constraints": {
+                "quality_floor": 0.99,
+                "p95_latency_ms": null,
+                "max_memory_mib": null
+              },
+              "quality_mode": "verified",
+              "task_quality": {
+                "version": "synthetic-rehearsal-v1",
+                "floor": 0.99,
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 1.0,
+                    "error": null
+                  }
+                ]
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": null,
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "metrics": {
+                "p95_latency_ms": 100.0,
+                "output_tokens_per_second": 100.0,
+                "generation_errors": 0,
+                "request_count": 3,
+                "mean_queue_ms": null,
+                "mean_ttft_ms": null,
+                "preemptions": null,
+                "sampled_peak_memory_mib": 2000
+              },
+              "remaining_trials": 2,
+              "supported_changes": {
+                "kv_cache_dtype": [
+                  "fp8"
+                ]
+              },
+              "baseline_self_check": {
+                "version": "token-agreement-v1",
+                "floor": 0.99,
+                "scores": [
+                  1.0
+                ],
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": false
+              },
+              "limitations": [
+                "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+                "Token agreement does not establish task correctness.",
+                "Sampled peak memory includes runtime reservation, not just model weights.",
+                "This small sample cannot establish statistical significance."
+              ],
+              "history": [],
+              "previous_rounds": [],
+              "specialist_role": "quantization",
+              "frozen_candidate_hashes": [
+                "d685f575f60970614290f425b6ad8e6a9c8cac68580d87f8bcff5f62c882c5b3"
+              ]
+            },
+            "status": "accepted",
+            "proposal": {
+              "action": "trial",
+              "proposal_id": "quantization-1",
+              "agent_role": "quantization",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "changed_lever": "kv_cache_dtype",
+              "proposed_value": "fp8",
+              "evidence_used": [
+                "p95_latency_ms"
+              ],
+              "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "Quality fails or p95 improves by less than 5%",
+              "reason": "Test the declared cache-precision experiment"
+            },
+            "arbiter_proposal_id": "quantization:quantization-1"
+          },
+          {
+            "role": "batching",
+            "evidence": {
+              "trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+              "objective": {
+                "priority": "latency",
+                "min_improvement_fraction": 0.05
+              },
+              "constraints": {
+                "quality_floor": 0.99,
+                "p95_latency_ms": null,
+                "max_memory_mib": null
+              },
+              "quality_mode": "verified",
+              "task_quality": {
+                "version": "synthetic-rehearsal-v1",
+                "floor": 0.99,
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 1.0,
+                    "error": null
+                  }
+                ]
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": null,
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "metrics": {
+                "p95_latency_ms": 100.0,
+                "output_tokens_per_second": 100.0,
+                "generation_errors": 0,
+                "request_count": 3,
+                "mean_queue_ms": null,
+                "mean_ttft_ms": null,
+                "preemptions": null,
+                "sampled_peak_memory_mib": 2000
+              },
+              "remaining_trials": 2,
+              "supported_changes": {
+                "max_num_batched_tokens": [
+                  2048
+                ]
+              },
+              "baseline_self_check": {
+                "version": "token-agreement-v1",
+                "floor": 0.99,
+                "scores": [
+                  1.0
+                ],
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": false
+              },
+              "limitations": [
+                "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+                "Token agreement does not establish task correctness.",
+                "Sampled peak memory includes runtime reservation, not just model weights.",
+                "This small sample cannot establish statistical significance."
+              ],
+              "history": [],
+              "previous_rounds": [],
+              "specialist_role": "batching",
+              "frozen_candidate_hashes": [
+                "52376de0c6bb2d839947e1b056542e5e3803a13f93c58a145173b9281c119a14"
+              ]
+            },
+            "status": "abstained",
+            "proposal": {
+              "action": "keep-baseline",
+              "proposal_id": "batching-1",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "changed_lever": null,
+              "proposed_value": null,
+              "evidence_used": [
+                "p95_latency_ms"
+              ],
+              "predicted_metric_change": "No change until the cache result is available",
+              "confidence": 0.5,
+              "expected_trial_cost": 0,
+              "falsification_condition": "Quality fails or p95 improves by less than 5%",
+              "reason": "Wait for the cache experiment"
+            }
+          }
+        ],
+        "trial_ids": [
+          "trial-1"
+        ],
+        "arbiter_evidence": {
+          "trial_id": "baseline",
+          "model_id": "Qwen/Qwen3-0.6B",
+          "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "quality_mode": "verified",
+          "task_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "configuration": {
+            "dtype": "bfloat16",
+            "quantization": null,
+            "kv_cache_dtype": "auto",
+            "tensor_parallel_size": 1,
+            "max_model_len": 4096,
+            "max_num_seqs": 8,
+            "max_num_batched_tokens": 4096,
+            "gpu_memory_utilization": 0.9,
+            "enable_prefix_caching": false,
+            "enable_chunked_prefill": true,
+            "enforce_eager": true
+          },
+          "metrics": {
+            "p95_latency_ms": 100.0,
+            "output_tokens_per_second": 100.0,
+            "generation_errors": 0,
+            "request_count": 3,
+            "mean_queue_ms": null,
+            "mean_ttft_ms": null,
+            "preemptions": null,
+            "sampled_peak_memory_mib": 2000
+          },
+          "remaining_trials": 2,
+          "supported_changes": {
+            "kv_cache_dtype": [
+              "fp8"
+            ],
+            "max_num_batched_tokens": [
+              2048
+            ]
+          },
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "limitations": [
+            "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+            "Token agreement does not establish task correctness.",
+            "Sampled peak memory includes runtime reservation, not just model weights.",
+            "This small sample cannot establish statistical significance."
+          ],
+          "history": [],
+          "previous_rounds": [],
+          "legal_proposal_ids": [
+            "quantization:quantization-1"
+          ],
+          "proposals": [
+            {
+              "action": "trial",
+              "proposal_id": "quantization:quantization-1",
+              "agent_role": "quantization",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "changed_lever": "kv_cache_dtype",
+              "proposed_value": "fp8",
+              "evidence_used": [
+                "p95_latency_ms"
+              ],
+              "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "Quality fails or p95 improves by less than 5%",
+              "reason": "Test the declared cache-precision experiment"
+            }
+          ],
+          "proposal_id_map": {
+            "quantization:quantization-1": {
+              "agent_role": "quantization",
+              "original_proposal_id": "quantization-1"
+            }
+          }
+        },
+        "arbiter": {
+          "ranked_proposal_ids": [
+            "quantization:quantization-1"
+          ],
+          "reason": "Choose the only active proposal in this scripted rehearsal"
+        }
+      },
+      {
+        "round": 2,
+        "specialists": [
+          {
+            "role": "batching",
+            "evidence": {
+              "trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+              "objective": {
+                "priority": "latency",
+                "min_improvement_fraction": 0.05
+              },
+              "constraints": {
+                "quality_floor": 0.99,
+                "p95_latency_ms": null,
+                "max_memory_mib": null
+              },
+              "quality_mode": "verified",
+              "task_quality": {
+                "version": "synthetic-rehearsal-v1",
+                "floor": 0.99,
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 1.0,
+                    "error": null
+                  }
+                ]
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": null,
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "metrics": {
+                "p95_latency_ms": 100.0,
+                "output_tokens_per_second": 100.0,
+                "generation_errors": 0,
+                "request_count": 3,
+                "mean_queue_ms": null,
+                "mean_ttft_ms": null,
+                "preemptions": null,
+                "sampled_peak_memory_mib": 2000,
+                "trial_1_p95_latency_ms": 10.0,
+                "trial_1_output_tokens_per_second": 100.0,
+                "trial_1_generation_errors": 0,
+                "trial_1_request_count": 3,
+                "trial_1_sampled_peak_memory_mib": 2000
+              },
+              "remaining_trials": 1,
+              "supported_changes": {
+                "max_num_batched_tokens": [
+                  2048
+                ]
+              },
+              "baseline_self_check": {
+                "version": "token-agreement-v1",
+                "floor": 0.99,
+                "scores": [
+                  1.0
+                ],
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": false
+              },
+              "limitations": [
+                "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+                "Token agreement does not establish task correctness.",
+                "Sampled peak memory includes runtime reservation, not just model weights.",
+                "This small sample cannot establish statistical significance."
+              ],
+              "history": [
+                {
+                  "trial": {
+                    "trial_id": "trial-1",
+                    "status": "collected",
+                    "config_hash": "d685f575f60970614290f425b6ad8e6a9c8cac68580d87f8bcff5f62c882c5b3",
+                    "reduced": {
+                      "p95_latency_ms": 10.0,
+                      "output_tokens_per_second": 100.0,
+                      "generation_errors": 0,
+                      "request_count": 3
+                    },
+                    "task_quality": {
+                      "version": "synthetic-rehearsal-v1",
+                      "floor": 0.99,
+                      "mean": 0.0,
+                      "valid_outputs": true,
+                      "passed": false,
+                      "task_quality_verified": true,
+                      "per_prompt": [
+                        {
+                          "prompt_index": 0,
+                          "score": 0.0,
+                          "error": null
+                        }
+                      ]
+                    },
+                    "decision": {
+                      "selected": "baseline",
+                      "outcome": "no-safe-improvement",
+                      "baseline_self_check": {
+                        "version": "token-agreement-v1",
+                        "floor": 0.99,
+                        "scores": [
+                          1.0
+                        ],
+                        "mean": 1.0,
+                        "valid_outputs": true,
+                        "passed": true,
+                        "task_quality_verified": false
+                      },
+                      "candidate_quality": {
+                        "version": "synthetic-rehearsal-v1",
+                        "floor": 0.99,
+                        "mean": 0.0,
+                        "valid_outputs": true,
+                        "passed": false,
+                        "task_quality_verified": true,
+                        "per_prompt": [
+                          {
+                            "prompt_index": 0,
+                            "score": 0.0,
+                            "error": null
+                          }
+                        ]
+                      },
+                      "p95_improvement_fraction": 0.9,
+                      "objective": {
+                        "priority": "latency",
+                        "min_improvement_fraction": 0.05
+                      },
+                      "objective_improvement_fraction": 0.9,
+                      "constraints": {
+                        "quality_floor": 0.99,
+                        "p95_latency_ms": null,
+                        "max_memory_mib": null
+                      },
+                      "constraint_failures": {
+                        "baseline": [],
+                        "candidate": [
+                          "task-quality-failed"
+                        ]
+                      },
+                      "baseline_quality": {
+                        "version": "synthetic-rehearsal-v1",
+                        "floor": 0.99,
+                        "mean": 1.0,
+                        "valid_outputs": true,
+                        "passed": true,
+                        "task_quality_verified": true,
+                        "per_prompt": [
+                          {
+                            "prompt_index": 0,
+                            "score": 1.0,
+                            "error": null
+                          }
+                        ]
+                      },
+                      "reason": "candidate-constraints-failed"
+                    }
+                  },
+                  "configuration": {
+                    "dtype": "bfloat16",
+                    "quantization": null,
+                    "kv_cache_dtype": "fp8",
+                    "tensor_parallel_size": 1,
+                    "max_model_len": 4096,
+                    "max_num_seqs": 8,
+                    "max_num_batched_tokens": 4096,
+                    "gpu_memory_utilization": 0.9,
+                    "enable_prefix_caching": false,
+                    "enable_chunked_prefill": true,
+                    "enforce_eager": true
+                  },
+                  "proposal": {
+                    "action": "trial",
+                    "proposal_id": "quantization-1",
+                    "agent_role": "quantization",
+                    "parent_trial_id": "baseline",
+                    "model_id": "Qwen/Qwen3-0.6B",
+                    "changed_lever": "kv_cache_dtype",
+                    "proposed_value": "fp8",
+                    "evidence_used": [
+                      "p95_latency_ms"
+                    ],
+                    "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+                    "confidence": 0.5,
+                    "expected_trial_cost": 1,
+                    "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                    "reason": "Test the declared cache-precision experiment"
+                  },
+                  "review": {
+                    "selected_trial_id": "baseline",
+                    "prediction_outcome": "refuted",
+                    "reason": "The deterministic task and performance gates rejected this trial"
+                  },
+                  "review_error": null
+                }
+              ],
+              "previous_rounds": [
+                {
+                  "round": 1,
+                  "trial_ids": [
+                    "trial-1"
+                  ],
+                  "arbiter": {
+                    "ranked_proposal_ids": [
+                      "quantization:quantization-1"
+                    ],
+                    "reason": "Choose the only active proposal in this scripted rehearsal"
+                  },
+                  "arbiter_error": null,
+                  "specialists": [
+                    {
+                      "role": "quantization",
+                      "status": "accepted",
+                      "proposal": {
+                        "action": "trial",
+                        "proposal_id": "quantization-1",
+                        "agent_role": "quantization",
+                        "parent_trial_id": "baseline",
+                        "model_id": "Qwen/Qwen3-0.6B",
+                        "changed_lever": "kv_cache_dtype",
+                        "proposed_value": "fp8",
+                        "evidence_used": [
+                          "p95_latency_ms"
+                        ],
+                        "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+                        "confidence": 0.5,
+                        "expected_trial_cost": 1,
+                        "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                        "reason": "Test the declared cache-precision experiment"
+                      },
+                      "arbiter_proposal_id": "quantization:quantization-1"
+                    },
+                    {
+                      "role": "batching",
+                      "status": "abstained",
+                      "proposal": {
+                        "action": "keep-baseline",
+                        "proposal_id": "batching-1",
+                        "agent_role": "batching",
+                        "parent_trial_id": "baseline",
+                        "model_id": "Qwen/Qwen3-0.6B",
+                        "changed_lever": null,
+                        "proposed_value": null,
+                        "evidence_used": [
+                          "p95_latency_ms"
+                        ],
+                        "predicted_metric_change": "No change until the cache result is available",
+                        "confidence": 0.5,
+                        "expected_trial_cost": 0,
+                        "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                        "reason": "Wait for the cache experiment"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "specialist_role": "batching",
+              "frozen_candidate_hashes": [
+                "52376de0c6bb2d839947e1b056542e5e3803a13f93c58a145173b9281c119a14"
+              ]
+            },
+            "status": "accepted",
+            "proposal": {
+              "action": "trial",
+              "proposal_id": "batching-2",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 2048,
+              "evidence_used": [
+                "trial_1_p95_latency_ms"
+              ],
+              "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "Quality fails or p95 improves by less than 5%",
+              "reason": "The earlier cache trial was fast but failed quality; test batching with baseline precision"
+            },
+            "arbiter_proposal_id": "batching:batching-2"
+          }
+        ],
+        "trial_ids": [
+          "trial-2"
+        ],
+        "arbiter_evidence": {
+          "trial_id": "baseline",
+          "model_id": "Qwen/Qwen3-0.6B",
+          "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "quality_mode": "verified",
+          "task_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "configuration": {
+            "dtype": "bfloat16",
+            "quantization": null,
+            "kv_cache_dtype": "auto",
+            "tensor_parallel_size": 1,
+            "max_model_len": 4096,
+            "max_num_seqs": 8,
+            "max_num_batched_tokens": 4096,
+            "gpu_memory_utilization": 0.9,
+            "enable_prefix_caching": false,
+            "enable_chunked_prefill": true,
+            "enforce_eager": true
+          },
+          "metrics": {
+            "p95_latency_ms": 100.0,
+            "output_tokens_per_second": 100.0,
+            "generation_errors": 0,
+            "request_count": 3,
+            "mean_queue_ms": null,
+            "mean_ttft_ms": null,
+            "preemptions": null,
+            "sampled_peak_memory_mib": 2000,
+            "trial_1_p95_latency_ms": 10.0,
+            "trial_1_output_tokens_per_second": 100.0,
+            "trial_1_generation_errors": 0,
+            "trial_1_request_count": 3,
+            "trial_1_sampled_peak_memory_mib": 2000
+          },
+          "remaining_trials": 1,
+          "supported_changes": {
+            "kv_cache_dtype": [
+              "fp8"
+            ],
+            "max_num_batched_tokens": [
+              2048
+            ]
+          },
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "limitations": [
+            "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+            "Token agreement does not establish task correctness.",
+            "Sampled peak memory includes runtime reservation, not just model weights.",
+            "This small sample cannot establish statistical significance."
+          ],
+          "history": [
+            {
+              "trial": {
+                "trial_id": "trial-1",
+                "status": "collected",
+                "config_hash": "d685f575f60970614290f425b6ad8e6a9c8cac68580d87f8bcff5f62c882c5b3",
+                "reduced": {
+                  "p95_latency_ms": 10.0,
+                  "output_tokens_per_second": 100.0,
+                  "generation_errors": 0,
+                  "request_count": 3
+                },
+                "task_quality": {
+                  "version": "synthetic-rehearsal-v1",
+                  "floor": 0.99,
+                  "mean": 0.0,
+                  "valid_outputs": true,
+                  "passed": false,
+                  "task_quality_verified": true,
+                  "per_prompt": [
+                    {
+                      "prompt_index": 0,
+                      "score": 0.0,
+                      "error": null
+                    }
+                  ]
+                },
+                "decision": {
+                  "selected": "baseline",
+                  "outcome": "no-safe-improvement",
+                  "baseline_self_check": {
+                    "version": "token-agreement-v1",
+                    "floor": 0.99,
+                    "scores": [
+                      1.0
+                    ],
+                    "mean": 1.0,
+                    "valid_outputs": true,
+                    "passed": true,
+                    "task_quality_verified": false
+                  },
+                  "candidate_quality": {
+                    "version": "synthetic-rehearsal-v1",
+                    "floor": 0.99,
+                    "mean": 0.0,
+                    "valid_outputs": true,
+                    "passed": false,
+                    "task_quality_verified": true,
+                    "per_prompt": [
+                      {
+                        "prompt_index": 0,
+                        "score": 0.0,
+                        "error": null
+                      }
+                    ]
+                  },
+                  "p95_improvement_fraction": 0.9,
+                  "objective": {
+                    "priority": "latency",
+                    "min_improvement_fraction": 0.05
+                  },
+                  "objective_improvement_fraction": 0.9,
+                  "constraints": {
+                    "quality_floor": 0.99,
+                    "p95_latency_ms": null,
+                    "max_memory_mib": null
+                  },
+                  "constraint_failures": {
+                    "baseline": [],
+                    "candidate": [
+                      "task-quality-failed"
+                    ]
+                  },
+                  "baseline_quality": {
+                    "version": "synthetic-rehearsal-v1",
+                    "floor": 0.99,
+                    "mean": 1.0,
+                    "valid_outputs": true,
+                    "passed": true,
+                    "task_quality_verified": true,
+                    "per_prompt": [
+                      {
+                        "prompt_index": 0,
+                        "score": 1.0,
+                        "error": null
+                      }
+                    ]
+                  },
+                  "reason": "candidate-constraints-failed"
+                }
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": null,
+                "kv_cache_dtype": "fp8",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "proposal": {
+                "action": "trial",
+                "proposal_id": "quantization-1",
+                "agent_role": "quantization",
+                "parent_trial_id": "baseline",
+                "model_id": "Qwen/Qwen3-0.6B",
+                "changed_lever": "kv_cache_dtype",
+                "proposed_value": "fp8",
+                "evidence_used": [
+                  "p95_latency_ms"
+                ],
+                "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+                "confidence": 0.5,
+                "expected_trial_cost": 1,
+                "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                "reason": "Test the declared cache-precision experiment"
+              },
+              "review": {
+                "selected_trial_id": "baseline",
+                "prediction_outcome": "refuted",
+                "reason": "The deterministic task and performance gates rejected this trial"
+              },
+              "review_error": null
+            }
+          ],
+          "previous_rounds": [
+            {
+              "round": 1,
+              "trial_ids": [
+                "trial-1"
+              ],
+              "arbiter": {
+                "ranked_proposal_ids": [
+                  "quantization:quantization-1"
+                ],
+                "reason": "Choose the only active proposal in this scripted rehearsal"
+              },
+              "arbiter_error": null,
+              "specialists": [
+                {
+                  "role": "quantization",
+                  "status": "accepted",
+                  "proposal": {
+                    "action": "trial",
+                    "proposal_id": "quantization-1",
+                    "agent_role": "quantization",
+                    "parent_trial_id": "baseline",
+                    "model_id": "Qwen/Qwen3-0.6B",
+                    "changed_lever": "kv_cache_dtype",
+                    "proposed_value": "fp8",
+                    "evidence_used": [
+                      "p95_latency_ms"
+                    ],
+                    "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+                    "confidence": 0.5,
+                    "expected_trial_cost": 1,
+                    "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                    "reason": "Test the declared cache-precision experiment"
+                  },
+                  "arbiter_proposal_id": "quantization:quantization-1"
+                },
+                {
+                  "role": "batching",
+                  "status": "abstained",
+                  "proposal": {
+                    "action": "keep-baseline",
+                    "proposal_id": "batching-1",
+                    "agent_role": "batching",
+                    "parent_trial_id": "baseline",
+                    "model_id": "Qwen/Qwen3-0.6B",
+                    "changed_lever": null,
+                    "proposed_value": null,
+                    "evidence_used": [
+                      "p95_latency_ms"
+                    ],
+                    "predicted_metric_change": "No change until the cache result is available",
+                    "confidence": 0.5,
+                    "expected_trial_cost": 0,
+                    "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                    "reason": "Wait for the cache experiment"
+                  }
+                }
+              ]
+            }
+          ],
+          "legal_proposal_ids": [
+            "batching:batching-2"
+          ],
+          "proposals": [
+            {
+              "action": "trial",
+              "proposal_id": "batching:batching-2",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 2048,
+              "evidence_used": [
+                "trial_1_p95_latency_ms"
+              ],
+              "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "Quality fails or p95 improves by less than 5%",
+              "reason": "The earlier cache trial was fast but failed quality; test batching with baseline precision"
+            }
+          ],
+          "proposal_id_map": {
+            "batching:batching-2": {
+              "agent_role": "batching",
+              "original_proposal_id": "batching-2"
+            }
+          }
+        },
+        "arbiter": {
+          "ranked_proposal_ids": [
+            "batching:batching-2"
+          ],
+          "reason": "Choose the only active proposal in this scripted rehearsal"
+        }
+      }
+    ],
+    "stop_reason": "budget-exhausted"
+  },
+  "search_trials": [
+    {
+      "trial_id": "trial-1",
+      "status": "collected",
+      "runtime": {
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "fp8",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "sampled_peak_memory_mib": 2000,
+        "provenance": "synthetic",
+        "closed": true
+      },
+      "config_hash": "d685f575f60970614290f425b6ad8e6a9c8cac68580d87f8bcff5f62c882c5b3",
+      "proposal": {
+        "action": "trial",
+        "proposal_id": "quantization-1",
+        "agent_role": "quantization",
+        "parent_trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "changed_lever": "kv_cache_dtype",
+        "proposed_value": "fp8",
+        "evidence_used": [
+          "p95_latency_ms"
+        ],
+        "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+        "confidence": 0.5,
+        "expected_trial_cost": 1,
+        "falsification_condition": "Quality fails or p95 improves by less than 5%",
+        "reason": "Test the declared cache-precision experiment"
+      },
+      "selection_reason": "arbiter",
+      "input_token_ids": [
+        [
+          1
+        ]
+      ],
+      "quality": [
+        {
+          "prompt_index": 0,
+          "text": "{\"answer\": 0}",
+          "token_ids": [
+            0
+          ],
+          "prompt_token_ids": [
+            1
+          ],
+          "error": null
+        }
+      ],
+      "self_check": [],
+      "metrics": {},
+      "provenance": "synthetic",
+      "reduced": {
+        "p95_latency_ms": 10.0,
+        "output_tokens_per_second": 100.0,
+        "generation_errors": 0,
+        "request_count": 3
+      },
+      "task_quality": {
+        "version": "synthetic-rehearsal-v1",
+        "floor": 0.99,
+        "mean": 0.0,
+        "valid_outputs": true,
+        "passed": false,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 0.0,
+            "error": null
+          }
+        ]
+      },
+      "decision": {
+        "selected": "baseline",
+        "outcome": "no-safe-improvement",
+        "baseline_self_check": {
+          "version": "token-agreement-v1",
+          "floor": 0.99,
+          "scores": [
+            1.0
+          ],
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": false
+        },
+        "candidate_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 0.0,
+          "valid_outputs": true,
+          "passed": false,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 0.0,
+              "error": null
+            }
+          ]
+        },
+        "p95_improvement_fraction": 0.9,
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "objective_improvement_fraction": 0.9,
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_memory_mib": null
+        },
+        "constraint_failures": {
+          "baseline": [],
+          "candidate": [
+            "task-quality-failed"
+          ]
+        },
+        "baseline_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "reason": "candidate-constraints-failed"
+      },
+      "review_evidence": {
+        "proposal": {
+          "action": "trial",
+          "proposal_id": "quantization-1",
+          "agent_role": "quantization",
+          "parent_trial_id": "baseline",
+          "model_id": "Qwen/Qwen3-0.6B",
+          "changed_lever": "kv_cache_dtype",
+          "proposed_value": "fp8",
+          "evidence_used": [
+            "p95_latency_ms"
+          ],
+          "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+          "confidence": 0.5,
+          "expected_trial_cost": 1,
+          "falsification_condition": "Quality fails or p95 improves by less than 5%",
+          "reason": "Test the declared cache-precision experiment"
+        },
+        "decision": {
+          "selected": "baseline",
+          "outcome": "no-safe-improvement",
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "candidate_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 0.0,
+            "valid_outputs": true,
+            "passed": false,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 0.0,
+                "error": null
+              }
+            ]
+          },
+          "p95_improvement_fraction": 0.9,
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "objective_improvement_fraction": 0.9,
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "constraint_failures": {
+            "baseline": [],
+            "candidate": [
+              "task-quality-failed"
+            ]
+          },
+          "baseline_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "reason": "candidate-constraints-failed"
+        },
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "candidate_tested": true,
+        "candidate_status": "collected",
+        "baseline_metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "candidate_metrics": {
+          "p95_latency_ms": 10.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "eligible_trial_ids": [
+          "baseline"
+        ]
+      },
+      "review_response": {
+        "selected_trial_id": "baseline",
+        "prediction_outcome": "refuted",
+        "reason": "The deterministic task and performance gates rejected this trial"
+      },
+      "review": {
+        "selected_trial_id": "baseline",
+        "prediction_outcome": "refuted",
+        "reason": "The deterministic task and performance gates rejected this trial"
+      }
+    },
+    {
+      "trial_id": "trial-2",
+      "status": "collected",
+      "runtime": {
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 2048,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "sampled_peak_memory_mib": 2000,
+        "provenance": "synthetic",
+        "closed": true
+      },
+      "config_hash": "52376de0c6bb2d839947e1b056542e5e3803a13f93c58a145173b9281c119a14",
+      "proposal": {
+        "action": "trial",
+        "proposal_id": "batching-2",
+        "agent_role": "batching",
+        "parent_trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "changed_lever": "max_num_batched_tokens",
+        "proposed_value": 2048,
+        "evidence_used": [
+          "trial_1_p95_latency_ms"
+        ],
+        "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+        "confidence": 0.5,
+        "expected_trial_cost": 1,
+        "falsification_condition": "Quality fails or p95 improves by less than 5%",
+        "reason": "The earlier cache trial was fast but failed quality; test batching with baseline precision"
+      },
+      "selection_reason": "arbiter",
+      "input_token_ids": [
+        [
+          1
+        ]
+      ],
+      "quality": [
+        {
+          "prompt_index": 0,
+          "text": "{\"answer\": 5}",
+          "token_ids": [
+            5
+          ],
+          "prompt_token_ids": [
+            1
+          ],
+          "error": null
+        }
+      ],
+      "self_check": [],
+      "metrics": {},
+      "provenance": "synthetic",
+      "reduced": {
+        "p95_latency_ms": 80.0,
+        "output_tokens_per_second": 100.0,
+        "generation_errors": 0,
+        "request_count": 3
+      },
+      "task_quality": {
+        "version": "synthetic-rehearsal-v1",
+        "floor": 0.99,
+        "mean": 1.0,
+        "valid_outputs": true,
+        "passed": true,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 1.0,
+            "error": null
+          }
+        ]
+      },
+      "decision": {
+        "selected": "candidate",
+        "outcome": "improved",
+        "baseline_self_check": {
+          "version": "token-agreement-v1",
+          "floor": 0.99,
+          "scores": [
+            1.0
+          ],
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": false
+        },
+        "candidate_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "p95_improvement_fraction": 0.19999999999999996,
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "objective_improvement_fraction": 0.2,
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_memory_mib": null
+        },
+        "constraint_failures": {
+          "baseline": [],
+          "candidate": []
+        },
+        "baseline_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "reason": "quality-passed-and-p95-improved-at-least-five-percent"
+      },
+      "review_evidence": {
+        "proposal": {
+          "action": "trial",
+          "proposal_id": "batching-2",
+          "agent_role": "batching",
+          "parent_trial_id": "baseline",
+          "model_id": "Qwen/Qwen3-0.6B",
+          "changed_lever": "max_num_batched_tokens",
+          "proposed_value": 2048,
+          "evidence_used": [
+            "trial_1_p95_latency_ms"
+          ],
+          "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+          "confidence": 0.5,
+          "expected_trial_cost": 1,
+          "falsification_condition": "Quality fails or p95 improves by less than 5%",
+          "reason": "The earlier cache trial was fast but failed quality; test batching with baseline precision"
+        },
+        "decision": {
+          "selected": "candidate",
+          "outcome": "improved",
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "candidate_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "p95_improvement_fraction": 0.19999999999999996,
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "objective_improvement_fraction": 0.2,
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "constraint_failures": {
+            "baseline": [],
+            "candidate": []
+          },
+          "baseline_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "reason": "quality-passed-and-p95-improved-at-least-five-percent"
+        },
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "candidate_tested": true,
+        "candidate_status": "collected",
+        "baseline_metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "candidate_metrics": {
+          "p95_latency_ms": 80.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "eligible_trial_ids": [
+          "trial-2"
+        ]
+      },
+      "review_response": {
+        "selected_trial_id": "trial-2",
+        "prediction_outcome": "confirmed",
+        "reason": "The deterministic task and performance gates passed"
+      },
+      "review": {
+        "selected_trial_id": "trial-2",
+        "prediction_outcome": "confirmed",
+        "reason": "The deterministic task and performance gates passed"
+      }
+    }
+  ],
+  "agent_calls": [
+    {
+      "role": "proposal",
+      "evidence": {
+        "trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_memory_mib": null
+        },
+        "quality_mode": "verified",
+        "task_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3,
+          "mean_queue_ms": null,
+          "mean_ttft_ms": null,
+          "preemptions": null,
+          "sampled_peak_memory_mib": 2000
+        },
+        "remaining_trials": 2,
+        "supported_changes": {
+          "kv_cache_dtype": [
+            "fp8"
+          ]
+        },
+        "baseline_self_check": {
+          "version": "token-agreement-v1",
+          "floor": 0.99,
+          "scores": [
+            1.0
+          ],
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": false
+        },
+        "limitations": [
+          "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+          "Token agreement does not establish task correctness.",
+          "Sampled peak memory includes runtime reservation, not just model weights.",
+          "This small sample cannot establish statistical significance."
+        ],
+        "history": [],
+        "previous_rounds": [],
+        "specialist_role": "quantization",
+        "frozen_candidate_hashes": [
+          "d685f575f60970614290f425b6ad8e6a9c8cac68580d87f8bcff5f62c882c5b3"
+        ]
+      },
+      "raw_response": {
+        "action": "trial",
+        "proposal_id": "quantization-1",
+        "agent_role": "quantization",
+        "parent_trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "changed_lever": "kv_cache_dtype",
+        "proposed_value": "fp8",
+        "evidence_used": [
+          "p95_latency_ms"
+        ],
+        "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+        "confidence": 0.5,
+        "expected_trial_cost": 1,
+        "falsification_condition": "Quality fails or p95 improves by less than 5%",
+        "reason": "Test the declared cache-precision experiment"
+      },
+      "provenance": "synthetic"
+    },
+    {
+      "role": "proposal",
+      "evidence": {
+        "trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_memory_mib": null
+        },
+        "quality_mode": "verified",
+        "task_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3,
+          "mean_queue_ms": null,
+          "mean_ttft_ms": null,
+          "preemptions": null,
+          "sampled_peak_memory_mib": 2000
+        },
+        "remaining_trials": 2,
+        "supported_changes": {
+          "max_num_batched_tokens": [
+            2048
+          ]
+        },
+        "baseline_self_check": {
+          "version": "token-agreement-v1",
+          "floor": 0.99,
+          "scores": [
+            1.0
+          ],
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": false
+        },
+        "limitations": [
+          "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+          "Token agreement does not establish task correctness.",
+          "Sampled peak memory includes runtime reservation, not just model weights.",
+          "This small sample cannot establish statistical significance."
+        ],
+        "history": [],
+        "previous_rounds": [],
+        "specialist_role": "batching",
+        "frozen_candidate_hashes": [
+          "52376de0c6bb2d839947e1b056542e5e3803a13f93c58a145173b9281c119a14"
+        ]
+      },
+      "raw_response": {
+        "action": "keep-baseline",
+        "proposal_id": "batching-1",
+        "agent_role": "batching",
+        "parent_trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "changed_lever": null,
+        "proposed_value": null,
+        "evidence_used": [
+          "p95_latency_ms"
+        ],
+        "predicted_metric_change": "No change until the cache result is available",
+        "confidence": 0.5,
+        "expected_trial_cost": 0,
+        "falsification_condition": "Quality fails or p95 improves by less than 5%",
+        "reason": "Wait for the cache experiment"
+      },
+      "provenance": "synthetic"
+    },
+    {
+      "role": "arbiter",
+      "evidence": {
+        "trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_memory_mib": null
+        },
+        "quality_mode": "verified",
+        "task_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3,
+          "mean_queue_ms": null,
+          "mean_ttft_ms": null,
+          "preemptions": null,
+          "sampled_peak_memory_mib": 2000
+        },
+        "remaining_trials": 2,
+        "supported_changes": {
+          "kv_cache_dtype": [
+            "fp8"
+          ],
+          "max_num_batched_tokens": [
+            2048
+          ]
+        },
+        "baseline_self_check": {
+          "version": "token-agreement-v1",
+          "floor": 0.99,
+          "scores": [
+            1.0
+          ],
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": false
+        },
+        "limitations": [
+          "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+          "Token agreement does not establish task correctness.",
+          "Sampled peak memory includes runtime reservation, not just model weights.",
+          "This small sample cannot establish statistical significance."
+        ],
+        "history": [],
+        "previous_rounds": [],
+        "legal_proposal_ids": [
+          "quantization:quantization-1"
+        ],
+        "proposals": [
+          {
+            "action": "trial",
+            "proposal_id": "quantization:quantization-1",
+            "agent_role": "quantization",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen3-0.6B",
+            "changed_lever": "kv_cache_dtype",
+            "proposed_value": "fp8",
+            "evidence_used": [
+              "p95_latency_ms"
+            ],
+            "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+            "confidence": 0.5,
+            "expected_trial_cost": 1,
+            "falsification_condition": "Quality fails or p95 improves by less than 5%",
+            "reason": "Test the declared cache-precision experiment"
+          }
+        ],
+        "proposal_id_map": {
+          "quantization:quantization-1": {
+            "agent_role": "quantization",
+            "original_proposal_id": "quantization-1"
+          }
+        }
+      },
+      "raw_response": {
+        "ranked_proposal_ids": [
+          "quantization:quantization-1"
+        ],
+        "reason": "Choose the only active proposal in this scripted rehearsal"
+      },
+      "provenance": "synthetic"
+    },
+    {
+      "role": "frontier",
+      "evidence": {
+        "proposal": {
+          "action": "trial",
+          "proposal_id": "quantization-1",
+          "agent_role": "quantization",
+          "parent_trial_id": "baseline",
+          "model_id": "Qwen/Qwen3-0.6B",
+          "changed_lever": "kv_cache_dtype",
+          "proposed_value": "fp8",
+          "evidence_used": [
+            "p95_latency_ms"
+          ],
+          "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+          "confidence": 0.5,
+          "expected_trial_cost": 1,
+          "falsification_condition": "Quality fails or p95 improves by less than 5%",
+          "reason": "Test the declared cache-precision experiment"
+        },
+        "decision": {
+          "selected": "baseline",
+          "outcome": "no-safe-improvement",
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "candidate_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 0.0,
+            "valid_outputs": true,
+            "passed": false,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 0.0,
+                "error": null
+              }
+            ]
+          },
+          "p95_improvement_fraction": 0.9,
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "objective_improvement_fraction": 0.9,
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "constraint_failures": {
+            "baseline": [],
+            "candidate": [
+              "task-quality-failed"
+            ]
+          },
+          "baseline_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "reason": "candidate-constraints-failed"
+        },
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "candidate_tested": true,
+        "candidate_status": "collected",
+        "baseline_metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "candidate_metrics": {
+          "p95_latency_ms": 10.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "eligible_trial_ids": [
+          "baseline"
+        ]
+      },
+      "raw_response": {
+        "selected_trial_id": "baseline",
+        "prediction_outcome": "refuted",
+        "reason": "The deterministic task and performance gates rejected this trial"
+      },
+      "provenance": "synthetic"
+    },
+    {
+      "role": "proposal",
+      "evidence": {
+        "trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_memory_mib": null
+        },
+        "quality_mode": "verified",
+        "task_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3,
+          "mean_queue_ms": null,
+          "mean_ttft_ms": null,
+          "preemptions": null,
+          "sampled_peak_memory_mib": 2000,
+          "trial_1_p95_latency_ms": 10.0,
+          "trial_1_output_tokens_per_second": 100.0,
+          "trial_1_generation_errors": 0,
+          "trial_1_request_count": 3,
+          "trial_1_sampled_peak_memory_mib": 2000
+        },
+        "remaining_trials": 1,
+        "supported_changes": {
+          "max_num_batched_tokens": [
+            2048
+          ]
+        },
+        "baseline_self_check": {
+          "version": "token-agreement-v1",
+          "floor": 0.99,
+          "scores": [
+            1.0
+          ],
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": false
+        },
+        "limitations": [
+          "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+          "Token agreement does not establish task correctness.",
+          "Sampled peak memory includes runtime reservation, not just model weights.",
+          "This small sample cannot establish statistical significance."
+        ],
+        "history": [
+          {
+            "trial": {
+              "trial_id": "trial-1",
+              "status": "collected",
+              "config_hash": "d685f575f60970614290f425b6ad8e6a9c8cac68580d87f8bcff5f62c882c5b3",
+              "reduced": {
+                "p95_latency_ms": 10.0,
+                "output_tokens_per_second": 100.0,
+                "generation_errors": 0,
+                "request_count": 3
+              },
+              "task_quality": {
+                "version": "synthetic-rehearsal-v1",
+                "floor": 0.99,
+                "mean": 0.0,
+                "valid_outputs": true,
+                "passed": false,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 0.0,
+                    "error": null
+                  }
+                ]
+              },
+              "decision": {
+                "selected": "baseline",
+                "outcome": "no-safe-improvement",
+                "baseline_self_check": {
+                  "version": "token-agreement-v1",
+                  "floor": 0.99,
+                  "scores": [
+                    1.0
+                  ],
+                  "mean": 1.0,
+                  "valid_outputs": true,
+                  "passed": true,
+                  "task_quality_verified": false
+                },
+                "candidate_quality": {
+                  "version": "synthetic-rehearsal-v1",
+                  "floor": 0.99,
+                  "mean": 0.0,
+                  "valid_outputs": true,
+                  "passed": false,
+                  "task_quality_verified": true,
+                  "per_prompt": [
+                    {
+                      "prompt_index": 0,
+                      "score": 0.0,
+                      "error": null
+                    }
+                  ]
+                },
+                "p95_improvement_fraction": 0.9,
+                "objective": {
+                  "priority": "latency",
+                  "min_improvement_fraction": 0.05
+                },
+                "objective_improvement_fraction": 0.9,
+                "constraints": {
+                  "quality_floor": 0.99,
+                  "p95_latency_ms": null,
+                  "max_memory_mib": null
+                },
+                "constraint_failures": {
+                  "baseline": [],
+                  "candidate": [
+                    "task-quality-failed"
+                  ]
+                },
+                "baseline_quality": {
+                  "version": "synthetic-rehearsal-v1",
+                  "floor": 0.99,
+                  "mean": 1.0,
+                  "valid_outputs": true,
+                  "passed": true,
+                  "task_quality_verified": true,
+                  "per_prompt": [
+                    {
+                      "prompt_index": 0,
+                      "score": 1.0,
+                      "error": null
+                    }
+                  ]
+                },
+                "reason": "candidate-constraints-failed"
+              }
+            },
+            "configuration": {
+              "dtype": "bfloat16",
+              "quantization": null,
+              "kv_cache_dtype": "fp8",
+              "tensor_parallel_size": 1,
+              "max_model_len": 4096,
+              "max_num_seqs": 8,
+              "max_num_batched_tokens": 4096,
+              "gpu_memory_utilization": 0.9,
+              "enable_prefix_caching": false,
+              "enable_chunked_prefill": true,
+              "enforce_eager": true
+            },
+            "proposal": {
+              "action": "trial",
+              "proposal_id": "quantization-1",
+              "agent_role": "quantization",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "changed_lever": "kv_cache_dtype",
+              "proposed_value": "fp8",
+              "evidence_used": [
+                "p95_latency_ms"
+              ],
+              "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "Quality fails or p95 improves by less than 5%",
+              "reason": "Test the declared cache-precision experiment"
+            },
+            "review": {
+              "selected_trial_id": "baseline",
+              "prediction_outcome": "refuted",
+              "reason": "The deterministic task and performance gates rejected this trial"
+            },
+            "review_error": null
+          }
+        ],
+        "previous_rounds": [
+          {
+            "round": 1,
+            "trial_ids": [
+              "trial-1"
+            ],
+            "arbiter": {
+              "ranked_proposal_ids": [
+                "quantization:quantization-1"
+              ],
+              "reason": "Choose the only active proposal in this scripted rehearsal"
+            },
+            "arbiter_error": null,
+            "specialists": [
+              {
+                "role": "quantization",
+                "status": "accepted",
+                "proposal": {
+                  "action": "trial",
+                  "proposal_id": "quantization-1",
+                  "agent_role": "quantization",
+                  "parent_trial_id": "baseline",
+                  "model_id": "Qwen/Qwen3-0.6B",
+                  "changed_lever": "kv_cache_dtype",
+                  "proposed_value": "fp8",
+                  "evidence_used": [
+                    "p95_latency_ms"
+                  ],
+                  "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+                  "confidence": 0.5,
+                  "expected_trial_cost": 1,
+                  "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                  "reason": "Test the declared cache-precision experiment"
+                },
+                "arbiter_proposal_id": "quantization:quantization-1"
+              },
+              {
+                "role": "batching",
+                "status": "abstained",
+                "proposal": {
+                  "action": "keep-baseline",
+                  "proposal_id": "batching-1",
+                  "agent_role": "batching",
+                  "parent_trial_id": "baseline",
+                  "model_id": "Qwen/Qwen3-0.6B",
+                  "changed_lever": null,
+                  "proposed_value": null,
+                  "evidence_used": [
+                    "p95_latency_ms"
+                  ],
+                  "predicted_metric_change": "No change until the cache result is available",
+                  "confidence": 0.5,
+                  "expected_trial_cost": 0,
+                  "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                  "reason": "Wait for the cache experiment"
+                }
+              }
+            ]
+          }
+        ],
+        "specialist_role": "batching",
+        "frozen_candidate_hashes": [
+          "52376de0c6bb2d839947e1b056542e5e3803a13f93c58a145173b9281c119a14"
+        ]
+      },
+      "raw_response": {
+        "action": "trial",
+        "proposal_id": "batching-2",
+        "agent_role": "batching",
+        "parent_trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "changed_lever": "max_num_batched_tokens",
+        "proposed_value": 2048,
+        "evidence_used": [
+          "trial_1_p95_latency_ms"
+        ],
+        "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+        "confidence": 0.5,
+        "expected_trial_cost": 1,
+        "falsification_condition": "Quality fails or p95 improves by less than 5%",
+        "reason": "The earlier cache trial was fast but failed quality; test batching with baseline precision"
+      },
+      "provenance": "synthetic"
+    },
+    {
+      "role": "arbiter",
+      "evidence": {
+        "trial_id": "baseline",
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "constraints": {
+          "quality_floor": 0.99,
+          "p95_latency_ms": null,
+          "max_memory_mib": null
+        },
+        "quality_mode": "verified",
+        "task_quality": {
+          "version": "synthetic-rehearsal-v1",
+          "floor": 0.99,
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": true,
+          "per_prompt": [
+            {
+              "prompt_index": 0,
+              "score": 1.0,
+              "error": null
+            }
+          ]
+        },
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": null,
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3,
+          "mean_queue_ms": null,
+          "mean_ttft_ms": null,
+          "preemptions": null,
+          "sampled_peak_memory_mib": 2000,
+          "trial_1_p95_latency_ms": 10.0,
+          "trial_1_output_tokens_per_second": 100.0,
+          "trial_1_generation_errors": 0,
+          "trial_1_request_count": 3,
+          "trial_1_sampled_peak_memory_mib": 2000
+        },
+        "remaining_trials": 1,
+        "supported_changes": {
+          "kv_cache_dtype": [
+            "fp8"
+          ],
+          "max_num_batched_tokens": [
+            2048
+          ]
+        },
+        "baseline_self_check": {
+          "version": "token-agreement-v1",
+          "floor": 0.99,
+          "scores": [
+            1.0
+          ],
+          "mean": 1.0,
+          "valid_outputs": true,
+          "passed": true,
+          "task_quality_verified": false
+        },
+        "limitations": [
+          "No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+          "Token agreement does not establish task correctness.",
+          "Sampled peak memory includes runtime reservation, not just model weights.",
+          "This small sample cannot establish statistical significance."
+        ],
+        "history": [
+          {
+            "trial": {
+              "trial_id": "trial-1",
+              "status": "collected",
+              "config_hash": "d685f575f60970614290f425b6ad8e6a9c8cac68580d87f8bcff5f62c882c5b3",
+              "reduced": {
+                "p95_latency_ms": 10.0,
+                "output_tokens_per_second": 100.0,
+                "generation_errors": 0,
+                "request_count": 3
+              },
+              "task_quality": {
+                "version": "synthetic-rehearsal-v1",
+                "floor": 0.99,
+                "mean": 0.0,
+                "valid_outputs": true,
+                "passed": false,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 0.0,
+                    "error": null
+                  }
+                ]
+              },
+              "decision": {
+                "selected": "baseline",
+                "outcome": "no-safe-improvement",
+                "baseline_self_check": {
+                  "version": "token-agreement-v1",
+                  "floor": 0.99,
+                  "scores": [
+                    1.0
+                  ],
+                  "mean": 1.0,
+                  "valid_outputs": true,
+                  "passed": true,
+                  "task_quality_verified": false
+                },
+                "candidate_quality": {
+                  "version": "synthetic-rehearsal-v1",
+                  "floor": 0.99,
+                  "mean": 0.0,
+                  "valid_outputs": true,
+                  "passed": false,
+                  "task_quality_verified": true,
+                  "per_prompt": [
+                    {
+                      "prompt_index": 0,
+                      "score": 0.0,
+                      "error": null
+                    }
+                  ]
+                },
+                "p95_improvement_fraction": 0.9,
+                "objective": {
+                  "priority": "latency",
+                  "min_improvement_fraction": 0.05
+                },
+                "objective_improvement_fraction": 0.9,
+                "constraints": {
+                  "quality_floor": 0.99,
+                  "p95_latency_ms": null,
+                  "max_memory_mib": null
+                },
+                "constraint_failures": {
+                  "baseline": [],
+                  "candidate": [
+                    "task-quality-failed"
+                  ]
+                },
+                "baseline_quality": {
+                  "version": "synthetic-rehearsal-v1",
+                  "floor": 0.99,
+                  "mean": 1.0,
+                  "valid_outputs": true,
+                  "passed": true,
+                  "task_quality_verified": true,
+                  "per_prompt": [
+                    {
+                      "prompt_index": 0,
+                      "score": 1.0,
+                      "error": null
+                    }
+                  ]
+                },
+                "reason": "candidate-constraints-failed"
+              }
+            },
+            "configuration": {
+              "dtype": "bfloat16",
+              "quantization": null,
+              "kv_cache_dtype": "fp8",
+              "tensor_parallel_size": 1,
+              "max_model_len": 4096,
+              "max_num_seqs": 8,
+              "max_num_batched_tokens": 4096,
+              "gpu_memory_utilization": 0.9,
+              "enable_prefix_caching": false,
+              "enable_chunked_prefill": true,
+              "enforce_eager": true
+            },
+            "proposal": {
+              "action": "trial",
+              "proposal_id": "quantization-1",
+              "agent_role": "quantization",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen3-0.6B",
+              "changed_lever": "kv_cache_dtype",
+              "proposed_value": "fp8",
+              "evidence_used": [
+                "p95_latency_ms"
+              ],
+              "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+              "confidence": 0.5,
+              "expected_trial_cost": 1,
+              "falsification_condition": "Quality fails or p95 improves by less than 5%",
+              "reason": "Test the declared cache-precision experiment"
+            },
+            "review": {
+              "selected_trial_id": "baseline",
+              "prediction_outcome": "refuted",
+              "reason": "The deterministic task and performance gates rejected this trial"
+            },
+            "review_error": null
+          }
+        ],
+        "previous_rounds": [
+          {
+            "round": 1,
+            "trial_ids": [
+              "trial-1"
+            ],
+            "arbiter": {
+              "ranked_proposal_ids": [
+                "quantization:quantization-1"
+              ],
+              "reason": "Choose the only active proposal in this scripted rehearsal"
+            },
+            "arbiter_error": null,
+            "specialists": [
+              {
+                "role": "quantization",
+                "status": "accepted",
+                "proposal": {
+                  "action": "trial",
+                  "proposal_id": "quantization-1",
+                  "agent_role": "quantization",
+                  "parent_trial_id": "baseline",
+                  "model_id": "Qwen/Qwen3-0.6B",
+                  "changed_lever": "kv_cache_dtype",
+                  "proposed_value": "fp8",
+                  "evidence_used": [
+                    "p95_latency_ms"
+                  ],
+                  "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+                  "confidence": 0.5,
+                  "expected_trial_cost": 1,
+                  "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                  "reason": "Test the declared cache-precision experiment"
+                },
+                "arbiter_proposal_id": "quantization:quantization-1"
+              },
+              {
+                "role": "batching",
+                "status": "abstained",
+                "proposal": {
+                  "action": "keep-baseline",
+                  "proposal_id": "batching-1",
+                  "agent_role": "batching",
+                  "parent_trial_id": "baseline",
+                  "model_id": "Qwen/Qwen3-0.6B",
+                  "changed_lever": null,
+                  "proposed_value": null,
+                  "evidence_used": [
+                    "p95_latency_ms"
+                  ],
+                  "predicted_metric_change": "No change until the cache result is available",
+                  "confidence": 0.5,
+                  "expected_trial_cost": 0,
+                  "falsification_condition": "Quality fails or p95 improves by less than 5%",
+                  "reason": "Wait for the cache experiment"
+                }
+              }
+            ]
+          }
+        ],
+        "legal_proposal_ids": [
+          "batching:batching-2"
+        ],
+        "proposals": [
+          {
+            "action": "trial",
+            "proposal_id": "batching:batching-2",
+            "agent_role": "batching",
+            "parent_trial_id": "baseline",
+            "model_id": "Qwen/Qwen3-0.6B",
+            "changed_lever": "max_num_batched_tokens",
+            "proposed_value": 2048,
+            "evidence_used": [
+              "trial_1_p95_latency_ms"
+            ],
+            "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+            "confidence": 0.5,
+            "expected_trial_cost": 1,
+            "falsification_condition": "Quality fails or p95 improves by less than 5%",
+            "reason": "The earlier cache trial was fast but failed quality; test batching with baseline precision"
+          }
+        ],
+        "proposal_id_map": {
+          "batching:batching-2": {
+            "agent_role": "batching",
+            "original_proposal_id": "batching-2"
+          }
+        }
+      },
+      "raw_response": {
+        "ranked_proposal_ids": [
+          "batching:batching-2"
+        ],
+        "reason": "Choose the only active proposal in this scripted rehearsal"
+      },
+      "provenance": "synthetic"
+    },
+    {
+      "role": "frontier",
+      "evidence": {
+        "proposal": {
+          "action": "trial",
+          "proposal_id": "batching-2",
+          "agent_role": "batching",
+          "parent_trial_id": "baseline",
+          "model_id": "Qwen/Qwen3-0.6B",
+          "changed_lever": "max_num_batched_tokens",
+          "proposed_value": 2048,
+          "evidence_used": [
+            "trial_1_p95_latency_ms"
+          ],
+          "predicted_metric_change": "Reduce p95 by at least 5% while preserving task correctness",
+          "confidence": 0.5,
+          "expected_trial_cost": 1,
+          "falsification_condition": "Quality fails or p95 improves by less than 5%",
+          "reason": "The earlier cache trial was fast but failed quality; test batching with baseline precision"
+        },
+        "decision": {
+          "selected": "candidate",
+          "outcome": "improved",
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              1.0
+            ],
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": false
+          },
+          "candidate_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "p95_improvement_fraction": 0.19999999999999996,
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "objective_improvement_fraction": 0.2,
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "constraint_failures": {
+            "baseline": [],
+            "candidate": []
+          },
+          "baseline_quality": {
+            "version": "synthetic-rehearsal-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "reason": "quality-passed-and-p95-improved-at-least-five-percent"
+        },
+        "objective": {
+          "priority": "latency",
+          "min_improvement_fraction": 0.05
+        },
+        "candidate_tested": true,
+        "candidate_status": "collected",
+        "baseline_metrics": {
+          "p95_latency_ms": 100.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "candidate_metrics": {
+          "p95_latency_ms": 80.0,
+          "output_tokens_per_second": 100.0,
+          "generation_errors": 0,
+          "request_count": 3
+        },
+        "eligible_trial_ids": [
+          "trial-2"
+        ]
+      },
+      "raw_response": {
+        "selected_trial_id": "trial-2",
+        "prediction_outcome": "confirmed",
+        "reason": "The deterministic task and performance gates passed"
+      },
+      "provenance": "synthetic"
+    }
+  ],
+  "returned_runner_closed": true,
+  "decision": {
+    "selected": "trial-2",
+    "outcome": "improved",
+    "reason": "budget-exhausted"
+  },
+  "provenance": {
+    "kind": "synthetic",
+    "gpu_trials": 0,
+    "provider_calls": 0,
+    "claim": "Controller behavior only; no model quality, speedup, or search advantage claim"
+  },
+  "rehearsal": {
+    "fresh_prompt": "What is 7 + 8?",
+    "fresh_response": "{\"answer\": 15}",
+    "fresh_probe_passed": true
+  }
+}
