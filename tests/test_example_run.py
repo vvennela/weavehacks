@@ -47,6 +47,24 @@ def test_baseline_requires_idle_gpu_and_certificate(monkeypatch, tmp_path):
         demo.baseline()
 
 
+def test_litellm_configuration_keeps_the_openai_key_on_the_agent(tmp_path):
+    demo = ExampleRun(output_root=tmp_path)
+    demo.configure_weave('weave-fixture-key', project='test/project')
+    demo.configure_agent(provider='litellm-openai', model='gpt-6-astra', api_key='openai-fixture-key')
+    assert demo.agent.provider == 'litellm-openai'
+    assert demo.agent.model == 'gpt-6-astra'
+    assert 'openai-fixture-key' not in repr(demo.agent.__dict__)
+
+
+def test_configured_api_selects_litellm_without_a_controller(monkeypatch):
+    from sera.api import _configured_agent
+    for name, value in {'SERA_AGENT_PROVIDER': 'litellm-openai', 'SERA_AGENT_MODEL': 'gpt-6-astra',
+                        'SERA_PROJECT': 'test/project', 'OPENAI_API_KEY': 'fixture-key'}.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.delenv('SERA_RELAY_DIR', raising=False)
+    assert _configured_agent().provider == 'litellm-openai'
+
+
 def test_failed_baseline_stops_and_closes_runner(monkeypatch, tmp_path):
     from sera import measurement, quality
     import sera

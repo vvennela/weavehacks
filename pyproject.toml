@@ -20,6 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.6"]
 agent = ["openai>=2,<4"]
+litellm = ["litellm==1.82.0"]
 swarm = ["weave==0.53.2", "openai>=2,<4"]
 # Notebook presentation layer for the two-phase loop. Weave is deliberately absent:
 # the swarm extra pins it, and a second range here would only argue with that pin.

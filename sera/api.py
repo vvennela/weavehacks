@@ -20,8 +20,8 @@ def _required_environment(name):
 
 def _configured_agent():
     provider = _required_environment('SERA_AGENT_PROVIDER')
-    if provider not in ('wandb', 'codex-relay', 'openai-compatible'):
-        raise ValueError('SERA_AGENT_PROVIDER must be wandb, codex-relay, or openai-compatible')
+    if provider not in ('wandb', 'codex-relay', 'openai-compatible', 'litellm-openai'):
+        raise ValueError('SERA_AGENT_PROVIDER must be wandb, codex-relay, openai-compatible, or litellm-openai')
     model = _required_environment('SERA_AGENT_MODEL')
     project = _required_environment('SERA_PROJECT')
     if provider == 'codex-relay':
@@ -30,6 +30,9 @@ def _configured_agent():
                           relay_dir=_required_environment('SERA_RELAY_DIR'))
     if os.environ.get('SERA_RELAY_DIR'):
         raise ValueError('SERA_RELAY_DIR is only valid with codex-relay')
+    if provider == 'litellm-openai':
+        from .litellm_agent import LiteLLMAgent
+        return LiteLLMAgent(project=project, model=model)
     if provider == 'openai-compatible':
         from .agent import OpenAICompatibleAgent
         return OpenAICompatibleAgent(project=project, model=model,

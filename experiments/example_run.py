@@ -63,8 +63,13 @@ class ExampleRun:
                 raise ValueError('Codex needs a relay directory and a running external controller')
             from sera.relay import RelayAgent
             agent = RelayAgent(project=self.project, model=model, relay_dir=relay_dir)
+        elif provider == 'litellm-openai':
+            if not api_key or base_url is not None or relay_dir is not None:
+                raise ValueError('Supply an OpenAI key; this route uses the fixed OpenAI endpoint')
+            from sera.litellm_agent import LiteLLMAgent
+            agent = LiteLLMAgent(project=self.project, model=model, api_key=api_key)
         else:
-            raise ValueError('Choose wandb, openai-compatible, or codex-relay')
+            raise ValueError('Choose wandb, openai-compatible, litellm-openai, or codex-relay')
         self.agent, self.certificate = agent, None
 
     def _require_weave(self):
