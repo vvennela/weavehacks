@@ -17,7 +17,11 @@ PY=".venv/bin/python"
 "$PY" scripts/build_lab_notebook.py
 
 rm -rf output/notebook
-"$PY" -m marimo export html-wasm notebooks/lab.py -o output/notebook --mode edit >/dev/null
+# --mode run, not edit: the page embeds this as an app, so the only controls it may
+# show are the model dropdown and the Run button. Edit mode hands the visitor a
+# cell-by-cell editor and runs nothing until they press each cell in turn.
+"$PY" -m marimo export html-wasm notebooks/lab.py -o output/notebook \
+    --mode run --no-show-code >/dev/null
 # marimo copies a CLAUDE.md into the export; it is not ours to serve.
 rm -f output/notebook/CLAUDE.md
 

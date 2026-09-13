@@ -44,24 +44,15 @@ def _():
     from sera_loop.phase1 import Phase1
     from sera_loop.runner.sim_runner import SimRunner
     from sera_loop.spec import load_spec
-    return Ledger, Phase1, SERA_ROOT, SimRunner, load_spec, sera
+    return Ledger, Phase1, SERA_ROOT, SimRunner, load_spec, sera_loop
 
 
 @app.cell(hide_code=True)
-def _(mo, sera):
+def _(mo, sera_loop):
     mo.md(
-        f"""
-        # Sera Lab
-
-        Pick an open-weight model and press **Run**. Sera's specialist agents
-        propose one configuration change at a time, every trial is measured, and
-        anything that breaks the latency target or the quality floor is reverted
-        and recorded as such.
-
-        This executes `sera` **{sera_loop.__version__}** in your browser. Nothing below
-        is replayed — pressing Run calls `Phase1.run()` and the tables are built
-        from the ledger it writes.
-        """
+        f"Running `sera` **{sera_loop.__version__}** in this browser. Nothing here is "
+        "replayed — Run calls `Phase1.run()` and every table below is built from the "
+        "ledger it writes."
     )
     return
 
@@ -126,21 +117,22 @@ def _(Phase1, mo):
 
 
 @app.cell(hide_code=True)
-def _(mo, model_select, run_button):
+def _(Ledger, Phase1, SimRunner, mo, model, run_button, spec):
+    import tempfile, time
+    from pathlib import Path as _Path
+
+    # The gate has to be in this cell, not a cell of its own: marimo stops a cell's
+    # descendants, and descendants are found through variables. A gate cell that
+    # defines nothing has none. Reading run_button here is also what makes pressing
+    # the button re-run this — and picking a different model clears the results,
+    # because `spec` changes while run_button.value has reset to False.
     mo.stop(
         not run_button.value,
         mo.callout(
-            mo.md(f"Press **Run Sera** to tune **{model_select.value}** now."),
+            mo.md(f"Press **Run Sera** to tune `{model.hf_id}` now."),
             kind="neutral",
         ),
     )
-    return
-
-
-@app.cell(hide_code=True)
-def _(Ledger, Phase1, SimRunner, mo, spec):
-    import tempfile, time
-    from pathlib import Path as _Path
 
     # The actual run. Nothing is cached and nothing is replayed: a fresh ledger
     # every time, so re-running genuinely re-measures.
