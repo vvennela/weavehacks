@@ -8,7 +8,11 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 The [two-iteration GPU run](evidence/live-swarm-investigation-v1/README.md) is saved with its [Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a31-ec01-7c30-86cd-c51337b414a9). Three investigators compared findings. The context candidate crashed at startup; the batch candidate passed quality but gained only 0.054%, below 5%. Sera returned the working baseline and released the GPU.
 
-The run exposed a real gap: round two skipped fresh failure inspections and repeated incorrect token-count explanations. It proves safe recovery, not successful failure diagnosis. The updated code requires a failure inspection and exposes the specific startup-error record. The no-GPU follow-up check is still in progress. The older staged rehearsal below remains a separate recording.
+The run exposed a real gap: round two skipped fresh failure inspections and repeated incorrect token-count explanations. The updated code requires a successful failure inspection and exposes the specific startup-error record, with source hashes. A startup crash is not a measured quality failure; an observed kernel error is not proof of its underlying cause.
+
+The [two-round failure replay](evidence/failure-replay-v1/README.md) used real hosted agents and persisted Weave reads, with no new GPU trials. All three investigators read evidence in both rounds. However, one agent's false claim that 2,265 tokens was a per-request count spread through the shared findings. All six final explanations repeated it. One optional inspection used an invalid query and was rejected. This proves trace access and exposes a reasoning failure; it does **not** prove reliable diagnosis. The replay also supplied diagnostic guidance and revealed a later outcome category too early. That leak is fixed in newer code, not this recording. Round two had no remaining trial budget. The original failed recording is preserved; no extra GPU run was used to hide it.
+
+Open the [failure-replay trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a63-0465-7324-8010-1db65f99d9cb) to see the inspection, initial proposal, shared findings, and peer review. The next unresolved acceptance item is factual checking before findings can influence the group. The older staged rehearsal below remains a separate recording.
 
 ### What we are building
 
