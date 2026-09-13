@@ -1,0 +1,34 @@
+{
+  "schema_version": "sera-weave-live-verification-v1",
+  "source_commit": "27f877d34b9ef90b8ed4c1010503dbbd277ee562",
+  "result_sha256": "495287f872c0ce9f42586b83227b411118ae0121337ff580fc4a25b2f151914d",
+  "root_call_id": "01a09a0f-065b-7fcd-b076-d419fd5ae02d",
+  "trace_id": "01a09a0f-065a-7361-9a7d-47b805ee4059",
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a0f-065b-7fcd-b076-d419fd5ae02d",
+  "call_count": 297,
+  "op_counts": {
+    "run_investigation": 1,
+    "fit_quantization_advisor": 1,
+    "openai.chat.completions.create": 7,
+    "record_agent_response": 7,
+    "arbiter": 2,
+    "recorded_model_request": 273,
+    "recorded_trial_metrics": 2,
+    "frontier_reviewer": 2,
+    "batching_specialist": 2
+  },
+  "checks": {
+    "recorded_model_request_exact_match": true,
+    "recorded_trial_metrics_exact_match": true,
+    "provider_content_and_reasoning_exact_match": true,
+    "specialist_evidence_exact_match": true,
+    "specialists_received_request_examples": true,
+    "later_round_received_measured_history": true,
+    "all_calls_ended_without_exception": true,
+    "root_selected_baseline_and_closed": true
+  },
+  "passed": true,
+  "gpu_memory_mib_after_exit": 0,
+  "provider_returned_reasoning_count": 7,
+  "evidence_source": "Agents receive selected saved request records, not a remote Weave query. This audit queried the persisted Weave calls."
+}

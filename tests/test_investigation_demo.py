@@ -22,8 +22,9 @@ def load(root):
     return load_investigation_demo(root)
 
 
-def test_existing_real_run_is_prominent_but_labeled_batching_only():
-    view = load(ROOT)
+def test_existing_real_run_is_prominent_but_labeled_batching_only(tmp_path):
+    write_record(tmp_path, 'live-investigation-v1', saved_report())
+    view = load(tmp_path)
     assert view['source'] == 'evidence/live-investigation-v1/result.json'
     assert 'Recorded real run' in view['banner']
     assert 'batching-only' in view['scope']
@@ -42,6 +43,23 @@ def test_existing_real_run_is_prominent_but_labeled_batching_only():
     assert 'baseline' in view['runner'] and '4096' in view['runner']
     assert 'fresh request passed' in view['runner'] and 'closed' in view['runner']
     assert 'does not prove a search advantage' in view['limits']
+
+
+def test_current_real_team_record_is_the_default_with_honest_staged_roles():
+    view = load(ROOT)
+    assert view['source'] == 'evidence/live-team-investigation-v1/result.json'
+    assert 'status: closed' in view['banner']
+    assert view['budget'] == '2/3'
+    deployment, trial, stop = view['rows']
+    assert deployment['Specialist'] == 'quantization'
+    assert deployment['Proposed change'] == 'FP8 weights'
+    assert trial['Prediction review'] == 'refuted'
+    assert 'needs 5%' in trial['Measured gates']
+    assert stop['Proposed change'] == 'no change'
+    assert stop['Measured gates'] == 'not run'
+    assert 'separate stages' in view['scope']
+    assert 'fresh request passed' in view['runner']
+    assert 'closed after the recorded run' in view['runner']
 
 
 def test_preferred_team_record_shows_deployment_then_rounds(tmp_path):

@@ -1,0 +1,168 @@
+{
+  "source_directory": "/marimo/sera-evidence/live-team-investigation-v1",
+  "note": "UTF-8 text copied without content edits. Server log carriage returns are normalized to newlines; both hashes are recorded.",
+  "files": [
+    {
+      "path": "candidate/metrics-concurrency-1-after-measurement.prom",
+      "characters": 51492,
+      "sha256": "bbac1c0f6f1123e94684b84e0928ce59cf38e42194f2b6662945a0e5e86a6b41",
+      "raw_sha256": "bbac1c0f6f1123e94684b84e0928ce59cf38e42194f2b6662945a0e5e86a6b41"
+    },
+    {
+      "path": "candidate/metrics-concurrency-1-before-measurement.prom",
+      "characters": 51244,
+      "sha256": "609f5e061c949c29867640d6e86e5d51d0e4c790c97263ba3109b609a04e84c9",
+      "raw_sha256": "609f5e061c949c29867640d6e86e5d51d0e4c790c97263ba3109b609a04e84c9"
+    },
+    {
+      "path": "candidate/metrics-concurrency-2-after-measurement.prom",
+      "characters": 51473,
+      "sha256": "e474f43c7c9b76e860cab8194d3e2aba08e828ddb41cc30eb13f5458dd1cd005",
+      "raw_sha256": "e474f43c7c9b76e860cab8194d3e2aba08e828ddb41cc30eb13f5458dd1cd005"
+    },
+    {
+      "path": "candidate/metrics-concurrency-2-before-measurement.prom",
+      "characters": 51480,
+      "sha256": "e12d9362d7fab70140c7543ace42d72d5de77684af41ce1f0ac2d6d770b17645",
+      "raw_sha256": "e12d9362d7fab70140c7543ace42d72d5de77684af41ce1f0ac2d6d770b17645"
+    },
+    {
+      "path": "candidate/metrics-concurrency-4-after-measurement.prom",
+      "characters": 51490,
+      "sha256": "9b4c098bc6df323afdb4ad805fd9740d93dff935009844dbdd2348f2440efcb9",
+      "raw_sha256": "9b4c098bc6df323afdb4ad805fd9740d93dff935009844dbdd2348f2440efcb9"
+    },
+    {
+      "path": "candidate/metrics-concurrency-4-before-measurement.prom",
+      "characters": 51492,
+      "sha256": "1fcf714d166e939bebcf674478ab8c0269259e283f8794c11f36a6fb470e50b8",
+      "raw_sha256": "1fcf714d166e939bebcf674478ab8c0269259e283f8794c11f36a6fb470e50b8"
+    },
+    {
+      "path": "candidate/metrics-concurrency-8-after-measurement.prom",
+      "characters": 51692,
+      "sha256": "76980c56508645bac6df7fec6d43b1a4770e89aa768ac96d3a6e552f519dbdb6",
+      "raw_sha256": "76980c56508645bac6df7fec6d43b1a4770e89aa768ac96d3a6e552f519dbdb6"
+    },
+    {
+      "path": "candidate/metrics-concurrency-8-before-measurement.prom",
+      "characters": 51687,
+      "sha256": "e01f53e4f86c18a3461f8a9bfdbf56df4d8f649fd735536a238d11d1751eba02",
+      "raw_sha256": "e01f53e4f86c18a3461f8a9bfdbf56df4d8f649fd735536a238d11d1751eba02"
+    },
+    {
+      "path": "candidate/runtime.json",
+      "characters": 6531,
+      "sha256": "d3abf442a27ebd766c28c41b26ccd3d02b80b732b5acbc2caa33331aa1d5ad83",
+      "raw_sha256": "d3abf442a27ebd766c28c41b26ccd3d02b80b732b5acbc2caa33331aa1d5ad83"
+    },
+    {
+      "path": "candidate/server.log",
+      "characters": 207735,
+      "sha256": "7602e1ad04cc947482fa2d44bae5139ef0e838007cbaccd1da8e5062987a72a5",
+      "raw_sha256": "3a368938efe63662d9657c1e6c2cacc4a8074c822eb9c50cbbcc80992ade99e5"
+    },
+    {
+      "path": "candidate/trial.json",
+      "characters": 667336,
+      "sha256": "f9a22cf6b7b2f7e7e0af4914019bc74fb20b8912b17308272df23e242a91f25e",
+      "raw_sha256": "f9a22cf6b7b2f7e7e0af4914019bc74fb20b8912b17308272df23e242a91f25e"
+    },
+    {
+      "path": "invocation.json",
+      "characters": 88650,
+      "sha256": "f6c43f304ff93839c554637dd5debd4021a98c0c73e59456d9ada907bbfcf79f",
+      "raw_sha256": "f6c43f304ff93839c554637dd5debd4021a98c0c73e59456d9ada907bbfcf79f"
+    },
+    {
+      "path": "report.md",
+      "characters": 10311,
+      "sha256": "3e2399603287900e3fbd1ea2bb601b2f63d47384690514ed1ebc4078bc1594cf",
+      "raw_sha256": "3e2399603287900e3fbd1ea2bb601b2f63d47384690514ed1ebc4078bc1594cf"
+    },
+    {
+      "path": "result.json",
+      "characters": 2723777,
+      "sha256": "495287f872c0ce9f42586b83227b411118ae0121337ff580fc4a25b2f151914d",
+      "raw_sha256": "495287f872c0ce9f42586b83227b411118ae0121337ff580fc4a25b2f151914d"
+    },
+    {
+      "path": "returned-best/runtime.json",
+      "characters": 6531,
+      "sha256": "41728fbc57a24f4d8b0e37606cf2ace2090335d52f2d83d889fc946e56f300f7",
+      "raw_sha256": "41728fbc57a24f4d8b0e37606cf2ace2090335d52f2d83d889fc946e56f300f7"
+    },
+    {
+      "path": "returned-best/server.log",
+      "characters": 192616,
+      "sha256": "87a5c176ca53aaea87424533c87535b2bdd8a7f3e50d3c71d5aea5ffa33d5222",
+      "raw_sha256": "d983b62d7d59ee35e39525cee210f1800f5e1cc7303e5ae05db101a78fb4f9b7"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-1-after-measurement.prom",
+      "characters": 51471,
+      "sha256": "478c329b419a4fd70a7c6251589ec1d8b4584fe5a17f121f33551c0e7d81a2eb",
+      "raw_sha256": "478c329b419a4fd70a7c6251589ec1d8b4584fe5a17f121f33551c0e7d81a2eb"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-1-before-measurement.prom",
+      "characters": 51226,
+      "sha256": "5f8b34c3c9f7407fb3578781b4f798f60a48373922911b5fd9b4f4256ddb2f21",
+      "raw_sha256": "5f8b34c3c9f7407fb3578781b4f798f60a48373922911b5fd9b4f4256ddb2f21"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-2-after-measurement.prom",
+      "characters": 51484,
+      "sha256": "6c95cffc6a39fb518b7df28f20627ad5ec3f501163965f9b092e445b07af6291",
+      "raw_sha256": "6c95cffc6a39fb518b7df28f20627ad5ec3f501163965f9b092e445b07af6291"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-2-before-measurement.prom",
+      "characters": 51476,
+      "sha256": "7c4e2ab540614d80f5194fed5db2fb6e1e3a11b46547496aff7ad67d4ee99b85",
+      "raw_sha256": "7c4e2ab540614d80f5194fed5db2fb6e1e3a11b46547496aff7ad67d4ee99b85"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-4-after-measurement.prom",
+      "characters": 51485,
+      "sha256": "e318bb5cd49c90674392314f1a2e365894c2dd15e581f2364cc8347ac732864b",
+      "raw_sha256": "e318bb5cd49c90674392314f1a2e365894c2dd15e581f2364cc8347ac732864b"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-4-before-measurement.prom",
+      "characters": 51470,
+      "sha256": "c3a0e2f96bf4c29ef4a23d03207e531696c3f23f977c54eb346e0b911634667a",
+      "raw_sha256": "c3a0e2f96bf4c29ef4a23d03207e531696c3f23f977c54eb346e0b911634667a"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-8-after-measurement.prom",
+      "characters": 51688,
+      "sha256": "10e4c1510951777a30e2f65b18308fb20ef80aeff5e88cee86b5d20a910915b6",
+      "raw_sha256": "10e4c1510951777a30e2f65b18308fb20ef80aeff5e88cee86b5d20a910915b6"
+    },
+    {
+      "path": "trial-2/metrics-concurrency-8-before-measurement.prom",
+      "characters": 51684,
+      "sha256": "764f4794d91a5569d15f597850bf6025bb9e53677e4268b47bc567ef40199530",
+      "raw_sha256": "764f4794d91a5569d15f597850bf6025bb9e53677e4268b47bc567ef40199530"
+    },
+    {
+      "path": "trial-2/runtime.json",
+      "characters": 6531,
+      "sha256": "20c7bd1219f2352eb845bc13f70f6b9e4cc17a6d0a468b995fe8d34842884532",
+      "raw_sha256": "20c7bd1219f2352eb845bc13f70f6b9e4cc17a6d0a468b995fe8d34842884532"
+    },
+    {
+      "path": "trial-2/server.log",
+      "characters": 207611,
+      "sha256": "6e94ca8507f951b92bdda4ce76424a6a440597b458e5e2766c1b07cda5f24263",
+      "raw_sha256": "ed37f344fbfb2cc62eb9414fb8c1b0e9008430b56fcae1855b10b1e2052441fa"
+    },
+    {
+      "path": "trial-2/trial.json",
+      "characters": 667332,
+      "sha256": "dc503a630ea4e5e841a1bc15280a020e5956148fce8edc99b04158320ad53e87",
+      "raw_sha256": "dc503a630ea4e5e841a1bc15280a020e5956148fce8edc99b04158320ad53e87"
+    }
+  ]
+}

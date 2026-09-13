@@ -1,0 +1,1926 @@
+{
+  "schema_version": "sera-live-investigation-invocation-v1",
+  "passed": true,
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "budget": {
+    "max_candidate_trials": 3
+  },
+  "fit_first": true,
+  "automatic_space": true,
+  "objective": {
+    "priority": "latency",
+    "min_improvement_fraction": 0.05
+  },
+  "workload": {
+    "concurrency": [
+      1,
+      2,
+      4,
+      8
+    ]
+  },
+  "investigation_space": {
+    "supported_changes": {
+      "max_num_batched_tokens": [
+        2048
+      ],
+      "max_model_len": [
+        256
+      ]
+    },
+    "candidate_hashes": [
+      "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+      "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536"
+    ],
+    "space_hash": "d9b54fd3bb1e1eea93c005ffed822bb60411617954817fd88a1932b9183ce0a4"
+  },
+  "provider_validation": {
+    "path": "/marimo/sera-release-04313ea/evidence/provider-v5/result.json",
+    "schema_hash": "e80de32d65eef75c3821f06d27dccd8fd7fd7f58b63b513a9dd6637478a83813",
+    "model": "openai/gpt-oss-20b",
+    "first_pass_valid": 30,
+    "valid_with_one_retry": 30
+  },
+  "evaluation_cases_sha256": "2f3c6687cf2a19bde4c3f5b60ab56cb24ac67c6755e999ad98227b04e42d95a7",
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a0f-065b-7fcd-b076-d419fd5ae02d",
+  "returned_runner_closed": true,
+  "limits": "A bounded live investigation is not proof of search superiority.",
+  "search": {
+    "budget": {
+      "max_candidate_trials": 3
+    },
+    "initial_trials_used": 1,
+    "trials_used": 2,
+    "rounds": [
+      {
+        "round": 1,
+        "specialists": [
+          {
+            "role": "batching",
+            "evidence": {
+              "trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+              "objective": {
+                "priority": "latency",
+                "min_improvement_fraction": 0.05
+              },
+              "constraints": {
+                "quality_floor": 0.99,
+                "p95_latency_ms": null,
+                "max_memory_mib": null
+              },
+              "quality_mode": "verified",
+              "task_quality": {
+                "version": "sera-easy-strict-json-v1",
+                "floor": 0.99,
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 1,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 2,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 3,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 4,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 5,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 6,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 7,
+                    "score": 1.0,
+                    "error": null
+                  }
+                ]
+              },
+              "request_evidence": {
+                "source": "saved trial request records; also used for optional Weave export",
+                "trial_id": "baseline",
+                "config_hash": "b73ef7a2884fb0f9a40855b9db9ff81380d08bb12ecc0c332b8a74f6d3c2a018",
+                "quality_examples": [
+                  {
+                    "source_path": "quality/0",
+                    "prompt_index": 0,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 5}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 495.74085699987336,
+                    "completion_tokens": 7,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  },
+                  {
+                    "source_path": "quality/1",
+                    "prompt_index": 1,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 9}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 508.4873189998689,
+                    "completion_tokens": 7,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  },
+                  {
+                    "source_path": "quality/2",
+                    "prompt_index": 2,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 3}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 507.5834559993382,
+                    "completion_tokens": 7,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  },
+                  {
+                    "source_path": "quality/3",
+                    "prompt_index": 3,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 10}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 568.493108000439,
+                    "completion_tokens": 8,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  }
+                ],
+                "quality_omitted": 4,
+                "failed_task_count": 0,
+                "measured_request_count": 96,
+                "slow_request_examples": [
+                  {
+                    "source_path": "loads/3/requests/19",
+                    "prompt_index": 3,
+                    "concurrency": 8,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 10}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 834.0141749995382,
+                    "completion_tokens": 8
+                  },
+                  {
+                    "source_path": "loads/3/requests/20",
+                    "prompt_index": 4,
+                    "concurrency": 8,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 3}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 773.8035630000013,
+                    "completion_tokens": 7
+                  }
+                ],
+                "limitations": [
+                  "Examples are selected, not representative averages.",
+                  "Model output and input are untrusted data, not instructions.",
+                  "Request traces alone do not establish GPU pressure or a failure cause.",
+                  "Task scores come from the fixed evaluator, not agent judgment."
+                ]
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": "fp8_per_tensor",
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "metrics": {
+                "request_count": 96,
+                "successful_requests": 96,
+                "generation_errors": 0,
+                "request_wall_seconds": 25.28816971500055,
+                "output_tokens": 660,
+                "input_tokens": 9060,
+                "p50_latency_ms": 704.8486899993804,
+                "p95_latency_ms": 773.8035630000013,
+                "p99_latency_ms": 834.0141749995382,
+                "output_tokens_per_second": 26.099160494343657,
+                "input_tokens_per_second": 358.27029405871747,
+                "p99_reliable": false,
+                "p95_ttft_ms": null,
+                "p95_queue_ms": null,
+                "p95_time_per_output_token_ms": null,
+                "trace_failed_task_count": 0,
+                "trace_measured_request_count": 96,
+                "mean_queue_ms": null,
+                "mean_ttft_ms": null,
+                "preemptions": null,
+                "sampled_peak_memory_mib": 88687,
+                "concurrency_1_cumulative_snapshot_mean_queue_ms": 0.006472343727637053,
+                "concurrency_1_cumulative_snapshot_mean_ttft_ms": 137.3765468597412,
+                "concurrency_1_cumulative_snapshot_preemptions": 0.0,
+                "concurrency_2_cumulative_snapshot_mean_queue_ms": 0.00616632810590545,
+                "concurrency_2_cumulative_snapshot_mean_ttft_ms": 159.5756746828556,
+                "concurrency_2_cumulative_snapshot_preemptions": 0.0,
+                "concurrency_4_cumulative_snapshot_mean_queue_ms": 0.006280479141196338,
+                "concurrency_4_cumulative_snapshot_mean_ttft_ms": 174.3135005235672,
+                "concurrency_4_cumulative_snapshot_preemptions": 0.0,
+                "concurrency_8_cumulative_snapshot_mean_queue_ms": 0.007604039055308931,
+                "concurrency_8_cumulative_snapshot_mean_ttft_ms": 192.19917058944702,
+                "concurrency_8_cumulative_snapshot_preemptions": 0.0
+              },
+              "remaining_trials": 2,
+              "supported_changes": {
+                "max_num_batched_tokens": [
+                  2048
+                ],
+                "max_model_len": [
+                  256
+                ]
+              },
+              "baseline_self_check": {
+                "version": "token-agreement-v1",
+                "floor": 0.99,
+                "scores": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "mean": 0.0,
+                "valid_outputs": false,
+                "passed": false,
+                "task_quality_verified": false
+              },
+              "limitations": [
+                "No measured in-flight KV peak; idle KV use is not pressure evidence.",
+                "concurrency_N_cumulative_snapshot_* fields are snapshots after that load, cumulative since server startup and including warmup and earlier loads; they are not measured-window means or counter deltas. Legacy unprefixed mean_queue_ms, mean_ttft_ms, and preemptions have the same cumulative scope.",
+                "Token agreement does not establish task correctness.",
+                "Sampled peak memory includes runtime reservation, not just model weights.",
+                "This small sample cannot establish statistical significance."
+              ],
+              "deployment_context": {
+                "bf16_baseline_measured": false,
+                "infeasible_baseline": {
+                  "status": "infeasible",
+                  "reason": "Estimated BF16 runtime exceeds the service memory budget",
+                  "fit_estimate": {
+                    "plan_id": "baseline",
+                    "configuration": {
+                      "dtype": "bfloat16",
+                      "quantization": null,
+                      "kv_cache_dtype": "auto",
+                      "tensor_parallel_size": 1,
+                      "max_model_len": 4096,
+                      "max_num_seqs": 8,
+                      "max_num_batched_tokens": 4096,
+                      "gpu_memory_utilization": 0.9,
+                      "enable_prefix_caching": false,
+                      "enable_chunked_prefill": true,
+                      "enforce_eager": true
+                    },
+                    "weights_bytes": 145412407296,
+                    "kv_bytes": 10737418240,
+                    "workspace_bytes": 4294967296,
+                    "estimated_peak_bytes": 160444792832,
+                    "estimated_fit": false,
+                    "measurement_status": "not-measured"
+                  }
+                },
+                "selected_configuration": {
+                  "dtype": "bfloat16",
+                  "quantization": "fp8_per_tensor",
+                  "kv_cache_dtype": "auto",
+                  "tensor_parallel_size": 1,
+                  "max_model_len": 4096,
+                  "max_num_seqs": 8,
+                  "max_num_batched_tokens": 4096,
+                  "gpu_memory_utilization": 0.9,
+                  "enable_prefix_caching": false,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": true
+                },
+                "task_quality": {
+                  "version": "sera-easy-strict-json-v1",
+                  "floor": 0.99,
+                  "mean": 1.0,
+                  "valid_outputs": true,
+                  "passed": true
+                },
+                "feasibility_prediction": {
+                  "kind": "deployment-feasibility",
+                  "statement": "Online FP8 weights let the requested model run on this GPU and meet the supplied task and resource constraints."
+                },
+                "feasibility_review": {
+                  "selected_trial_id": "candidate",
+                  "prediction_outcome": "confirmed",
+                  "reason": "The candidate trial ran successfully with 96 requests, all successful, and met the quality and resource constraints specified. The measured latency and memory usage are within the acceptable limits (no constraint failures reported for the candidate), confirming the deployment‑feasibility prediction that online FP8 weights allow the model to run on the GPU while satisfying the task and resource constraints."
+                },
+                "review_error": null,
+                "comparison_scope": "Search compares against the measured FP8 reference, not BF16 performance."
+              },
+              "frozen_candidate_hashes": [
+                "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+                "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536"
+              ],
+              "history": [],
+              "previous_rounds": [],
+              "specialist_role": "batching"
+            },
+            "status": "accepted",
+            "proposal": {
+              "action": "trial",
+              "proposal_id": "trial-001",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 2048,
+              "evidence_used": [
+                "concurrency_8_cumulative_snapshot_mean_ttft_ms",
+                "concurrency_8_cumulative_snapshot_mean_queue_ms",
+                "p95_latency_ms"
+              ],
+              "predicted_metric_change": "p95_latency_ms decreases by at least 5%",
+              "confidence": 0.6,
+              "expected_trial_cost": 1,
+              "falsification_condition": "p95_latency_ms does not improve by ≥5% relative to baseline",
+              "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 is expected to lower peak memory usage and reduce contention for GPU resources, which should lower queue times and first‑token latency, thereby improving overall p95 latency. The baseline shows high queue and TTFT metrics at concurrency 8, indicating potential memory pressure that can be alleviated by a smaller batch size."
+            },
+            "arbiter_proposal_id": "batching:trial-001"
+          }
+        ],
+        "trial_ids": [
+          "trial-2"
+        ],
+        "specialist_participation": [
+          {
+            "role": "quantization",
+            "status": "inactive",
+            "reason": "No control values are enabled for this specialist in this run.",
+            "legal_candidate_count": 0
+          },
+          {
+            "role": "batching",
+            "status": "active",
+            "reason": "Legal untested candidates are available for this specialist.",
+            "legal_candidate_count": 2
+          },
+          {
+            "role": "parallelism",
+            "status": "inactive",
+            "legal_candidate_count": 0,
+            "reason": "Single-GPU runtime fixes tensor_parallel_size at 1; parallelism controls are not enabled."
+          }
+        ],
+        "arbiter_evidence": {
+          "trial_id": "baseline",
+          "model_id": "Qwen/Qwen2.5-72B-Instruct",
+          "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+          "objective": {
+            "priority": "latency",
+            "min_improvement_fraction": 0.05
+          },
+          "constraints": {
+            "quality_floor": 0.99,
+            "p95_latency_ms": null,
+            "max_memory_mib": null
+          },
+          "quality_mode": "verified",
+          "task_quality": {
+            "version": "sera-easy-strict-json-v1",
+            "floor": 0.99,
+            "mean": 1.0,
+            "valid_outputs": true,
+            "passed": true,
+            "task_quality_verified": true,
+            "per_prompt": [
+              {
+                "prompt_index": 0,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 1,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 2,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 3,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 4,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 5,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 6,
+                "score": 1.0,
+                "error": null
+              },
+              {
+                "prompt_index": 7,
+                "score": 1.0,
+                "error": null
+              }
+            ]
+          },
+          "request_evidence": {
+            "source": "saved trial request records; also used for optional Weave export",
+            "trial_id": "baseline",
+            "config_hash": "b73ef7a2884fb0f9a40855b9db9ff81380d08bb12ecc0c332b8a74f6d3c2a018",
+            "quality_examples": [
+              {
+                "source_path": "quality/0",
+                "prompt_index": 0,
+                "concurrency": 1,
+                "input": [
+                  {
+                    "role": "system",
+                    "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                  },
+                  {
+                    "role": "user",
+                    "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+                  }
+                ],
+                "output": "{\"answer\": 5}",
+                "input_truncated": false,
+                "output_truncated": false,
+                "error": null,
+                "finish_reason": "stop",
+                "latency_ms": 495.74085699987336,
+                "completion_tokens": 7,
+                "task_score": 1.0,
+                "evaluator_error": null
+              },
+              {
+                "source_path": "quality/1",
+                "prompt_index": 1,
+                "concurrency": 1,
+                "input": [
+                  {
+                    "role": "system",
+                    "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+                  }
+                ],
+                "output": "{\"answer\": 9}",
+                "input_truncated": false,
+                "output_truncated": false,
+                "error": null,
+                "finish_reason": "stop",
+                "latency_ms": 508.4873189998689,
+                "completion_tokens": 7,
+                "task_score": 1.0,
+                "evaluator_error": null
+              },
+              {
+                "source_path": "quality/2",
+                "prompt_index": 2,
+                "concurrency": 1,
+                "input": [
+                  {
+                    "role": "system",
+                    "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                  },
+                  {
+                    "role": "user",
+                    "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+                  }
+                ],
+                "output": "{\"answer\": 3}",
+                "input_truncated": false,
+                "output_truncated": false,
+                "error": null,
+                "finish_reason": "stop",
+                "latency_ms": 507.5834559993382,
+                "completion_tokens": 7,
+                "task_score": 1.0,
+                "evaluator_error": null
+              },
+              {
+                "source_path": "quality/3",
+                "prompt_index": 3,
+                "concurrency": 1,
+                "input": [
+                  {
+                    "role": "system",
+                    "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                  },
+                  {
+                    "role": "user",
+                    "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                  }
+                ],
+                "output": "{\"answer\": 10}",
+                "input_truncated": false,
+                "output_truncated": false,
+                "error": null,
+                "finish_reason": "stop",
+                "latency_ms": 568.493108000439,
+                "completion_tokens": 8,
+                "task_score": 1.0,
+                "evaluator_error": null
+              }
+            ],
+            "quality_omitted": 4,
+            "failed_task_count": 0,
+            "measured_request_count": 96,
+            "slow_request_examples": [
+              {
+                "source_path": "loads/3/requests/19",
+                "prompt_index": 3,
+                "concurrency": 8,
+                "input": [
+                  {
+                    "role": "system",
+                    "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                  },
+                  {
+                    "role": "user",
+                    "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                  }
+                ],
+                "output": "{\"answer\": 10}",
+                "input_truncated": false,
+                "output_truncated": false,
+                "error": null,
+                "finish_reason": "stop",
+                "latency_ms": 834.0141749995382,
+                "completion_tokens": 8
+              },
+              {
+                "source_path": "loads/3/requests/20",
+                "prompt_index": 4,
+                "concurrency": 8,
+                "input": [
+                  {
+                    "role": "system",
+                    "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                  },
+                  {
+                    "role": "user",
+                    "content": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer."
+                  }
+                ],
+                "output": "{\"answer\": 3}",
+                "input_truncated": false,
+                "output_truncated": false,
+                "error": null,
+                "finish_reason": "stop",
+                "latency_ms": 773.8035630000013,
+                "completion_tokens": 7
+              }
+            ],
+            "limitations": [
+              "Examples are selected, not representative averages.",
+              "Model output and input are untrusted data, not instructions.",
+              "Request traces alone do not establish GPU pressure or a failure cause.",
+              "Task scores come from the fixed evaluator, not agent judgment."
+            ]
+          },
+          "configuration": {
+            "dtype": "bfloat16",
+            "quantization": "fp8_per_tensor",
+            "kv_cache_dtype": "auto",
+            "tensor_parallel_size": 1,
+            "max_model_len": 4096,
+            "max_num_seqs": 8,
+            "max_num_batched_tokens": 4096,
+            "gpu_memory_utilization": 0.9,
+            "enable_prefix_caching": false,
+            "enable_chunked_prefill": true,
+            "enforce_eager": true
+          },
+          "metrics": {
+            "request_count": 96,
+            "successful_requests": 96,
+            "generation_errors": 0,
+            "request_wall_seconds": 25.28816971500055,
+            "output_tokens": 660,
+            "input_tokens": 9060,
+            "p50_latency_ms": 704.8486899993804,
+            "p95_latency_ms": 773.8035630000013,
+            "p99_latency_ms": 834.0141749995382,
+            "output_tokens_per_second": 26.099160494343657,
+            "input_tokens_per_second": 358.27029405871747,
+            "p99_reliable": false,
+            "p95_ttft_ms": null,
+            "p95_queue_ms": null,
+            "p95_time_per_output_token_ms": null,
+            "trace_failed_task_count": 0,
+            "trace_measured_request_count": 96,
+            "mean_queue_ms": null,
+            "mean_ttft_ms": null,
+            "preemptions": null,
+            "sampled_peak_memory_mib": 88687,
+            "concurrency_1_cumulative_snapshot_mean_queue_ms": 0.006472343727637053,
+            "concurrency_1_cumulative_snapshot_mean_ttft_ms": 137.3765468597412,
+            "concurrency_1_cumulative_snapshot_preemptions": 0.0,
+            "concurrency_2_cumulative_snapshot_mean_queue_ms": 0.00616632810590545,
+            "concurrency_2_cumulative_snapshot_mean_ttft_ms": 159.5756746828556,
+            "concurrency_2_cumulative_snapshot_preemptions": 0.0,
+            "concurrency_4_cumulative_snapshot_mean_queue_ms": 0.006280479141196338,
+            "concurrency_4_cumulative_snapshot_mean_ttft_ms": 174.3135005235672,
+            "concurrency_4_cumulative_snapshot_preemptions": 0.0,
+            "concurrency_8_cumulative_snapshot_mean_queue_ms": 0.007604039055308931,
+            "concurrency_8_cumulative_snapshot_mean_ttft_ms": 192.19917058944702,
+            "concurrency_8_cumulative_snapshot_preemptions": 0.0
+          },
+          "remaining_trials": 2,
+          "supported_changes": {
+            "max_num_batched_tokens": [
+              2048
+            ],
+            "max_model_len": [
+              256
+            ]
+          },
+          "baseline_self_check": {
+            "version": "token-agreement-v1",
+            "floor": 0.99,
+            "scores": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "valid_outputs": false,
+            "passed": false,
+            "task_quality_verified": false
+          },
+          "limitations": [
+            "No measured in-flight KV peak; idle KV use is not pressure evidence.",
+            "concurrency_N_cumulative_snapshot_* fields are snapshots after that load, cumulative since server startup and including warmup and earlier loads; they are not measured-window means or counter deltas. Legacy unprefixed mean_queue_ms, mean_ttft_ms, and preemptions have the same cumulative scope.",
+            "Token agreement does not establish task correctness.",
+            "Sampled peak memory includes runtime reservation, not just model weights.",
+            "This small sample cannot establish statistical significance."
+          ],
+          "deployment_context": {
+            "bf16_baseline_measured": false,
+            "infeasible_baseline": {
+              "status": "infeasible",
+              "reason": "Estimated BF16 runtime exceeds the service memory budget",
+              "fit_estimate": {
+                "plan_id": "baseline",
+                "configuration": {
+                  "dtype": "bfloat16",
+                  "quantization": null,
+                  "kv_cache_dtype": "auto",
+                  "tensor_parallel_size": 1,
+                  "max_model_len": 4096,
+                  "max_num_seqs": 8,
+                  "max_num_batched_tokens": 4096,
+                  "gpu_memory_utilization": 0.9,
+                  "enable_prefix_caching": false,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": true
+                },
+                "weights_bytes": 145412407296,
+                "kv_bytes": 10737418240,
+                "workspace_bytes": 4294967296,
+                "estimated_peak_bytes": 160444792832,
+                "estimated_fit": false,
+                "measurement_status": "not-measured"
+              }
+            },
+            "selected_configuration": {
+              "dtype": "bfloat16",
+              "quantization": "fp8_per_tensor",
+              "kv_cache_dtype": "auto",
+              "tensor_parallel_size": 1,
+              "max_model_len": 4096,
+              "max_num_seqs": 8,
+              "max_num_batched_tokens": 4096,
+              "gpu_memory_utilization": 0.9,
+              "enable_prefix_caching": false,
+              "enable_chunked_prefill": true,
+              "enforce_eager": true
+            },
+            "task_quality": {
+              "version": "sera-easy-strict-json-v1",
+              "floor": 0.99,
+              "mean": 1.0,
+              "valid_outputs": true,
+              "passed": true
+            },
+            "feasibility_prediction": {
+              "kind": "deployment-feasibility",
+              "statement": "Online FP8 weights let the requested model run on this GPU and meet the supplied task and resource constraints."
+            },
+            "feasibility_review": {
+              "selected_trial_id": "candidate",
+              "prediction_outcome": "confirmed",
+              "reason": "The candidate trial ran successfully with 96 requests, all successful, and met the quality and resource constraints specified. The measured latency and memory usage are within the acceptable limits (no constraint failures reported for the candidate), confirming the deployment‑feasibility prediction that online FP8 weights allow the model to run on the GPU while satisfying the task and resource constraints."
+            },
+            "review_error": null,
+            "comparison_scope": "Search compares against the measured FP8 reference, not BF16 performance."
+          },
+          "frozen_candidate_hashes": [
+            "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+            "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536"
+          ],
+          "history": [],
+          "previous_rounds": [],
+          "legal_proposal_ids": [
+            "batching:trial-001"
+          ],
+          "proposals": [
+            {
+              "action": "trial",
+              "proposal_id": "batching:trial-001",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "changed_lever": "max_num_batched_tokens",
+              "proposed_value": 2048,
+              "evidence_used": [
+                "concurrency_8_cumulative_snapshot_mean_ttft_ms",
+                "concurrency_8_cumulative_snapshot_mean_queue_ms",
+                "p95_latency_ms"
+              ],
+              "predicted_metric_change": "p95_latency_ms decreases by at least 5%",
+              "confidence": 0.6,
+              "expected_trial_cost": 1,
+              "falsification_condition": "p95_latency_ms does not improve by ≥5% relative to baseline",
+              "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 is expected to lower peak memory usage and reduce contention for GPU resources, which should lower queue times and first‑token latency, thereby improving overall p95 latency. The baseline shows high queue and TTFT metrics at concurrency 8, indicating potential memory pressure that can be alleviated by a smaller batch size."
+            }
+          ],
+          "proposal_id_map": {
+            "batching:trial-001": {
+              "agent_role": "batching",
+              "original_proposal_id": "trial-001"
+            }
+          }
+        },
+        "arbiter": {
+          "ranked_proposal_ids": [
+            "batching:trial-001"
+          ],
+          "reason": "The baseline run shows a high p95 latency (~774 ms) with no constraint violations. The proposed change to reduce max_num_batched_tokens from 4096 to 2048 is expected to lower peak memory usage and GPU contention, which should improve queue and first‑token latency. The prediction is a ≥5 % reduction in p95 latency, with a 0.6 confidence and a low trial cost of 1. No constraints are at risk, and the potential latency gain outweighs the modest risk of no improvement. Thus the proposal is ranked as the most promising experiment."
+        }
+      },
+      {
+        "round": 2,
+        "specialists": [
+          {
+            "role": "batching",
+            "evidence": {
+              "trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+              "objective": {
+                "priority": "latency",
+                "min_improvement_fraction": 0.05
+              },
+              "constraints": {
+                "quality_floor": 0.99,
+                "p95_latency_ms": null,
+                "max_memory_mib": null
+              },
+              "quality_mode": "verified",
+              "task_quality": {
+                "version": "sera-easy-strict-json-v1",
+                "floor": 0.99,
+                "mean": 1.0,
+                "valid_outputs": true,
+                "passed": true,
+                "task_quality_verified": true,
+                "per_prompt": [
+                  {
+                    "prompt_index": 0,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 1,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 2,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 3,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 4,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 5,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 6,
+                    "score": 1.0,
+                    "error": null
+                  },
+                  {
+                    "prompt_index": 7,
+                    "score": 1.0,
+                    "error": null
+                  }
+                ]
+              },
+              "request_evidence": {
+                "source": "saved trial request records; also used for optional Weave export",
+                "trial_id": "baseline",
+                "config_hash": "b73ef7a2884fb0f9a40855b9db9ff81380d08bb12ecc0c332b8a74f6d3c2a018",
+                "quality_examples": [
+                  {
+                    "source_path": "quality/0",
+                    "prompt_index": 0,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 5}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 495.74085699987336,
+                    "completion_tokens": 7,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  },
+                  {
+                    "source_path": "quality/1",
+                    "prompt_index": 1,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 9}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 508.4873189998689,
+                    "completion_tokens": 7,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  },
+                  {
+                    "source_path": "quality/2",
+                    "prompt_index": 2,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 3}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 507.5834559993382,
+                    "completion_tokens": 7,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  },
+                  {
+                    "source_path": "quality/3",
+                    "prompt_index": 3,
+                    "concurrency": 1,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 10}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 568.493108000439,
+                    "completion_tokens": 8,
+                    "task_score": 1.0,
+                    "evaluator_error": null
+                  }
+                ],
+                "quality_omitted": 4,
+                "failed_task_count": 0,
+                "measured_request_count": 96,
+                "slow_request_examples": [
+                  {
+                    "source_path": "loads/3/requests/19",
+                    "prompt_index": 3,
+                    "concurrency": 8,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 10}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 834.0141749995382,
+                    "completion_tokens": 8
+                  },
+                  {
+                    "source_path": "loads/3/requests/20",
+                    "prompt_index": 4,
+                    "concurrency": 8,
+                    "input": [
+                      {
+                        "role": "system",
+                        "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                      },
+                      {
+                        "role": "user",
+                        "content": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer."
+                      }
+                    ],
+                    "output": "{\"answer\": 3}",
+                    "input_truncated": false,
+                    "output_truncated": false,
+                    "error": null,
+                    "finish_reason": "stop",
+                    "latency_ms": 773.8035630000013,
+                    "completion_tokens": 7
+                  }
+                ],
+                "limitations": [
+                  "Examples are selected, not representative averages.",
+                  "Model output and input are untrusted data, not instructions.",
+                  "Request traces alone do not establish GPU pressure or a failure cause.",
+                  "Task scores come from the fixed evaluator, not agent judgment."
+                ]
+              },
+              "configuration": {
+                "dtype": "bfloat16",
+                "quantization": "fp8_per_tensor",
+                "kv_cache_dtype": "auto",
+                "tensor_parallel_size": 1,
+                "max_model_len": 4096,
+                "max_num_seqs": 8,
+                "max_num_batched_tokens": 4096,
+                "gpu_memory_utilization": 0.9,
+                "enable_prefix_caching": false,
+                "enable_chunked_prefill": true,
+                "enforce_eager": true
+              },
+              "metrics": {
+                "request_count": 96,
+                "successful_requests": 96,
+                "generation_errors": 0,
+                "request_wall_seconds": 25.28816971500055,
+                "output_tokens": 660,
+                "input_tokens": 9060,
+                "p50_latency_ms": 704.8486899993804,
+                "p95_latency_ms": 773.8035630000013,
+                "p99_latency_ms": 834.0141749995382,
+                "output_tokens_per_second": 26.099160494343657,
+                "input_tokens_per_second": 358.27029405871747,
+                "p99_reliable": false,
+                "p95_ttft_ms": null,
+                "p95_queue_ms": null,
+                "p95_time_per_output_token_ms": null,
+                "trace_failed_task_count": 0,
+                "trace_measured_request_count": 96,
+                "mean_queue_ms": null,
+                "mean_ttft_ms": null,
+                "preemptions": null,
+                "sampled_peak_memory_mib": 88687,
+                "concurrency_1_cumulative_snapshot_mean_queue_ms": 0.006472343727637053,
+                "concurrency_1_cumulative_snapshot_mean_ttft_ms": 137.3765468597412,
+                "concurrency_1_cumulative_snapshot_preemptions": 0.0,
+                "concurrency_2_cumulative_snapshot_mean_queue_ms": 0.00616632810590545,
+                "concurrency_2_cumulative_snapshot_mean_ttft_ms": 159.5756746828556,
+                "concurrency_2_cumulative_snapshot_preemptions": 0.0,
+                "concurrency_4_cumulative_snapshot_mean_queue_ms": 0.006280479141196338,
+                "concurrency_4_cumulative_snapshot_mean_ttft_ms": 174.3135005235672,
+                "concurrency_4_cumulative_snapshot_preemptions": 0.0,
+                "concurrency_8_cumulative_snapshot_mean_queue_ms": 0.007604039055308931,
+                "concurrency_8_cumulative_snapshot_mean_ttft_ms": 192.19917058944702,
+                "concurrency_8_cumulative_snapshot_preemptions": 0.0,
+                "trial_2_request_count": 96,
+                "trial_2_successful_requests": 96,
+                "trial_2_generation_errors": 0,
+                "trial_2_request_wall_seconds": 25.293812122999043,
+                "trial_2_output_tokens": 660,
+                "trial_2_input_tokens": 9060,
+                "trial_2_p50_latency_ms": 706.0643260001598,
+                "trial_2_p95_latency_ms": 773.4960869993301,
+                "trial_2_p99_latency_ms": 835.2228260000629,
+                "trial_2_output_tokens_per_second": 26.093338433548265,
+                "trial_2_input_tokens_per_second": 358.1903730423444,
+                "trial_2_p99_reliable": false,
+                "trial_2_p95_ttft_ms": null,
+                "trial_2_p95_queue_ms": null,
+                "trial_2_p95_time_per_output_token_ms": null,
+                "trial_2_trace_failed_task_count": 0,
+                "trial_2_trace_measured_request_count": 96,
+                "trial_2_sampled_peak_memory_mib": 88561,
+                "trial_2_concurrency_1_cumulative_snapshot_mean_queue_ms": 0.005977781171395691,
+                "trial_2_concurrency_1_cumulative_snapshot_mean_ttft_ms": 137.27827370166779,
+                "trial_2_concurrency_1_cumulative_snapshot_preemptions": 0.0,
+                "trial_2_concurrency_2_cumulative_snapshot_mean_queue_ms": 0.005884937422706571,
+                "trial_2_concurrency_2_cumulative_snapshot_mean_ttft_ms": 159.93040055036545,
+                "trial_2_concurrency_2_cumulative_snapshot_preemptions": 0.0,
+                "trial_2_concurrency_4_cumulative_snapshot_mean_queue_ms": 0.006265666598892494,
+                "trial_2_concurrency_4_cumulative_snapshot_mean_ttft_ms": 174.58584904670715,
+                "trial_2_concurrency_4_cumulative_snapshot_preemptions": 0.0,
+                "trial_2_concurrency_8_cumulative_snapshot_mean_queue_ms": 0.007398679642278694,
+                "trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms": 192.5639845430851,
+                "trial_2_concurrency_8_cumulative_snapshot_preemptions": 0.0
+              },
+              "remaining_trials": 1,
+              "supported_changes": {
+                "max_model_len": [
+                  256
+                ]
+              },
+              "baseline_self_check": {
+                "version": "token-agreement-v1",
+                "floor": 0.99,
+                "scores": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "mean": 0.0,
+                "valid_outputs": false,
+                "passed": false,
+                "task_quality_verified": false
+              },
+              "limitations": [
+                "No measured in-flight KV peak; idle KV use is not pressure evidence.",
+                "concurrency_N_cumulative_snapshot_* fields are snapshots after that load, cumulative since server startup and including warmup and earlier loads; they are not measured-window means or counter deltas. Legacy unprefixed mean_queue_ms, mean_ttft_ms, and preemptions have the same cumulative scope.",
+                "Token agreement does not establish task correctness.",
+                "Sampled peak memory includes runtime reservation, not just model weights.",
+                "This small sample cannot establish statistical significance."
+              ],
+              "deployment_context": {
+                "bf16_baseline_measured": false,
+                "infeasible_baseline": {
+                  "status": "infeasible",
+                  "reason": "Estimated BF16 runtime exceeds the service memory budget",
+                  "fit_estimate": {
+                    "plan_id": "baseline",
+                    "configuration": {
+                      "dtype": "bfloat16",
+                      "quantization": null,
+                      "kv_cache_dtype": "auto",
+                      "tensor_parallel_size": 1,
+                      "max_model_len": 4096,
+                      "max_num_seqs": 8,
+                      "max_num_batched_tokens": 4096,
+                      "gpu_memory_utilization": 0.9,
+                      "enable_prefix_caching": false,
+                      "enable_chunked_prefill": true,
+                      "enforce_eager": true
+                    },
+                    "weights_bytes": 145412407296,
+                    "kv_bytes": 10737418240,
+                    "workspace_bytes": 4294967296,
+                    "estimated_peak_bytes": 160444792832,
+                    "estimated_fit": false,
+                    "measurement_status": "not-measured"
+                  }
+                },
+                "selected_configuration": {
+                  "dtype": "bfloat16",
+                  "quantization": "fp8_per_tensor",
+                  "kv_cache_dtype": "auto",
+                  "tensor_parallel_size": 1,
+                  "max_model_len": 4096,
+                  "max_num_seqs": 8,
+                  "max_num_batched_tokens": 4096,
+                  "gpu_memory_utilization": 0.9,
+                  "enable_prefix_caching": false,
+                  "enable_chunked_prefill": true,
+                  "enforce_eager": true
+                },
+                "task_quality": {
+                  "version": "sera-easy-strict-json-v1",
+                  "floor": 0.99,
+                  "mean": 1.0,
+                  "valid_outputs": true,
+                  "passed": true
+                },
+                "feasibility_prediction": {
+                  "kind": "deployment-feasibility",
+                  "statement": "Online FP8 weights let the requested model run on this GPU and meet the supplied task and resource constraints."
+                },
+                "feasibility_review": {
+                  "selected_trial_id": "candidate",
+                  "prediction_outcome": "confirmed",
+                  "reason": "The candidate trial ran successfully with 96 requests, all successful, and met the quality and resource constraints specified. The measured latency and memory usage are within the acceptable limits (no constraint failures reported for the candidate), confirming the deployment‑feasibility prediction that online FP8 weights allow the model to run on the GPU while satisfying the task and resource constraints."
+                },
+                "review_error": null,
+                "comparison_scope": "Search compares against the measured FP8 reference, not BF16 performance."
+              },
+              "frozen_candidate_hashes": [
+                "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536"
+              ],
+              "history": [
+                {
+                  "trial": {
+                    "trial_id": "trial-2",
+                    "status": "collected",
+                    "config_hash": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+                    "reduced": {
+                      "request_count": 96,
+                      "successful_requests": 96,
+                      "generation_errors": 0,
+                      "request_wall_seconds": 25.293812122999043,
+                      "output_tokens": 660,
+                      "input_tokens": 9060,
+                      "p50_latency_ms": 706.0643260001598,
+                      "p95_latency_ms": 773.4960869993301,
+                      "p99_latency_ms": 835.2228260000629,
+                      "output_tokens_per_second": 26.093338433548265,
+                      "input_tokens_per_second": 358.1903730423444,
+                      "p99_reliable": false,
+                      "p95_ttft_ms": null,
+                      "p95_queue_ms": null,
+                      "p95_time_per_output_token_ms": null
+                    },
+                    "task_quality": {
+                      "version": "sera-easy-strict-json-v1",
+                      "floor": 0.99,
+                      "mean": 1.0,
+                      "valid_outputs": true,
+                      "passed": true,
+                      "task_quality_verified": true,
+                      "per_prompt": [
+                        {
+                          "prompt_index": 0,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 1,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 2,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 3,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 4,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 5,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 6,
+                          "score": 1.0,
+                          "error": null
+                        },
+                        {
+                          "prompt_index": 7,
+                          "score": 1.0,
+                          "error": null
+                        }
+                      ]
+                    },
+                    "decision": {
+                      "selected": "baseline",
+                      "outcome": "no-safe-improvement",
+                      "baseline_self_check": {
+                        "version": "token-agreement-v1",
+                        "floor": 0.99,
+                        "scores": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "mean": 0.0,
+                        "valid_outputs": false,
+                        "passed": false,
+                        "task_quality_verified": false
+                      },
+                      "candidate_quality": {
+                        "version": "sera-easy-strict-json-v1",
+                        "floor": 0.99,
+                        "mean": 1.0,
+                        "valid_outputs": true,
+                        "passed": true,
+                        "task_quality_verified": true,
+                        "per_prompt": [
+                          {
+                            "prompt_index": 0,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 1,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 2,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 3,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 4,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 5,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 6,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 7,
+                            "score": 1.0,
+                            "error": null
+                          }
+                        ]
+                      },
+                      "p95_improvement_fraction": 0.0003973566617851976,
+                      "objective": {
+                        "priority": "latency",
+                        "min_improvement_fraction": 0.05
+                      },
+                      "objective_improvement_fraction": 0.00039735666178517974,
+                      "constraints": {
+                        "quality_floor": 0.99,
+                        "p95_latency_ms": null,
+                        "max_memory_mib": null
+                      },
+                      "constraint_failures": {
+                        "baseline": [],
+                        "candidate": []
+                      },
+                      "baseline_quality": {
+                        "version": "sera-easy-strict-json-v1",
+                        "floor": 0.99,
+                        "mean": 1.0,
+                        "valid_outputs": true,
+                        "passed": true,
+                        "task_quality_verified": true,
+                        "per_prompt": [
+                          {
+                            "prompt_index": 0,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 1,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 2,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 3,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 4,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 5,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 6,
+                            "score": 1.0,
+                            "error": null
+                          },
+                          {
+                            "prompt_index": 7,
+                            "score": 1.0,
+                            "error": null
+                          }
+                        ]
+                      },
+                      "reason": "p95-improvement-below-five-percent"
+                    }
+                  },
+                  "configuration": {
+                    "dtype": "bfloat16",
+                    "quantization": "fp8_per_tensor",
+                    "kv_cache_dtype": "auto",
+                    "tensor_parallel_size": 1,
+                    "max_model_len": 4096,
+                    "max_num_seqs": 8,
+                    "max_num_batched_tokens": 2048,
+                    "gpu_memory_utilization": 0.9,
+                    "enable_prefix_caching": false,
+                    "enable_chunked_prefill": true,
+                    "enforce_eager": true
+                  },
+                  "request_evidence": {
+                    "source": "saved trial request records; also used for optional Weave export",
+                    "trial_id": "trial-2",
+                    "config_hash": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+                    "quality_examples": [
+                      {
+                        "source_path": "quality/0",
+                        "prompt_index": 0,
+                        "concurrency": 1,
+                        "input": [
+                          {
+                            "role": "system",
+                            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                          },
+                          {
+                            "role": "user",
+                            "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+                          }
+                        ],
+                        "output": "{\"answer\": 5}",
+                        "input_truncated": false,
+                        "output_truncated": false,
+                        "error": null,
+                        "finish_reason": "stop",
+                        "latency_ms": 496.0004309996293,
+                        "completion_tokens": 7,
+                        "task_score": 1.0,
+                        "evaluator_error": null
+                      },
+                      {
+                        "source_path": "quality/1",
+                        "prompt_index": 1,
+                        "concurrency": 1,
+                        "input": [
+                          {
+                            "role": "system",
+                            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                          },
+                          {
+                            "role": "user",
+                            "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+                          }
+                        ],
+                        "output": "{\"answer\": 9}",
+                        "input_truncated": false,
+                        "output_truncated": false,
+                        "error": null,
+                        "finish_reason": "stop",
+                        "latency_ms": 507.95437499982654,
+                        "completion_tokens": 7,
+                        "task_score": 1.0,
+                        "evaluator_error": null
+                      },
+                      {
+                        "source_path": "quality/2",
+                        "prompt_index": 2,
+                        "concurrency": 1,
+                        "input": [
+                          {
+                            "role": "system",
+                            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                          },
+                          {
+                            "role": "user",
+                            "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+                          }
+                        ],
+                        "output": "{\"answer\": 3}",
+                        "input_truncated": false,
+                        "output_truncated": false,
+                        "error": null,
+                        "finish_reason": "stop",
+                        "latency_ms": 507.67982399975153,
+                        "completion_tokens": 7,
+                        "task_score": 1.0,
+                        "evaluator_error": null
+                      },
+                      {
+                        "source_path": "quality/3",
+                        "prompt_index": 3,
+                        "concurrency": 1,
+                        "input": [
+                          {
+                            "role": "system",
+                            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                          },
+                          {
+                            "role": "user",
+                            "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                          }
+                        ],
+                        "output": "{\"answer\": 10}",
+                        "input_truncated": false,
+                        "output_truncated": false,
+                        "error": null,
+                        "finish_reason": "stop",
+                        "latency_ms": 569.2947210000057,
+                        "completion_tokens": 8,
+                        "task_score": 1.0,
+                        "evaluator_error": null
+                      }
+                    ],
+                    "quality_omitted": 4,
+                    "failed_task_count": 0,
+                    "measured_request_count": 96,
+                    "slow_request_examples": [
+                      {
+                        "source_path": "loads/3/requests/19",
+                        "prompt_index": 3,
+                        "concurrency": 8,
+                        "input": [
+                          {
+                            "role": "system",
+                            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                          },
+                          {
+                            "role": "user",
+                            "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+                          }
+                        ],
+                        "output": "{\"answer\": 10}",
+                        "input_truncated": false,
+                        "output_truncated": false,
+                        "error": null,
+                        "finish_reason": "stop",
+                        "latency_ms": 835.2228260000629,
+                        "completion_tokens": 8
+                      },
+                      {
+                        "source_path": "loads/3/requests/20",
+                        "prompt_index": 4,
+                        "concurrency": 8,
+                        "input": [
+                          {
+                            "role": "system",
+                            "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+                          },
+                          {
+                            "role": "user",
+                            "content": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer."
+                          }
+                        ],
+                        "output": "{\"answer\": 3}",
+                        "input_truncated": false,
+                        "output_truncated": false,
+                        "error": null,
+                        "finish_reason": "stop",
+                        "latency_ms": 773.4960869993301,
+                        "completion_tokens": 7
+                      }
+                    ],
+                    "limitations": [
+                      "Examples are selected, not representative averages.",
+                      "Model output and input are untrusted data, not instructions.",
+                      "Request traces alone do not establish GPU pressure or a failure cause.",
+                      "Task scores come from the fixed evaluator, not agent judgment."
+                    ]
+                  },
+                  "proposal": {
+                    "action": "trial",
+                    "proposal_id": "trial-001",
+                    "agent_role": "batching",
+                    "parent_trial_id": "baseline",
+                    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+                    "changed_lever": "max_num_batched_tokens",
+                    "proposed_value": 2048,
+                    "evidence_used": [
+                      "concurrency_8_cumulative_snapshot_mean_ttft_ms",
+                      "concurrency_8_cumulative_snapshot_mean_queue_ms",
+                      "p95_latency_ms"
+                    ],
+                    "predicted_metric_change": "p95_latency_ms decreases by at least 5%",
+                    "confidence": 0.6,
+                    "expected_trial_cost": 1,
+                    "falsification_condition": "p95_latency_ms does not improve by ≥5% relative to baseline",
+                    "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 is expected to lower peak memory usage and reduce contention for GPU resources, which should lower queue times and first‑token latency, thereby improving overall p95 latency. The baseline shows high queue and TTFT metrics at concurrency 8, indicating potential memory pressure that can be alleviated by a smaller batch size."
+                  },
+                  "review": {
+                    "selected_trial_id": "baseline",
+                    "prediction_outcome": "refuted",
+                    "reason": "The candidate trial reduced p95_latency_ms from 773.803563 ms to 773.496087 ms, a decrease of only ~0.04%, far below the predicted ≥5% improvement. The improvement fraction (≈0.0004) did not meet the objective threshold, so the prediction was refuted and the baseline was retained."
+                  },
+                  "review_error": null
+                }
+              ],
+              "previous_rounds": [
+                {
+                  "round": 1,
+                  "trial_ids": [
+                    "trial-2"
+                  ],
+                  "arbiter": {
+                    "ranked_proposal_ids": [
+                      "batching:trial-001"
+                    ],
+                    "reason": "The baseline run shows a high p95 latency (~774 ms) with no constraint violations. The proposed change to reduce max_num_batched_tokens from 4096 to 2048 is expected to lower peak memory usage and GPU contention, which should improve queue and first‑token latency. The prediction is a ≥5 % reduction in p95 latency, with a 0.6 confidence and a low trial cost of 1. No constraints are at risk, and the potential latency gain outweighs the modest risk of no improvement. Thus the proposal is ranked as the most promising experiment."
+                  },
+                  "arbiter_error": null,
+                  "specialist_participation": [
+                    {
+                      "role": "quantization",
+                      "status": "inactive",
+                      "reason": "No control values are enabled for this specialist in this run.",
+                      "legal_candidate_count": 0
+                    },
+                    {
+                      "role": "batching",
+                      "status": "active",
+                      "reason": "Legal untested candidates are available for this specialist.",
+                      "legal_candidate_count": 2
+                    },
+                    {
+                      "role": "parallelism",
+                      "status": "inactive",
+                      "legal_candidate_count": 0,
+                      "reason": "Single-GPU runtime fixes tensor_parallel_size at 1; parallelism controls are not enabled."
+                    }
+                  ],
+                  "specialists": [
+                    {
+                      "role": "batching",
+                      "status": "accepted",
+                      "proposal": {
+                        "action": "trial",
+                        "proposal_id": "trial-001",
+                        "agent_role": "batching",
+                        "parent_trial_id": "baseline",
+                        "model_id": "Qwen/Qwen2.5-72B-Instruct",
+                        "changed_lever": "max_num_batched_tokens",
+                        "proposed_value": 2048,
+                        "evidence_used": [
+                          "concurrency_8_cumulative_snapshot_mean_ttft_ms",
+                          "concurrency_8_cumulative_snapshot_mean_queue_ms",
+                          "p95_latency_ms"
+                        ],
+                        "predicted_metric_change": "p95_latency_ms decreases by at least 5%",
+                        "confidence": 0.6,
+                        "expected_trial_cost": 1,
+                        "falsification_condition": "p95_latency_ms does not improve by ≥5% relative to baseline",
+                        "reason": "Reducing the maximum number of batched tokens from 4096 to 2048 is expected to lower peak memory usage and reduce contention for GPU resources, which should lower queue times and first‑token latency, thereby improving overall p95 latency. The baseline shows high queue and TTFT metrics at concurrency 8, indicating potential memory pressure that can be alleviated by a smaller batch size."
+                      },
+                      "arbiter_proposal_id": "batching:trial-001"
+                    }
+                  ]
+                }
+              ],
+              "specialist_role": "batching"
+            },
+            "status": "abstained",
+            "proposal": {
+              "action": "keep-baseline",
+              "proposal_id": "keep-001",
+              "agent_role": "batching",
+              "parent_trial_id": "baseline",
+              "model_id": "Qwen/Qwen2.5-72B-Instruct",
+              "changed_lever": null,
+              "proposed_value": null,
+              "evidence_used": [
+                "p95_latency_ms",
+                "concurrency_8_cumulative_snapshot_mean_ttft_ms",
+                "concurrency_8_cumulative_snapshot_mean_queue_ms"
+              ],
+              "predicted_metric_change": "p95_latency_ms does not improve",
+              "confidence": 1.0,
+              "expected_trial_cost": 0,
+              "falsification_condition": "none",
+              "reason": "The candidate trial reduced max_num_batched_tokens from 4096 to 2048, but the p95_latency_ms decreased only by ~0.04%, far below the required 5% improvement. Therefore the baseline remains the best configuration."
+            }
+          }
+        ],
+        "trial_ids": [],
+        "specialist_participation": [
+          {
+            "role": "quantization",
+            "status": "inactive",
+            "reason": "No control values are enabled for this specialist in this run.",
+            "legal_candidate_count": 0
+          },
+          {
+            "role": "batching",
+            "status": "active",
+            "reason": "Legal untested candidates are available for this specialist.",
+            "legal_candidate_count": 1
+          },
+          {
+            "role": "parallelism",
+            "status": "inactive",
+            "legal_candidate_count": 0,
+            "reason": "Single-GPU runtime fixes tensor_parallel_size at 1; parallelism controls are not enabled."
+          }
+        ]
+      }
+    ],
+    "stop_reason": "specialists-abstained"
+  },
+  "trace_export_failures": [],
+  "candidate_policy": {
+    "policy_version": "sera-evidence-space-v1",
+    "status": "generated",
+    "space": {
+      "supported_changes": {
+        "max_model_len": [
+          256
+        ],
+        "max_num_batched_tokens": [
+          2048
+        ]
+      },
+      "candidate_hashes": [
+        "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+        "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536"
+      ]
+    },
+    "candidates": [
+      {
+        "changed": {
+          "max_model_len": 256
+        },
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": "fp8_per_tensor",
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 256,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 4096,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "config_hash": "ecad7b8b9215ce36495ddb81c7b222a2f0ed776a9c6624dc5952048427e41536",
+        "reason": "Smallest bounded context bucket covering every input plus output allowance."
+      },
+      {
+        "changed": {
+          "max_num_batched_tokens": 2048
+        },
+        "configuration": {
+          "dtype": "bfloat16",
+          "quantization": "fp8_per_tensor",
+          "kv_cache_dtype": "auto",
+          "tensor_parallel_size": 1,
+          "max_model_len": 4096,
+          "max_num_seqs": 8,
+          "max_num_batched_tokens": 2048,
+          "gpu_memory_utilization": 0.9,
+          "enable_prefix_caching": false,
+          "enable_chunked_prefill": true,
+          "enforce_eager": true
+        },
+        "config_hash": "db44d4ab077713d10318c550c6bc8da4df8db6232233e198ac5916c61d91565f",
+        "reason": "Lower batch-token limit covers the declared token-wave envelope; this is not a speedup claim."
+      }
+    ],
+    "evidence": {
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "baseline_configuration_hash": "b73ef7a2884fb0f9a40855b9db9ff81380d08bb12ecc0c332b8a74f6d3c2a018",
+      "input_token_ids_hash": "961ec04c0a5b387d9c15e7f6241549c9113623f21752c7a771b441bc56891309",
+      "max_input_tokens": 109,
+      "output_token_allowance": 64,
+      "required_context_tokens": 173,
+      "peak_declared_concurrency": 8,
+      "declared_wave_token_envelope": 1384,
+      "wave_scope": "planning envelope for declared requests, not measured engine batch occupancy",
+      "kv_pressure_established": false,
+      "loads": [
+        {
+          "concurrency": 1,
+          "preemptions_delta": 0.0,
+          "preemption_scope": "difference between this load before/after counters",
+          "mean_queue_ms": 0.006472343727637053,
+          "queue_scope": "cumulative since startup; includes warmup and earlier loads",
+          "kv_cache_percent": 0.0,
+          "kv_scope": "after-load snapshot, not an in-flight peak"
+        },
+        {
+          "concurrency": 2,
+          "preemptions_delta": 0.0,
+          "preemption_scope": "difference between this load before/after counters",
+          "mean_queue_ms": 0.00616632810590545,
+          "queue_scope": "cumulative since startup; includes warmup and earlier loads",
+          "kv_cache_percent": 0.0,
+          "kv_scope": "after-load snapshot, not an in-flight peak"
+        },
+        {
+          "concurrency": 4,
+          "preemptions_delta": 0.0,
+          "preemption_scope": "difference between this load before/after counters",
+          "mean_queue_ms": 0.006280479141196338,
+          "queue_scope": "cumulative since startup; includes warmup and earlier loads",
+          "kv_cache_percent": 0.0,
+          "kv_scope": "after-load snapshot, not an in-flight peak"
+        },
+        {
+          "concurrency": 8,
+          "preemptions_delta": 0.0,
+          "preemption_scope": "difference between this load before/after counters",
+          "mean_queue_ms": 0.007604039055308931,
+          "queue_scope": "cumulative since startup; includes warmup and earlier loads",
+          "kv_cache_percent": 0.0,
+          "kv_scope": "after-load snapshot, not an in-flight peak"
+        }
+      ]
+    },
+    "rationale": [
+      "Smallest bounded context bucket covering every input plus output allowance.",
+      "Lower batch-token limit covers the declared token-wave envelope; this is not a speedup claim."
+    ],
+    "missing_or_invalid": [],
+    "limits": [
+      "Suggestions require existing runtime validation and trial authorization.",
+      "No quality or performance improvement is predicted by this policy.",
+      "No precision settings, combinations, or Cartesian products are generated."
+    ]
+  }
+}

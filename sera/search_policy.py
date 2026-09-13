@@ -1,4 +1,4 @@
-"""Standalone deterministic search-space suggestions; never starts or enables trials.
+"""Deterministic search-space suggestions; never starts trials itself.
 
 Normal-mode suggestions are single-setting alternatives, not a Cartesian product.
 Explicit spaces are preserved for the existing runtime validator to check later.
@@ -63,7 +63,7 @@ def _load_evidence(baseline, workload, missing):
 def propose_search_space(baseline, *, model_id, workload, explicit_space=None):
     """Return a serializable space plus reasons, or space=None when none is justified.
 
-    This function is not wired into optimize. Calling it does not authorize trials.
+    Optimize uses this only with automatic_space=True. Calling it does not authorize trials.
     It never adds precision settings or alters a caller's explicit/frozen universe.
     """
     report = dict(policy_version='sera-evidence-space-v1', status='no-candidate', space=None,

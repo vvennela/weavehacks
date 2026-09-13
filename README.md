@@ -75,8 +75,8 @@ For a repeat run, check all five items above before claiming success. A differen
 ### Before presenting
 
 - Open the recorded demo first. From the repository root, run `uvx marimo@0.24.0 edit demo.py --sandbox`. This uses saved real results and needs no GPU or API key. The Molab notebook also shows this summary near the top.
-- For live inference, ask the technical partner to use the live command under “Large-model fit-first path” with `--interactive`. Use the supplied Linux GPU environment, not a laptop without that GPU. Keep the W&B API key in the environment; never put it on a slide or in a recording.
-- Prepare the model download before the talk. In the completed run, server startup took 71 seconds after download. That startup cost is separate from the 573 ms request measurement. Start early and leave the returned runner open.
+- For interactive inference, use the separate fit-only command under “Large-model fit-first path” with `--interactive`. The autonomous-loop command above checks and closes its returned runner. Use the supplied Linux GPU environment, not a laptop without that GPU. Keep the W&B API key in the environment; never put it on a slide or in a recording.
+- Prepare the model download before the talk. The latest loop's first startup took 64 seconds with model files already present; startup is excluded from request latency. For an interactive segment, start the separate interactive command early and leave its returned runner open.
 - Rehearse one fresh prompt, then confirm how to stop: blank input closes the interactive runner. Do not close it just before the live part.
 - If the live service fails, use the recorded demo and say: “This is a saved real GPU run, not live inference.” Do not present saved output as a fresh answer.
 
