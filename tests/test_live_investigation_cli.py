@@ -646,8 +646,9 @@ def test_provider_export_failure_preserves_recommendation_but_fails_invocation(c
     class Agent:
         model = 'fixture-model'
 
-        def __init__(self, project):
+        def __init__(self, project, model):
             self.project = project
+            self.model = model
             self.history = []
 
         def request(self, *args):

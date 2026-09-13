@@ -13,6 +13,7 @@ from pathlib import Path
 import sys
 
 import sera
+from sera.agent import AGENT_MODEL
 from benchmarks.grade import SYSTEM_PROMPT, dataset_hash, grade_case, load_cases
 from experiments.weave_evidence import QUERY_IDS, RECORDED_OPS, WeaveEvidenceReader
 from sera.config import LARGE_MODEL_ID, MODEL_ID, resolve_investigation_space
@@ -190,6 +191,8 @@ def main(argv=None):
     parser.add_argument('--fp8-kv', action='store_true',
                         help='Include the FP8 KV candidate for the small Qwen BF16 baseline')
     parser.add_argument('--project', required=True)
+    parser.add_argument('--agent-model', default=AGENT_MODEL,
+                        help='Hosted investigator model; must match the provider certificate')
     parser.add_argument('--provider-check', required=True, help='Current passing 30-case certificate')
     parser.add_argument('--output-dir', required=True, help='A new evidence directory')
     parser.add_argument('--priority', choices=['latency', 'throughput', 'memory'], default='latency')
@@ -225,7 +228,7 @@ def main(argv=None):
         frozen_space = (None if args.auto_space else resolve_investigation_space(
             space, baseline=reference, model_id=args.model, workload=workload))
         cases = load_cases(CASES_PATH)
-        agent = sera.WandbAgent(project=args.project)
+        agent = sera.WandbAgent(project=args.project, model=args.agent_model)
         certificate = require_provider_check(args.provider_check, agent)
         if not os.environ.get('WANDB_API_KEY'):
             raise ValueError('WANDB_API_KEY must be set in this process')

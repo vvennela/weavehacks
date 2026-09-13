@@ -14,7 +14,7 @@ from pathlib import Path
 from benchmarks.grade import SYSTEM_PROMPT, dataset_hash, load_cases
 from experiments.run_investigation import TracedInvestigationAgent, traced_evidence_reader, weave_event_sink
 from experiments.weave_evidence import WeaveEvidenceReader
-from sera.agent import WandbAgent
+from sera.agent import AGENT_MODEL, WandbAgent
 from sera.config import Constraints, LARGE_MODEL_ID, LARGE_MODEL_REVISION, Objective, RuntimeConfig, Workload
 from sera.diagnosis import export_trial_diagnosis, trial_diagnosis
 from sera.investigation import remaining_candidates, round_evidence
@@ -175,6 +175,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('source-dir','project','output-dir','provider-check'):
         parser.add_argument('--'+name, required=True)
+    parser.add_argument('--agent-model', default=AGENT_MODEL,
+                        help='Hosted investigator model; must match the provider certificate')
     args = parser.parse_args(argv)
     try:
         source = load_source(args.source_dir)
@@ -183,7 +185,7 @@ def main(argv=None):
         folder = Path(args.output_dir).resolve()
         if folder.exists() or folder.is_relative_to(source['folder']):
             raise ValueError('Use a new output directory outside the source')
-        agent = WandbAgent(project=args.project)
+        agent = WandbAgent(project=args.project, model=args.agent_model)
         certificate = require_provider_check(args.provider_check, agent)
         if not os.environ.get('WANDB_API_KEY'):
             raise ValueError('WANDB_API_KEY must be set')

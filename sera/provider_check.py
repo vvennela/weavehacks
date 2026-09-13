@@ -183,11 +183,16 @@ def require_provider_check(path, agent):
             "model": agent.model, "first_pass_valid": first, "valid_with_one_retry": 30}
 
 
-if __name__ == "__main__":
+def main(argv=None):
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--project", required=True)
     parser.add_argument("--output-dir", required=True)
-    args = parser.parse_args()
-    report = check_provider(project=args.project, output_dir=args.output_dir)
+    parser.add_argument("--model", default=AGENT_MODEL, help="Hosted investigator model to certify")
+    args = parser.parse_args(argv)
+    report = check_provider(project=args.project, output_dir=args.output_dir, model=args.model)
     print({key: report[key] for key in ("passed", "first_pass_valid", "valid_with_one_retry")})
+
+
+if __name__ == "__main__":
+    main()
