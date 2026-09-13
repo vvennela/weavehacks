@@ -49,3 +49,24 @@ returned-runner probe is regraded by the live import audit, not claimed as a
 post-return Weave span.
 
 [Live Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09b97-cb9a-701a-a608-ea20decf8416).
+
+## Retrospective source-path correction
+
+The recorded launcher used the benchmark driver from checkout `6601669`. It did
+not record Python module import paths. Later inspection found `PYTHONSAFEPATH=1`
+and installed packages before the checkout. The Sera library therefore likely
+came from the installed 0.2.0 wheel built from `d8c7304`; that path is an inference,
+not a fact captured at launch.
+
+The complete `sera/` source trees at `d8c7304` and `6601669` are byte-identical.
+This source-path uncertainty does not introduce a code difference between those
+two library versions. The driver's checkout revision must not be described as
+proof of where Python imported the library. `source-comparison.json` records
+every file hash and the driver's hash. Reproduce with:
+
+```bash
+PYTHONPATH=. python evidence/live-grid-random-replay-v1/audit_source.py
+```
+
+This retrospective git audit does not attest the wheel or running-process bytes.
+No original source artifact was edited and no GPU result was rerun.

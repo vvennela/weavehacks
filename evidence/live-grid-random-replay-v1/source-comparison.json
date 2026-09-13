@@ -1,0 +1,82 @@
+{
+  "schema_version": "sera-retrospective-source-comparison-v1",
+  "revisions": {
+    "installed_package_source": "d8c73042c820eddc2f90945a4cdf1f0061ab0c89",
+    "live_driver_checkout": "6601669e47879b0492cab09130123a363ae8b91a"
+  },
+  "source_trees": {
+    "installed_package_source": {
+      "sera/__init__.py": "0c16c568b5e576ded933081531074295ae181309488410d56f095bad8a62f73f",
+      "sera/agent.py": "d4dcfd9db3a70e390d0863d279df7ff2398e90a5e5283118bfd99a22d1fcfd27",
+      "sera/api.py": "804e95cf10abcceef8af69f3d0a439d7f0180119e672598c85107765d2475435",
+      "sera/config.py": "9c70e9ad00c20351163f550dd6de5182c64368fd27867ade74073ee613a6fabd",
+      "sera/diagnosis.py": "c378b24bfae45500220d951a85d8d2c9a891dbbaa020d2a855eccf469095a7d0",
+      "sera/fit.py": "451977d619f3c8233d50598a565a66f84b0c3d9b57d95688baa1c78cb17c2407",
+      "sera/investigation.py": "7d7182180e96836d89361a7698783c9550f91cadaee4f62fc345a93b0fec6a31",
+      "sera/investigation_prompt.py": "bd4b851edc937928d5b312f427476d3f6b917887f9d1bdba00f2d15ef7a885e4",
+      "sera/investigation_report.py": "fccc37bb0da696448d8d05f011856dca2cca8a06a84debf1b6e29bf1fd0f0b39",
+      "sera/measurement.py": "bc1c96759007940053df840cbd9a7e3e9da235b8e166362819d124f0b329e162",
+      "sera/memory.py": "9c1f35a0ae90d737b6e7f295f27098d01bba7660db9fb88fa973f8249c74aecd",
+      "sera/metrics.py": "164421d27a789cd90078319bd783fdce0813baaa8c37d4f84f48267ddfbd8ca7",
+      "sera/pipeline.py": "4a8d28cc43f4b7e9c249231d1aa7e12a7a39e3b8547078588bd01f171bd3930c",
+      "sera/placement_config.py": "0d9d702664727acf8d0784d2223a6000d2f8a937adef854cd76d4312dcd66204",
+      "sera/pressure_pilot.py": "e9a6083e1194fecd300e1af9d098bb636805957ba91fcb539ef6f9fb467c1302",
+      "sera/provider_check.py": "45cde2c9a2112e5963bb8c6d1c51761c3ebe0cb22640fde8d2352d72b37a82a5",
+      "sera/quality.py": "00280261a0a89c1a47138c8966ac0ae1b2e16dc31a76b26b7c3e4cda3d12271c",
+      "sera/relay.py": "7e718cbd3ce4950fabaa7aa7a51e56386da6e8ecc8a4545161d08f9922ac8bf8",
+      "sera/runtime.py": "99d26d650e63f0cba0d2e379c6528ee1609df4a96c93c6968ad97b760fb81dca",
+      "sera/search_policy.py": "db1dd3a3f634555da076451a03347994f7d018a05ea1a0944a0fc4111a8fc994",
+      "sera/storage.py": "6b9dec854ffb63bc59e854d5215bf4031f518028c50eb6a5d75be5f553b64c8e",
+      "sera/swarm.py": "b6eb07a652c52616e9b5efa53aa79522d9586e2422219494e5082f1045533704",
+      "sera/techniques.py": "33e70c0cd56b9a48e28566de5f5125d20607e63023f05958ae8738d7d7f24ae9",
+      "sera/trace_evidence.py": "c3b5aca365219dd6e25ce23cf15d50000ddc58cff10fb5482b30bfaaac7aa11a",
+      "sera/tracing.py": "5d86aa3919abf60af5f95edd563c530c06346c7423ba5698919a7b6aa6520bf9",
+      "sera/weave_evidence.py": "db4b9ef7c1c171415d248234a9ac8ed401a6112655dba2ebfe8607714b65a09e",
+      "sera/weave_integration.py": "8bb890f00a4a90bbbb725d749cba94f7133fee84287f82ead14227a2076a6f77"
+    },
+    "live_driver_checkout": {
+      "sera/__init__.py": "0c16c568b5e576ded933081531074295ae181309488410d56f095bad8a62f73f",
+      "sera/agent.py": "d4dcfd9db3a70e390d0863d279df7ff2398e90a5e5283118bfd99a22d1fcfd27",
+      "sera/api.py": "804e95cf10abcceef8af69f3d0a439d7f0180119e672598c85107765d2475435",
+      "sera/config.py": "9c70e9ad00c20351163f550dd6de5182c64368fd27867ade74073ee613a6fabd",
+      "sera/diagnosis.py": "c378b24bfae45500220d951a85d8d2c9a891dbbaa020d2a855eccf469095a7d0",
+      "sera/fit.py": "451977d619f3c8233d50598a565a66f84b0c3d9b57d95688baa1c78cb17c2407",
+      "sera/investigation.py": "7d7182180e96836d89361a7698783c9550f91cadaee4f62fc345a93b0fec6a31",
+      "sera/investigation_prompt.py": "bd4b851edc937928d5b312f427476d3f6b917887f9d1bdba00f2d15ef7a885e4",
+      "sera/investigation_report.py": "fccc37bb0da696448d8d05f011856dca2cca8a06a84debf1b6e29bf1fd0f0b39",
+      "sera/measurement.py": "bc1c96759007940053df840cbd9a7e3e9da235b8e166362819d124f0b329e162",
+      "sera/memory.py": "9c1f35a0ae90d737b6e7f295f27098d01bba7660db9fb88fa973f8249c74aecd",
+      "sera/metrics.py": "164421d27a789cd90078319bd783fdce0813baaa8c37d4f84f48267ddfbd8ca7",
+      "sera/pipeline.py": "4a8d28cc43f4b7e9c249231d1aa7e12a7a39e3b8547078588bd01f171bd3930c",
+      "sera/placement_config.py": "0d9d702664727acf8d0784d2223a6000d2f8a937adef854cd76d4312dcd66204",
+      "sera/pressure_pilot.py": "e9a6083e1194fecd300e1af9d098bb636805957ba91fcb539ef6f9fb467c1302",
+      "sera/provider_check.py": "45cde2c9a2112e5963bb8c6d1c51761c3ebe0cb22640fde8d2352d72b37a82a5",
+      "sera/quality.py": "00280261a0a89c1a47138c8966ac0ae1b2e16dc31a76b26b7c3e4cda3d12271c",
+      "sera/relay.py": "7e718cbd3ce4950fabaa7aa7a51e56386da6e8ecc8a4545161d08f9922ac8bf8",
+      "sera/runtime.py": "99d26d650e63f0cba0d2e379c6528ee1609df4a96c93c6968ad97b760fb81dca",
+      "sera/search_policy.py": "db1dd3a3f634555da076451a03347994f7d018a05ea1a0944a0fc4111a8fc994",
+      "sera/storage.py": "6b9dec854ffb63bc59e854d5215bf4031f518028c50eb6a5d75be5f553b64c8e",
+      "sera/swarm.py": "b6eb07a652c52616e9b5efa53aa79522d9586e2422219494e5082f1045533704",
+      "sera/techniques.py": "33e70c0cd56b9a48e28566de5f5125d20607e63023f05958ae8738d7d7f24ae9",
+      "sera/trace_evidence.py": "c3b5aca365219dd6e25ce23cf15d50000ddc58cff10fb5482b30bfaaac7aa11a",
+      "sera/tracing.py": "5d86aa3919abf60af5f95edd563c530c06346c7423ba5698919a7b6aa6520bf9",
+      "sera/weave_evidence.py": "db4b9ef7c1c171415d248234a9ac8ed401a6112655dba2ebfe8607714b65a09e",
+      "sera/weave_integration.py": "8bb890f00a4a90bbbb725d749cba94f7133fee84287f82ead14227a2076a6f77"
+    }
+  },
+  "sera_trees_byte_identical": true,
+  "file_count": 27,
+  "different_files": [],
+  "driver": {
+    "path": "benchmarks/live_comparison.py",
+    "revision": "6601669e47879b0492cab09130123a363ae8b91a",
+    "sha256": "ddacbebcb0b07a85f66af6a520a7cfefd2c51853ad45ab961d131295d79d8883"
+  },
+  "scope": "Retrospective comparison of immutable git source, not a launch-time import-path record.",
+  "limitations": [
+    "The live launch did not record Python module __file__ paths.",
+    "Later inspection found PYTHONSAFEPATH=1 and site-packages before the checkout.",
+    "The likely installed-library import path is an inference, not a recorded launch fact.",
+    "This audit compares git source trees; it does not attest wheel bytes or the running process."
+  ]
+}
