@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 
 from benchmarks.live_comparison import _audit_import
+from benchmarks.grade import dataset_hash
 from experiments.verify_swarm import Audit, _verify_swarm
 from sera.storage import content_hash
 
@@ -46,6 +47,8 @@ def verify_registered_grid(folder, calls_path=None):
     audit.require(audit.valid_plateau_launch(launch), 'registered-launch',
                   'The exact registered uncapped driver and launch binding are required.')
     result = _verify_swarm(audit, report, calls, launch)
+    cases = registration['bundle']['records']['workload']['cases']
+    result['saved_profile'].update(task_count=len(cases), evaluation_cases_sha256=dataset_hash(cases))
     result['source_hashes'].update(registration=content_hash(registration), runner_probe=content_hash(probe))
     result['registered_live_grid'] = {
         'registration_hash': registration['registration_hash'],

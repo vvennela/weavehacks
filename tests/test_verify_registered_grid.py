@@ -9,11 +9,14 @@ from tests.test_verify_swarm import fixture
 
 def test_registered_adapter_keeps_shared_swarm_checks(monkeypatch, tmp_path):
     from experiments.verify_registered_grid import verify_registered_grid
+    from benchmarks.grade import dataset_hash, load_cases
     from sera.storage import content_hash
     report, dump = fixture()
     root = next(call for call in dump['calls'] if call['id'] == dump['root_call_id'])
     root['op_name'] = root['op_name'].replace('run_investigation', 'sera_optimize')
-    registration = {'registration_hash': 'frozen', 'live_search': {'max_candidate_trials': None}}
+    cases = load_cases('benchmarks/easy_cases.json')
+    registration = {'registration_hash': 'frozen', 'live_search': {'max_candidate_trials': None},
+                    'bundle': {'records': {'workload': {'cases': cases}}}}
     monkeypatch.setattr('experiments.verify_registered_grid._audit_import',
                         lambda folder: (registration, report, {}, [], {}, {}))
     launch = {'command': ['python', '-m', 'benchmarks.live_comparison', 'run-live',
@@ -27,6 +30,8 @@ def test_registered_adapter_keeps_shared_swarm_checks(monkeypatch, tmp_path):
     result = verify_registered_grid(tmp_path, calls)
     assert result['execution_passed'], result['issues']
     assert result['source_hashes']['registration'] == content_hash(registration)
+    assert result['saved_profile']['task_count'] == 8
+    assert result['saved_profile']['evaluation_cases_sha256'] == dataset_hash(cases)
     assert result['registered_live_grid']['probe_scope'] == 'separate-source-regraded-by-live-import'
 
     root['exception'] = 'failed trace'

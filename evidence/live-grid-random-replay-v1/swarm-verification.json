@@ -7,8 +7,8 @@
   "saved_profile": {
     "model_id": "Qwen/Qwen2.5-72B-Instruct",
     "model_revision": "495f39366efef23836d0cfae4fbe635880d2be31",
-    "evaluation_cases_sha256": null,
-    "task_count": 0,
+    "evaluation_cases_sha256": "2f3c6687cf2a19bde4c3f5b60ab56cb24ac67c6755e999ad98227b04e42d95a7",
+    "task_count": 8,
     "constraints": {
       "quality_floor": 0.99,
       "p95_latency_ms": null,
