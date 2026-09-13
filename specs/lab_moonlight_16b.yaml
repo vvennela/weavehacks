@@ -1,0 +1,79 @@
+# Lab spec: Moonlight-16B-A3B-Instruct (Moonshot AI, the Kimi family) on the Molab card.
+#
+# Two honest caveats, because this model does not fit Sera's arithmetic as
+# cleanly as a dense GQA model does.
+#
+# 1. KV CACHE. Moonlight uses Multi-head Latent Attention, not grouped-query
+#    attention. MLA stores one compressed latent per token per layer —
+#    kv_lora_rank (512) plus qk_rope_head_dim (64) = 576 elements — rather than
+#    separate K and V tensors across kv heads. Sera's cache arithmetic in
+#    config.kv_cache_gb_per_token is 2 x layers x num_kv_heads x head_dim, so
+#    num_kv_heads 1 and head_dim 288 reproduces MLA's true 576 elements per token
+#    per layer exactly. These are therefore EFFECTIVE values chosen to make the
+#    memory arithmetic correct, not values read off config.json. The real config
+#    declares num_attention_heads 16 with MLA projections.
+#
+# 2. COMPUTE. This is a mixture of experts: 15.3B total parameters, about 2.2B
+#    active per token. params_b is set to the total because every expert must be
+#    resident in VRAM, which is what the memory arithmetic needs. The consequence
+#    is that Sera's compute and bandwidth estimates for this model are
+#    CONSERVATIVE — it models all 15.3B as read per step when a real forward pass
+#    touches far fewer. Treat its latency figures as an upper bound, and do not
+#    compare them to the dense models above as though the substrate were equal.
+
+meta:
+  name: lab_moonlight_16b
+  environment: "Molab on CoreWeave, 1x RTX Pro 6000 Blackwell 96GB, 4 CPU, 32GB host"
+  note: >-
+    MoE with MLA. KV per token is unusually small for the parameter count, so
+    this model tolerates high concurrency; see the caveats in this file's header
+    before quoting any latency number from it.
+
+seed: 7
+
+models:
+  - name: moonlight_16b
+    hf_id: moonshotai/Moonlight-16B-A3B-Instruct
+    params_b: 15.3
+    num_layers: 27
+    hidden_size: 2048
+    num_attn_heads: 16
+    num_kv_heads: 1
+    head_dim_override: 288
+    max_model_len: 4096
+    base_dtype: bf16
+
+gpus:
+  - id: gpu0
+    name: RTX PRO 6000 Blackwell
+    vram_gb: 96.0
+    mem_bandwidth_gbs: 1792.0
+    tflops_bf16: 126.0
+    overhead_frac: 0.10
+
+workloads:
+  - model: moonlight_16b
+    request_rate_rps: 0.8
+    input_len_mean: 768
+    input_len_stdev: 256
+    output_len_mean: 128
+    output_len_stdev: 24
+    duration_s: 45
+    burstiness: 1.8
+
+slos:
+  - model: moonlight_16b
+    p95_latency_ms: 4800.0
+    min_throughput_rps: 0.70
+
+quality_floors:
+  - model: moonlight_16b
+    min_score: 0.975
+    eval_name: behavior_preservation
+    smoke_min_score: 0.5
+
+budget:
+  phase1_trials: 8
+  phase2_trials: 0
+  concurrent_slots: 2
+  max_rounds: 3

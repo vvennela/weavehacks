@@ -15,7 +15,7 @@
         const response=await fetch(signup?'/api/sign-up':'/api/sign-in',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:form.email.value,password:password.value})});
         const data=await response.json();
         if(!response.ok)throw new Error(data.error||'Unable to sign in. Please try again.');
-        location.assign('/lab');
+        location.assign(data.redirect||'/notebook');
       }catch(err){error.textContent=err instanceof TypeError?'Cannot reach the local server. Please try again.':err.message;error.hidden=false;submit.disabled=false;mode.disabled=false;submit.textContent=signup?'Create account ↗':'Sign in ↗';}
     });
   }

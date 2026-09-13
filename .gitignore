@@ -34,3 +34,6 @@ models/
 
 # Local frontend accounts and sessions
 .local/
+
+# Generated marimo WASM export (scripts/build_notebook.sh rebuilds it)
+output/notebook/

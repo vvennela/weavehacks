@@ -18,3 +18,27 @@ outside the publicly served directory and preserves accounts across restarts.
 The lab remains an interactive design preview; authentication does not execute
 the optimization backend. Run the server instead of `python -m http.server` to
 retain route protection and account endpoints. This server binds only to loopback.
+
+## The notebook
+
+`/notebook` is the first page after sign-in: a marimo notebook, exported to
+WebAssembly, that runs in the browser. Pick one of three open-weight models and
+press **Run** to see Sera tune its serving configuration — every trial, every
+revert, and the recommendation at the end.
+
+Build it before demoing, because the export is not committed:
+
+```bash
+scripts/build_notebook.sh            # reuse the captured ledgers
+scripts/build_notebook.sh --rerun    # re-measure the three specs first
+```
+
+That writes `output/notebook/` (~27MB of vendored marimo runtime, gitignored).
+The server serves it under `/notebook-app/`, behind the same session check as the
+rest of the workspace, resolving every path to confirm it stays inside that
+directory. Until it is built, `/notebook-app/` answers 503 with the command to run.
+
+The numbers shown are replayed from ledgers captured by `python -m sera`, and the
+notebook states which substrate produced them. Today that is the analytic
+simulator; re-capture with `--vllm` on a GPU node and the page relabels itself,
+because the substrate is read from the ledger rather than hardcoded.
