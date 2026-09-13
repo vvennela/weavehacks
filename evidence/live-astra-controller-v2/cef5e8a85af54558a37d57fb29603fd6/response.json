@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested because placement was unsupported in the single-model milestone. No candidate latency or quality measurements establish the predicted improvement. Baseline is the only eligible trial and the deterministic selection. Abstain from selecting the candidate; the next proposal must use supported placement.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12599,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 80,
+    "reasoning_output_tokens": 0
+  }
+}

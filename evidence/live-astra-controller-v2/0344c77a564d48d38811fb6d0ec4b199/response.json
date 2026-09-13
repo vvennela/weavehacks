@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"p1\"],\"reason\":\"Both legal proposals fit the remaining budget; p1 has the lower predicted p95 latency (90 ms versus 95 ms).\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12409,
+    "cached_input_tokens": 8448,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 49,
+    "reasoning_output_tokens": 0
+  }
+}

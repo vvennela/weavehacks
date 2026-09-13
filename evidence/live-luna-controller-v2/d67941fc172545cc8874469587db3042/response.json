@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested because the budget was exhausted, so the proposed lower-p95 prediction while preserving quality was not evaluated. The baseline p95 was 100 ms, but no candidate measurement or quality result supports a comparison. Next proposal should either test the candidate or abstain until budget is available.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10146,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 131,
+    "reasoning_output_tokens": 42
+  }
+}

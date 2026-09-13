@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ab1-5990-7bb3-a7c5-fc43991ece56"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[],\"reason\":\"No legal proposals are eligible because the remaining trial budget is zero.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12408,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":34,"reasoning_output_tokens":0}}

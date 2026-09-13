@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"keep-baseline\",\"proposal_id\":\"retain-baseline-001\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":null,\"proposed_value\":null,\"evidence_used\":[\"generation_errors\",\"kv_cache_percent\",\"mean_queue_ms\",\"p95_latency_ms\"],\"predicted_metric_change\":\"Retaining the configuration predicts no systematic change in p95_latency_ms, mean_queue_ms, or kv_cache_percent, with generation_errors remaining zero under the same workload.\",\"confidence\":0.8,\"expected_trial_cost\":0,\"falsification_condition\":\"A comparable repeat shows generation_errors above zero or a reproducible shift in latency, queue time, or cache utilization beyond measurement variability.\",\"reason\":\"The synthetic fixture requests keep-baseline and supplies no supported changes. The candidate's lower p95_latency_ms accompanies quality_pass=false, so it does not justify replacement. Retain the actual baseline configuration and preserve the remaining trial budget; no gates are approved.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13647,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 220,
+    "reasoning_output_tokens": 0
+  }
+}

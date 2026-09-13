@@ -1,0 +1,1 @@
+{"additionalProperties": false, "properties": {"ranked_proposal_ids": {"items": {"type": "string"}, "maxItems": 1, "title": "Ranked Proposal Ids", "type": "array"}, "reason": {"minLength": 1, "title": "Reason", "type": "string"}}, "required": ["ranked_proposal_ids", "reason"], "title": "ArbiterDecision", "type": "object"}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"baseline-context-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"max_model_len\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"mean_queue_ms\",\"kv_cache_percent\",\"generation_errors\"],\"predicted_metric_change\":\"For requests fitting within 2048 tokens, predict p95_latency_ms will remain within 5% of baseline 103 ms and generation_errors will remain zero.\",\"confidence\":0.5,\"expected_trial_cost\":1,\"falsification_condition\":\"Under the same workload restricted to requests fitting within 2048 tokens, p95_latency_ms differs from baseline by more than 5% or generation_errors exceeds zero.\",\"reason\":\"The synthetic fixture requests a trial. Reducing max_model_len from 4096 to 2048 is the sole supported change and uses the one remaining trial. Low mean_queue_ms and moderate kv_cache_percent provide little evidence of a performance benefit; this is a testable prediction, not a measured result or gate approval.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13618,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 240,
+    "reasoning_output_tokens": 0
+  }
+}

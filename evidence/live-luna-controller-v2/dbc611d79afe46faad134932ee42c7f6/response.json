@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"p1\"],\"reason\":\"p1 is legal within the remaining budget and has the lower predicted p95 latency.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 9953,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 123,
+    "reasoning_output_tokens": 80
+  }
+}

@@ -1,0 +1,1 @@
+{"ranked_proposal_ids":["p1"],"reason":"Both legal proposals fit the remaining budget; p1 has the lower predicted p95 latency (90 ms versus 95 ms)."}

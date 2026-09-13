@@ -1,0 +1,23 @@
+{
+  "action": "keep-baseline",
+  "proposal_id": "output-quality-keep-baseline-01",
+  "agent_role": "batching",
+  "parent_trial_id": "baseline",
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "changed_lever": null,
+  "proposed_value": null,
+  "evidence_used": [
+    "successful_requests",
+    "generation_errors",
+    "trace_failed_task_count",
+    "p95_latency_ms",
+    "p99_reliable",
+    "concurrency_8_cumulative_snapshot_mean_queue_ms",
+    "concurrency_8_cumulative_snapshot_preemptions"
+  ],
+  "predicted_metric_change": "Retaining baseline predicts no configuration-driven change. The permitted token budgets of 1024 and 2048 have no demonstrated route to a 5% latency improvement: measured_facts.baseline.prepared_prompt_tokens reports a maximum of 109 tokens per prompt, and eight such prompts fit below 1024 tokens. This is a hypothesis about scheduler impact, not a measured candidate result. No read call IDs or external evidence paths were supplied.",
+  "confidence": 0.86,
+  "expected_trial_cost": 0,
+  "falsification_condition": "A subsequent authorized comparison would refute abstention if either supported token budget reproducibly reduced p95_latency_ms by at least 5% from 770.0346799997533 while maintaining measured quality at or above 0.99. Compare quality against measured_facts.baseline.quality and workload lengths against measured_facts.baseline.prepared_prompt_tokens. No read call IDs or external evidence paths are available; p99_reliable is false, so p99 alone would not establish improvement.",
+  "reason": "No observed failure requires remediation: successful_requests is 96, generation_errors and trace_failed_task_count are zero, and measured_facts.baseline.quality records measured mean quality 1.0 with valid outputs. There are no previous trials or peer claims to assess. Inspection was declined; no successful reads, read call IDs, or fixed external evidence paths are supplied. The hypothesis is that reducing max_num_batched_tokens would rarely constrain this short-prompt workload and therefore offers little latency benefit. measured_facts.baseline.prepared_prompt_tokens supplies per-prompt lengths; aggregate input_tokens is not a context length. Near-zero concurrency_8_cumulative_snapshot_mean_queue_ms and zero concurrency_8_cumulative_snapshot_preemptions provide no evidence of scheduler pressure, although cumulative snapshots cannot establish causality. Preserve the verified baseline rather than spend the remaining trial on an unsupported improvement hypothesis."
+}

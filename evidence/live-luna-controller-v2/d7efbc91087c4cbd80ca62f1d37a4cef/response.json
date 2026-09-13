@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed latency is the relevant measured concern: p50 latency was 702.59 ms and p95 latency was 770.98 ms across 96 successful requests, while quality passed with mean 1.0 and no generation errors. The cause of latency variation is unknown, and cumulative queue/TTFT snapshots do not establish causality. Inspect latency outliers to identify whether tail behavior is concentrated in specific requests before selecting a supported batching change.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11293,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 184,
+    "reasoning_output_tokens": 67
+  }
+}

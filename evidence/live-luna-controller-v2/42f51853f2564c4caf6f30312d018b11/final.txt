@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested, so the proposed p95 improvement and quality preservation were not measured. The baseline p95 is 100 ms, but no candidate comparison is available; abstain from claiming improvement and require a supported placement and executed candidate trial next."}

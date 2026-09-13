@@ -1,0 +1,78 @@
+{
+  "schema_version": "sera-codex-fit-run-verification-v1",
+  "scope": "Completed two-trial Luna comparison only; not the later autonomous stopping-policy run.",
+  "audit_source_commit": "3cbc743",
+  "audit_command": "experiments/audit_codex_fit_run.py evidence/live-luna-fit-loop-v1 evidence/live-luna-fit-loop-v1/weave-calls-normalized.json gpt-5.6-luna evidence/live-luna-controller-v2",
+  "source_file_sha256": {
+    "result.json": "f6261de08cf1c84ab29da680c18672f39723100b46ca1be69ec54747a0bc9c34",
+    "invocation.json": "cef248faca6cb001b95a9c96e11f80d39ec542ec0f2dc4f933d0d349f5225e91",
+    "weave-calls-normalized.json": "55f66d8727551f1f70620281fb17a025e47219bcd93340f3678cab81d5fc0bcb"
+  },
+  "structural_verification": {
+    "accepted": true,
+    "investigator": "gpt-5.6-luna",
+    "deployment_measured": true,
+    "swarm_rounds": 1,
+    "batching_trial_attempted": true,
+    "full_bounded_loop_exercised": true,
+    "returned_configuration": "baseline",
+    "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09ab2-8a98-7815-b4b1-77fcb3bc61f0",
+    "weave_calls": 318,
+    "agent_requests": 17,
+    "agent_attempts": 17,
+    "completed_inspections": 6,
+    "returned_probe_passed": true,
+    "returned_runner_closed": true,
+    "returned_gpu_memory_mib": 0,
+    "limits": [
+      "No measured BF16 comparison or multi-GPU claim.",
+      "One post-deployment swarm round, not two.",
+      "CLI model selection verified; no independent backend attestation.",
+      "The call dump was re-exported as actual typed field dictionaries; no string representation parsing was used by the accepted audit."
+    ]
+  },
+  "performance": {
+    "baseline_p95_latency_ms": 770.9771380000348,
+    "candidate_p95_latency_ms": 769.1628219999984,
+    "observed_improvement_fraction": 0.002353268223676252,
+    "required_improvement_fraction": 0.05,
+    "baseline_task_quality": 1.0,
+    "candidate_task_quality": 1.0,
+    "quality_floor": 0.99,
+    "improvement_established": false,
+    "decision": "The baseline was correctly retained because the measured gain missed the fixed 5% threshold."
+  },
+  "factual_reasoning": {
+    "verified": false,
+    "selection_and_latency_arithmetic_correct": true,
+    "limits": [
+      {
+        "source": "result.json#/agent_calls/13",
+        "finding": "The output-quality investigator initially claimed that exact supported untested values could not be established and that baseline sampled peak memory was unavailable.",
+        "contradicting_supplied_evidence": {
+          "supported_changes": {"max_num_batched_tokens": [1024, 2048]},
+          "remaining_trials": 1,
+          "sampled_peak_memory_mib": 88687
+        },
+        "consequence": "The investigator changed from abstention to the legal 2048 trial during peer refinement. Its initial explanation remains factually wrong."
+      },
+      {
+        "source": "result.json#/search_trials/0/review",
+        "finding": "The final review computed the correct candidate gain and rejected it, but called two baseline source records read calls while citing them alongside candidate measurements.",
+        "cited_sources": [
+          {
+            "call_id": "01a09ab6-b8db-7676-a3a1-73d35c27c632",
+            "actual_operation": "recorded_trial_metrics",
+            "actual_trial_id": "candidate"
+          },
+          {
+            "call_id": "01a09ab6-b8e6-76b4-881a-6b030798a556",
+            "actual_operation": "recorded_trial_diagnosis",
+            "actual_trial_id": "candidate"
+          }
+        ],
+        "consequence": "These IDs identify the original FP8 deployment promoted to baseline, not the new trial-2 records or inspection operations. The candidate measurements were available in review_evidence, but this citation does not independently support them."
+      }
+    ]
+  }
+}

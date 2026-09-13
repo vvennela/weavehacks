@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-format-check-1\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"max_model_len\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"mean_queue_ms\",\"kv_cache_percent\",\"generation_errors\"],\"predicted_metric_change\":\"p95_latency_ms decreases from 103 ms while generation_errors remains 0\",\"confidence\":0.72,\"expected_trial_cost\":1,\"falsification_condition\":\"The trial is falsified if p95_latency_ms does not decrease or generation_errors rises above 0.\",\"reason\":\"The supported change permits reducing max_model_len from the parent configuration of 4096 to 2048; the baseline shows p95_latency_ms of 103, mean_queue_ms of 0.1, kv_cache_percent of 40, and generation_errors of 0.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11160,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 264,
+    "reasoning_output_tokens": 59
+  }
+}

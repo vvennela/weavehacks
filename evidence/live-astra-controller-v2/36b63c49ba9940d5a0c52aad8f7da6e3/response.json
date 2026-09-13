@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"keep-baseline\",\"proposal_id\":\"scheduling-refine-abstain-01\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":null,\"proposed_value\":null,\"evidence_used\":[\"p95_latency_ms\",\"successful_requests\",\"request_count\",\"generation_errors\",\"concurrency_8_cumulative_snapshot_mean_queue_ms\",\"concurrency_8_cumulative_snapshot_preemptions\",\"p99_reliable\"],\"predicted_metric_change\":\"Retaining baseline predicts no configuration-driven change. Neither supported max_num_batched_tokens value, 1024 or 2048, is expected to deliver the required 5% p95_latency_ms improvement over 770.0346799997533 ms (call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0, reduced/p95_latency_ms at concurrency 8). measured_facts.baseline.prepared_prompt_tokens reports at most 109 tokens per prompt, so eight such prompts total 872 tokens, below both budgets. This is a hypothesis, not a measured comparison.\",\"confidence\":0.86,\"expected_trial_cost\":0,\"falsification_condition\":\"A controlled comparison demonstrating p95_latency_ms at or below 731.5329459997656 ms with either supported budget, preserving workload constraints and measured quality of at least 0.99, would refute the prediction. Compare latency against call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0 at reduced/p95_latency_ms, and quality against call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 at task_quality/per_prompt. No comparison or gate approval is claimed.\",\"reason\":\"No failure is observed: call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 records accepted/collected at status and decision, zero generation_errors at reduced, and passing measured quality at task_quality/per_prompt. The supplied baseline has 96 successful_requests out of 96 request_count. No scheduling or memory cause is established. Independently reviewing the evidence, I accept the memory_context peer's prompt-budget argument: measured_facts.baseline.prepared_prompt_tokens places eight maximum-length prompts below both permitted budgets. I also accept output_quality's claim that no observed quality failure requires remediation. Near-zero concurrency_8_cumulative_snapshot_mean_queue_ms and zero concurrency_8_cumulative_snapshot_preemptions support abstention but, being cumulative snapshots, do not establish causality. Call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0 at reduced/p95_latency_ms shows latency increasing with concurrency; that alone does not demonstrate token-budget contention. These measurements provide insufficient justification to spend the remaining trial on either smaller budget.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18208,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 621,
+    "reasoning_output_tokens": 0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-baseline-fp8-001\",\"agent_role\":\"quantization\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"kv_cache_dtype\",\"proposed_value\":\"fp8\",\"evidence_used\":[\"kv_cache_percent\",\"p95_latency_ms\",\"generation_errors\"],\"predicted_metric_change\":\"p95_latency_ms decreases from 107 ms while generation_errors remains 0.\",\"confidence\":0.62,\"expected_trial_cost\":1,\"falsification_condition\":\"The trial is falsified if p95_latency_ms does not decrease or generation_errors becomes greater than 0.\",\"reason\":\"fp8 is supported, fits the remaining one-trial budget, and may reduce KV-cache overhead without changing the parent batching configuration.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11170,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 396,
+    "reasoning_output_tokens": 220
+  }
+}

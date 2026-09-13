@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"refuted","reason":"The selected trial is baseline per the deterministic result. Although the candidate p95 was 80 ms versus 100 ms baseline, candidate quality failed, so the proposal's requirement to preserve quality was not met; a fast quality failure is not an improvement."}

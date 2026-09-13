@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection is baseline, the only eligible trial. The budget was exhausted and the candidate was not tested, so neither the predicted 5% p95 reduction nor preserved quality was measured. Retain baseline and abstain from another proposal under the exhausted budget; unsupported placement does not establish a hardware cause.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12602,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 88,
+    "reasoning_output_tokens": 0
+  }
+}

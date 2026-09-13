@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection is baseline, the only eligible trial. The candidate was not tested because placement is unsupported in the single-model milestone; candidate latency and quality are unmeasured. The predicted 5% p95 reduction with preserved quality therefore remains untested. Retain baseline and propose a supported placement before evaluating the prediction.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12601,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 91,
+    "reasoning_output_tokens": 0
+  }
+}

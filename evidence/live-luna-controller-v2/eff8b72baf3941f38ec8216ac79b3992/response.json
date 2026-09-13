@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"scheduling:proposal-scheduling-2048\"],\"reason\":\"No observed failure was established: the measured baseline had 96/96 successful requests, zero generation errors, and verified quality mean 1.0 at source call 01a09ab6-b8e6-76b4-881a-6b030798a556, with p95 latency 770.9771380000348 ms. The cause of latency is unknown; the evidence does not establish a model, kernel, memory-pressure, or scheduling cause. I accept the peers' shared proposal to test max_num_batched_tokens=2048 as a legal, untested latency hypothesis within the one-trial budget, while rejecting any implication that its gain is already measured. Quality and latency gates must be evaluated after execution.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14401,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 266,
+    "reasoning_output_tokens": 85
+  }
+}

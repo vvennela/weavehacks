@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No failure is observed: successful_requests=96, generation_errors=0, and baseline quality.mean=1.0 passed floor=0.99. sampled_peak_memory_mib=88687 and zero cumulative preemptions do not establish memory pressure; latency causes remain unknown. Inspect load_metrics for load-specific memory and scheduling evidence relevant to the supported token-budget changes. Cumulative queue/TTFT snapshots cannot establish a causal gain. No source call IDs or peer claims were supplied.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13750,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 154,
+    "reasoning_output_tokens": 32
+  }
+}

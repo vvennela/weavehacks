@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"Observed evidence shows 96 successful requests with zero generation errors, verified quality mean 1.0, and baseline p95 latency of 770.977 ms; the persisted candidate diagnosis was accepted but explicitly states that no model, kernel, memory-pressure, or scheduling cause was established. The completed latency_outliers inspection does not resolve that unknown cause, so inspecting load metrics is the useful remaining read-only query before selecting the bounded next action.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12415,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 250,
+    "reasoning_output_tokens": 137
+  }
+}

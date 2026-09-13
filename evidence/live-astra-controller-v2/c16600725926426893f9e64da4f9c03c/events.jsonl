@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ab3-09fb-7722-9744-10638b730c4c"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The candidate's p95 was 20% lower (80 ms versus 100 ms), but it failed quality, refuting the prediction of lower latency while preserving quality. The deterministic selection retains baseline, the only eligible trial. No causal diagnosis or evidence references were supplied; the next proposal must address quality preservation before claiming improvement.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12602,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":92,"reasoning_output_tokens":0}}
