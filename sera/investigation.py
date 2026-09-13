@@ -52,6 +52,8 @@ def remaining_candidates(evidence, baseline_config, seen, workload, baseline):
 
 
 def round_evidence(initial, search, trials, remaining):
+    from .pipeline import load_snapshot_metrics
+
     evidence = deepcopy(initial)
     evidence['remaining_trials'] = remaining
     evidence['history'] = [dict(trial={key: deepcopy(trial[key]) for key in
@@ -69,6 +71,7 @@ def round_evidence(initial, search, trials, remaining):
     for index, trial in enumerate(trials, 1):
         metrics = dict(trial.get('reduced', {}))
         metrics['sampled_peak_memory_mib'] = trial['runtime'].get('sampled_peak_memory_mib')
+        metrics.update(load_snapshot_metrics(trial))
         for key, value in metrics.items():
             evidence['metrics'][f'trial_{index}_{key}'] = value
     return evidence

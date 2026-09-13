@@ -12,6 +12,17 @@ from .runtime import CleanupError, GENERATION, SeraModel
 from .storage import content_hash, save_json
 
 
+def load_snapshot_metrics(trial):
+    """Expose after-load cumulative snapshots, not measured-window averages."""
+    metrics = {}
+    for load in trial.get('loads', []):
+        snapshot = load.get('metrics', {}).get('after-measurement', {})
+        prefix = f"concurrency_{load['concurrency']}_cumulative_snapshot_"
+        for name in ('mean_queue_ms', 'mean_ttft_ms', 'preemptions'):
+            metrics[prefix + name] = snapshot.get(name)
+    return metrics
+
+
 def agent_evidence(baseline, objective=None, constraints=None):
     from .config import SUPPORTED_CHANGES
     metrics = dict(baseline["reduced"])
@@ -20,6 +31,7 @@ def agent_evidence(baseline, objective=None, constraints=None):
                    mean_ttft_ms=snapshot.get("mean_ttft_ms"),
                    preemptions=snapshot.get("preemptions"),
                    sampled_peak_memory_mib=baseline["runtime"].get("sampled_peak_memory_mib"))
+    metrics.update(load_snapshot_metrics(baseline))
     model_id = baseline["runtime"].get("model_id", MODEL_ID)
     supported = SUPPORTED_CHANGES if model_id == MODEL_ID else {"max_num_batched_tokens": [2048]}
     return {"trial_id": "baseline", "model_id": model_id,
@@ -31,7 +43,11 @@ def agent_evidence(baseline, objective=None, constraints=None):
             "configuration": baseline["runtime"]["configuration"],
             "metrics": metrics, "remaining_trials": 1, "supported_changes": supported,
             "baseline_self_check": token_agreement(baseline["quality"], baseline["self_check"]),
-            "limitations": ["No measured KV peak in this serial run; idle KV use is not pressure evidence.",
+            "limitations": ["No measured in-flight KV peak; idle KV use is not pressure evidence.",
+                            "concurrency_N_cumulative_snapshot_* fields are snapshots after that load, "
+                            "cumulative since server startup and including warmup and earlier loads; "
+                            "they are not measured-window means or counter deltas. Legacy unprefixed "
+                            "mean_queue_ms, mean_ttft_ms, and preemptions have the same cumulative scope.",
                             "Token agreement does not establish task correctness.",
                             "Sampled peak memory includes runtime reservation, not just model weights.",
                             "This small sample cannot establish statistical significance."]}
