@@ -206,7 +206,14 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                                                error=record['arbiter_error']))
             save()
             if not experiments:
-                search['stop_reason'] = 'no-valid-selected-proposal'
+                if (not record.get('arbiter_error')
+                        and record.get('arbiter', {}).get('ranked_proposal_ids') == []):
+                    search['stop_reason'] = 'arbiter-declined'
+                elif (record['specialists']
+                      and all(check['status'] == 'abstained' for check in record['specialists'])):
+                    search['stop_reason'] = 'specialists-abstained'
+                else:
+                    search['stop_reason'] = 'no-valid-selected-proposal'
                 break
             for proposal, candidate, selection_reason in experiments:
                 close_active()
