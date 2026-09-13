@@ -1,6 +1,6 @@
 # Sera Technical Specification
 
-Status: MVP specification
+Status: Hackathon specification; Qwen BF16 runtime check passed; FP8 and agent-provider checks are unverified
 
 ## 1. Purpose
 
@@ -106,6 +106,27 @@ The Qwen model uses the Apache 2.0 license. The GLM model uses its own license. 
 
 Every run records the exact Hugging Face revision SHA. A run must not compare floating repository revisions.
 
+The complete search benchmark runs only on Qwen/Qwen3-0.6B. GLM is used only for the two-model placement demonstration and its required compatibility checks and isolated reference measurements. Do not run an exhaustive GLM candidate universe.
+
+### 5.1 First experiment: FP8 on the actual GPU
+
+Before building the quantization search, spend at most 20 minutes on a manual FP8 compatibility check on the RTX Pro 6000. Record actual compute capability; the target is sm_120. Record driver, CUDA, PyTorch, vLLM, attention backend, model revisions, and resolved runtime settings.
+
+For each demonstration model, check these configurations sequentially:
+
+| Configuration | Weight quantization | KV-cache data type |
+| --- | --- | --- |
+| Reference | None; bfloat16 weights | auto |
+| FP8 weights alone | On-load FP8 via --quantization fp8 | auto |
+| FP8 KV cache alone | None; bfloat16 weights | fp8 |
+| Combined | On-load FP8 via --quantization fp8 | fp8 |
+
+Use the named baseline in section 7 for other settings. Each check must reach readiness, generate nonempty output for the same saved prompts, expose metrics, record peak startup and steady-state memory, and release the owned process and GPU memory. Inspect startup logs to confirm the requested precision and kernel path were used. Record quick-gate scores separately from runtime compatibility. A working kernel does not establish preserved output behavior.
+
+Record pass, fail, or unverified for each model and configuration. Installation, download, or startup delay can exhaust the 20-minute window; an incomplete check stays unverified. Do not spend the night patching kernels. Only enable combinations that ran successfully; if one FP8 path fails, retain any other proven path for that model. If no quantization path works, disable that specialist, use batching, and remove the cache-precision scenario and quantization-placement claim.
+
+On-load FP8 avoids requiring a separate quantized checkpoint, but its startup memory and architecture support still require this experiment. Documentation alone is not a passing result. See [vLLM online FP8](https://docs.vllm.ai/en/stable/features/quantization/llm_compressor/fp8/#online-dynamic-quantization).
+
 ## 6. Public API
 
 ### 6.1 Quick mode
@@ -119,7 +140,7 @@ Quick mode requires:
 
 - At least one model identifier
 - At least one representative prompt
-- A W&B API key in the WANDB_API_KEY environment variable
+- A W&B API key in the WANDB_API_KEY environment variable when agent selection is enabled; the first fixed-candidate milestone requires no LM calls or key
 
 Quick mode supplies:
 
@@ -192,6 +213,38 @@ The defaults exist to keep the minimum call small.
 
 Defaults must be printed in the summary and stored in the ledger.
 
+### 7.1 Named baseline: sera-baseline-v1
+
+Use this explicit configuration for isolated reference trials. These are Sera's chosen defaults, not a claim about vLLM's defaults or optimal settings.
+
+| Setting | Value |
+| --- | --- |
+| Model and tokenizer revisions | Exact recorded SHAs |
+| dtype | bfloat16 |
+| quantization | None |
+| kv_cache_dtype | auto, resolving to bfloat16 for these reference models |
+| tensor_parallel_size | 1 |
+| max_num_seqs | 8 |
+| max_num_batched_tokens | 4096 |
+| max_model_len | 4096 |
+| enable_prefix_caching | false |
+| enable_chunked_prefill | true |
+| gpu_memory_utilization | 0.90 for isolated runs |
+| kv_cache_memory_bytes | None; derive from the service memory fraction |
+| enforce_eager | true |
+| CPU weight offload | Disabled |
+| Generation | temperature=0, top_p=1, top_k=-1, seed=0, max_tokens=64, normal EOS handling |
+
+Pin the runtime version and record its complete resolved configuration, tokenizer, chat template, and model-specific generation options. Do not inherit a repository generation config silently. Render and save identical prompt inputs for baseline and candidate. Reject prompts whose input plus output allowance exceeds the configured context; do not truncate them silently. An unsupported baseline setting requires a named, recorded baseline revision before trials start.
+
+Benchmark workload profiles and the constrained placement scenario may override only the baseline memory fraction before a run. Name and hash each override, hold it fixed for every method and compared candidate, and include it in the report. Changing a comparison's budget requires a new run.
+
+### 7.2 Measurement contract for the first deliverable
+
+Start with 32 saved prompts, concurrency 1, 16 warm-up requests, and three measured passes: 96 measured requests per configuration. Use nearest-rank percentiles and report request count with latency. Keep model, prompts, sampling, load, memory limit, and output limit fixed across baseline and candidate. Report output token counts and throughput so shorter answers cannot silently masquerade as faster inference.
+
+For later concurrency sweeps, store separate metrics and gates for each load. The selection latency is the worst p95 across the declared loads; never pool their request samples. Benchmark profiles must declare their loads before any method runs. Small prompt sets remain allowed in quick mode, but their report must state the sample count and cannot establish a reliable p99 claim.
+
 ## 8. System architecture
 
 ### 8.1 AI roles
@@ -204,9 +257,13 @@ Sera uses five AI roles:
 4. Arbiter
 5. Frontier reader
 
-The agents use W&B Inference through its OpenAI-compatible API. The user supplies the W&B API key through the environment. The agent model is configurable. The MVP default is openai/gpt-oss-20b.
+The agents use W&B Inference through its OpenAI-compatible API. The user supplies the W&B API key through the environment. The agent model is configurable. openai/gpt-oss-20b is the proposed default, pending the provider check below.
 
 Each agent receives structured evidence and returns data that conforms to a fixed schema. An agent cannot execute commands, edit the ledger, approve a result, or bypass the validator.
+
+Before connecting agents to GPU trials, run a manual provider check with the actual proposal, arbiter, and frontier-reader schemas. Use response_format.type=json_schema with strict=true and validate responses locally. Run 30 recorded requests covering active levers, inactive levers, rejection history, ranking, and placement. Require at least 29 of 30 schema-valid first responses and 30 of 30 after at most one retry per failed response. Record first-pass validity, retries, truncation, API errors, and latency; do not repair malformed output silently. This is a small compatibility sample, not a reliability guarantee.
+
+If the model fails this check, keep agent selection disabled until another configured model passes the same check. Continue the fixed-candidate measured path. Missing credentials leave the check unverified. The [W&B structured-output example](https://docs.wandb.ai/inference/response-settings/structured-output) uses openai/gpt-oss-20b, but does not verify Sera's schemas.
 
 ### 8.2 Deterministic components
 
@@ -399,7 +456,9 @@ Sera exposes only methods supported by the installed vLLM version, model, and GP
 - enable_prefix_caching
 - chunked prefill when supported
 
-Values come from a small policy-generated set based on prompt lengths, output limits, available KV cache, and observed queueing. Sera does not form their full Cartesian product.
+In normal operation, values come from a small policy-generated set based on prompt lengths, output limits, available KV cache, and observed queueing. This search space is a superset of the benchmark subset and can expand as new evidence arrives. Sera does not form its full Cartesian product.
+
+In benchmark runs, both values and complete candidate configurations are frozen before any method starts. Evidence can change proposal ranking, but cannot add values or configurations. Every proposal must name a candidate in the frozen universe; out-of-universe proposals are rejected before GPU execution. See section 19.
 
 ### 11.3 Parallelism
 
@@ -438,6 +497,8 @@ The arbiter ranks proposals. It does not merge unrelated proposals into an untra
 ## 13. Search policy
 
 Sera does not perform grid search during normal optimization.
+
+Benchmark runs use the frozen universe from section 19. The specialist, arbiter, combination, and exploration rules operate only within that universe. Normal runs can use the broader policy-generated space from section 11.2.
 
 Each round works as follows:
 
@@ -478,7 +539,7 @@ It checks:
 - Sum of per-service GPU memory limits for joint placement
 - Duplicate configuration hashes
 
-The default joint-placement memory reserve is 10 percent of GPU memory. A candidate that only fits without the reserve is rejected.
+The default joint-placement memory reserve is 10 percent of the declared total memory budget. For unconstrained runs this is physical GPU memory; for the constrained demonstration it is the smaller declared budget. Enforce both the declared budget and physical headroom. A candidate that only fits without the reserve is rejected.
 
 ## 15. Quality gates
 
@@ -494,7 +555,11 @@ The quick gate rejects:
 - Severe output-length collapse
 - Behavior-proxy score below the configured tolerance
 
-Quick mode uses baseline outputs and a versioned external judge to produce a behavior-preservation proxy. This is not task-quality proof.
+Quick mode uses deterministic token agreement against saved baseline outputs. It does not call an external judge.
+
+Use the pinned model tokenizer and the section 7 generation settings for both outputs. For each prompt, compare generated token IDs at matching positions. The score is matching positions divided by the longer output length; missing or extra tokens count as mismatches. Reject empty output before scoring. The run score is the arithmetic mean of prompt scores and must be at least 0.99. Store per-prompt scores, token sequences, and proxy version token-agreement-v1.
+
+Compute the proxy in a separate concurrency-1 quality pass with identical prompt order. Deterministic scoring does not guarantee deterministic GPU generation; if a baseline self-check falls below the same threshold, report an unstable reference and do not accept a candidate through this proxy. Token agreement is a strict behavior-preservation check, not semantic equivalence or task-quality proof. It can reject harmless wording changes; do not lower the floor after seeing results.
 
 ### 15.2 Full gate
 
@@ -550,9 +615,23 @@ The joint verdict is pass only when both models independently pass:
 
 Sera compares shared and isolated results. It records the observed changes without assigning an unsupported cause. A failed joint trial is rolled back and its evidence returns to the reducer and specialists.
 
+### 17.1 Deliberately constrained demonstration
+
+The demonstration uses a declared memory budget smaller than the physical 96 GB card. Choose and record the budget from preliminary isolated measurements so the unquantized pair is marginal or exceeds the allowance. Account for weights, KV cache, workspace, and startup peaks; weight sizes alone do not establish fit or contention.
+
+Let P be measured physical GPU bytes, B the declared smaller-card budget in bytes, and b_i each service's allocation. Set each service's gpu_memory_utilization to b_i / P and require sum(b_i) <= 0.90 * B. This leaves 10 percent of the declared budget as reserve. Keep kv_cache_memory_bytes unset so it cannot override the fraction, as specified in the [vLLM engine arguments](https://docs.vllm.ai/en/stable/configuration/engine_args/). Validate observed memory against the declared limit; the runtime fraction is not hardware isolation.
+
+Freeze B and the per-service allocations before the final comparison. Use those same limits and workloads for the unquantized and quantized pair, and for each configuration's isolated reference run. Keep any earlier calibration runs separate and report their cost. For GLM, retain only the reference and the compatible quantization candidates needed for placement; skip the general phase-one search.
+
+Show this sentence on the placement slide and in the notebook: "Memory budget constrained to represent a smaller card; execution uses an RTX Pro 6000 with 96 GB." Also show physical bytes, declared budget, service fractions, and measured peaks. This represents memory capacity only; it does not reproduce a smaller card's compute speed or bandwidth.
+
+Claim quantization enabled placement only when the unquantized pair fails the declared budget or workload gates and the quantized pair passes under the same limits. State whether the failure was a deterministic fit rejection or a measured runtime failure. A capped budget does not guarantee contention or a win. If the effect is absent, report that result and use the fallback ladder.
+
 ## 18. Ledger and Weave
 
 SQLite is the source of truth for local execution and recovery.
+
+For the first milestone only, one versioned local JSON run record is sufficient. Save baseline and candidate outcomes as they finish. SQLite and interruption recovery follow after the measured path works; do not block the first milestone on them.
 
 The ledger stores:
 
@@ -595,9 +674,11 @@ The benchmark tests whether Sera's evidence-driven policy finds a stronger valid
 
 ### 19.1 Candidate universe
 
-A deterministic benchmark generator creates a small legal candidate universe before any method runs. The universe contains the same allowed values for Sera, fixed-order grid search, and random search.
+A deterministic benchmark generator freezes a small legal universe for Qwen/Qwen3-0.6B only. Freeze explicit values, complete configurations, their hashes, lexicographic order, workload profiles, and memory limits before any method runs. Include sera-baseline-v1 from section 7, with any declared profile override. All methods select from exactly these candidates. Normal operation uses the broader search space in section 11.2.
 
-The full universe is executed once to establish the oracle result. The evaluation harness then uses cached results to replay non-agent baselines without more GPU use.
+Limit the universe to twelve candidates beyond the initial baseline per workload profile. Include only precision modes that passed the hardware check. Select the finite subset before collecting candidate outcomes; do not remove losing candidates after measurement. Measure one complete Qwen universe per profile to establish the best valid result within that universe, called the oracle. An incomplete universe has no oracle and cannot support the near-oracle claim.
+
+Replay every search policy, including Sera and its ablations, against the same cached trial outcomes. An agent sees the initial baseline and only the outcomes it has selected so far; it must not see unselected outcomes or the oracle. GPU trials are not repeated during replay. Report GPU collection time, startup time, candidate count, and agent-call time separately from the search trial budget. GLM has no oracle sweep and contributes no evidence to the search benchmark claim.
 
 ### 19.2 Compared methods
 
@@ -611,13 +692,15 @@ The full universe is executed once to establish the oracle result. The evaluatio
 All methods receive:
 
 - The same candidate universe
-- The same initial baseline
+- The same measured sera-baseline-v1 configuration, profile override, and configuration hash
 - The same trial budget
-- The same measurements
+- The same measurement procedure and cached outcome for each selected candidate; unselected outcomes remain hidden from adaptive policies
 - The same quality gate
 - The same objective
 
 The naive grid receives the same deterministic legality checks as Sera. This prevents invalid settings from creating a false advantage. The measured difference comes from trial selection.
+
+The initial baseline is shared setup and consumes no candidate trial. Each selected candidate consumes one trial, including a cached startup or quality failure. Rejected out-of-universe proposals consume no GPU trial but remain in the proposal log. Preregister a common search budget of at most eight candidates, strictly smaller than the nonbaseline universe, so end-of-budget comparisons do not reduce to every method seeing every result. If fewer legal configurations remain, reduce the common budget before collecting outcomes. No phase-two reserve applies to this one-model benchmark.
 
 ### 19.3 Primary metric
 
@@ -644,7 +727,7 @@ One lucky run is not evidence. Random-search results require recorded seeds and 
 
 ## 20. Intelligent ablation scenarios
 
-The demonstration includes a dead-lever scenario.
+The Qwen-only benchmark includes two predeclared workload profiles, each with its own frozen universe and oracle. Confirm the intended pressure in a baseline pilot before collecting candidate outcomes; if the pressure is absent, report the scenario as not established.
 
 On the one-GPU Molab environment:
 
@@ -652,11 +735,13 @@ On the one-GPU Molab environment:
 - Low queue time makes aggressive batching a low-value lever.
 - High KV-cache use and preemptions make cache precision a live lever.
 
-Sera must spend its first trials on the live lever. Fixed-order grid search and the round-robin ablation spend trials on settings that the evidence already marks as weak or impossible.
+The hypothesis is that Sera spends its first trials on the lever supported by measurements. Fixed-order grid search and the round-robin ablation can spend trials on legal but weak settings. Impossible tensor-parallel settings are excluded for every method and cannot create a benchmark advantage.
 
 The benchmark includes a second scenario that reverses the pressure: high queue time and low KV-cache pressure must move batching ahead of precision.
 
 These scenarios test whether Sera changes its search from evidence. They are not hand-coded answers for specific model IDs. The same reducer thresholds and proposal schema must apply to both scenarios.
+
+Run the cache-precision profile only if FP8 KV cache passed on Qwen. If it did not, mark that scenario unavailable and report results for the remaining supported levers. Never fabricate pressure, candidate outcomes, or a quantization win.
 
 ## 21. Failure behavior
 
@@ -675,62 +760,40 @@ Sera must:
 
 ## 22. Test strategy
 
-Development follows TDD.
+Keep automated tests for only these three areas:
 
-### 22.1 Unit tests
+| Area | Required behavior |
+| --- | --- |
+| VRAM arithmetic | Consistent units, fit boundaries, workspace and reserve, and combined service limits. |
+| Candidate schema validation | Accept legal typed candidates; reject missing fields, wrong types, unsupported settings, and out-of-range values. |
+| Metrics parser | Parse saved vLLM output from the recorded runtime version; preserve units and mark missing metrics unavailable. |
 
-- Input and default normalization
-- Model revision pinning
-- Candidate schema validation
-- VRAM arithmetic
-- Tensor-parallel legality
-- Reducer calculations
-- Budget reservation
-- Candidate hashing and deduplication
-- Frontier calculation
-- Quality gating
-- Search stop rules
-- Result selection
-- Secret redaction
+Use failing tests for changes in these areas and run them before shipping. Drop the remaining unit, contract, integration, and automated system acceptance requirements for the hackathon.
 
-### 22.2 Contract tests
-
-- Agent output against the proposal schema
-- vLLM process manager against a fake server
-- Metrics parser against saved vLLM output
-- NVIDIA telemetry adapter against recorded samples
-- Weave logging against a fake client
-- SQLite resume behavior
-
-### 22.3 Integration tests
-
-- Start and stop one small vLLM model
-- Run a baseline and one candidate
-- Reject one invalid candidate before GPU execution
-- Reject one quality failure
-- Resume an interrupted run
-- Run two small services on one GPU
-
-### 22.4 System acceptance test
-
-The Molab notebook must:
-
-1. Install Sera and its locked dependencies.
-2. detect the RTX Pro 6000 GPU.
-3. Resolve and pin both demonstration models.
-4. Complete baselines.
-5. Produce proposals from all active specialists.
-6. Avoid a parallelism trial on one GPU.
-7. Execute phase-one candidates.
-8. Record all outcomes in SQLite and Weave.
-9. Produce a frontier for each model.
-10. Execute a joint trial.
-11. Return two usable SeraModel wrappers or a clear no-safe-placement result.
-12. Render the grid-search comparison and ablation.
+The small hardware/provider experiments and selected demonstration path remain manual validation. Runtime validation, quality gates, and cleanup still apply to every live trial.
 
 ## 23. MVP completion criteria
 
-The MVP is complete when:
+### 23.1 First milestone
+
+One model → baseline → one candidate → quality gate → usable runner and report.
+
+Use Qwen/Qwen3-0.6B, the named baseline, and the measurement contract in section 7. Select one fixed legal candidate before execution; change only one setting. No agent selection, joint placement, or benchmark is required for this milestone.
+
+The milestone is complete when a real run:
+
+- Records the pinned model, baseline, candidate, workload, raw metrics, reduced metrics, and token-agreement results in a local saved result.
+- Rejects the candidate on generation errors, empty outputs, or token agreement below 0.99.
+- Selects a quality-passing candidate only when its measured p95 latency improves by at least five percent; otherwise selects the baseline and reports no-safe-improvement. This is the first milestone's explicit improvement threshold, not proof of statistical significance.
+- Returns one live SeraModel for the selected configuration and generates a fresh prompt through it after optimize returns.
+- Produces a readable report with baseline/candidate measurements, quality verdict, selection reason, and the saved result location.
+- Stops the runner through close and confirms cleanup.
+
+Check the rejection branch manually with an explicitly labeled empty or altered output fixture; it must select the baseline. Fixture results do not count as measured model quality. A safe baseline return completes the milestone even when the candidate does not improve performance.
+
+### 23.2 Full MVP target
+
+The full MVP is complete when:
 
 - The minimum two-argument API runs in Molab.
 - A new user receives a usable runner and understandable summary.
@@ -740,6 +803,22 @@ The MVP is complete when:
 - Sera reaches the benchmark threshold in fewer trials than fixed-order grid search.
 - The Weave trace shows the complete self-correcting loop.
 - The same core library can run on a multi-GPU CoreWeave Linux host without notebook-specific code.
+
+### 23.3 Hackathon fallback ladder
+
+Ship the highest level supported by working code and evidence. A fallback is a partial hackathon deliverable, not completion of the full MVP.
+
+| Level | Trigger | Deliverable |
+| --- | --- | --- |
+| Full live | Both isolated optimization and joint placement pass. | Two usable runners, measured joint results, frontier, notebook report, and trace. |
+| Single-model live | Joint placement fails, cannot fit, or is unfinished. | The first milestone: one usable runner, baseline/candidate evidence, and report. Include agent decisions and traces only when implemented. |
+| Replay | A real baseline/candidate run or usable returned runner cannot be completed. | An explicit replay notebook and demo package using saved real records; if none exist, a clearly labeled synthetic result fixture. No live runner. |
+
+For a single-model release, stop failed joint services and restore one working isolated configuration. Demonstrate an explicit one-model call; never silently drop a requested model. Return its baseline if no candidate passes. Record joint placement as no-safe-placement or not-attempted, with the reason. Do not claim shared-GPU benefits.
+
+For replay, keep the path separate from live optimize. Preserve provenance for recorded trials: model revisions, configuration, workload, runtime, metrics, and quality outcomes. Mark new agent proposals untested unless they have measured outcomes. Label synthetic fixtures and replayed trial outcomes in the report and trace, leave models empty, and show the live-runner failure. Synthetic fixtures support no speedup, quality, placement, or benchmark claim.
+
+For every level, the three test areas in section 22 must pass and the selected notebook path must run manually from a clean install. State the delivery level, evidence source, and unfinished capabilities in the notebook and release notes. Missing joint placement or a live runner does not block the corresponding fallback release.
 
 ## 24. External references
 
@@ -751,3 +830,7 @@ The MVP is complete when:
 - vLLM metrics: https://docs.vllm.ai/en/latest/usage/metrics/
 - W&B Inference API: https://docs.wandb.ai/inference/api-reference
 - Weave evaluation logging: https://weave-docs.wandb.ai/guides/evaluation/evaluation_logger
+- W&B schema-constrained responses: https://docs.wandb.ai/inference/response-settings/structured-output
+- vLLM service memory fractions and KV-cache override: https://docs.vllm.ai/en/stable/configuration/engine_args/
+- vLLM FP8 weights: https://docs.vllm.ai/en/stable/features/quantization/llm_compressor/fp8/
+- vLLM FP8 KV cache: https://docs.vllm.ai/en/stable/features/quantization/quantized_kvcache/

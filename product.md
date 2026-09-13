@@ -85,7 +85,7 @@ Metric reduction, configuration validation, trial execution, quality gates, pers
 
 The user supplies models and representative prompts. Sera derives prompt lengths, measures output behavior, sweeps a standard set of loads, and uses documented defaults for the experiment budget and acceptable change.
 
-Quick mode checks behavior preservation against the original model. It does not claim that task quality is verified.
+Quick mode checks deterministic token agreement against saved original-model outputs with fixed generation settings. It requires no external judge. This strict proxy can reject harmless wording changes and does not verify task quality.
 
 ### Verified mode
 
@@ -110,12 +110,9 @@ Sera returns a structured result, not terminal output alone.
 
 Grid search is a benchmark control. It is not part of Sera.
 
-The test gives Sera and a naive fixed-order grid search the same models, hardware, legal candidate settings, workload, quality gate, and trial budget. The grid tries configurations in a fixed order and does not use measurements to choose its next trial.
+The hackathon benchmark uses Qwen/Qwen3-0.6B only. It gives Sera and naive fixed-order grid search the same pinned model, named baseline, hardware, frozen candidate configurations, workload, quality gate, and trial budget. The grid tries configurations in a fixed order and does not use measurements to choose its next trial. GLM is reserved for the placement demonstration and its preparation.
 
-Sera passes the benchmark when it does one of the following:
-
-- Reaches the target latency, memory, and quality constraints in fewer trials
-- Finds a better valid configuration within the same trial budget
+The benchmark claim passes when Sera reaches a quality-valid result within five percent of the best measured latency in the frozen universe in fewer trials than fixed-order grid search, beats median random search at the same budget, and outperforms at least one ablation. Report an unmet claim when these conditions do not hold.
 
 An exhaustive grid eventually tests every configuration. That is not the comparison. The comparison measures which method finds a strong valid configuration first. Sera uses measurements and past results to choose which experiment is worth running next.
 
@@ -145,9 +142,23 @@ The Marimo notebook is the test and demonstration environment. The product remai
 
 Molab runs on CoreWeave and provides one NVIDIA RTX Pro 6000 Blackwell GPU with 96 GB of GPU memory. A session can run for up to 12 hours. This is enough to run real vLLM trials instead of a simulation.
 
-The demonstration loads Qwen/Qwen3-0.6B and zai-org/glm-4-9b-chat-hf with a prepared prompt set. It compares Sera with naive grid search over the same candidate space and trial budget. It then shows completed phase-one evidence, runs a joint placement trial, and displays how measured contention changes the next decision. Weave exposes the full loop, while the notebook shows the final frontier and recommended configuration.
+The first milestone is one Qwen model, a named baseline, one fixed candidate, a deterministic quality gate, a saved report, and a usable returned runner. Agent selection follows this working measured path.
+
+The later search demonstration compares Sera with fixed-order grid search on Qwen/Qwen3-0.6B using a frozen candidate universe and equal trial budgets. It then adds zai-org/glm-4-9b-chat-hf for joint placement, with only the GLM reference and quantization checks needed for that demonstration. The notebook shows measured decisions and their trace when available.
+
+Joint placement deliberately constrains each service's memory allocation to represent a smaller card. Freeze the allocations before the comparison. State on the placement slide and in the notebook: "Memory budget constrained to represent a smaller card; execution uses an RTX Pro 6000 with 96 GB." Show the declared budget, service limits, and measured peaks. This represents memory capacity, not a smaller card's compute speed or bandwidth. Claim quantization enabled placement only if the unquantized pair fails and the quantized pair passes under the same declared limits.
 
 On a single GPU, trials run sequentially. The demonstration proves better use of that GPU; it does not claim to free a second GPU.
+
+FP8 weights and FP8 KV cache must be checked on each architecture and the actual sm_120 GPU before enabling those levers. The proposed agent model must pass a structured-response check through W&B Inference before controlling trials. These checks remain unverified until their results are saved.
+
+The hackathon ships the highest working level:
+
+- Full live: two usable runners and measured joint placement.
+- Joint placement fails or is unfinished: single-model optimization with one usable runner, isolated measurements, and a report. Return the baseline when no safe improvement exists.
+- The live runner fails: an explicit replay notebook using saved real records, or a clearly labeled synthetic fixture when none exist. Replay provides no live runner and synthetic results support no performance or quality claim.
+
+State the delivery level and evidence source in the notebook and release notes. The latter two levels are partial deliverables, not the full product described above.
 
 ## What Sera is not
 
