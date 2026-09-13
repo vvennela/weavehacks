@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f5f0">
+  <meta name="description" content="Sera is an agentic inference optimization lab. Tune each model, test shared hardware, and understand every decision.">
+  <title>Product — Sera</title>
+  <link rel="stylesheet" href="sera-landing.css?v=green-theme">
+  <script src="sera-landing.js?v=green-theme" defer></script>
+  <script src="/sera-theme.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="site-shell">
+    <header class="header">
+      <a class="wordmark" href="/" aria-label="Sera home">sera<span aria-hidden="true">✳</span></a>
+      <nav aria-label="Main navigation" class="product-nav">
+        <a href="/product" aria-current="page">Product</a>
+        <a href="/solutions">Solutions</a>
+        <a href="/models">Models</a>
+        <a href="/resources">Resources</a>
+      </nav>
+      <div class="header-actions"><a class="sign-in-link" href="/sign-in">Sign in</a><a class="get-started-link" href="/get-started">Get started</a><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark colors" aria-pressed="false"><span aria-hidden="true">☾</span></button></div>
+    </header>
+    <main id="main"><section class="page-intro" aria-labelledby="page-title"><a class="back-link" href="/">← Sera home</a><p class="eyebrow">PRODUCT</p><h1 id="page-title">A specialist team.<br><em>A shared understanding.</em></h1><p>Follow how Sera turns workload requirements into proposals, trials, and decisions you can inspect.</p></section><section id="product" class="product-section" aria-labelledby="product-title">
+        <div class="section-heading"><div><p class="eyebrow">MEET YOUR RESEARCH TEAM</p><h2 id="product-title">Different perspectives.<br><em>Better-informed decisions.</em></h2></div><p>Three specialists reason from the same evidence. Each owns a different part of the serving configuration, so you can trace a result back to the change that caused it.</p></div>
+        <div class="specialist-workbench">
+          <div class="specialist-picker" role="group" aria-label="Explore a specialist">
+            <button type="button" data-specialist="quantization" aria-pressed="true"><span>01</span><div><strong>Quantization</strong><small>Make room for more.</small></div><b aria-hidden="true">↗</b></button>
+            <button type="button" data-specialist="batching" aria-pressed="false"><span>02</span><div><strong>Batching</strong><small>Find the right rhythm.</small></div><b aria-hidden="true">↗</b></button>
+            <button type="button" data-specialist="parallelism" aria-pressed="false"><span>03</span><div><strong>Parallelism</strong><small>Put devices to work.</small></div><b aria-hidden="true">↗</b></button>
+          </div>
+          <div class="specialist-detail" aria-live="polite"><p class="eyebrow" id="specialist-kicker">THE MEMORY SPECIALIST</p><h3 id="specialist-title">Smaller footprint.<br>Quality still comes first.</h3><p id="specialist-description">Explore weight and KV-cache precision to reduce memory demand. Every candidate still has to clear the quality and performance gates.</p><div class="lever-list" id="specialist-levers"><span>Weight precision</span><span>KV-cache precision</span></div><div class="specialist-principle"><span>RESEARCH PRINCIPLE</span><p id="specialist-principle">If memory isn’t the bottleneck, the specialist can say so. A useful answer doesn’t always require a change.</p></div></div>
+        </div>
+      </section><section class="process" id="process" aria-labelledby="process-title">
+        <div class="process-heading"><p class="eyebrow">FROM EXPERIMENT TO EVIDENCE</p><h2 id="process-title">Good instincts.<br>Measured decisions.</h2><p>Fitting in memory is a start.<br>Running well together is the test.</p></div>
+        <div class="steps">
+          <article><span class="step-number">01 / OPTIMIZE</span><h3>Find each model’s balance.</h3><p>Quantization, batching, and parallelism specialists propose changes. An arbiter decides which ideas earn a trial.</p></article>
+          <article><span class="step-number">02 / CONSOLIDATE</span><h3>Bring them together.</h3><p>Sera checks memory fit, then runs both models on one shared device. Each model must still meet its own limits.</p></article>
+          <article><span class="step-number">03 / UNDERSTAND</span><h3>Keep the whole story.</h3><p>Every trial enters the ledger, including failures. See what worked, what didn’t, and why a decision was made.</p></article>
+        </div>
+      </section><section id="evidence" class="evidence-section" aria-labelledby="evidence-title"><div><p class="eyebrow">A RESULT YOU CAN QUESTION</p><h2 id="evidence-title">The failed trials<br>belong in the story.</h2><p>A configuration can fit in memory and still fail under contention. Sera records reverts, checks predictions against measurements, and brings the evidence back to its specialists.</p><a class="text-link" href="/lab">Follow an experiment <span aria-hidden="true">↗</span></a></div><div class="ledger-example"><div class="ledger-heading"><span>DECISION RECORD</span><span>Illustrative example</span></div><div class="ledger-row"><span>Memory fit</span><strong>Passed</strong></div><div class="ledger-row"><span>Shared-device latency</span><strong class="reverted">Limit exceeded</strong></div><div class="ledger-row"><span>Decision</span><strong class="reverted">Revert</strong></div><div class="ledger-reason"><span>WHY IT MATTERS</span><p>Enough memory doesn’t mean enough device time. Keep the models separate when sharing breaches a model’s requirements.</p></div></div></section><section class="page-next"><div><p class="eyebrow">SEE THE LOOP IN ACTION</p><h2>Explore an experiment.</h2></div><a class="primary" href="/lab">Enter the lab <span aria-hidden="true">↗</span></a></section></main>
+    <footer><span class="footer-brand">sera <span>Independent minds. Shared hardware.</span></span><span>COREWEAVE HACKATHON <b>2026</b></span><a href="/lab">Open experiment <span aria-hidden="true">↗</span></a></footer>
+  </div>
+</body>
+</html>

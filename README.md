@@ -4,6 +4,24 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The [complete Astra loop](evidence/live-astra-expanded-v1/README.md) measured a 19.55% latency improvement, tested a combination, stopped under the progress rule, and returned a working runner.
 
+## Two implementations in this repository
+
+This repository holds two independent implementations of the same product idea. They
+share no code, and each has its own package, tests and documentation.
+
+| | package | import | what it is |
+|---|---|---|---|
+| **Swarm line** | `sera/` | `import sera` | The line this README documents. Agent swarm, expanding search, live runner, measured evidence under `evidence/`. |
+| **Two-phase loop** | `src/sera_loop/` | `import sera_loop` | Three specialists over disjoint lever groups, an arbiter spending a fixed trial budget, an append-only ledger, and a second phase that asks whether two models can share one card. Documented in [docs/two-phase-loop.md](docs/two-phase-loop.md). |
+
+They were merged into one branch rather than one system. `import sera` and
+`import sera_loop` resolve to different code, and `pytest` runs both suites — 917 tests
+for the swarm line, 204 for the two-phase loop.
+
+Deciding whether both should survive, and which public API the product ships behind, is
+open. Nothing here forces that choice, and the merge was arranged so it can be made
+later without unpicking anything.
+
 ## Demo rehearsal: plain-English guide
 
 ### Current release work

@@ -13,15 +13,12 @@ venv/
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
-dist/
 
 # run artifacts
 runs/
-sera-runs/
 *.jsonl
 !tests/fixtures/*.jsonl
 .marimo/
-__marimo__/
 wandb/
 
 # model caches
@@ -30,13 +27,3 @@ models/
 
 # os
 .DS_Store
-
-# macOS/iCloud conflict duplicates — never real files
-*[ ]2.*
-* 2.*
-
-# Local frontend accounts and sessions
-.local/
-
-# Generated marimo WASM export (scripts/build_notebook.sh rebuilds it)
-output/notebook/

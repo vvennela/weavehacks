@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f5f0">
+  <meta name="description" content="Sera is an agentic inference optimization lab. Tune each model, test shared hardware, and understand every decision.">
+  <title>Models — Sera</title>
+  <link rel="stylesheet" href="sera-landing.css?v=green-theme">
+  <script src="sera-landing.js?v=green-theme" defer></script>
+  <script src="/sera-theme.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="site-shell">
+    <header class="header">
+      <a class="wordmark" href="/" aria-label="Sera home">sera<span aria-hidden="true">✳</span></a>
+      <nav aria-label="Main navigation" class="product-nav">
+        <a href="/product">Product</a>
+        <a href="/solutions">Solutions</a>
+        <a href="/models" aria-current="page">Models</a>
+        <a href="/resources">Resources</a>
+      </nav>
+      <div class="header-actions"><a class="sign-in-link" href="/sign-in">Sign in</a><a class="get-started-link" href="/get-started">Get started</a><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark colors" aria-pressed="false"><span aria-hidden="true">☾</span></button></div>
+    </header>
+    <main id="main"><section class="page-intro" aria-labelledby="page-title"><a class="back-link" href="/">← Sera home</a><p class="eyebrow">MODELS</p><h1 id="page-title">Different models.<br><em>Different demands.</em></h1><p>Meet the two model configurations used in Sera’s demo and the workloads that make co-residency worth testing.</p></section><section id="models" class="product-section" aria-labelledby="models-title"><div class="section-heading"><div><p class="eyebrow">INSIDE THE DEMO</p><h2 id="models-title">Two models.<br><em>Two very different workloads.</em></h2></div><p>The demo pairs long prompts and short answers with short prompts and longer answers, so the shared device faces different demands.</p></div><div class="model-grid"><article><div class="model-letter">A</div><div><span class="step-number">PREFILL-HEAVY · BURSTY TRAFFIC</span><h3>Qwen2.5–1.5B Instruct</h3><p>Longer inputs and shorter outputs put prefill work at the center of the experiment.</p></div></article><article><div class="model-letter">B</div><div><span class="step-number">DECODE-HEAVY · STEADY TRAFFIC</span><h3>Llama 3.2–1B Instruct</h3><p>Shorter inputs and longer outputs make decode performance a different kind of constraint.</p></div></article></div><p class="model-footnote">Demo environment: two simulated 24 GB devices. Co-residency is tested on one shared device.</p></section><section class="product-section"><div class="section-heading"><div><p class="eyebrow">THE EXPERIMENT MATTERS</p><h2>A model is only<br><em>part of the workload.</em></h2></div><p>Request rate, input length, output length, and burstiness all affect serving behavior. Sera evaluates the configuration against the workload and requirements supplied in the experiment.</p></div><div class="steps"><article><span class="step-number">01 / TRAFFIC SHAPE</span><h3>Prompts and responses.</h3><p>Long prompts concentrate work in prefill. Long responses keep decode active for more steps.</p></article><article><span class="step-number">02 / DEVICE CAPACITY</span><h3>Memory and device time.</h3><p>A model’s footprint matters, but sharing also introduces competition for device time.</p></article><article><span class="step-number">03 / ACCEPTANCE GATES</span><h3>Requirements for each model.</h3><p>A shared configuration is accepted only when both models clear their individual gates.</p></article></div><p class="model-footnote">These are the demo’s configured models, not a claim of universal model support or physical hardware benchmark results.</p></section><section class="page-next"><div><p class="eyebrow">SEE THE LOOP IN ACTION</p><h2>Explore an experiment.</h2></div><a class="primary" href="/lab">Enter the lab <span aria-hidden="true">↗</span></a></section></main>
+    <footer><span class="footer-brand">sera <span>Independent minds. Shared hardware.</span></span><span>COREWEAVE HACKATHON <b>2026</b></span><a href="/lab">Open experiment <span aria-hidden="true">↗</span></a></footer>
+  </div>
+</body>
+</html>

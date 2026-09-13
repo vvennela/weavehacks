@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Remove Matcha Rater — Sera</title></head><body style="font:18px system-ui;background:#f6f5f0;color:#223a35;padding:60px"><h1>Removing the old Matcha Rater preview</h1><p id="status" role="status">Checking this browser’s local app cache…</p><a href="/">Return to Sera</a><script>
+(async()=>{
+ try{
+  let removed=0;
+  const names=await caches.keys();
+  for(const name of names){
+   const cache=await caches.open(name);let matcha=/matcha/i.test(name);
+   for(const request of await cache.keys()){
+    const url=new URL(request.url);
+    if(url.origin!==location.origin)continue;
+    const response=await cache.match(request);
+    if(response&&/text|json|javascript|manifest/.test(response.headers.get('content-type')||'')){
+      const body=await response.text();if(/Matcha Rater|Ippodo Ummon/.test(body))matcha=true;
+    }
+   }
+   if(matcha){await caches.delete(name);removed++;}
+  }
+  let workers=0;
+  if('serviceWorker' in navigator){for(const registration of await navigator.serviceWorker.getRegistrations()){
+   if(new URL(registration.scope).origin===location.origin && await registration.unregister())workers++;
+  }}
+  document.getElementById('status').textContent=`Cleanup complete. Removed ${removed} Matcha app caches and ${workers} old service workers. Sera accounts are preserved.`;
+ }catch(error){document.getElementById('status').textContent='Cleanup failed: '+error.message;}
+})();
+</script></body></html>

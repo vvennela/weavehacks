@@ -8,19 +8,46 @@ version = "0.2.0"
 description = "Measured inference configuration experiments"
 readme = "docs/simple-release.md"
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2.12,<3", "prometheus-client>=0.21,<1"]
+# pydantic and prometheus-client belong to the swarm line; pyyaml and numpy to the
+# two-phase loop. Both packages ship from this project, so both sets are required.
+dependencies = [
+    "pydantic>=2.12,<3",
+    "prometheus-client>=0.21,<1",
+    "pyyaml>=6.0",
+    "numpy>=1.26",
+]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10"]
+dev = ["pytest>=8,<10", "ruff>=0.6"]
 agent = ["openai>=2,<4"]
 swarm = ["weave==0.53.2", "openai>=2,<4"]
+# Notebook presentation layer for the two-phase loop. Weave is deliberately absent:
+# the swarm extra pins it, and a second range here would only argue with that pin.
+demo = [
+    "wandb>=0.17",
+    "marimo>=0.9",
+    "altair>=5.0",
+    "pandas>=2.0",
+]
+# Real GPU trial substrate
+gpu = [
+    "vllm>=0.6",
+    "torch>=2.4",
+    "transformers>=4.44",
+]
 
 [project.scripts]
 sera-provider-check = "sera.provider_check:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["sera"]
+packages = ["sera", "src/sera_loop"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["."]
+# "." resolves `sera` (the swarm line), "src" resolves `sera_loop` (the two-phase
+# loop). Two packages, two names, no shadowing.
+pythonpath = [".", "src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

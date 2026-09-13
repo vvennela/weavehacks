@@ -1,0 +1,102 @@
+# The Molab environment: ONE RTX Pro 6000 Blackwell, 96GB.
+#
+# Per the Sera spec §4.1, one-GPU limits are part of the design:
+#   - phase-one trials run sequentially
+#   - tensor parallelism is inactive and must not consume a trial
+#   - phase two tests two vLLM services on the SAME GPU
+#   - the claim is better GPU use, NOT that a second GPU was freed
+#
+# Architecture numbers are read from each model's published config.json. Note
+# Qwen3 declares head_dim 128 independently of hidden_size/num_attn_heads (1024/16
+# = 64), so head_dim_override is mandatory — inferring it halves every KV number.
+
+meta:
+  name: molab
+  environment: "Molab on CoreWeave, 1x RTX Pro 6000 Blackwell 96GB, 4 CPU, 32GB host"
+  note: >-
+    tflops_bf16 and mem_bandwidth_gbs are vendor figures and should be confirmed
+    against nvidia-smi on the actual Molab session before any published number
+    depends on them.
+
+seed: 7
+
+models:
+  # Small model, but the LARGER KV cache per token: 8 KV heads over 28 layers.
+  - name: qwen3_06b
+    hf_id: Qwen/Qwen3-0.6B
+    params_b: 0.6
+    num_layers: 28
+    hidden_size: 1024
+    num_attn_heads: 16
+    num_kv_heads: 8
+    head_dim_override: 128
+    max_model_len: 4096
+    base_dtype: bf16
+
+  # 15x the weights, but only 2 KV heads — so 2.8x LESS cache per token than the
+  # small model. Weight bandwidth is its constraint; cache is not.
+  - name: glm4_9b
+    hf_id: zai-org/glm-4-9b-chat-hf
+    params_b: 9.4
+    num_layers: 40
+    hidden_size: 4096
+    num_attn_heads: 32
+    num_kv_heads: 2
+    head_dim_override: 128
+    max_model_len: 4096
+    base_dtype: bf16
+
+gpus:
+  - id: gpu0
+    name: RTX PRO 6000 Blackwell
+    vram_gb: 96.0
+    mem_bandwidth_gbs: 1792.0
+    tflops_bf16: 126.0
+    overhead_frac: 0.10
+
+workloads:
+  # Long prompts, many concurrent streams — this is what fills a KV cache.
+  - model: qwen3_06b
+    request_rate_rps: 14.0
+    input_len_mean: 2048
+    input_len_stdev: 256
+    output_len_mean: 64
+    output_len_stdev: 16
+    duration_s: 45
+    burstiness: 2.0
+
+  # Short prompts, long generations — decode dominated, so it reads 18.8GB of
+  # weights on every single step.
+  - model: glm4_9b
+    request_rate_rps: 4.0
+    input_len_mean: 256
+    input_len_stdev: 64
+    output_len_mean: 256
+    output_len_stdev: 32
+    duration_s: 45
+    burstiness: 1.0
+
+slos:
+  - model: qwen3_06b
+    p95_latency_ms: 1500.0
+    min_throughput_rps: 12.0
+  - model: glm4_9b
+    p95_latency_ms: 6000.0
+    min_throughput_rps: 3.4
+
+quality_floors:
+  - model: qwen3_06b
+    min_score: 0.980
+    eval_name: behavior_preservation
+    smoke_min_score: 0.5
+  - model: glm4_9b
+    min_score: 0.975
+    eval_name: behavior_preservation
+    smoke_min_score: 0.5
+
+budget:
+  # Sera spec §7: eight trials across both phases, two reserved for phase two.
+  phase1_trials: 6
+  phase2_trials: 2
+  concurrent_slots: 2
+  max_rounds: 3
