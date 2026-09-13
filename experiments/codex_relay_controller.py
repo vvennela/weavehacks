@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from copy import deepcopy
 import json
 import os
 from pathlib import Path
@@ -18,9 +19,24 @@ import tempfile
 import time
 from urllib.parse import urlsplit
 
+from sera.storage import content_hash
+
 
 MODELS = {'gpt-6-astra', 'gpt-5.6-luna'}
 SENTINEL = 'SERA_RELAY_DATA '
+DECODER_SCHEMA_PROTOCOL = 'sera-codex-root-anyof-projection-v1'
+
+
+def decoder_schema(source):
+    """Keep field constraints; Sera still enforces root action relationships.
+
+    Codex Structured Outputs rejects the proposal's root anyOf. The original
+    schema stays in Sera's messages and request artifact; only this decoder
+    projection omits it. Nested nullable unions and citation enums stay intact.
+    """
+    projected = deepcopy(source)
+    projected.pop('anyOf', None)
+    return projected
 
 
 def codex_environment(source=None):
@@ -159,7 +175,9 @@ def run_request(request, output_dir):
     payload = request['payload']
     (artifact_dir / 'request.json').write_text(json.dumps(request, indent=2))
     schema_path = artifact_dir / 'schema.json'
-    schema_path.write_text(json.dumps(payload['response_format']['json_schema']['schema']))
+    source_schema = payload['response_format']['json_schema']['schema']
+    projected_schema = decoder_schema(source_schema)
+    schema_path.write_text(json.dumps(projected_schema))
     final_path = artifact_dir / 'final.txt'
     prompt = ('Act only as the Sera investigator described by the messages below. '
               'Use no tools, files, network, or outside evidence. Respond only with the '
@@ -173,7 +191,9 @@ def run_request(request, output_dir):
                    '--output-last-message', str(final_path), '--cd', work_dir, '-']
         (artifact_dir / 'invocation.json').write_text(json.dumps(dict(
             command=command, prompt=prompt, transport='codex-cli',
-            model=request['model']), indent=2))
+            model=request['model'], decoder_schema_protocol=DECODER_SCHEMA_PROTOCOL,
+            source_schema_hash=content_hash(source_schema),
+            decoder_schema_hash=content_hash(projected_schema)), indent=2))
         now = time.time()
         timeout = min(180, request.get('expires_at', now + 190) - now - 10)
         if timeout <= 0:

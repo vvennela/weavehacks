@@ -6,6 +6,8 @@ from pathlib import Path
 import pytest
 
 from experiments import codex_relay_controller as controller
+from sera.agent import parse_response, request_schema
+from sera.storage import content_hash
 
 
 def request():
@@ -15,6 +17,31 @@ def request():
                           dict(role='user', content='{"latency": 12}')],
                 response_format=dict(type='json_schema', json_schema=dict(
                     schema={'type': 'object', 'properties': {'action': {'type': 'string'}}}))))
+
+
+def test_decoder_removes_only_root_anyof_without_mutating_source():
+    source = request_schema('proposal', {'metrics': {'p95_latency_ms': 12}})
+    original = deepcopy(source)
+    decoder = controller.decoder_schema(source)
+    assert 'anyOf' not in decoder
+    assert decoder == {key: value for key, value in original.items() if key != 'anyOf'}
+    assert decoder['properties']['changed_lever']['anyOf'] == original[
+        'properties']['changed_lever']['anyOf']
+    assert decoder['properties']['evidence_used']['items']['enum'] == ['p95_latency_ms']
+    decoder['properties']['evidence_used']['items']['enum'].append('invented')
+    assert source == original
+
+
+def test_decoder_projection_does_not_relax_sera_action_validation():
+    evidence = {'metrics': {'p95_latency_ms': 12}}
+    controller.decoder_schema(request_schema('proposal', evidence))
+    value = dict(action='keep-baseline', proposal_id='p1', agent_role='batching',
+        parent_trial_id='baseline', model_id='qwen', changed_lever='max_num_batched_tokens',
+        proposed_value=2048, expected_trial_cost=0, evidence_used=['p95_latency_ms'],
+        predicted_metric_change='Unmeasured', confidence=0.5,
+        falsification_condition='No measured gain', reason='An invalid keep action')
+    with pytest.raises(ValueError, match='null lever/value'):
+        parse_response('proposal', json.dumps(value), evidence)
 
 
 def test_codex_environment_keeps_login_context_but_not_service_secrets():
@@ -116,6 +143,11 @@ def test_codex_preserves_payload_output_and_actual_usage(monkeypatch, tmp_path):
     assert seen['timeout'] == 180
     assert json.dumps(request()['payload']['messages'], ensure_ascii=False) in seen['input']
     assert json.loads((tmp_path / ('a' * 32) / 'request.json').read_text()) == request()
+    invocation = json.loads((tmp_path / ('a' * 32) / 'invocation.json').read_text())
+    source_schema = request()['payload']['response_format']['json_schema']['schema']
+    assert invocation['decoder_schema_protocol'] == controller.DECODER_SCHEMA_PROTOCOL
+    assert invocation['source_schema_hash'] == content_hash(source_schema)
+    assert invocation['decoder_schema_hash'] == content_hash(controller.decoder_schema(source_schema))
 
 
 @pytest.mark.parametrize('event', [dict(type='item.started', item=dict(type='command_execution')),
