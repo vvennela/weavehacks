@@ -2,7 +2,7 @@
 # requires-python = ">=3.11,<3.14"
 # dependencies = [
 #     "marimo==0.24.2",
-#     "sera-inference[swarm,litellm] @ git+https://github.com/vvennela/weavehacks.git@9b0c9da89e73bc729e42dfde750ca48bac5a6313",
+#     "sera-inference[swarm,litellm] @ git+https://github.com/vvennela/weavehacks.git@e702afb27c8a0b558c63c7b60b8d3dd970ccaf83",
 #     "vllm==0.26.0; sys_platform == 'linux'",
 #     "torch==2.11.0; sys_platform == 'linux'",
 #     "transformers==5.17.0",
