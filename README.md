@@ -11,6 +11,9 @@ Weave team/project. Press **Shift+Enter** on either the latency cell or the
 latency → throughput cell. Molab installs the declared dependencies; the run cell
 downloads missing pinned model files, runs the loop, tests the returned runner,
 and saves separate 8× and 16× HTML demos. Entering keys alone starts no experiment.
+The **Run 1 / Run 2 tabs** show each code example and its own replay downloads.
+Comments above each workflow explain its model, tasks, performance goal, and quality limits.
+Downloaded replays include the website logo, cream-and-green colors, and embedded fonts.
 
 Weave records outputs, measurements, and decisions that investigators can inspect.
 Each workflow also creates an **ARIA browser-agent task** using its own trace links.

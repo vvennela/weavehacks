@@ -96,9 +96,19 @@ def _(mo, os):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    # RESULTS: each workflow updates its own tab without starting the other workflow.
+    get_demo_runs, set_demo_runs = mo.state({})
+    return get_demo_runs, set_demo_runs
+
+
 @app.cell
-def _(aria_agent_task, aria_review_prompt, mo, os, prepare_demo, sera):
+def _(aria_agent_task, aria_review_prompt, mo, os, prepare_demo, sera, set_demo_runs):
     # WORKFLOW 1 — LATENCY: Shift+Enter runs this complete workflow.
+    # WORKLOAD 1: Qwen2.5-72B, FP8 weights, BF16 KV cache; eight exact-answer JSON tasks.
+    # Measure concurrency 1/2/4/8. Reduce p95 response time; preserve 99% task quality.
+    # Accept improvements of at least 5%. Save this run's replay in the Run 1 tab below.
     # Check GPU/provider, download missing weights, then measure the baseline.
     # THE LOOP: three agents investigate → propose → review → test → learn → repeat.
     # The quality gate remains fixed. The with block always closes the returned runner.
@@ -122,17 +132,23 @@ def _(aria_agent_task, aria_review_prompt, mo, os, prepare_demo, sera):
     (latency_result.output_dir / 'aria-review-request.md').write_text(_aria_request)
     _aria_task = aria_agent_task(latency_result)
     (latency_result.output_dir / 'aria-agent-task.md').write_text(_aria_task)
-    mo.vstack([_replay8,
+    _view = mo.vstack([_replay8,
         mo.download(_replay8.html.encode(), filename='latency-demo-8x.html', label='Download latency demo · 8×'),
         mo.download(_replay16.html.encode(), filename='latency-demo-16x.html', label='Download latency demo · 16×'),
         mo.download(_aria_request.encode(), filename='aria-review-request.md', label='Download manual ARIA review request'),
         mo.download(_aria_task.encode(), filename='aria-agent-task.md', label='Download task for your ARIA browser agent')])
+    set_demo_runs(lambda previous: {**previous, 'Run 1': _view})
+    mo.md('Run 1 saved. Open the **Run 1** tab below for its replay and downloads.')
     return (latency_result,)
 
 
 @app.cell
-def _(aria_agent_task, aria_review_prompt, mo, os, prepare_demo, sera):
+def _(aria_agent_task, aria_review_prompt, mo, os, prepare_demo, sera, set_demo_runs):
     # WORKFLOW 2 — LATENCY THEN THROUGHPUT: Shift+Enter runs both stages in order.
+    # WORKLOAD 2: the same Qwen2.5-72B model, precision, eight JSON tasks, and concurrency 1/2/4/8.
+    # First reduce p95 response time, then increase output tokens per second.
+    # Preserve 99% task quality; throughput may worsen the saved latency by at most 3%.
+    # Accept improvements of at least 5%. Save this run's replay in the Run 2 tab below.
     # Stage 1 runs the latency loop. Stage 2 starts from its saved winner and remeasures.
     # k=3 allows at most 3% worse earlier-stage performance, not a required 3% gain.
     # Both stages keep the 99% quality floor. This is a separate run from workflow 1.
@@ -157,12 +173,52 @@ def _(aria_agent_task, aria_review_prompt, mo, os, prepare_demo, sera):
     (staged_result.output_dir / 'aria-review-request.md').write_text(_aria_request)
     _aria_task = aria_agent_task(staged_result)
     (staged_result.output_dir / 'aria-agent-task.md').write_text(_aria_task)
-    mo.vstack([_replay8,
+    _view = mo.vstack([_replay8,
         mo.download(_replay8.html.encode(), filename='latency-throughput-demo-8x.html', label='Download staged demo · 8×'),
         mo.download(_replay16.html.encode(), filename='latency-throughput-demo-16x.html', label='Download staged demo · 16×'),
         mo.download(_aria_request.encode(), filename='aria-review-request.md', label='Download manual ARIA review request'),
         mo.download(_aria_task.encode(), filename='aria-agent-task.md', label='Download task for your ARIA browser agent')])
+    set_demo_runs(lambda previous: {**previous, 'Run 2': _view})
+    mo.md('Run 2 saved. Open the **Run 2** tab below for its replay and downloads.')
     return (staged_result,)
+
+
+@app.cell(hide_code=True)
+def _(get_demo_runs, mo):
+    # RUN TABS: compare the two code examples and download each completed run's own replay.
+    # This display reads saved results only. Switching tabs never starts GPU or API work.
+    _runs = get_demo_runs()
+    _latency = mo.md('''
+    ## Run 1 · Latency
+    Eight exact-answer JSON tasks on Qwen2.5-72B. Lower p95 response time at
+    concurrency 1/2/4/8 while keeping the 99% quality floor.
+    ```python
+    config = prepare_demo(project=os.environ["SERA_PROJECT"], download=True)
+    with sera.optimize(**config, objective=sera.Objective(priority="latency"),
+                       min_improvement_pct=5.0) as result:
+        result.print_summary()
+    sera.visualize(result, speed=8)
+    ```
+    ''')
+    _staged = mo.md('''
+    ## Run 2 · Latency → throughput
+    The same workload, optimized in two stages. Increase throughput while keeping
+    p95 within 3% of the saved latency winner and maintaining the 99% quality floor.
+    ```python
+    config = prepare_demo(project=os.environ["SERA_PROJECT"], download=True)
+    with sera.optimize(**config, stages=["latency", "throughput"], k=3.0,
+                       min_improvement_pct=5.0) as result:
+        result.print_summary()
+    sera.visualize(result, speed=8)
+    ```
+    ''')
+    _pending = mo.md('Run this workflow with **Shift+Enter** in its code cell above. '
+                     'Its 8× and 16× replay downloads and ARIA review task appear here after completion.')
+    mo.ui.tabs({
+        'Run 1': mo.vstack([_latency, _runs.get('Run 1', _pending)]),
+        'Run 2': mo.vstack([_staged, _runs.get('Run 2', _pending)]),
+    })
+    return
 
 
 if __name__ == "__main__":

@@ -10,13 +10,18 @@ import pytest
 NOTEBOOK = Path(__file__).resolve().parents[1] / 'notebooks/FAST_START.py'
 
 
+def _runs_optimizer(cell):
+    return any(isinstance(node, ast.Call) and ast.unparse(node.func) == 'sera.optimize'
+               for node in ast.walk(cell))
+
+
 def test_notebook_keeps_both_examples_and_blank_password_fields():
     text = NOTEBOOK.read_text()
     tree = ast.parse(text)
     assert 'Add your keys here:' in text
     assert 'wandb_v1_' not in text and 'sk-proj-' not in text
     cells = [node for node in tree.body if isinstance(node, ast.FunctionDef)]
-    runs = [node for node in cells if 'sera.optimize(' in ast.unparse(node)]
+    runs = [node for node in cells if _runs_optimizer(node)]
     assert len(runs) == 2
     for cell in runs:
         source = ast.unparse(cell)
@@ -51,6 +56,29 @@ def test_demo_dependency_uses_the_actual_distribution_not_unrelated_sera_package
     assert 'GPU time and hosted investigator calls can cost money' in text
     assert 'vllm==0.26.0' in text
     assert 'nvidia-cuda-nvcc==13.0.88' in text
+
+
+def test_workflows_explain_the_workload_and_publish_independent_tabs():
+    text = NOTEBOOK.read_text()
+    for marker in ['# WORKLOAD 1:', '# WORKLOAD 2:']:
+        assert marker in text
+    tree = ast.parse(text)
+    runs = [node for node in tree.body if isinstance(node, ast.FunctionDef)
+            and _runs_optimizer(node)]
+    for run in runs:
+        source = ast.unparse(run)
+        assert 'set_demo_runs(' in source
+        assert 'get_demo_runs' not in source
+    tabs = _cell_function('mo.ui.tabs(')
+    rendered = []
+    mo = SimpleNamespace(md=lambda x:x, vstack=lambda x:x,
+                         ui=SimpleNamespace(tabs=lambda x: rendered.append(x)))
+    tabs(lambda: {'Run 1': 'latency downloads'}, mo)
+    assert list(rendered[0]) == ['Run 1', 'Run 2']
+    assert rendered[0]['Run 1'][-1] == 'latency downloads'
+    assert 'Run this workflow' in rendered[0]['Run 2'][-1]
+    assert 'priority="latency"' in rendered[0]['Run 1'][0]
+    assert 'stages=["latency", "throughput"]' in rendered[0]['Run 2'][0]
 
 
 def _cell_function(fragment):
@@ -117,10 +145,14 @@ def test_manual_workflow_downloads_runs_closes_and_saves_two_replays(fragment, t
         download=lambda data, **kwargs: downloads.append((data, kwargs)))
     api = SimpleNamespace(optimize=optimize, Objective=sera.Objective, visualize=sera.visualize)
     run = _cell_function(fragment)
+    published = {}
+    def publish(update):
+        published.update(update(published))
     with pytest.raises(RuntimeError, match='not armed'):
-        run(aria_agent_task, aria_review_prompt, mo, SimpleNamespace(environ={}), prepare, api)
+        run(aria_agent_task, aria_review_prompt, mo, SimpleNamespace(environ={}), prepare, api, publish)
     assert not events
-    run(aria_agent_task, aria_review_prompt, mo, SimpleNamespace(environ={'SERA_DEMO_READY': '1', 'SERA_PROJECT': 'team/project'}), prepare, api)
+    run(aria_agent_task, aria_review_prompt, mo, SimpleNamespace(environ={'SERA_DEMO_READY': '1', 'SERA_PROJECT': 'team/project'}), prepare, api, publish)
+    assert list(published) == ['Run 2' if 'staged' in fragment else 'Run 1']
     assert events == ['prepare', 'start', 'summary', 'request', 'close']
     assert len(downloads) == 4 and len(list(tmp_path.glob('*.html'))) == 2
     assert (tmp_path / 'aria-review-request.md').is_file()

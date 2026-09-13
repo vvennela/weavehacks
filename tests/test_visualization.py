@@ -37,6 +37,17 @@ def data(replay):
                                replay.html, re.S).group(1))
 
 
+def test_downloaded_replay_embeds_the_website_brand_without_network_assets():
+    html = sera.visualize(SimpleNamespace(report=report())).html
+    assert '--bg:#f6f5f0' in html and '--green:#286555' in html
+    assert "font-family:'DM Sans'" in html
+    assert "font-family:'Manrope'" in html
+    assert 'font/ttf;base64,' in html
+    assert '<title>Sera</title>' in html
+    assert 'M16 4.6V27.4' in html
+    assert 'fonts.googleapis.com' not in html
+
+
 def test_replay_snapshots_actual_result_and_saves_offline(tmp_path):
     original = report()
     replay = sera.visualize(SimpleNamespace(report=original), speed=4)
