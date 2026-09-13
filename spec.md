@@ -175,7 +175,7 @@ Verified mode requires:
 - A latency requirement for each model
 - A workload definition
 
-The implemented single-model subset accepts `evaluation(prompt, output_text)` returning a boolean or finite score in [0, 1], a required nonempty `evaluation_version`, and one `Constraints` record (directly or in a one-element list). The quality floor is explicit; p95 latency and sampled-peak-memory limits are optional. It uses the existing serial workload, not yet the target concurrency sweep. The evaluator receives the original prompt and unmodified output; Sera does not repair formatting or execute model-produced code.
+The implemented single-model subset accepts `evaluation(prompt, output_text)` returning a boolean or finite score in [0, 1], a required nonempty `evaluation_version`, and one `Constraints` record (directly or in a one-element list). The quality floor is explicit; p95 latency and sampled-peak-memory limits are optional. `Workload(concurrency=[1, 2, 4, 8])` enables a measured load sweep; the default remains `[1]` for the existing quick path. The evaluator receives the original prompt and unmodified output; Sera does not repair formatting or execute model-produced code. Quality checks remain serial. Selection latency is the worst per-load p95; aggregate throughput is total output tokens divided by the sum of measured load-window durations. Every per-load result is retained.
 
 In verified mode, task scores replace the token-agreement acceptance proxy. The proxy can remain diagnostic. A baseline with a low task score may still provide measurements for a candidate trial. A baseline evaluator error stops the run. If only the candidate passes the requirements, return it with outcome `feasible`, without claiming improvement over an eligible baseline. If neither passes, close the runtime and return `no-safe-configuration` with no models. Never mark an ineligible fallback runner verified.
 
@@ -816,7 +816,7 @@ Accept the core pipeline when one saved real run shows:
 
 A rejected recommendation with a usable baseline is a successful pipeline outcome. It does not establish an optimization win or evidence-driven search superiority. Provider reliability and the full benchmark claims remain separate checks; do not manufacture them from one agent call.
 
-Use the simpler questions in benchmarks/easy_cases.json when preparing the next task-quality workload. Their results are currently unmeasured. The first milestone's existing measurement contract and conservative gate are not silently replaced by this eight-case dataset. A task-based evaluator must report absolute baseline/candidate correctness and newly failed cases separately from format compliance; a candidate must not be accepted merely because it matches an incorrect baseline answer.
+Use the simpler questions in benchmarks/easy_cases.json for the bounded task-quality workload. Their Qwen72B FP8 deployment and four-load batching results are saved under evidence/large-fit-v1 and evidence/large-batch-comparison-v1. The first milestone's original measurement contract is not silently replaced by this eight-case dataset. A task-based evaluator must report absolute baseline/candidate correctness and newly failed cases separately from format compliance; a candidate must not be accepted merely because it matches an incorrect baseline answer.
 
 ### 23.2 Full MVP target
 

@@ -19,7 +19,7 @@ Our long-term goal is like choosing a route home: the best plan depends on wheth
 - All 24 timed requests completed. The measured p95 response time was 573 milliseconds: at least 95% of those requests finished within that time. Peak GPU memory was 86.38 GiB.
 - Sera saved the evidence and released the GPU after the test. The agent's final-review wording needed a fix; a separate review of the saved evidence then passed. Both records remain available.
 
-These are small, specific checks, not proof that the model answers every question correctly. We have not demonstrated a speedup over the original model, because the original model could not fit. We have not yet demonstrated best-plan search or two models sharing the GPU.
+These are small, specific checks, not proof that the model answers every question correctly. We have not demonstrated a speedup over the original model, because the original model could not fit. A later comparison tested two batching settings and correctly kept the reference because neither offered the required improvement. We have not yet demonstrated best-plan search or two models sharing the GPU.
 
 ### Three-minute walkthrough
 
@@ -151,7 +151,17 @@ This wiring passes local synthetic checks, including different recommendations f
 
 For an explicit load sweep, pass `workload=sera.Workload(concurrency=[1, 2, 4, 8])`. Each load receives its own warm-up and three measured passes. Quality checks remain serial. The result stores every load separately; selection uses the worst per-load p95, not pooled latency percentiles. Throughput is total output tokens divided by the sum of measured window durations across the declared loads. Compare only runs with the same load list. The default remains concurrency 1.
 
-After the large model's FP8 weight plan works, pass `baseline_configuration=sera.RuntimeConfig(quantization="fp8_per_tensor")` with that model to compare batching against a feasible FP8 reference. The supported alternative changes only `max_num_batched_tokens` from 4096 to 2048. Both plans keep FP8 weights and BF16 KV. This is named `sera-fp8-weight-reference-v1`, not the non-fitting BF16 baseline and not the Qwen0.6B search benchmark. The approved four-load comparison is pending live measurement.
+After the large model's FP8 weight plan works, pass `baseline_configuration=sera.RuntimeConfig(quantization="fp8_per_tensor")` with that model to compare batching against a feasible FP8 reference. The supported alternative changes only `max_num_batched_tokens` from 4096 to 2048. Both plans keep FP8 weights and BF16 KV. This is named `sera-fp8-weight-reference-v1`, not the non-fitting BF16 baseline and not the Qwen0.6B search benchmark.
+
+The approved live comparison completed at concurrency 1, 2, 4, and 8. Both plans passed all eight tasks and all 96 timed requests. The smaller batch limit improved aggregate throughput by only 0.024%, below the 5% rule. Sera kept the reference, the agent agreed, and the returned runner passed a fresh request. See [the per-load measurements](evidence/large-batch-comparison-v1/README.md). This proves measured selection between working plans, not adaptive search or a performance win.
+
+The delegated [search replay harness](benchmarks/SEARCH.md) implements a frozen universe, equal budgets, grid and seeded random controls, and narrow agent adapters. It has not established a real benchmark win. The current agent schema limits the useful universe to two changes and cannot express the full no-telemetry ablation; wider schema support requires a new provider check. No benchmark prompts or thresholds were tuned to make the batching result look better.
+
+## Two-model status: blocked by task quality
+
+The specified Qwen0.6B + GLM-4-9B pair is not ready for verified placement. GLM loaded in BF16 and FP8, but passed 0/8 strict-format tasks. Qwen FP8 passed 1/8; it had both format errors and a wrong filtering answer. The earlier Qwen BF16 result was 2/8. We stopped before running them together. See [the preserved prerequisite results](evidence/placement-prerequisites-v1/README.md).
+
+In plain English: the programs run, but these two smaller models do not yet meet the promised answer contract. More GPU memory does not fix that. Changing the task rules or model pair needs an explicit decision. This does not invalidate the successful Qwen72B deployment and rehearsal. No joint-placement or smaller-card benefit is claimed.
 
 ## Verified task requirements
 

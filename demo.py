@@ -69,5 +69,26 @@ def _(Path, json, mo):
     return
 
 
+
+
+@app.cell
+def _(Path, json, mo):
+    _comparison = json.loads(Path("evidence/large-batch-comparison-v1/result.json").read_text())
+    _rows = []
+    for _baseline, _candidate in zip(_comparison['baseline']['loads'], _comparison['candidate_trial']['loads'], strict=True):
+        _rows.append({
+            'Concurrent requests': _baseline['concurrency'],
+            '4096 batch p95 (ms)': round(_baseline['reduced']['p95_latency_ms'], 2),
+            '2048 batch p95 (ms)': round(_candidate['reduced']['p95_latency_ms'], 2),
+            '4096 output tokens/s': round(_baseline['reduced']['output_tokens_per_second'], 2),
+            '2048 output tokens/s': round(_candidate['reduced']['output_tokens_per_second'], 2),
+        })
+    mo.vstack([
+        mo.md("## Two working plans compared\n\nBoth passed all eight tasks. Sera kept batch 4096 because the alternative's throughput gain was only 0.024%, below the 5% requirement. The agent agreed; the returned runner worked."),
+        mo.ui.table(_rows, selection=None, pagination=False),
+        mo.md(f"Recorded comparison, not live inference or a grid-search win. [Trace]({_comparison['weave_url']}).\n\n**Two-model placement is blocked:** GLM failed the strict JSON format; Qwen0.6B also gave a wrong filtering answer. No joint run was started. The successful Qwen72B demo remains available.")
+    ])
+    return
+
 if __name__ == "__main__":
     app.run()
