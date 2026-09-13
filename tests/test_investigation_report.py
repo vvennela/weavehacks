@@ -1,6 +1,24 @@
 from sera.investigation_report import render_investigation
 
 
+def test_report_separates_observed_failure_from_unproven_cause():
+    report = {'search': {'rounds': []}, 'search_trials': [{
+        'trial_id': 'trial-1', 'status': 'collected', 'diagnosis': {
+            'failure_kind': 'objective-miss',
+            'observed': {'objective': {'priority': 'latency', 'baseline_value': 100,
+                'candidate_value': 99, 'improvement_fraction': .01,
+                'required_improvement_fraction': .05}},
+            'root_cause': {'status': 'not-established', 'reason': 'No causal test was run.'},
+            'evidence_paths': ['search_trials[0].reduced'],
+            'next_proposal_constraints': ['Do not repeat the measured configuration.']}}]}
+    text = render_investigation(report)
+    assert 'Observed experiment result: objective-miss' in text
+    assert 'latency: baseline=100; candidate=99; gain=0.01; required=0.05' in text
+    assert 'Root cause: not-established. No causal test was run.' in text
+    assert 'search_trials[0].reduced' in text
+    assert 'Do not repeat the measured configuration.' in text
+
+
 def test_swarm_report_shows_inspections_board_and_observed_overlap():
     checks = []
     for index, name in enumerate(['scheduling', 'memory_context', 'output_quality']):

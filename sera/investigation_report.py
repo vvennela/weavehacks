@@ -159,6 +159,23 @@ def _trial_lines(trial):
         lines.append(f"Prediction review: {trial.get('review_error', MISSING)}.")
     if trial.get('error'):
         lines.append(f"Trial error: {trial['error']}.")
+    diagnosis = trial.get('diagnosis') or {}
+    if diagnosis:
+        lines.append(f"Observed experiment result: {diagnosis.get('failure_kind', MISSING)}.")
+        observed = diagnosis.get('observed') or {}
+        objective = observed.get('objective') or {}
+        if objective:
+            lines.append(f"{objective.get('priority', MISSING)}: "
+                         f"baseline={_value(objective.get('baseline_value'))}; "
+                         f"candidate={_value(objective.get('candidate_value'))}; "
+                         f"gain={_value(objective.get('improvement_fraction'))}; "
+                         f"required={_value(objective.get('required_improvement_fraction'))}. "
+                         'Gain and required gain are fractions, not percentages.')
+        cause = diagnosis.get('root_cause') or {}
+        lines.append(f"Root cause: {cause.get('status', MISSING)}. {cause.get('reason', '')}")
+        lines.append('Saved evidence: ' + ', '.join(diagnosis.get('evidence_paths', [])) + '.')
+        for constraint in diagnosis.get('next_proposal_constraints', []):
+            lines.append(f"Next proposal constraint: {constraint}")
     return lines
 
 
