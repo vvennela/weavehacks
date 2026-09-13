@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Sera · Recorded optimization replay</title>
+<style>
+:root{color-scheme:dark;--bg:#101713;--panel:#19221c;--line:#344638;--ink:#edf5e9;--muted:#afc0af;--green:#befa88;--orange:#f6ba74}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:24px 30px}header,.controls,.stage-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-size:26px;font-weight:750;letter-spacing:-1px}.brand span,a{color:var(--green)}.tag{border:1px solid #738565;border-radius:5px;padding:4px 9px;font:11px ui-monospace,monospace;color:var(--green)}h1{font-size:clamp(25px,3vw,38px);letter-spacing:-1px;line-height:1.15;margin:20px 0 9px}h2{font-size:20px;margin:0}h3{font-size:17px;margin:0}.note,.muted{color:var(--muted)}.note{font-size:12px}p{margin:8px 0}.controls{justify-content:start;margin:20px 0 10px}button,select{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;border-radius:7px;padding:7px 12px;cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--orange);outline-offset:3px}#play{background:var(--green);color:#182110;font-weight:700;min-width:90px}#scrub{flex:1;min-width:140px;accent-color:var(--green)}#clock{font:12px ui-monospace,monospace}.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin:20px 0}.step{border:1px solid var(--line);padding:10px 8px;border-radius:8px;color:var(--muted);font-size:12px}.step.active{background:var(--green);color:#15200e}.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}.stage-head{margin-bottom:12px}.round{font:12px ui-monospace,monospace;color:var(--green)}.agents{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.agent,aside{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}.agent.selected{border-color:var(--green);box-shadow:inset 0 3px var(--green)}.label{font:10px ui-monospace,monospace;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:12px 0 4px}.proposal{font-weight:650;overflow-wrap:anywhere}.feedback{font-size:12px;overflow-wrap:anywhere;white-space:pre-wrap}.changed{color:var(--green)}.detail{border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;padding:14px 16px;margin-top:14px;min-height:110px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}.best{font-size:32px;letter-spacing:-1px;margin:12px 0 0}.bar-row{margin:13px 0;font-size:12px;overflow-wrap:anywhere}.bar{height:10px;border-radius:3px;background:#71866b;margin-top:4px}.bar.selected{background:var(--green)}footer{border-top:1px solid var(--line);margin-top:20px;padding-top:13px;font-size:12px;color:var(--muted)}#limits,#scope{overflow-wrap:anywhere}details{font-size:12px}summary{cursor:pointer;color:var(--green)}@media(max-width:850px){.layout{grid-template-columns:1fr}.flow{grid-template-columns:repeat(4,1fr)}main{padding:20px 16px}.agents{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style></head><body><main>
+<header><div class="brand">sera<span>↗</span></div><span class="tag">RECORDED REPLAY · YOUR RESULT</span></header>
+<h1>Propose. Review. Measure. Learn.</h1><p class="muted" id="scope"></p>
+<div class="controls"><label for="stage">Stage</label><select id="stage"></select><button id="play" type="button">▶ Play</button><button id="restart" type="button">Restart</button><label for="speed">Speed</label><select id="speed"></select><input id="scrub" type="range" min="0" max="1" step="0.01" value="0" aria-label="Replay position"><output id="clock"></output></div>
+<p class="note">Schematic pacing: each step has an illustrative duration. This replay does not claim measured phase or run times. Press Play to begin.</p>
+<p class="note" id="limits"></p><nav class="flow" id="flow" aria-label="Optimization loop"></nav>
+<div class="layout"><section aria-label="Current replay step"><div class="stage-head"><h2 id="headline" aria-live="polite"></h2><span class="round" id="round"></span></div><div class="agents" id="agents"></div><div class="detail" id="detail" aria-live="polite"></div></section><aside><h2 id="metric-title">Recorded measurements</h2><div class="best" id="best"></div><p id="gain" class="changed"></p><div id="chart" role="img" aria-label="Recorded measurements by trial"></div><p class="note">Best shown uses collected trials with a recorded passing quality gate. The saved decision determines the returned trial.</p></aside></div>
+<footer><div id="outcome"></div><div id="cleanup"></div><p id="trace"></p><p>This page runs offline. No model, GPU, or provider calls. Proposals are hypotheses; trial metrics are measurements. Unknown means the source did not record that value. Results apply to the recorded workload and do not establish a global optimum. Text over 2,400 characters is marked as shortened.</p></footer>
+</main><script id="replay-data" type="application/json">__SERA_REPLAY_DATA__</script><script>
+'use strict';
+const replay = JSON.parse(document.getElementById('replay-data').textContent);
+const el = id => document.getElementById(id);
+const known = value => value === null || value === undefined ? 'unknown' : String(value);
+const fmt = value => typeof value === 'number' ? value.toLocaleString(undefined,{maximumFractionDigits:3}) : 'unknown';
+function node(tag,text,className){const item=document.createElement(tag);if(text!==undefined)item.textContent=text;if(className)item.className=className;return item;}
+function labelled(parent,label,text,cls=''){parent.append(node('div',label,'label'),node('div',text,cls));}
+const steps=['Inspect','Propose','Peer review','Arbiter','GPU trial','Measure','Stop / return'];
+let selectedStage=0, elapsed=0, speed=replay.speed, playing=false, lastFrame=0, lastEvent=-1, events=[];
+const empty={name:null,model:null,record_status:'missing',trials:[],rounds:[],constraints:{},decision:{},returned_runtimes:[],rejected:[]};
+const current=()=>replay.stages[selectedStage] || empty;
+for(const [index,stage] of replay.stages.entries()){const option=node('option',`${index+1}. ${stage.name || stage.objective || 'Optimization'}`);option.value=index;el('stage').append(option);}
+if(!replay.stages.length)el('stage').append(node('option','No recorded stages'));
+for(const value of [...new Set([1,4,8,16,speed])].sort((a,b)=>a-b)){const option=node('option',`${value}×`);option.value=value;option.selected=value===speed;el('speed').append(option);}
+function build(){
+  const stage=current();events=[{phase:0,title:'Inspect recorded baseline',round:null,revealed:stage.trials.filter(t=>t.trial_id==='baseline').map(t=>t.trial_id)}];
+  let revealed=[...events[0].revealed];
+  for(const round of stage.rounds){
+    for(const phase of [1,2,3,4,5]){
+      if(phase===5)revealed=[...new Set([...revealed,...round.trial_ids])];
+      events.push({phase,round,title:['','Independent proposals','Peer review and revision','Arbiter selects an experiment','Recorded experiment','Measure and compare'][phase],revealed:[...revealed]});
+    }
+  }
+  const remaining=stage.trials.filter(t=>!revealed.includes(t.trial_id));
+  if(remaining.length){revealed=[...revealed,...remaining.map(t=>t.trial_id)];events.push({phase:5,round:null,title:'Additional recorded measurements',revealed:[...revealed]});}
+  events.push({phase:6,round:null,title:'Stop and return · recorded outcome',revealed:[...revealed]});
+  el('scrub').max=(events.length-1)*8;elapsed=0;playing=false;lastEvent=-1;render();
+}
+function proposal(value){if(!value || !value.changed_lever)return value && value.action ? value.action : 'unknown';return `${value.changed_lever} → ${known(value.proposed_value)}`;}
+function cleanup(stage){
+  const closed=stage.returned_runner_closed;
+  let text=closed===true?'Runner closure: recorded closed.':closed===false?'Runner closure: not recorded closed.':'Runner closure: unknown.';
+  if(stage.cleanup_error)text+=` Cleanup error: ${stage.cleanup_error}.`;
+  for(const runtime of stage.returned_runtimes || [])text+=` Cleanup check: ${known(runtime.cleanup_pass)}; memory after: ${fmt(runtime.memory_after_mib)} MiB.`;
+  return text;
+}
+function render(){
+  el('play').textContent=playing?'Ⅱ Pause':'▶ Play';el('scrub').value=elapsed;
+  const index=Math.min(events.length-1,Math.floor(elapsed/8));el('clock').textContent=`Step ${index+1} / ${events.length}`;
+  if(index===lastEvent)return;lastEvent=index;
+  const event=events[index],stage=current(),round=event.round;
+  el('headline').textContent=event.title;el('round').textContent=round?`ROUND ${known(round.number)}${round.confirmation?' · CONFIRMATION':''}`:'RECORDED RESULT';
+  el('scope').textContent=`${known(stage.model)} · ${known(stage.status)} · ${stage.record_status==='missing'?'Stage record missing.':'Saved evidence snapshot.'}`;
+  const limits=Object.entries(stage.constraints).filter(([,value])=>value!==null).map(([key,value])=>`${key}: ${value}`).join(' · ');
+  el('limits').textContent=`Constraints: ${limits || 'unknown'}${replay.k_percent!==null?` · Allowed earlier-stage regression k: ${replay.k_percent}%`:''}${replay.min_improvement_percent!==null?` · Minimum stage improvement: ${replay.min_improvement_percent}%`:''}`;
+  el('flow').replaceChildren(...steps.map((name,i)=>{const item=node('div',`${i+1}. ${name}`,`step${i===event.phase?' active':''}`);if(i===event.phase)item.setAttribute('aria-current','step');return item;}));
+  const cards=[];
+  for(const agent of round?round.agents:[]){
+    const chosen=event.phase>=3 && round.arbiter.ranked_proposal_ids.includes(agent.proposal_id);
+    const card=node('article',undefined,`agent${chosen?' selected':''}`);card.append(node('h3',known(agent.name)),node('p',`Status: ${known(agent.status)}`,'note'));
+    labelled(card,'Initial proposal',proposal(agent.initial),'proposal');
+    if(event.phase>=2){labelled(card,'After peer review',proposal(agent.final),'proposal changed');const detail=node('details');detail.append(node('summary','Recorded reasoning'),node('p',known(agent.final.reason),'feedback'));card.append(detail);}
+    else{const detail=node('details');detail.append(node('summary','Recorded reasoning'),node('p',known(agent.initial.reason),'feedback'));card.append(detail);}
+    if(chosen)card.append(node('p','Selected for experiment','changed'));
+    if(agent.error)card.append(node('p',agent.error,'note'));cards.push(card);
+  }
+  if(!cards.length)cards.push(node('p',event.phase===6?'See the saved outcome below.':'No agent proposals recorded for this step.','muted'));
+  el('agents').replaceChildren(...cards);
+  let text='Recorded baseline and constraints. Missing values remain unknown.';
+  if(round && event.phase===1)text='Initial proposals are hypotheses. They do not establish a measured gain.';
+  if(round && event.phase===2)text='Initial and final proposals are shown side by side in each card. Open Recorded reasoning for the saved explanation.';
+  if(round && event.phase===3)text=`Arbiter: ${known(round.arbiter.reason)}\nSelected proposal IDs: ${round.arbiter.ranked_proposal_ids.join(', ') || 'none recorded'}${round.arbiter.error?`\nError: ${round.arbiter.error}`:''}`;
+  if(round && event.phase===4)text=`Recorded trial IDs: ${round.trial_ids.join(', ') || 'none — no recorded experiment'}\nThis is playback of the saved record.`;
+  if(event.phase===5){const ids=round?round.trial_ids:event.revealed;text=stage.trials.filter(t=>ids.includes(t.trial_id)).map(t=>`${known(t.trial_id)} · ${known(t.status)}\np95 latency: ${fmt(t.metrics.p95_latency_ms)} ms · throughput: ${fmt(t.metrics.output_tokens_per_second)} tokens/s · peak memory: ${fmt(t.metrics.sampled_peak_memory_mib)} MiB\nQuality passed: ${known(t.quality.passed)} · mean: ${fmt(t.quality.mean)} · generation errors: ${fmt(t.generation_errors)}\nDecision: ${known(t.decision.outcome)} · ${known(t.decision.reason)}`).join('\n\n') || 'No measured trial was recorded for this round.';}
+  if(event.phase===6){const chosen=stage.trials.find(t=>t.trial_id===stage.decision.selected);const config=chosen?Object.entries(chosen.configuration).filter(([,value])=>value!==null).map(([key,value])=>`${key}: ${value}`).join(', '):'';text=`Stop: ${known(stage.stop_reason || stage.decision.reason)}\nReturned trial: ${known(stage.decision.selected)}\nOutcome: ${known(stage.decision.outcome)}\nSelected configuration: ${config || 'unknown'}\n${cleanup(stage)}${stage.rejected.length?'\nRejections:\n'+stage.rejected.map(r=>known(r.reason)).join('\n'):''}`;}
+  el('detail').textContent=text;
+  const priorities={latency:['p95_latency_ms','Latency (ms)','lower'],throughput:['output_tokens_per_second','Throughput (tokens/s)','higher'],memory:['sampled_peak_memory_mib','Peak memory (MiB)','lower']};
+  const metric=priorities[stage.objective];el('metric-title').textContent=metric?`${metric[1]} · ${metric[2]} is better`:'Objective unknown';
+  const key=metric?metric[0]:null, shown=stage.trials.filter(t=>event.revealed.includes(t.trial_id));
+  const valid=shown.filter(t=>key && typeof t.metrics[key]==='number' && t.quality.passed===true && t.status==='collected');
+  const values=valid.map(t=>t.metrics[key]);const best=values.length?(metric[2]==='higher'?Math.max(...values):Math.min(...values)):null;
+  el('best').textContent=fmt(best);
+  const baseline=stage.trials.find(t=>t.trial_id==='baseline');const base=baseline && key?baseline.metrics[key]:null;
+  el('gain').textContent=best!==null && typeof base==='number' && base>0?`${fmt((metric[2]==='higher'?best/base-1:1-best/base)*100)}% improvement vs baseline`:'Baseline comparison: unknown';
+  const maximum=Math.max(1,...shown.map(t=>key && typeof t.metrics[key]==='number'?t.metrics[key]:0));
+  el('chart').replaceChildren(...shown.map(t=>{const row=node('div',`${known(t.trial_id)} · ${key?fmt(t.metrics[key]):'unknown'} · quality ${known(t.quality.passed)}`,'bar-row');const bar=node('div',undefined,`bar${t.trial_id===stage.decision.selected?' selected':''}`);bar.style.width=`${key && typeof t.metrics[key]==='number'?Math.max(0,t.metrics[key]/maximum*100):0}%`;row.append(bar);return row;}));
+  el('outcome').textContent=`Saved outcome: ${known(stage.decision.outcome)} · selected trial: ${known(stage.decision.selected)} · overall status: ${known(replay.status)}`;
+  el('cleanup').textContent=`${cleanup(stage)}${replay.stages.length>1?` Overall returned runner closed: ${known(replay.returned_runner_closed)}.`:''}`;
+  el('trace').replaceChildren();if(stage.weave_url){const link=node('a','Open source trace ↗');link.href=stage.weave_url;link.target='_blank';link.rel='noopener noreferrer';el('trace').append(link);}
+}
+function seek(value){elapsed=Math.max(0,Math.min((events.length-1)*8,value));if(elapsed===(events.length-1)*8)playing=false;render();}
+el('play').addEventListener('click',()=>{if(elapsed===(events.length-1)*8)seek(0);playing=!playing;lastFrame=performance.now();render();});
+el('restart').addEventListener('click',()=>{playing=false;seek(0);});
+el('stage').addEventListener('change',event=>{selectedStage=Number(event.target.value);build();});
+el('speed').addEventListener('change',event=>{speed=Number(event.target.value);});
+el('scrub').addEventListener('input',event=>{seek(Number(event.target.value));lastFrame=performance.now();});
+function tick(now){if(playing)seek(elapsed+(now-lastFrame)/1000*speed);lastFrame=now;requestAnimationFrame(tick);}
+build();requestAnimationFrame(tick);
+</script></body></html>

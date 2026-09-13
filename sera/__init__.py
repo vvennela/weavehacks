@@ -4,6 +4,7 @@ from .config import Budget, Candidate, Constraints, InvestigationSpace, Objectiv
 from .pipeline import SeraResult
 from .api import optimize
 from .stages import StagedResult
+from .visualization import Replay, visualize
 from .recovery import inspect_recovery, resume
 from .runtime import SeraModel, SeraResponse
 from .agent import OpenAICompatibleAgent, WandbAgent
@@ -20,4 +21,5 @@ __all__ += ["place", "PlacementResult", "PlacementWorkload", "PlacementMemoryEst
             "PlacementPlan", "PlacementService", "PlacementConstraints", "measure_placement_references"]
 __all__ += ["optimize_placement", "PlacementSearchResult"]
 __all__ += ["StagedResult"]
+__all__ += ["Replay", "visualize"]
 __all__ += ["OpenAICompatibleAgent"]
