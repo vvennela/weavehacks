@@ -11,7 +11,7 @@ dependencies = ["pydantic>=2.12,<3", "prometheus-client>=0.21,<1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10"]
-agent = ["openai>=1,<3"]
+agent = ["openai>=2,<4"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["sera"]
