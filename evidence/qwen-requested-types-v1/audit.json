@@ -1,0 +1,121 @@
+{
+  "schema_version": "sera-requested-type-quality-audit-v1",
+  "audit_passed": true,
+  "source_sha256": {
+    "result.json": "96750e7180e71ede890de2c7549ff89a6e2f614b15db64bb0070af2b2e1c4969",
+    "runtime/runtime.json": "f3333f464d5372914d40737348a3195900970299134fe7bb3ae97a31758d1d41",
+    "runtime/server.log": "13834e79bdc7013c7f8d7d0ca393958540d68a4a03d4558c3505652b0617424f"
+  },
+  "audit_code_sha256": {
+    "benchmarks/easy_cases.json": "2b4a93663298c763791e0637b77a924b3fac807c564a6913381edff80b812807",
+    "benchmarks/grade.py": "a7099dcbfcbb6e0bb51c74445a144dfd068338dccb262cdc70b7a47b125e9db3",
+    "experiments/requested_answer_types.py": "25abd0e6ab459b7bfd5e1df840675cb7cf3147aa8642e7fadf8aad7b8f0f0253",
+    "experiments/run_structured_quality_pilot.py": "40da3e53a0192bcdce2ccc41a9d56362c5fc75ac64d5c97f82ead4d94efc32e4"
+  },
+  "profile_hash": "06a6ff34af165fd02d2139c51e2bf8cd34de1b4ca83d265981861e013f4d8f13",
+  "model_id": "Qwen/Qwen3-0.6B",
+  "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "task_quality": {
+    "correct": 8,
+    "total": 8,
+    "score": 1.0,
+    "floor": 0.99,
+    "passed": true
+  },
+  "per_case": [
+    {
+      "case_id": "easy-01-add",
+      "raw_output": "{\"answer\": 5}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 690.896760999749
+    },
+    {
+      "case_id": "easy-02-larger",
+      "raw_output": "{\n  \"answer\": 9\n}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 114.78111899850774
+    },
+    {
+      "case_id": "easy-03-length",
+      "raw_output": "{\"answer\": 3}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 84.93297699897084
+    },
+    {
+      "case_id": "easy-04-index",
+      "raw_output": "{\"answer\": 10}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 91.8413799990958
+    },
+    {
+      "case_id": "easy-05-increment",
+      "raw_output": "{\n  \"answer\": 3\n}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 113.45308200179716
+    },
+    {
+      "case_id": "easy-06-copy",
+      "raw_output": "{\"answer\": 4}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 83.15735100040911
+    },
+    {
+      "case_id": "easy-07-filter",
+      "raw_output": "{\"answer\": [\"a\"]}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 99.07510600169189
+    },
+    {
+      "case_id": "easy-08-upper",
+      "raw_output": "{\"answer\": \"CAT\"}",
+      "grade": {
+        "passed": true,
+        "format_valid": true,
+        "reason": "correct"
+      },
+      "latency_ms": 86.31610999873374
+    }
+  ],
+  "median_request_ms": 95.45824300039385,
+  "p95_request_ms": 690.896760999749,
+  "startup_seconds": 46.05506802599848,
+  "cleanup_memory_mib": 0,
+  "provider_calls_during_audit": 0,
+  "gpu_trials_during_audit": 0,
+  "joint_placement_accepted": false,
+  "limitations": [
+    "A new typed-decoding quality profile, not a regrade of old failed profiles.",
+    "One serial pass of eight tasks; no warmup, retry, speedup, or broad quality claim.",
+    "Latency can include first-use grammar work; this is not the repeated load protocol.",
+    "The schema constrains requested type, not answer value, permitted IDs, or array length.",
+    "Saved-artifact consistency audit, not independent proof of GPU execution."
+  ]
+}
