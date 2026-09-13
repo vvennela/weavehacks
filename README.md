@@ -5,7 +5,7 @@ Sera recommends and measures inference configurations, rejects quality failures,
 See [completion.md](completion.md) for the current verified status, remaining work,
 and local/cloud setup. The rehearsal sections below preserve historical results.
 
-The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The [complete Astra loop](evidence/live-astra-expanded-v1/README.md) measured a 19.55% latency improvement, tested a combination, stopped under the progress rule, and returned a working runner.
+The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. An [earlier Codex-backed Astra loop](evidence/live-astra-expanded-v1/README.md) measured a 19.55% latency improvement. The latest direct-API result is below.
 
 ## Latest demo: a full autonomous run passed
 
@@ -92,6 +92,14 @@ specialists inspect the results and compare ideas. Sera tests their chosen idea,
 keeps the best valid result, and uses the measurements to choose the next test.
 It stops when another test does not justify continuing.”
 
+Open [the standalone replay](demos/recorded-loop.html) in a browser. It works
+offline: no API keys, GPU, or running server are needed. Press Play; pause,
+restart, seek, or change speed as needed.
+
+After cloning or pulling the repository, double-click `demos/recorded-loop.html`.
+On this Mac, you can also run `open demos/recorded-loop.html`. GitHub's file view
+shows the source; open the downloaded file to play the animation.
+
 The separate recorded replay shows the three agents, their revised proposals,
 the arbiter's choice, and each measured outcome. Label it **recorded replay at
 8× speed**, not live inference. At 8×, the complete 13:58 run takes about 1:45.
@@ -111,6 +119,11 @@ Authenticated headless ARIA, automatic answer extraction, and orchestrator
 handoff are **not yet verified**. A normal login in that separate profile is
 still needed. A missing, slow, or unhelpful advisor must not stop Sera. No ARIA
 recommendation can bypass the arbiter, task-quality checks, or measured gates.
+
+The [final ARIA review](docs/aria-final-run-review.md) checked the latest completed
+run and found no fatal flaw for this scoped demo. Its useful next-step advice was
+to repeat configurations in randomized order before claiming a general speedup.
+We did not start more GPU trials. ARIA's review is advice, not certification.
 
 ### What we can claim
 
@@ -158,10 +171,12 @@ and closes it. This report covers two scripted specialists; the tests above also
 check the three-investigator swarm. The reports label all results **synthetic**.
 The rehearsal block creates a fresh directory, so it is safe to repeat.
 
-For a real GPU and hosted-agent run, use the
-[live loop commands below](#repeat-the-rehearsal-let-sera-choose-the-settings).
-Those require the Molab GPU, model files, credentials, and a connected controller;
-they are not a quick local check.
+For the latest real GPU and hosted-agent run, use the
+[Example run notebook](notebooks/Example%20run.ipynb) and
+[hosted setup](docs/hosted-investigators.md). It needs the Molab GPU, model files,
+and runtime credentials, but its OpenAI/LiteLLM route needs no local controller.
+The older [Codex-backed commands below](#repeat-the-rehearsal-let-sera-choose-the-settings)
+also require a connected controller. Neither is a quick local check.
 
 ## Two implementations in this repository
 
@@ -187,7 +202,7 @@ later without unpicking anything.
 
 The simple API, clean-install packaging, controller recovery, and frozen benchmark collector were merged at this earlier checkpoint. Its combined suite passed **917 tests**. Clean installation and the [installed-package GPU rehearsal](evidence/public-api-release-v1/README.md) passed: three rounds, automatic stop, returned runner, Weave trace, and clean shutdown. That quick-mode rehearsal does not establish task correctness; its wrong arithmetic answers are saved. See [release acceptance](docs/release-acceptance.md), [the simple API](docs/simple-release.md), and [benchmark collection](docs/benchmark-collection.md). Recovery fault tests are not proof of a real unattended outage, and collector implementation is not proof that Sera beats grid or random search. Current status is in the latest demo section and `completion.md`.
 
-### Current expanded loop
+### Earlier Codex-backed expanded loop
 
 The saved expanded-loop release passed 851 local tests. [Luna](evidence/provider-luna-expanded-v1/README.md) and [Astra](evidence/provider-astra-expanded-v1/README.md) each passed all 34 current schema cases without a retry.
 
@@ -324,7 +339,7 @@ For a repeat run, check all five items above before claiming success. A differen
 
 The earlier interactive rehearsal also **passed**. Its separate command started the model, passed all eight tasks, accepted a fresh prompt through its input, answered `7 + 8` as `15`, and closed cleanly on blank input. Startup was 60 seconds with the weights cached. See [interactive rehearsal evidence](evidence/demo-rehearsal-v1/README.md). The automatic team command above instead checks its returned runner and closes automatically.
 
-## Current implementation
+## Earlier implementation checkpoint
 
 The large-model deployment path passed on the supplied RTX PRO 6000: reject the non-fitting BF16 plan → agent selects FP8 weights → load original Qwen2.5-72B weights with online quantization → pass all eight strict tasks → return a runner → pass a fresh request → save report and Weave trace → clean up. Measured p95 was 573 ms and peak total GPU memory was 86.38 GiB. See [the result and limits](evidence/large-fit-v1/README.md). The original final-agent review exposed an ambiguous prediction contract; that record is preserved and the review question has been corrected.
 
