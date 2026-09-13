@@ -217,3 +217,48 @@ def test_changed_answer_key_requires_new_profile_and_no_start(monkeypatch, tmp_p
     with pytest.raises(ValueError, match='dataset changed'):
         pilot.run_pilot(model_id=MODEL_ID, output_dir=tmp_path / 'pilot')
     assert not state['started']
+
+
+@pytest.mark.parametrize('model_id', [MODEL_ID, GLM_MODEL_ID])
+def test_explicit_fp8_weights_change_only_configuration_and_its_profile_hash(monkeypatch, tmp_path, model_id):
+    pilot = pilot_module()
+    baseline_state = fake_runtime(monkeypatch)
+    baseline = pilot.run_pilot(model_id=model_id, output_dir=tmp_path / 'baseline')
+    state = fake_runtime(monkeypatch)
+    candidate = pilot.run_pilot(model_id=model_id, output_dir=tmp_path / 'candidate',
+                                quantization='fp8_per_tensor')
+    assert len(state['started']) == len(state['closed']) == 1
+    assert state['started'][0].configuration == RuntimeConfig(quantization='fp8_per_tensor')
+    assert candidate['configuration'] == baseline['configuration'] | {'quantization': 'fp8_per_tensor'}
+    assert candidate['configuration']['kv_cache_dtype'] == 'auto'
+    assert candidate['profile_hash'] != baseline['profile_hash']
+    for field in ('evaluation_cases', 'generation', 'response_format', 'response_schema_hash',
+                  'system_prompt', 'quality_floor', 'model_id', 'model_revision', 'profile_version'):
+        assert candidate[field] == baseline[field]
+    assert state['requests'] == baseline_state['requests']
+    assert candidate['status'] == 'pass'
+
+
+@pytest.mark.parametrize('quantization', ['fp8', 'int4', True, 2048, [], {}])
+def test_invalid_quantization_is_rejected_before_output_creation(monkeypatch, tmp_path, quantization):
+    pilot = pilot_module()
+    state = fake_runtime(monkeypatch)
+    folder = tmp_path / 'invalid'
+    with pytest.raises(ValueError):
+        pilot.run_pilot(model_id=MODEL_ID, output_dir=folder, quantization=quantization)
+    assert not folder.exists()
+    assert not state['started']
+
+
+@pytest.mark.parametrize('flags,expected', [([], None), (['--quantization', 'fp8_per_tensor'], 'fp8_per_tensor')])
+def test_cli_quantization_is_explicit_and_default_stays_bf16(monkeypatch, tmp_path, flags, expected):
+    pilot = pilot_module()
+    captured = {}
+
+    def run(**kwargs):
+        captured.update(kwargs)
+        return {'status': 'pass', 'task_quality': {'correct': 8}}
+
+    monkeypatch.setattr(pilot, 'run_pilot', run)
+    assert pilot.main(['--model-id', MODEL_ID, '--output-dir', str(tmp_path / 'pilot'), *flags]) == 0
+    assert captured['quantization'] == expected

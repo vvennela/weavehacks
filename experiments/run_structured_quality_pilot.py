@@ -1,11 +1,13 @@
-"""Test one pinned BF16 model with native JSON decoding and the unchanged eight tasks.
+"""Test one pinned model with native JSON decoding and the unchanged eight tasks.
 
 Run from the repository root:
   python -m experiments.run_structured_quality_pilot --model-id Qwen/Qwen3-0.6B \
     --output-dir evidence/qwen-structured-quality-v1
 
 This is a new task-quality profile, not a regrade or a performance comparison.
-No output repair, task retries, quantization, or joint placement is performed.
+Weights default to BF16; --quantization fp8_per_tensor explicitly tests FP8 weights.
+KV stays BF16. Each invocation tests one configuration only.
+No output repair, task retries, or joint placement is performed.
 Native response_format reference (checked for the installed runtime):
 https://docs.vllm.ai/en/v0.26.0/features/structured_outputs/
 """
@@ -92,15 +94,15 @@ def collect_case(model, case):
     return row
 
 
-def run_pilot(*, model_id, output_dir):
+def run_pilot(*, model_id, output_dir, quantization=None):
     if model_id not in PINNED_MODELS:
         raise ValueError('The pilot requires one of the two specified model IDs')
+    config = RuntimeConfig(quantization=quantization)
     cases = load_cases(Path(__file__).resolve().parents[1] / 'benchmarks/easy_cases.json')
     if dataset_hash(cases) != DATASET_HASH:
         raise ValueError('The original eight-question dataset changed; create a new approved profile')
     folder = Path(output_dir).resolve()
     folder.mkdir(parents=True, exist_ok=False)
-    config = RuntimeConfig()
     profile = {'profile_version': PROFILE_VERSION, 'dataset_hash': DATASET_HASH,
                'system_prompt': SYSTEM_PROMPT, 'response_format': response_format(),
                'generation': GENERATION, 'enable_thinking': False,
@@ -114,7 +116,7 @@ def run_pilot(*, model_id, output_dir):
               'limits': 'New decoding profile; does not replace earlier results. Eight serial requests, '
                         'no retries or warmup. Request latency includes possible first-use grammar '
                         'compilation, but excludes model startup and tokenization. '
-                        'No speedup, FP8 quality, or joint-placement claim.'}
+                        'No broad quality, speedup, or joint-placement claim.'}
     path = folder / 'result.json'
     save_json(path, report)
     model = RecordingSeraModel(artifact_dir=folder / 'runtime', configuration=config,
@@ -147,8 +149,9 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model-id', required=True, choices=PINNED_MODELS)
     parser.add_argument('--output-dir', required=True)
+    parser.add_argument('--quantization', choices=['fp8_per_tensor'])
     args = parser.parse_args(argv)
-    report = run_pilot(model_id=args.model_id, output_dir=args.output_dir)
+    report = run_pilot(model_id=args.model_id, output_dir=args.output_dir, quantization=args.quantization)
     print(f"{report['status']}: {report['task_quality']['correct']}/8 strict tasks")
     return 0 if report['status'] == 'pass' else 1
 
