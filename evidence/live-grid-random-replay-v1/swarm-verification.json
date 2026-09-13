@@ -1,0 +1,107 @@
+{
+  "schema_version": "sera-swarm-evidence-verification-v1",
+  "execution_passed": true,
+  "issues": [],
+  "decision_rounds": 3,
+  "candidate_trials": 3,
+  "saved_profile": {
+    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+    "model_revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+    "evaluation_cases_sha256": null,
+    "task_count": 0,
+    "constraints": {
+      "quality_floor": 0.99,
+      "p95_latency_ms": null,
+      "max_memory_mib": null
+    },
+    "workload": {
+      "prompt_count": 8,
+      "concurrency": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "warmup_requests_per_load": 8,
+      "measured_requests_per_load": 24,
+      "quality_requests": 8,
+      "quality_concurrency": 1,
+      "latency_reduction": "worst-per-load-percentile",
+      "throughput_reduction": "total-tokens-over-total-measured-window-seconds"
+    },
+    "baseline_configuration": {
+      "dtype": "bfloat16",
+      "quantization": "fp8_per_tensor",
+      "kv_cache_dtype": "auto",
+      "tensor_parallel_size": 1,
+      "max_model_len": 4096,
+      "max_num_seqs": 8,
+      "max_num_batched_tokens": 4096,
+      "gpu_memory_utilization": 0.9,
+      "enable_prefix_caching": false,
+      "enable_chunked_prefill": true,
+      "enforce_eager": true
+    }
+  },
+  "source_hashes": {
+    "result": "1c4d5b7c80386fdce73c5f28c1efc057f056522d8c05d4636cc0d917184117d3",
+    "calls": "a14ae8d5066927d47de812b9487a4391f7ffd70a5a784304a3462eab0071e745",
+    "launch": "f6a72776dfa7a2d13e6d837f38d321da4895e3a5c1a922726cf5324fc714dc90",
+    "registration": "cff53f01c45553079fb4a9698a27a33f46bddf64dcedc1031e50e337cce6b175",
+    "runner_probe": "41eade132ae1b5de4a7ad5d0e064ebbd8e23af3c126e723b397eab0f2411e194"
+  },
+  "root_call_id": "01a09b97-cb9a-701a-a608-ea20decf8416",
+  "trace_id": "01a09b97-cb9a-7db2-ad01-b3a336d59908",
+  "normalized_call_references": 0,
+  "feedback": {
+    "observed_trial_feedback": true,
+    "measured_candidate_feedback": true,
+    "startup_failure_feedback": false,
+    "rejected_raw_reviews": [],
+    "limitation": "A recorded startup failure is feedback, not a measured quality or performance result. Rejected raw reviews are preserved, not relabeled as validated or delivered to later agents."
+  },
+  "search_policy": {
+    "mode": "until-plateau",
+    "confirmation_trial_executed": true,
+    "objective_plateau_confirmed": true,
+    "stop_reason": "objective-plateau-confirmed"
+  },
+  "failure_diagnosis": {
+    "established": true,
+    "missing_trial_ids": [],
+    "root_cause_established": false,
+    "scope": "Observed failures and consequences only; no model or hardware cause is inferred. Matching diagnosis records do not prove the agents understood or used them."
+  },
+  "proposal_diversity": {
+    "initial_distinct_candidates": [
+      2,
+      2,
+      1
+    ],
+    "refined_distinct_candidates": [
+      1,
+      2,
+      1
+    ],
+    "initial_alternatives_observed": true,
+    "refined_alternatives_observed": true
+  },
+  "improvement": {
+    "priority": "latency",
+    "required_gain_fraction": 0.05,
+    "best_observed_gain_fraction": 0.18808605056587868,
+    "established": true
+  },
+  "limitations": [
+    "Consistency audit of supplied artifacts, not cryptographic proof of origin.",
+    "The saved profile is reported, not certification against an external benchmark or hardware profile.",
+    "No search-superiority or failure-cause claim follows from execution or proposal diversity.",
+    "Cached inspections retain remote source provenance; they are not fresh network requests."
+  ],
+  "registered_live_grid": {
+    "registration_hash": "2843eee593b706529bd178369ef91a529900ee6cb8412ce27ffa553e019c1eb5",
+    "source_revision": "6601669e47879b0492cab09130123a363ae8b91a",
+    "probe_scope": "separate-source-regraded-by-live-import",
+    "strict_section_19_4_claim": false
+  }
+}

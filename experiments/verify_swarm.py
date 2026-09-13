@@ -77,6 +77,8 @@ def _historical_record_matches(actual, expected):
 
 
 class Audit:
+    root_op = 'run_investigation'
+
     def __init__(self, report, dump):
         self.report = report
         self.issues = []
@@ -123,9 +125,9 @@ class Audit:
 
     def lineage(self):
         root = self.by_id.get(self.root_id, {})
-        self.require(bool(root) and _op(root) == 'run_investigation' and bool(self.trace_id)
+        self.require(bool(root) and _op(root) == self.root_op and bool(self.trace_id)
                      and self.declared_trace_id == self.trace_id,
-                     'trace-root', 'A saved run_investigation root is required.')
+                     'trace-root', f'A saved {self.root_op} root is required.')
         self.require(len(self.by_id) == len(self.calls), 'trace-lineage', 'Call IDs must be unique.')
         for call in self.calls:
             seen = set()
@@ -310,6 +312,14 @@ class Audit:
                     limitation='A recorded startup failure is feedback, not a measured quality or performance result. '
                                'Rejected raw reviews are preserved, not relabeled as validated or delivered to later agents.')
 
+    def valid_plateau_launch(self, launch):
+        command = launch.get('command') if isinstance(launch, dict) else None
+        return (isinstance(command, list) and all(isinstance(part, str) for part in command)
+                and 'experiments.run_investigation' in command and '--until-plateau' in command
+                and not any(part == '--budget' or part.startswith('--budget=') for part in command)
+                and 'total_trial_cap' in launch and launch['total_trial_cap'] is None
+                and launch.get('stop_policy') == 'plateau-plus-one-confirmation-round')
+
     def plateau(self, rounds, trials, launch):
         from sera.config import Constraints, Objective
         from sera.investigation import objective_progress
@@ -319,12 +329,7 @@ class Audit:
         stop = search.get('stop_reason')
         result = dict(mode='until-plateau', confirmation_trial_executed=False,
                       objective_plateau_confirmed=False, stop_reason=stop)
-        command = launch.get('command') if isinstance(launch, dict) else None
-        self.require(isinstance(command, list) and all(isinstance(part, str) for part in command)
-                     and 'experiments.run_investigation' in command and '--until-plateau' in command
-                     and not any(part == '--budget' or part.startswith('--budget=') for part in command)
-                     and 'total_trial_cap' in launch and launch['total_trial_cap'] is None
-                     and launch.get('stop_policy') == 'plateau-plus-one-confirmation-round',
+        self.require(self.valid_plateau_launch(launch),
                      'plateau-launch', 'Uncapped search needs the actual uncapped GPU launch record.')
         try:
             objective = Objective.model_validate(self.report['objective'])
@@ -443,6 +448,10 @@ class Audit:
                      and not probe.get('error') and any(r.get('output') == probe.get('text') and
                          r.get('token_ids') == probe.get('token_ids') for r in records),
                      'returned-probe', 'A fresh successful request from the selected runner must be persisted.')
+        self.returned_cleanup()
+
+    def returned_cleanup(self):
+        report = self.report
         runtimes = report.get('returned_runtimes') or []
         self.require(report.get('returned_runner_closed') is True and bool(runtimes) and
                      all(r.get('cleanup_pass') is True and r.get('memory_after_mib') == 0 for r in runtimes),
@@ -486,7 +495,10 @@ class Audit:
 
 def verify_swarm(report, calls_dump, *, launch=None):
     """Return independent execution, proposal-diversity and performance verdicts."""
-    audit = Audit(report, calls_dump)
+    return _verify_swarm(Audit(report, calls_dump), report, calls_dump, launch)
+
+
+def _verify_swarm(audit, report, calls_dump, launch):
     rounds = (report.get('search') or {}).get('rounds') or []
     trials = {trial.get('trial_id'): trial for trial in report.get('search_trials', [])}
     audit.require(report.get('provenance') != 'synthetic' and
