@@ -115,6 +115,7 @@ def test_runtime_delegates_busy_gpu_and_cleanup_to_registered_owner(monkeypatch,
             calls.append('check')
         def verify_service_cleanup(self, model):
             calls.append('cleanup')
+            assert model.record['status'] == 'closing'
             model.record.update(cleanup_pass=True, memory_after_mib=500)
     class Thread:
         def __init__(self, **kwargs):

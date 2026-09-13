@@ -354,6 +354,9 @@ class SeraModel:
         if self.record.get("cleanup_pass") is True:
             return self.record
         self._ready = False
+        if self.placement_owner is not None and self.record['status'] == 'ready':
+            # A peer monitor must not treat this expected shutdown as missing memory.
+            self.record['status'] = 'closing'
         self._stop_monitor.set()
         if self._monitor is not None:
             self._monitor.join(timeout=11)
