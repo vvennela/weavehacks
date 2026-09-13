@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The tested candidate was collected with 96 successful requests, zero generation errors, and quality mean 1.0, but p95 latency increased from 769.4799790006073 ms to 770.4907300012565 ms, yielding -0.001313550746261043 improvement versus the required 0.05. Diagnosis call 01a09b26-af08-73d1-91c4-4ea6d7624968 and evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt support objective-not-improved; no causal scheduling or hardware cause is established. Do not retry this tested configuration.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15385,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 265,
+    "reasoning_output_tokens": 98
+  }
+}

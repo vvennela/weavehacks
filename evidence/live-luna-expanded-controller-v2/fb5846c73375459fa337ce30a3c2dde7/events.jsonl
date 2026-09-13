@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b22-cc40-7202-899a-84cf2f3ec5ca"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No quality failure is observed: all 96 requests succeeded, quality mean was 1.0, and the quality floor passed. The observed performance concern is latency, with p95 latency of 769.48 ms and increasing mean TTFT from 136.31 ms at concurrency 1 to 191.59 ms at concurrency 8. The cause of the tail is unknown because no per-request latency diagnosis is recorded, so inspect latency outliers next.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":14189,"cached_input_tokens":8960,"cache_write_input_tokens":0,"output_tokens":242,"reasoning_output_tokens":122}}

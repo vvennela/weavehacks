@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sched-batch-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"concurrency_8_cumulative_snapshot_mean_ttft_ms\",\"concurrency_8_cumulative_snapshot_mean_queue_ms\",\"successful_requests\",\"generation_errors\",\"trial_2_p95_latency_ms\"],\"predicted_metric_change\":\"At fixed quality and workload, p95_latency_ms will decrease relative to the baseline 769.48 ms, especially at concurrency 8; successful_requests and generation_errors should remain unchanged. The direction and magnitude are unmeasured.\",\"confidence\":0.58,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute this hypothesis if measured p95_latency_ms is not at least 5% below 769.4799790006073 ms, or if quality falls below 0.99, successful_requests decreases, or generation_errors becomes nonzero. Use diagnosis call 01a09b26-af08-73d1-91c4-4ea6d7624968 and fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt for comparison.\",\"reason\":\"No execution failure was observed: the candidate diagnosis at call 01a09b22-ad08-73ba-a0b8-48308de93914 reports status accepted, generation_errors 0, and the fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt; its underlying cause was explicitly not established. Baseline p95_latency_ms was 769.4799790006073 ms, with concurrency_8_cumulative_snapshot_mean_ttft_ms 191.58900901675224 ms and negligible concurrency_8_cumulative_snapshot_mean_queue_ms 0.007232046712601914 ms. The already tested prefix-caching trial improved trial_2_p95_latency_ms to 625.3724439993675 ms with quality passing, but that does not establish a batching cause. I therefore propose the legal, untested max_num_batched_tokens=2048 candidate to test whether a smaller scheduling token wave reduces tail latency; the observed low queue time means any gain remains uncertain, and the candidate's throughput risk must be measured.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 20732,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 733,
+    "reasoning_output_tokens": 222
+  }
+}

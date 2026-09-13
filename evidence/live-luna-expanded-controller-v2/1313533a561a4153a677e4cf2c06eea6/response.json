@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No quality failure is observed: measured quality is 1.0 with all 8 scored prompts valid, and there are no trial or inspection failures. Because latency is the optimization priority and only aggregate p50/p95/p99 metrics are available, inspecting latency outliers is useful to distinguish tail behavior across loads before proposing an experiment; its cause remains unknown.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14144,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 284,
+    "reasoning_output_tokens": 185
+  }
+}

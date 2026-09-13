@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"scheduling:sera-scheduling-2048\"],\"reason\":\"No execution failure was observed: the baseline and trial-2 both had 96 successful requests and zero generation errors, while trial-2 measured p95 latency of 625.3724439993675 ms versus the baseline 769.4799790006073 ms and quality 1.0. The cause of that improvement is unknown; peer predictions are not measurements. I accept the scheduling peer's max_num_batched_tokens=2048 proposal as a legal, untested latency hypothesis aligned with the latency objective, while rejecting any claim that its gain is established before execution.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18849,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 282,
+    "reasoning_output_tokens": 134
+  }
+}

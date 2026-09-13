@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"Observed outcome: trial-2 was collected with 96/96 successful requests, quality mean 1.0 passing the 0.99 floor, and p95 latency improved from 769.4799790006073 ms to 625.3724439993675 ms, as recorded in diagnosis source 01a09b26-af08-73d1-91c4-4ea6d7624968. No failure is established; the cause of the improvement remains unknown. Inspect load_metrics to examine per-load latency behavior across concurrency before making any further decision.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 16568,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 294,
+    "reasoning_output_tokens": 152
+  }
+}

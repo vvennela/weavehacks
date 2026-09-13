@@ -1,0 +1,8 @@
+{
+  "source_revision": "d4d55b0e1a90b47500adafde7ad26e36c5795fe8",
+  "command": [".venv/bin/python", "-m", "experiments.codex_relay_controller", "--url", "https://sb-4d6d72981b11fb9d.sb.molab.run", "--relay-dir", "/tmp/sera-relay-luna-expanded-v2", "--pair-script", "/Users/vishnuv/Documents/Documents/weavehacks/.agents/skills/marimo-pair/scripts/execute-code.sh", "--output-dir", "evidence/live-luna-expanded-controller-v2", "--max-requests", "none", "--idle-timeout", "1800"],
+  "authentication": "Existing local Codex login. Molab token supplied only through the environment.",
+  "purpose": "Fresh Luna loop after the v1 controller interruption. Same GPU implementation, provider certificate, workload, and gates; read-only connection retries are enabled.",
+  "max_concurrent_investigator_requests": 3,
+  "gpu_source_revision": "c7c8ae1b6bcca5d0ed73640ecc12fd0dfbe98d7c"
+}

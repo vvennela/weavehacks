@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b30-985f-7a21-b9bd-bcff299a40d9"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"trial-4\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The measured trial was collected and met the prediction: p95 latency was 625.5590509990725 ms versus the 769.4799790006073 ms baseline, with 96 successful requests, zero generation errors, and verified quality of 1.0 above the 0.99 floor. Evidence: calls 01a09b26-af08-73d1-91c4-4ea6d7624968 and 01a09b29-d886-7f1a-a219-45b31e47c021.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":15517,"cached_input_tokens":7936,"cache_write_input_tokens":0,"output_tokens":207,"reasoning_output_tokens":63}}

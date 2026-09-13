@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b26-dc20-75a2-b853-f1ffc5696434"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No failure was observed: trial-2 collected 96/96 requests with zero generation errors, quality mean 1.0 passed the 0.99 floor, and measured p95 latency improved from 769.479979 ms to 625.372444 ms. The cause of the improvement remains unknown. Inspect latency_outliers because the objective uses the worst per-load percentile, while the supplied evidence reports only aggregate p95 and does not establish per-concurrency outlier behavior.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":15513,"cached_input_tokens":5888,"cache_write_input_tokens":0,"output_tokens":371,"reasoning_output_tokens":247}}

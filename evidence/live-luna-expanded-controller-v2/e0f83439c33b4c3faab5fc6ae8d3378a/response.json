@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"proposal-enforce-eager-false\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"enforce_eager\",\"proposed_value\":false,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"successful_requests\",\"trial_2_successful_requests\",\"generation_errors\",\"trial_2_generation_errors\",\"concurrency_8_cumulative_snapshot_mean_ttft_ms\",\"trial_2_concurrency_8_cumulative_snapshot_mean_ttft_ms\"],\"predicted_metric_change\":\"The enforce_eager=false trial may reduce p95_latency_ms relative to the baseline value of 769.4799790006073 ms while preserving successful_requests and generation_errors; the magnitude is unknown.\",\"confidence\":0.58,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute this prediction if p95_latency_ms does not improve by at least 5% versus 769.4799790006073 ms, or if quality falls below the fixed 0.99 floor, successful_requests decreases, or generation_errors becomes nonzero.\",\"reason\":\"No execution failure was observed: the baseline and accepted trial-2 both completed with 96 successful_requests and zero generation_errors, as recorded in diagnosis call 01a09b26-af08-73d1-91c4-4ea6d7624968 at evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. Trial-2 changed enable_prefix_caching and improved trial_2_p95_latency_ms to 625.3724439993675 ms versus baseline p95_latency_ms of 769.4799790006073 ms, with quality mean 1.0 and passed true in the same diagnosis evidence. The cause of that improvement is not established. Since prefix caching is already tested and the graph-execution technique is available-for-trial, enforce_eager=false is a legal untested setting for investigating execution overhead. The baseline and trial-2 load records show concurrency_8_cumulative_snapshot_mean_ttft_ms of 191.58900901675224 and 147.41472713649273 respectively, but these cumulative snapshots do not establish causality. This trial should therefore test whether graph-enabled execution changes latency while preserving the measured quality and reliability gates.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 20687,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 627,
+    "reasoning_output_tokens": 126
+  }
+}

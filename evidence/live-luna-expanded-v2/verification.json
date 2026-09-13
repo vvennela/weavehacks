@@ -1,0 +1,96 @@
+{
+  "schema_version": "sera-swarm-evidence-verification-v1",
+  "execution_passed": true,
+  "issues": [],
+  "decision_rounds": 3,
+  "candidate_trials": 3,
+  "saved_profile": {
+    "model_id": "Qwen/Qwen2.5-72B-Instruct",
+    "model_revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+    "evaluation_cases_sha256": "2f3c6687cf2a19bde4c3f5b60ab56cb24ac67c6755e999ad98227b04e42d95a7",
+    "task_count": 8,
+    "constraints": {
+      "quality_floor": 0.99,
+      "p95_latency_ms": null,
+      "max_memory_mib": null
+    },
+    "workload": {
+      "prompt_count": 8,
+      "concurrency": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "warmup_requests_per_load": 8,
+      "measured_requests_per_load": 24,
+      "quality_requests": 8
+    },
+    "baseline_configuration": {
+      "dtype": "bfloat16",
+      "quantization": "fp8_per_tensor",
+      "kv_cache_dtype": "auto",
+      "tensor_parallel_size": 1,
+      "max_model_len": 4096,
+      "max_num_seqs": 8,
+      "max_num_batched_tokens": 4096,
+      "gpu_memory_utilization": 0.9,
+      "enable_prefix_caching": false,
+      "enable_chunked_prefill": true,
+      "enforce_eager": true
+    }
+  },
+  "source_hashes": {
+    "result": "0b14aea1d5b56216d012116343831d0a5be1f2e9998ff9c66dc544d20154f8b5",
+    "calls": "dea6a30a35f10ad18dde15910290d83e94d0ed382f1a80b1ef494bb074827820",
+    "launch": "42072e3aae5746479fe2cd0cf732489a71c17c919f25eeb7ac727a5d0d5b1267"
+  },
+  "root_call_id": "01a09b20-b22e-7adb-8fb2-e7a4b6e4ca17",
+  "trace_id": "01a09b20-b22d-7f21-a713-8f41dd22155a",
+  "normalized_call_references": 0,
+  "feedback": {
+    "observed_trial_feedback": true,
+    "measured_candidate_feedback": true,
+    "startup_failure_feedback": false,
+    "rejected_raw_reviews": [],
+    "limitation": "A recorded startup failure is feedback, not a measured quality or performance result. Rejected raw reviews are preserved, not relabeled as validated or delivered to later agents."
+  },
+  "search_policy": {
+    "mode": "until-plateau",
+    "confirmation_trial_executed": true,
+    "objective_plateau_confirmed": true,
+    "stop_reason": "objective-plateau-confirmed"
+  },
+  "failure_diagnosis": {
+    "established": true,
+    "missing_trial_ids": [],
+    "root_cause_established": false,
+    "scope": "Observed failures and consequences only; no model or hardware cause is inferred. Matching diagnosis records do not prove the agents understood or used them."
+  },
+  "proposal_diversity": {
+    "initial_distinct_candidates": [
+      3,
+      3,
+      3
+    ],
+    "refined_distinct_candidates": [
+      2,
+      3,
+      2
+    ],
+    "initial_alternatives_observed": true,
+    "refined_alternatives_observed": true
+  },
+  "improvement": {
+    "priority": "latency",
+    "required_gain_fraction": 0.05,
+    "best_observed_gain_fraction": 0.187279122178598,
+    "established": true
+  },
+  "limitations": [
+    "Consistency audit of supplied artifacts, not cryptographic proof of origin.",
+    "The saved profile is reported, not certification against an external benchmark or hardware profile.",
+    "No search-superiority or failure-cause claim follows from execution or proposal diversity.",
+    "Cached inspections retain remote source provenance; they are not fresh network requests."
+  ]
+}

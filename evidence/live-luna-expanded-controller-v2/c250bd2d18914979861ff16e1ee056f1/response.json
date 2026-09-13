@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"weight-fp8\"],\"reason\":\"Recommend weight-fp8 for deployment feasibility: its estimated peak memory is 90,248,921,088 bytes versus 160,444,792,832 bytes for baseline, while retaining the same KV-cache estimate. This materially reduces weight memory and fits the supplied service budget estimate; however, latency and task quality are unmeasured, so no speedup or quality benefit is established.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10683,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 151,
+    "reasoning_output_tokens": 45
+  }
+}
