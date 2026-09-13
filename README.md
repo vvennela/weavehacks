@@ -18,6 +18,8 @@ The first provider check failed (19/30 valid first responses; 22/30 after retrie
 
 ## Install
 
+For the recorded demo, run `uvx marimo@0.24.0 edit demo.py --sandbox` from this repository's root. It reads committed real evidence, makes no API calls, and needs no GPU. The live GPU command is in the large-model section below. The [corrected final-agent review](evidence/large-fit-review-v2/README.md) passed using the saved measurements.
+
 Use the existing GPU environment with its working vLLM and CUDA packages. Installing Sera does not install or change the GPU stack.
 
 ```sh

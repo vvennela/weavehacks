@@ -25,7 +25,7 @@ The 0.90 service fraction is not a hard total-process memory cap: the observed p
 
 The initial agent selected `weight-fp8`. After measurement, it selected `candidate` but labeled the throughput prediction `not-tested` because BF16 measurements were unavailable. That explanation was correct. The fit-first validator rejected this response because it expected the deployment prediction, not a speedup prediction. The raw response and `agent_final_error` remain unchanged in `result.json`. The deterministic deployment decision and returned runner passed independently.
 
-The implementation now states the deployment-feasibility prediction explicitly. A separate saved-evidence agent review checks that fix without rerunning the GPU workload; it does not replace this original record.
+The implementation now states the deployment-feasibility prediction explicitly. The [separate saved-evidence agent review](../large-fit-review-v2/README.md) passed on its first response without rerunning the GPU workload; it does not replace this original record.
 
 ## Limits
 

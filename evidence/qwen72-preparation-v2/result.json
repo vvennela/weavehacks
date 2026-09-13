@@ -1,0 +1,20 @@
+{
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "revision": "495f39366efef23836d0cfae4fbe635880d2be31",
+  "status": "complete",
+  "command": [
+    "hf",
+    "download",
+    "Qwen/Qwen2.5-72B-Instruct",
+    "--revision",
+    "495f39366efef23836d0cfae4fbe635880d2be31",
+    "--max-workers",
+    "4"
+  ],
+  "timeout_seconds": 1200,
+  "weight_files": 37,
+  "weight_bytes": 145412519312,
+  "tensor_bytes": 145412407296,
+  "snapshot": "/home/marimo/.cache/huggingface/hub/models--Qwen--Qwen2.5-72B-Instruct/snapshots/495f39366efef23836d0cfae4fbe635880d2be31",
+  "elapsed_seconds": 292.80054280399963
+}

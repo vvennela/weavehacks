@@ -72,7 +72,7 @@ The verified environment provides:
 - One NVIDIA RTX Pro 6000 Blackwell GPU
 - 96 GB GPU memory
 - Four CPUs
-- 32 GB host memory
+- 160 GiB host memory in the measured session (cgroup limit 171,798,691,840 bytes); the initial 32 GB assumption was incorrect
 - A maximum session length of 12 hours
 - Linux and Python package installation through uv
 
