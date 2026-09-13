@@ -10,6 +10,7 @@ from sera.agent import ArbiterDecision, Proposal
 from sera.config import CONTROL_ROLES, MODEL_ID, RuntimeConfig, Workload
 from sera.investigation import remaining_candidates
 from sera.swarm import choose_swarm_experiments
+from sera.tracing import InspectionReadError
 
 
 context = ContextVar('swarm-test-context', default=None)
@@ -180,3 +181,18 @@ def test_non_record_reader_result_is_an_explicit_inspection_failure():
     assert all(item['inspections'][0]['status'] == 'failed'
                and 'result' not in item['inspections'][0]
                for item in record['swarm']['investigators'])
+
+
+def test_reader_failure_uses_allowlisted_explanation_not_exception_text():
+    def reader(*args):
+        error = InspectionReadError('incomplete-requests')
+        error.safe_message = 'unsafe overwritten instance message'
+        error.args = ('secret error text',)
+        raise error
+    _, record = run(Agent(), reader)
+    for investigator in record['swarm']['investigators']:
+        error = investigator['inspections'][0]
+        assert error['reason_code'] == 'incomplete-requests'
+        assert error['safe_message'] == InspectionReadError.messages['incomplete-requests']
+    assert 'secret error text' not in str(record)
+    assert 'unsafe overwritten' not in str(record)

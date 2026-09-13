@@ -8,6 +8,7 @@ from .measurement import measured_frontier, objective_value, select_candidate, t
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION
 from .trace_evidence import request_evidence
+from .diagnosis import export_trial_diagnosis, trial_diagnosis
 
 
 def search_frontier(baseline, trials, *, constraints):
@@ -63,8 +64,11 @@ def round_evidence(initial, search, trials, remaining, *, prompts=()):
          'failure_stage', 'investigator_id', 'arbiter_proposal_id') if key in trial},
         configuration=deepcopy(trial['runtime']['configuration']),
         request_evidence=request_evidence(trial, prompts),
+        diagnosis=deepcopy(trial.get('diagnosis')),
         proposal=deepcopy(trial.get('proposal')), review=deepcopy(trial.get('review')),
         review_error=trial.get('review_error')) for trial in trials]
+    evidence['failure_diagnoses'] = [dict(trial_id=trial['trial_id'], diagnosis=deepcopy(trial['diagnosis']))
+        for trial in trials if trial.get('diagnosis', {}).get('failure_kind') not in (None, 'accepted')]
     evidence['previous_rounds'] = [dict(round=record['round'], trial_ids=record['trial_ids'][:],
         arbiter=deepcopy(record.get('arbiter')), arbiter_error=record.get('arbiter_error'),
         specialist_participation=deepcopy(record.get('specialist_participation', [])),
@@ -341,6 +345,10 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                         version=evaluation_version, floor=constraints.quality_floor)
                 decision = select_candidate(baseline, trial, objective=objective, constraints=constraints)
                 trial['decision'] = decision
+                trial['diagnosis'] = trial_diagnosis(baseline, trial, decision)
+                save()
+                export_trial_diagnosis(trial)
+                save()
                 if decision['selected'] == 'candidate':
                     new_value = objective_value(trial, objective.priority)
                     old_value = objective_value(best, objective.priority) if best else None
@@ -353,6 +361,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                     if improves_objective or breaks_tie:
                         best = trial
                 feedback = dict(proposal=proposal.model_dump(), decision=decision,
+                    diagnosis=deepcopy(trial['diagnosis']),
                     objective=objective.model_dump(), candidate_tested=True,
                     candidate_status=trial['status'], baseline_metrics=baseline.get('reduced'),
                     candidate_metrics=trial.get('reduced'),

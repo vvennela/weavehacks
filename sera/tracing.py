@@ -9,6 +9,30 @@ import inspect
 _event_sink = ContextVar('sera_event_sink', default=None)
 
 
+class InspectionReadError(RuntimeError):
+    """A read failure with a fixed, secret-free explanation."""
+
+    messages = {
+        'missing-trace-id': 'A current trace ID is required.',
+        'unsupported-query': 'The inspection query is not supported.',
+        'invalid-scope': 'A complete bounded trial scope is required.',
+        'duplicate-scope': 'The trial scope contains duplicate identities.',
+        'query-failed': 'The persisted trace query failed.',
+        'call-limit': 'The trace query reached the bounded call limit.',
+        'incomplete-metrics': 'The persisted trial metrics are missing or duplicated.',
+        'incomplete-requests': 'The persisted request counts do not match the saved trial metrics.',
+        'incomplete-diagnosis': 'The required persisted trial diagnosis is missing or duplicated.',
+        'task-binding-mismatch': 'Saved request does not match the fixed task answer key.',
+    }
+
+    def __init__(self, reason_code):
+        if reason_code not in self.messages:
+            raise ValueError('Unsupported inspection error code')
+        self.reason_code = reason_code
+        self.safe_message = self.messages[reason_code]
+        super().__init__(self.safe_message)
+
+
 class TraceSinkError(RuntimeError):
     """An enabled sink failed; its arbitrary exception text is not exported."""
 

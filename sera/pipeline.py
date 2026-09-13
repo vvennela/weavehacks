@@ -31,6 +31,7 @@ def trial_trace_scope(trial):
     return dict(trial_id=trial.get('source_trial_id', trial.get('trial_id')),
         model_id=runtime.get('model_id', MODEL_ID), revision=runtime.get('revision', MODEL_REVISION),
         config_hash=trial.get('config_hash'),
+        diagnosis_required='diagnosis' in trial or 'diagnosis_trace_export' in trial,
         task_quality={key: deepcopy(quality[key]) for key in
                       ('version', 'floor', 'passed', 'per_prompt') if key in quality})
 

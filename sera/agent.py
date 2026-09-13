@@ -223,7 +223,10 @@ class WandbAgent:
         return self.request("frontier", evidence,
             "Select only from eligible_trial_ids. Explain whether the proposal's prediction held, "
             "was refuted, or was not tested. Respect the supplied deterministic quality and selection "
-            "result; a fast quality failure is not an improvement. When prediction.kind is "
+            "result. Use diagnosis to separate the observed failure from any unproven causal hypothesis. "
+            "Cite available read call IDs or saved evidence paths, never invented trace IDs, and explain "
+            "the consequence for the next proposal or abstention. Do not infer a hardware cause from no gain. "
+            "A fast quality failure is not an improvement. When prediction.kind is "
             "deployment-feasibility, assess that stated prediction, not an unmeasured speedup. "
             "A completed deployment meeting constraints confirms feasibility; a failed deployment "
             "or failed gate refutes it. Missing baseline measurements do not make an executed "

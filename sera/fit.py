@@ -7,6 +7,7 @@ import uuid
 
 from .config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, RuntimeConfig, Workload
 from .agent import ArbiterDecision
+from .diagnosis import export_trial_diagnosis, trial_diagnosis
 from .memory import fits_memory
 from .measurement import collect_trial, select_candidate
 from .quality import evaluate_quality
@@ -214,24 +215,39 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
                                    "reason": "Test whether online weight quantization makes the requested model feasible"}
             report["status"] = "running"
             result._save()
-            active = SeraModel(artifact_dir=folder / "candidate", model_id=LARGE_MODEL_ID,
-                               revision=LARGE_MODEL_REVISION, configuration=configuration)
+            stage = 'constructor'
+            trial = dict(trial_id='candidate', status='starting', config_hash=configuration.config_hash,
+                         runtime=dict(model_id=LARGE_MODEL_ID, revision=LARGE_MODEL_REVISION,
+                                      configuration=configuration.model_dump()))
             try:
+                active = SeraModel(artifact_dir=folder / "candidate", model_id=LARGE_MODEL_ID,
+                                   revision=LARGE_MODEL_REVISION, configuration=configuration)
+                trial['runtime'] = active.record
+                stage = 'startup'
                 active.start()
+                stage = 'measurement'
                 trial = collect_trial(active, prompts, "candidate", workload=workload)
             except CleanupError:
                 raise
             except Exception as failure:
-                trial = {"trial_id": "candidate", "status": "startup-failed", "runtime": active.record,
-                         "error": f"{type(failure).__name__}: {failure}"}
+                trial.update(status='measurement-failed' if stage == 'measurement' else 'startup-failed',
+                             failure_stage=stage, error=type(failure).__name__)
             trial["task_quality"] = evaluate_quality(trial, prompts, evaluation,
                 version=evaluation_version, floor=constraints.quality_floor)
             report["candidate_trial"] = trial
         report["decision"] = select_candidate(report["baseline"], report.get("candidate_trial"),
                                                objective=objective, constraints=constraints)
+        if report.get('candidate_trial'):
+            trial = report['candidate_trial']
+            trial['decision'] = deepcopy(report['decision'])
+            trial['diagnosis'] = trial_diagnosis(report['baseline'], trial, report['decision'])
+            result._save()
+            export_trial_diagnosis(trial)
+            result._save()
         if agent is not None and chosen is not None:
             selected = report["decision"]["selected"] or "no-safe-configuration"
             feedback = fit_review_evidence(chosen, report["candidate_trial"], report["decision"])
+            feedback['diagnosis'] = deepcopy(report['candidate_trial']['diagnosis'])
             report["agent_feedback"] = feedback
             try:
                 final = agent.review(feedback)
