@@ -299,6 +299,17 @@ class FrozenSwarmPolicy:
             raise StopSearch()
         supplied = project_evidence(view, self.variant)
         supplied['limitations'] = deepcopy(self.audit['limitations'])
+        supplied.update(revision=view['identity']['model_revision'],
+                        task_quality=_cached_quality(view['baseline']),
+                        objective={'priority': 'latency', 'tie_breaker': 'peak_memory_mib'},
+                        constraints={'quality_floor': view['baseline'].get('quality_floor')},
+                        workload={'cache_scope': 'repeated-prompts-after-per-load-warmup',
+                                  'inspection_scope': 'Cached load metrics and task scores only; '
+                                  'no raw request outliers or model-output text. '
+                                  'cached: source IDs refer to local artifacts, not Weave calls.'})
+        observed = [] if self.variant == 'no-history' else deepcopy(view['observed'])
+        if self.variant != 'no-history':
+            supplied['history'] = [_cached_history(row) for row in observed]
         legal, options = [], []
         for entry in view['candidates']:
             if entry['candidate_id'] not in view['remaining_candidate_ids']:
@@ -318,12 +329,31 @@ class FrozenSwarmPolicy:
         supplied['frozen_candidate_hashes'] = [entry[3].config.config_hash for entry in legal]
         # The closure captures this projected view only, never the full outcome table.
         projected = deepcopy(supplied)
+        cached = deepcopy([view['baseline'], *observed])
 
         def read_metrics(query, _):
+            rows = []
+            for outcome in cached:
+                identity = {'trial_id': outcome['candidate_id'], 'config_hash': outcome['config_hash'],
+                            'output_sha256': outcome['source_evidence_hash'], 'model_id': MODEL_ID,
+                            'revision': view['identity']['model_revision']}
+                if query == 'quality_outputs':
+                    rows.append({**identity, 'call_id': f"cached:{outcome['candidate_id']}:quality",
+                                 'record_type': 'trial_diagnosis', 'diagnosis': {
+                                     'failure_kind': 'cached-task-gate',
+                                     'observed': {'status': outcome['status'],
+                                                  'quality': _cached_quality(outcome)},
+                                     'root_cause': {'status': 'not-established'}}})
+                elif query == 'load_metrics':
+                    for level, p95 in outcome.get('per_load_p95_latency_ms', {}).items():
+                        rows.append({**identity, 'call_id': f"cached:{outcome['candidate_id']}:load:{level}",
+                                     'record_type': 'load_metrics', 'concurrency': int(level),
+                                     'reduced': {'p95_latency_ms': p95}})
             return {'query_id': query, 'source': 'selected-cached-metrics-only',
                     'baseline': {'candidate_id': projected['trial_id'],
                                  'metrics': deepcopy(_metrics(view['baseline']))},
                     'observed': deepcopy(projected.get('history', [])),
+                    'records': rows,
                     'limitations': ['Raw outputs and request outliers were not imported.',
                                     'No unselected candidate measurements are available.']}
 
@@ -360,3 +390,20 @@ class FrozenSwarmPolicy:
             raise ValueError('Swarm selected outside the remaining frozen universe')
         record['selected_candidate_id'] = selected
         return selected
+
+
+def _cached_quality(record):
+    return {'mean': record.get('quality_score'), 'floor': record.get('quality_floor'),
+            'passed': record['quality_passed'], 'valid_outputs': record.get('quality_valid_outputs', False)}
+
+
+def _cached_history(record):
+    """Match the existing production prompt projection without exposing other outcomes."""
+    return {'configuration': deepcopy(record['configuration']), 'trial': {
+        'trial_id': record['candidate_id'], 'config_hash': record['config_hash'],
+        'status': 'collected' if record['status'] == 'completed' else record['status'],
+        'reduced': {'p95_latency_ms': record['p95_latency_ms'],
+                    'generation_errors': record.get('generation_errors')},
+        'task_quality': _cached_quality(record),
+        'decision': {'constraint_failures': [key for key in (
+            'feasibility_passed', 'reliability_passed', 'quality_passed') if not record[key]]}}}

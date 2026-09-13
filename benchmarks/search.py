@@ -132,7 +132,7 @@ def _validate(manifest, artifacts, *, require_complete=True):
         if content_hash(record) != artifact['artifact_hash'] or not required <= set(record):
             raise ValueError('Outcome artifact hash or fields do not match')
         if set(record) - required - {'telemetry', 'per_load_p95_latency_ms', 'quality_score',
-                                    'generation_errors', 'error_type'}:
+                                    'quality_floor', 'quality_valid_outputs', 'generation_errors', 'error_type'}:
             raise ValueError('Unknown outcome fields')
         candidate_id = record['candidate_id']
         if candidate_id not in entries or candidate_id in outcomes:
@@ -165,9 +165,12 @@ def _validate(manifest, artifacts, *, require_complete=True):
                 key not in {'1', '2', '4', '8'} or (value is not None and not _finite(value))
                 for key, value in loads.items()):
             raise ValueError('Invalid per-load latency measurements')
-        score = record.get('quality_score')
-        if score is not None and (not _finite(score, zero=True) or score > 1):
-            raise ValueError('Invalid quality score')
+        for field in ('quality_score', 'quality_floor'):
+            score = record.get(field)
+            if score is not None and (not _finite(score, zero=True) or score > 1):
+                raise ValueError('Invalid quality score or floor')
+        if 'quality_valid_outputs' in record and type(record['quality_valid_outputs']) is not bool:
+            raise ValueError('Invalid quality output validity flag')
         errors = record.get('generation_errors')
         if errors is not None and (type(errors) is not int or errors < 0):
             raise ValueError('Invalid generation error count')

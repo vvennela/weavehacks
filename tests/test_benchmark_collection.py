@@ -219,6 +219,13 @@ def test_current_swarm_replay_uses_production_investigators_and_hides_outcomes(m
         def request(self, role, evidence, instruction):
             self.history.append({'role': role, 'evidence': deepcopy(evidence)})
             assert 'oracle' not in evidence
+            if role == 'proposal':
+                from sera.investigation_prompt import build_investigation_prompt
+                prompt = build_investigation_prompt(evidence)
+                assert prompt['measured_facts']['baseline']['quality']['measured'] is True
+                assert prompt['measured_facts']['inspection_records']
+                assert all(key.startswith('cached:') for key in prompt['measured_facts']['sources'])
+                assert prompt['constraints']['quality_floor'] == 0.99
             if role == 'arbiter':
                 return ArbiterDecision(ranked_proposal_ids=evidence['legal_proposal_ids'][:1], reason='fixture')
             option = evidence['candidate_options'][0]
@@ -280,6 +287,13 @@ def test_swarm_no_history_removes_selected_outcomes_from_inspection_reads(monkey
     assert seen[1][1]['observed'] == []
     assert 'history' not in seen[1][0]
     assert not any(key.startswith('observed.') for key in seen[1][0]['metrics'])
+    from sera.investigation_prompt import build_investigation_prompt
+    full_prompt = build_investigation_prompt(seen[0][0])
+    no_history_prompt = build_investigation_prompt(seen[1][0])
+    assert full_prompt['measured_facts']['trials'][0]['trial_id'] == artifacts[1]['record']['candidate_id']
+    assert full_prompt['measured_facts']['trials'][0]['reduced']['p95_latency_ms'] == 20
+    assert full_prompt['measured_facts']['trials'][0]['quality']['mean'] == 1
+    assert no_history_prompt['measured_facts']['trials'] == []
 
 
 def test_cli_replay_audits_sources_before_reporting(tmp_path):
