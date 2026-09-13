@@ -1,0 +1,410 @@
+SMOKE imported
+SMOKE before weave init
+[36m[1mweave[0m: weave version 0.53.9 is available!  To upgrade, please run:
+[36m[1mweave[0m:  $ pip install weave --upgrade
+[36m[1mweave[0m: Logged in as Weights & Biases user: vvennela.
+[36m[1mweave[0m: View Weave data at https://wandb.ai/vvennela-n-a/wandb_agent_default_project/weave
+SMOKE weave initialized
+SMOKE entered root
+SMOKE evidence prepared
+SMOKE choose start
+Timeout (0:00:30)!
+Thread 0x00007f3bf3fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c10ff96c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c117fa6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c11ffb6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c127fc6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c12ffd6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c137fe6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c13fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c30ff96c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c317fa6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c31ffb6c0 (most recent call first):
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 108 in __call__
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 149 in read
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 155 in inspect
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 76 in _initial
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59 in run
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 93 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c327fc6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c32ffd6c0 (most recent call first):
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 108 in __call__
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 149 in read
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 155 in inspect
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 76 in _initial
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59 in run
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 93 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c337fe6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c33fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/call_batch_processor.py", line 188 in stop_accepting_new_work_and_flush_queue
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/weave_client.py", line 3411 in _flush
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/weave_client.py", line 3311 in flush
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 161 in _fetch
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 111 in __call__
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 149 in read
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 155 in inspect
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 76 in _initial
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59 in run
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 93 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c54ff96c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c557fa6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c55ffb6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c567fc6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 359 in wait
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sentry_sdk/_queue.py", line 240 in get
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sentry_sdk/worker.py", line 150 in _target
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c56ffd6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 363 in wait
+  File "/usr/local/lib/python3.13/threading.py", line 660 in wait
+  File "/tmp/uv-venv/lib/python3.13/site-packages/opentelemetry/sdk/_shared_internal/__init__.py", line 156 in worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c577fe6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 363 in wait
+  File "/usr/local/lib/python3.13/threading.py", line 660 in wait
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 325 in _health_check
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c57fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 211 in _process_batches
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c64a526c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 363 in wait
+  File "/usr/local/lib/python3.13/threading.py", line 660 in wait
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 325 in _health_check
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c652536c0 (most recent call first):
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 211 in _process_batches
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c6685e6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/selectors.py", line 452 in select
+  File "/usr/local/lib/python3.13/asyncio/base_events.py", line 2012 in _run_once
+  File "/usr/local/lib/python3.13/asyncio/base_events.py", line 683 in run_forever
+  File "/usr/local/lib/python3.13/asyncio/base_events.py", line 712 in run_until_complete
+  File "/usr/local/lib/python3.13/asyncio/runners.py", line 118 in run
+  File "/usr/local/lib/python3.13/asyncio/runners.py", line 195 in run
+  File "/usr/local/lib/python3.13/site-packages/wandb/sdk/lib/asyncio_compat.py", line 76 in run
+  File "/usr/local/lib/python3.13/site-packages/wandb/sdk/lib/asyncio_manager.py", line 270 in _main
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c9fb77380 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 359 in wait
+  File "/usr/local/lib/python3.13/concurrent/futures/_base.py", line 451 in result
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 134 in _parallel
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 168 in choose_swarm_experiments
+  File "<string>", line 31 in replay_swarm_provider_smoke
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "<string>", line 36 in <module>
+Timeout (0:00:30)!
+Thread 0x00007f3bf3fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c10ff96c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c117fa6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c11ffb6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c127fc6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c12ffd6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c137fe6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c13fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c30ff96c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c317fa6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c31ffb6c0 (most recent call first):
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 108 in __call__
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 149 in read
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 155 in inspect
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 76 in _initial
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59 in run
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 93 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c327fc6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c32ffd6c0 (most recent call first):
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 108 in __call__
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 149 in read
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 155 in inspect
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 76 in _initial
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59 in run
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 93 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c337fe6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c33fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/call_batch_processor.py", line 188 in stop_accepting_new_work_and_flush_queue
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/weave_client.py", line 3411 in _flush
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/weave_client.py", line 3311 in flush
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 161 in _fetch
+  File "/marimo/sera-release-04313ea/experiments/weave_evidence.py", line 111 in __call__
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 149 in read
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "/marimo/sera-release-04313ea/experiments/run_investigation.py", line 155 in inspect
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 76 in _initial
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59 in run
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 93 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c54ff96c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c557fa6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c55ffb6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c567fc6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 359 in wait
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sentry_sdk/_queue.py", line 240 in get
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sentry_sdk/worker.py", line 150 in _target
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c56ffd6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 363 in wait
+  File "/usr/local/lib/python3.13/threading.py", line 660 in wait
+  File "/tmp/uv-venv/lib/python3.13/site-packages/opentelemetry/sdk/_shared_internal/__init__.py", line 156 in worker
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c577fe6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 363 in wait
+  File "/usr/local/lib/python3.13/threading.py", line 660 in wait
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 325 in _health_check
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c57fff6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 211 in _process_batches
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c64a526c0 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 363 in wait
+  File "/usr/local/lib/python3.13/threading.py", line 660 in wait
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 325 in _health_check
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c652536c0 (most recent call first):
+  File "/usr/local/lib/python3.13/site-packages/weave/trace_server_bindings/async_batch_processor.py", line 211 in _process_batches
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c6685e6c0 (most recent call first):
+  File "/usr/local/lib/python3.13/selectors.py", line 452 in select
+  File "/usr/local/lib/python3.13/asyncio/base_events.py", line 2012 in _run_once
+  File "/usr/local/lib/python3.13/asyncio/base_events.py", line 683 in run_forever
+  File "/usr/local/lib/python3.13/asyncio/base_events.py", line 712 in run_until_complete
+  File "/usr/local/lib/python3.13/asyncio/runners.py", line 118 in run
+  File "/usr/local/lib/python3.13/asyncio/runners.py", line 195 in run
+  File "/usr/local/lib/python3.13/site-packages/wandb/sdk/lib/asyncio_compat.py", line 76 in run
+  File "/usr/local/lib/python3.13/site-packages/wandb/sdk/lib/asyncio_manager.py", line 270 in _main
+  File "/usr/local/lib/python3.13/threading.py", line 995 in run
+  File "/usr/local/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/usr/local/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x00007f3c9fb77380 (most recent call first):
+  File "/usr/local/lib/python3.13/threading.py", line 359 in wait
+  File "/usr/local/lib/python3.13/concurrent/futures/_base.py", line 451 in result
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 134 in _parallel
+  File "/tmp/uv-venv/lib/python3.13/site-packages/sera/swarm.py", line 168 in choose_swarm_experiments
+  File "<string>", line 31 in replay_swarm_provider_smoke
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 565 in _call_sync_func
+  File "/usr/local/lib/python3.13/site-packages/weave/trace/op.py", line 1325 in wrapper
+  File "<string>", line 36 in <module>
