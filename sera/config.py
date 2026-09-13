@@ -9,6 +9,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 MODEL_ID = "Qwen/Qwen3-0.6B"
 MODEL_REVISION = "c1899de289a04d12100db370d81485cdf75e47ca"
+LARGE_MODEL_ID = "Qwen/Qwen2.5-72B-Instruct"
+LARGE_MODEL_REVISION = "495f39366efef23836d0cfae4fbe635880d2be31"
 BASELINE_NAME = "sera-baseline-v1"
 
 
@@ -35,7 +37,7 @@ class RuntimeConfig(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
 
     dtype: Literal["bfloat16"] = "bfloat16"
-    quantization: None = None
+    quantization: Literal["fp8_per_tensor"] | None = None
     kv_cache_dtype: Literal["auto", "fp8"] = "auto"
     tensor_parallel_size: Literal[1] = 1
     max_model_len: int = Field(default=4096, ge=65, le=4096)

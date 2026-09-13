@@ -124,6 +124,8 @@ def objective_value(trial, priority):
 
 
 def constraint_failures(trial, constraints):
+    if trial.get("status") == "infeasible":
+        return ["estimated-memory-does-not-fit"]
     failures = []
     if trial.get("status") != "collected":
         failures.append("measurement-failed")
@@ -145,7 +147,8 @@ def measured_frontier(baseline, candidate, *, constraints=None):
     if constraints is not None:
         constraints = Constraints.model_validate(constraints)
         viable = [trial for trial in [baseline, candidate] if trial and not constraint_failures(trial, constraints)]
-        if candidate and baseline.get("input_token_ids") != candidate.get("input_token_ids"):
+        if (candidate and baseline.get("status") != "infeasible"
+                and baseline.get("input_token_ids") != candidate.get("input_token_ids")):
             viable = [trial for trial in viable if trial is baseline]
     elif (baseline.get("status") != "collected"
             or not token_agreement(baseline.get("quality", []), baseline.get("self_check", []))["passed"]):
@@ -191,7 +194,8 @@ def select_candidate(baseline, candidate, *, objective=None, constraints=None):
         constraints = Constraints.model_validate(constraints)
         failures = {"baseline": constraint_failures(baseline, constraints),
                     "candidate": constraint_failures(candidate or {}, constraints)}
-        if candidate and baseline.get("input_token_ids") != candidate.get("input_token_ids"):
+        if (candidate and baseline.get("status") != "infeasible"
+                and baseline.get("input_token_ids") != candidate.get("input_token_ids")):
             failures["candidate"].append("input-token-mismatch")
         if after is None:
             failures["candidate"].append("objective-metric-unavailable")

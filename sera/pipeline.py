@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from .config import BASELINE_NAME, MODEL_ID, MODEL_REVISION, Candidate, Constraints, Objective, RuntimeConfig, validate_candidate
+from .config import BASELINE_NAME, LARGE_MODEL_ID, MODEL_ID, MODEL_REVISION, Candidate, Constraints, Objective, RuntimeConfig, validate_candidate
 from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
@@ -144,13 +144,20 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         if constraints is None:
             raise ValueError("Verified mode requires an explicit quality floor in Constraints")
         constraints = Constraints.model_validate(constraints)
-    if models != [MODEL_ID]:
-        raise ValueError(f"This milestone requires models=[{MODEL_ID!r}]")
+    if models not in ([MODEL_ID], [LARGE_MODEL_ID]):
+        raise ValueError("Supply one supported pinned Qwen model")
     if not isinstance(prompts, list) or not 1 <= len(prompts) <= 32:
         raise ValueError("Supply 1 to 32 prompts; inputs are never silently dropped")
     for prompt in prompts:
         if not isinstance(prompt, (str, list)) or not prompt:
             raise ValueError("Each prompt must be nonempty text or chat messages")
+    if models == [LARGE_MODEL_ID]:
+        from .fit import optimize_fit
+        if candidate is not None:
+            raise ValueError("The fit-first path selects its candidate from the validated memory plans")
+        return optimize_fit(prompts=prompts, output_dir=output_dir, objective=objective,
+                            evaluation=evaluation, evaluation_version=evaluation_version,
+                            constraints=constraints, agent=agent, provider_check=provider_check)
     provider_validation = None
     if agent is not None:
         from .provider_check import require_provider_check

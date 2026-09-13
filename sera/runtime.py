@@ -14,7 +14,7 @@ import time
 import urllib.error
 import urllib.request
 
-from .config import MODEL_ID, MODEL_REVISION, RuntimeConfig
+from .config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, RuntimeConfig
 from .metrics import parse_vllm_metrics
 from .storage import save_json
 
@@ -83,8 +83,9 @@ class SeraModel:
 
     def __init__(self, *, artifact_dir, configuration=None, model_id=MODEL_ID,
                  revision=MODEL_REVISION):
-        if model_id != MODEL_ID or revision != MODEL_REVISION:
-            raise ValueError("This milestone supports only the pinned Qwen3-0.6B revision")
+        pinned = {MODEL_ID: MODEL_REVISION, LARGE_MODEL_ID: LARGE_MODEL_REVISION}
+        if pinned.get(model_id) != revision:
+            raise ValueError("The runner requires a supported, pinned model revision")
         self.model_id = model_id
         self.revision = revision
         self.configuration = RuntimeConfig.model_validate(
@@ -143,8 +144,9 @@ class SeraModel:
             self.record.update(gpu=gpu, memory_before_mib=gpu["used_mib"])
             if gpu["used_mib"] > 128:
                 raise RuntimeError("GPU 0 is already in use; refusing an isolated trial")
-            if self.configuration.kv_cache_dtype == "fp8" and gpu["compute_capability"] != "12.0":
-                raise RuntimeError("FP8 KV has only been checked on the supplied sm_120 GPU")
+            if ((self.configuration.kv_cache_dtype == "fp8" or self.configuration.quantization is not None)
+                    and gpu["compute_capability"] != "12.0"):
+                raise RuntimeError("FP8 paths have only been checked on the supplied sm_120 GPU")
             env = _child_environment(self.artifact_dir, gpu["uuid"])
             with socket.socket() as listener:
                 listener.bind(("127.0.0.1", 0))
@@ -163,6 +165,8 @@ class SeraModel:
                        "--no-enable-prefix-caching", "--enable-chunked-prefill", "--enforce-eager",
                        "--generation-config", "vllm", "--seed", "0", "--cpu-offload-gb", "0",
                        "--enable-tokenizer-info-endpoint", "--shutdown-timeout", "15"]
+            if config.quantization is not None:
+                command.extend(["--quantization", config.quantization])
             self.record["command"] = command
             self._log = (self.artifact_dir / "server.log").open("w")
             started = time.monotonic()
