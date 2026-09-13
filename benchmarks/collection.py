@@ -5,7 +5,8 @@ import importlib.metadata
 from pathlib import Path
 import time
 
-from sera.config import BASELINE_NAME, MODEL_ID, MODEL_REVISION, RuntimeConfig, Workload
+from sera.config import (BASELINE_NAME, MODEL_ID, MODEL_REVISION, LARGE_MODEL_ID,
+                         LARGE_MODEL_REVISION, RuntimeConfig, Workload)
 from sera.measurement import collect_trial, nearest_rank
 from sera.quality import evaluate_quality
 from sera.runtime import GENERATION, SeraModel, gpu_snapshot
@@ -55,8 +56,9 @@ def freeze_collection(plan):
         raise ValueError('Freeze a sera-task-v1 quality floor')
     if set(records['hardware']) != set(HARDWARE_KEYS) or set(records['runtime']) != set(RUNTIME_PACKAGES):
         raise ValueError('Freeze the exact GPU identity and all four runtime versions')
-    if plan['model_revision'] != MODEL_REVISION or plan['tokenizer_revision'] != MODEL_REVISION:
-        raise ValueError('Collector requires the supported pinned Qwen0.6B revision')
+    revision = LARGE_MODEL_REVISION if plan.get('model_exception') == 'user-approved-qwen72b-fp8-v1' else MODEL_REVISION
+    if plan['model_revision'] != revision or plan['tokenizer_revision'] != revision:
+        raise ValueError('Collector requires the supported pinned model revision')
     baseline = RuntimeConfig.model_validate(plan['baseline'])
     if baseline.gpu_memory_utilization != profile['gpu_memory_utilization']:
         raise ValueError('Baseline memory fraction differs from the declared profile')
@@ -72,7 +74,8 @@ def freeze_collection(plan):
                                evidence_kind=plan.get('evidence_kind', 'measured'),
                                compatibility=plan.get('compatibility'),
                                random_seeds=plan.get('random_seeds', list(range(20))),
-                               max_proposals=plan.get('max_proposals', 32))
+                               max_proposals=plan.get('max_proposals', 32),
+                               model_exception=plan.get('model_exception'), comparison_scope=plan.get('comparison_scope'))
     bundle = {'manifest': manifest, 'records': records}
     return {**bundle, 'bundle_hash': content_hash(bundle)}
 
@@ -84,6 +87,7 @@ def validate_bundle(bundle):
             'candidates': [entry['configuration'] for entry in manifest['candidates']],
             **{key: manifest[key] for key in ('budget', 'evidence_kind', 'compatibility',
                                              'random_seeds', 'max_proposals')}}
+    plan.update({key: manifest[key] for key in ('model_exception', 'comparison_scope') if key in manifest})
     if freeze_collection(plan) != bundle:
         raise ValueError('Collection sources or manifest changed after they were frozen')
 
@@ -100,7 +104,8 @@ def measure_live(entry, folder, bundle):
                 {'role': 'user', 'content': case['prompt']}]
                for case in records['workload']['cases']]
     model = SeraModel(artifact_dir=folder, configuration=RuntimeConfig.model_validate(entry['configuration']),
-                      model_id=MODEL_ID, revision=MODEL_REVISION)
+                      model_id=bundle['manifest']['identity']['model_id'],
+                      revision=bundle['manifest']['identity']['model_revision'])
     started = time.monotonic()
     startup_finished = None
     trial = {'status': 'startup-failed', 'runtime': model.record, 'config_hash': entry['config_hash']}
@@ -109,7 +114,7 @@ def measure_live(entry, folder, bundle):
         startup_finished = time.monotonic()
         trial['status'] = 'request-failed'
         trial = collect_trial(model, prompts, entry['candidate_id'],
-                              baseline=entry['candidate_id'] == BASELINE_NAME,
+                              baseline=entry['candidate_id'] == bundle['manifest']['baseline']['candidate_id'],
                               workload=Workload(concurrency=records['profile']['concurrency']))
     except Exception as error:
         if startup_finished is None:
@@ -138,7 +143,8 @@ def normalize_trial(bundle, entry, trial):
     runtime = trial['runtime']
     if trial.get('collection_identity') != {key: records[key] for key in ('hardware', 'runtime')}:
         raise ValueError('Collected hardware or runtime differs from the frozen identity')
-    if (runtime.get('model_id') != MODEL_ID or runtime.get('revision') != MODEL_REVISION
+    if (runtime.get('model_id') != manifest['identity']['model_id']
+            or runtime.get('revision') != manifest['identity']['model_revision']
             or runtime.get('generation') != GENERATION or runtime.get('enable_thinking') is not False):
         raise ValueError('Collected model or generation settings differ from the frozen identity')
     if runtime['configuration'] != entry['configuration'] or trial['config_hash'] != entry['config_hash']:
@@ -216,11 +222,12 @@ def summarize(manifest, artifacts):
     outcomes = _validate(manifest, artifacts, require_complete=False)
     entries = [manifest['baseline'], *manifest['candidates']]
     missing = [entry['candidate_id'] for entry in entries if entry['candidate_id'] not in outcomes]
-    baseline_valid = BASELINE_NAME in outcomes and _valid(outcomes[BASELINE_NAME])
+    baseline_id = manifest['baseline']['candidate_id']
+    baseline_valid = baseline_id in outcomes and _valid(outcomes[baseline_id])
     complete = not missing and baseline_valid
     oracle = min((row for row in outcomes.values() if _valid(row)),
                  key=lambda row: (row['p95_latency_ms'], row['peak_memory_mib'])) if complete else None
-    return {'manifest_hash': manifest['manifest_hash'], 'complete': complete,
+    return {'manifest_hash': manifest['manifest_hash'], 'complete': complete, 'baseline_id': baseline_id,
             'missing_candidate_ids': missing, 'baseline_valid': baseline_valid,
             'oracle': deepcopy(oracle), 'rows': [outcomes[entry['candidate_id']] for entry in entries
                                                if entry['candidate_id'] in outcomes],
@@ -264,7 +271,7 @@ def collect(bundle, output_dir, *, measure=None):
         if artifact['record']['status'] == 'cleanup-failed':
             stop = 'cleanup-failed'
             break
-        if entry['candidate_id'] == BASELINE_NAME and not _valid(artifact['record']):
+        if entry['candidate_id'] == bundle['manifest']['baseline']['candidate_id'] and not _valid(artifact['record']):
             stop = 'baseline-failed-gates'
             break
     report = summarize(bundle['manifest'], artifacts)
@@ -297,12 +304,13 @@ def render_table(summary):
              'Request latency covers repeated prompts after per-load warmup. Startup is separate.', '',
              '| Configuration | Changes from baseline | Status | Task score | Worst p95 ms | Per-load p95 ms | Peak MiB | Startup s |',
              '| --- | --- | --- | --- | --- | --- | --- | --- |']
-    baseline = next((row['configuration'] for row in summary['rows'] if row['candidate_id'] == BASELINE_NAME), {})
+    baseline_id = summary.get('baseline_id', BASELINE_NAME)
+    baseline = next((row['configuration'] for row in summary['rows'] if row['candidate_id'] == baseline_id), {})
     for row in summary['rows']:
         loads = ', '.join(f'{key}: {value}' for key, value in row.get('per_load_p95_latency_ms', {}).items())
         changes = ', '.join(f'{key}={value}' for key, value in row['configuration'].items()
                             if baseline.get(key) != value) or 'named baseline'
-        identifier = BASELINE_NAME if row['candidate_id'] == BASELINE_NAME else row['candidate_id'][:12]
+        identifier = baseline_id if row['candidate_id'] == baseline_id else row['candidate_id'][:12]
         lines.append(f"| {identifier} | {changes} | {row['status']} | {row.get('quality_score')} | "
                      f"{row['p95_latency_ms']} | {loads} | {row['peak_memory_mib']} | {row['startup_seconds']} |")
     lines.extend(['', 'Full configurations and hashes are in bundle.json and outcomes.json.',

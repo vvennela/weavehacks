@@ -8,7 +8,7 @@ import re
 import statistics
 import time
 
-from sera.config import BASELINE_NAME, MODEL_ID, RuntimeConfig
+from sera.config import BASELINE_NAME, MODEL_ID, LARGE_MODEL_ID, RuntimeConfig
 from sera.storage import content_hash
 
 
@@ -26,9 +26,9 @@ def _hash(value, length=64):
     return isinstance(value, str) and re.fullmatch(f'[0-9a-f]{{{length}}}', value) is not None
 
 
-def _identity(identity):
+def _identity(identity, *, approved_large=False):
     required = {'model_id', 'model_revision', 'tokenizer_revision', 'profile_name', *IDENTITY_HASHES}
-    if (set(identity) != required or identity['model_id'] != MODEL_ID
+    if (set(identity) != required or identity['model_id'] != (LARGE_MODEL_ID if approved_large else MODEL_ID)
             or not _hash(identity['model_revision'], 40)
             or not _hash(identity['tokenizer_revision'], 40)
             or not isinstance(identity['profile_name'], str) or not identity['profile_name'].strip()
@@ -51,16 +51,25 @@ def _config_order(entry):
 
 
 def freeze_manifest(identity, baseline, candidates, *, budget, evidence_kind='measured',
-                    compatibility=None, random_seeds=tuple(range(20)), max_proposals=32):
+                    compatibility=None, random_seeds=tuple(range(20)), max_proposals=32,
+                    model_exception=None, comparison_scope=None):
     """Call and save before outcome collection. Only memory fraction may alter baseline."""
-    _identity(identity)
+    approved_large = model_exception == 'user-approved-qwen72b-fp8-v1'
+    exploratory = comparison_scope == 'exploratory-live-vs-grid-v1'
+    if (model_exception is not None and not approved_large or comparison_scope is not None and not exploratory
+            or approved_large != exploratory):
+        raise ValueError('Large-model reference requires the explicit exploratory comparison exception')
+    _identity(identity, approved_large=approved_large)
     baseline = _config(baseline)
-    if baseline != RuntimeConfig(gpu_memory_utilization=baseline.gpu_memory_utilization):
+    expected_base = RuntimeConfig(quantization='fp8_per_tensor') if approved_large else RuntimeConfig(
+        gpu_memory_utilization=baseline.gpu_memory_utilization)
+    if baseline != expected_base:
         raise ValueError('Named baseline may override only its declared memory fraction')
     candidates = [_entry(config) for config in candidates]
     if not 2 <= len(candidates) <= 12:
         raise ValueError('Freeze 2 to 12 nonbaseline candidates')
-    if type(budget) is not int or not 1 <= budget <= 8 or budget >= len(candidates):
+    if (type(budget) is not int or not 1 <= budget <= 8
+            or budget > len(candidates) or not exploratory and budget == len(candidates)):
         raise ValueError('Trial budget must be 1..8 and smaller than the nonbaseline universe')
     if (type(max_proposals) is not int or not budget <= max_proposals <= 128
             or evidence_kind not in {'measured', 'test-fixture'}):
@@ -77,6 +86,8 @@ def freeze_manifest(identity, baseline, candidates, *, budget, evidence_kind='me
             raise ValueError('Duplicate or baseline candidate configuration')
         seen.add(candidate['config_hash'])
         values = candidate['configuration']
+        if approved_large and (values['quantization'] != 'fp8_per_tensor' or values['kv_cache_dtype'] != 'auto'):
+            raise ValueError('Exploratory Qwen72B keeps proven FP8 weights and BF16 KV unchanged')
         changed = {key for key, value in values.items() if value != baseline.model_dump()[key]}
         if not changed <= {'quantization', 'kv_cache_dtype', 'max_num_seqs', 'max_num_batched_tokens',
                            'enable_prefix_caching', 'enable_chunked_prefill', 'enforce_eager'}:
@@ -85,16 +96,18 @@ def freeze_manifest(identity, baseline, candidates, *, budget, evidence_kind='me
                               ('kv-fp8', values['kv_cache_dtype'] == 'fp8'),
                               ('weights-and-kv-fp8', values['quantization'] is not None
                                and values['kv_cache_dtype'] == 'fp8')]:
-            if enabled and mode not in compatibility:
+            if enabled and mode not in compatibility and not (approved_large and mode == 'weights-fp8'):
                 raise ValueError(f'Missing passed compatibility evidence hash for {mode}')
     manifest = {
         'schema_version': 'sera-search-replay-v1', 'identity': deepcopy(identity),
-        'baseline': _entry(baseline, BASELINE_NAME),
+        'baseline': _entry(baseline, 'sera-fp8-weight-reference-v1' if approved_large else BASELINE_NAME),
         'candidates': sorted(candidates, key=_config_order), 'budget': budget,
         'evidence_kind': evidence_kind, 'compatibility': compatibility,
         'random_seeds': seeds, 'max_proposals': max_proposals,
         'objective': 'min-p95-latency-then-peak-memory', 'near_oracle_fraction': 0.05,
     }
+    if exploratory:
+        manifest.update(model_exception=model_exception, comparison_scope=comparison_scope)
     return {**manifest, 'manifest_hash': content_hash(manifest)}
 
 
@@ -114,6 +127,7 @@ def _validate(manifest, artifacts, *, require_complete=True):
         budget=manifest['budget'], evidence_kind=manifest['evidence_kind'],
         compatibility=manifest['compatibility'], random_seeds=manifest['random_seeds'],
         max_proposals=manifest['max_proposals'],
+        model_exception=manifest.get('model_exception'), comparison_scope=manifest.get('comparison_scope'),
     )
     if manifest != expected:
         raise ValueError('Manifest hash, baseline, order, or frozen settings do not match')
@@ -179,7 +193,7 @@ def _validate(manifest, artifacts, *, require_complete=True):
         outcomes[candidate_id] = deepcopy(record)
     if require_complete and outcomes.keys() != entries.keys():
         raise ValueError('Incomplete outcome universe: no oracle or comparison is permitted')
-    if require_complete and not _valid(outcomes[BASELINE_NAME]):
+    if require_complete and not _valid(outcomes[manifest['baseline']['candidate_id']]):
         raise ValueError('Initial baseline must be measured and pass the frozen gates')
     return outcomes
 
@@ -203,7 +217,7 @@ def replay(manifest, artifacts, *, policy=None, policy_name='fixed-grid', seed=N
     manifest, artifacts = deepcopy(manifest), deepcopy(artifacts)
     outcomes = _validate(manifest, artifacts)
     policy = fixed_grid if policy is None else policy
-    baseline = outcomes[BASELINE_NAME]
+    baseline = outcomes[manifest['baseline']['candidate_id']]
     selected, proposals, curve = [], [], []
     best = baseline
 

@@ -200,6 +200,27 @@ def test_partial_summary_does_not_compute_oracle(tmp_path):
     assert report['missing_candidate_ids']
 
 
+def test_large_model_exception_is_explicit_and_full_grid_is_exploratory_only():
+    from sera.config import LARGE_MODEL_ID, LARGE_MODEL_REVISION
+    supplied = plan()
+    supplied.update(model_id=LARGE_MODEL_ID, model_revision=LARGE_MODEL_REVISION,
+                    tokenizer_revision=LARGE_MODEL_REVISION, budget=2)
+    supplied['baseline']['quantization'] = 'fp8_per_tensor'
+    for candidate in supplied['candidates']:
+        candidate['quantization'] = 'fp8_per_tensor'
+    with pytest.raises(ValueError):
+        freeze_collection(supplied)
+    supplied.update(model_exception='user-approved-qwen72b-fp8-v1',
+                    comparison_scope='exploratory-live-vs-grid-v1')
+    frozen = freeze_collection(supplied)
+    assert frozen['manifest']['baseline']['candidate_id'] == 'sera-fp8-weight-reference-v1'
+    assert frozen['manifest']['budget'] == 2
+    assert frozen['manifest']['comparison_scope'] == 'exploratory-live-vs-grid-v1'
+    supplied['candidates'][0]['kv_cache_dtype'] = 'fp8'
+    with pytest.raises(ValueError):
+        freeze_collection(supplied)
+
+
 @pytest.mark.parametrize('variant', ['full-evidence', 'no-history', 'round-robin'])
 def test_current_swarm_replay_uses_production_investigators_and_hides_outcomes(monkeypatch, tmp_path, variant):
     from benchmarks.search_policies import FrozenSwarmPolicy
