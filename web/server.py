@@ -20,6 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 # git: it is ~27MB of vendored runtime assets that rebuild from source in one
 # command, so it does not belong in history.
 NOTEBOOK_DIR = ROOT / 'output' / 'notebook'
+# Which molab notebook the GPU tab embeds. Override with SERA_MOLAB_URL once the
+# synced notebook exists; molab mints a new id when you create one from GitHub.
+MOLAB_URL = os.environ.get('SERA_MOLAB_URL', '')
 NOTEBOOK_TYPES = ('.html', '.css', '.js', '.json', '.map', '.wasm', '.whl', '.zip',
                   '.woff', '.woff2', '.ttf', '.png', '.svg', '.ico', '.webmanifest', '.txt')
 SESSION_SECONDS = 86400
@@ -177,6 +180,12 @@ class Handler(SimpleHTTPRequestHandler):
                                  'updated': ledger.stat().st_mtime if ledger.exists() else None})
             except (OSError, ValueError):
                 self.reply(503, {'error': 'The run ledger is being updated. Try refreshing shortly.'})
+            return
+        if path == '/api/config' and not head:
+            if not self.user():
+                self.reply(401, {'error': 'Sign in to continue.'})
+                return
+            self.reply(200, {'molab_url': MOLAB_URL})
             return
         if path == '/api/session' and not head:
             user = self.user()

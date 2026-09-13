@@ -38,6 +38,10 @@ class ModelSpec:
     max_model_len: int
     base_dtype: str = "bf16"
     revision: str = "main"
+    # Some open-weight models ship their architecture as custom modelling code and
+    # vLLM refuses to execute it unless asked. Opt-in per model rather than global:
+    # this runs code from the model repo, which should be a deliberate choice.
+    trust_remote_code: bool = False
     # Read from config.json, never inferred. Qwen3-0.6B declares head_dim 128 with
     # hidden_size 1024 over 16 heads, so hidden_size // num_attn_heads would give 64
     # and halve every KV-cache number downstream. Left as None only for older

@@ -42,6 +42,9 @@ models:
     head_dim_override: 288
     max_model_len: 4096
     base_dtype: bf16
+    # Ships configuration_deepseek.py / modeling_deepseek.py via auto_map, so
+    # vLLM will not load it without being told to execute repo code.
+    trust_remote_code: true
 
 gpus:
   - id: gpu0

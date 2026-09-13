@@ -25,3 +25,17 @@
 @media (max-width:800px){
   .notebook-frame{height:calc(100vh - 260px);min-height:420px}
 }
+
+/* Substrate switch: which notebook the frame is showing. */
+.substrate-tabs{display:flex;gap:.4rem;margin:0 0 .9rem;flex-wrap:wrap}
+.substrate-tabs button{
+  font:inherit;font-size:.84rem;cursor:pointer;
+  padding:.42rem .85rem;border-radius:999px;
+  border:1px solid var(--line);background:var(--bg);color:var(--muted);
+}
+.substrate-tabs button:hover:not(:disabled){color:var(--text);border-color:var(--muted)}
+.substrate-tabs button.active{
+  background:var(--mint);border-color:var(--mint);color:#fff;font-weight:500;
+}
+.substrate-tabs button:disabled{opacity:.45;cursor:not-allowed}
+.substrate-tabs button:focus-visible{outline:2px solid var(--lilac);outline-offset:2px}

@@ -104,6 +104,12 @@ def vllm_flags(
         # --enable-log-requests, which already defaults to False. Passing the old flag
         # makes the server fail to start, so pass neither.
     ]
+    # Opt-in per model. Models whose architecture ships as custom code in the repo
+    # (Moonshot's Moonlight declares an auto_map alongside DeepseekV3ForCausalLM)
+    # will not start without it, and it executes code from the model repo, so it is
+    # never on by default.
+    if model.trust_remote_code:
+        args.append("--trust-remote-code")
 
     # vLLM's --gpu-memory-utilization is a fraction of the WHOLE card, not of this
     # service's share. Two co-tenants each asking for 0.9 would try to reserve 180%
