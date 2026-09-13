@@ -59,12 +59,13 @@ class Proposal(StrictRecord):
             self.to_candidate()
         return self
 
-    def to_candidate(self):
+    def to_candidate(self, baseline=None):
         if self.action == "keep-baseline":
             return None
-        values = RuntimeConfig().model_dump() | {self.changed_lever: self.proposed_value}
+        baseline = RuntimeConfig() if baseline is None else RuntimeConfig.model_validate(baseline)
+        values = baseline.model_dump() | {self.changed_lever: self.proposed_value}
         return validate_candidate(Candidate(name=self.proposal_id, reason=self.reason,
-                                             config=RuntimeConfig.model_validate(values)))
+                                             config=RuntimeConfig.model_validate(values)), baseline=baseline)
 
 
 class ArbiterDecision(StrictRecord):
@@ -103,7 +104,7 @@ def validate_proposal(proposal, evidence):
         raise ValueError("Proposal exceeds the remaining trial budget")
     if proposal.proposed_value not in evidence["supported_changes"].get(proposal.changed_lever, []):
         raise ValueError("Proposed setting is not active in this run")
-    return proposal.to_candidate()
+    return proposal.to_candidate(evidence.get("configuration"))
 
 
 class WandbAgent:

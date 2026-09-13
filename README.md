@@ -149,6 +149,10 @@ The agent receives the priority, and the deterministic selector applies it. `res
 
 This wiring passes local synthetic checks, including different recommendations from the same measurements when the priority changes. The saved FP8 KV candidate remains rejected under every priority in quick mode because token agreement failed. The separate fit-first path below enables online weight quantization for the pinned 72B model without a feasible BF16 baseline. Arbitrary models and multi-GPU placement remain unsupported.
 
+For an explicit load sweep, pass `workload=sera.Workload(concurrency=[1, 2, 4, 8])`. Each load receives its own warm-up and three measured passes. Quality checks remain serial. The result stores every load separately; selection uses the worst per-load p95, not pooled latency percentiles. Throughput is total output tokens divided by the sum of measured window durations across the declared loads. Compare only runs with the same load list. The default remains concurrency 1.
+
+After the large model's FP8 weight plan works, pass `baseline_configuration=sera.RuntimeConfig(quantization="fp8_per_tensor")` with that model to compare batching against a feasible FP8 reference. The supported alternative changes only `max_num_batched_tokens` from 4096 to 2048. Both plans keep FP8 weights and BF16 KV. This is named `sera-fp8-weight-reference-v1`, not the non-fitting BF16 baseline and not the Qwen0.6B search benchmark. The approved four-load comparison is pending live measurement.
+
 ## Verified task requirements
 
 For known-answer tasks, supply a versioned evaluator and explicit limits:

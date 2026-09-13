@@ -70,3 +70,10 @@ def test_first_candidate_accepts_cache_or_batch_change():
     for config in [RuntimeConfig(kv_cache_dtype="fp8"), RuntimeConfig(max_num_batched_tokens=2048)]:
         candidate = Candidate(name="trial", reason="Measured hypothesis", config=config)
         assert validate_candidate(candidate) == candidate
+def test_batch_candidate_preserves_explicit_fp8_weight_reference():
+    from sera.config import Candidate, RuntimeConfig, validate_candidate
+    baseline = RuntimeConfig(quantization="fp8_per_tensor")
+    candidate = Candidate(name="batch-2048", reason="Compare batching after weights fit",
+                          config=RuntimeConfig(quantization="fp8_per_tensor", max_num_batched_tokens=2048))
+    assert validate_candidate(candidate, baseline=baseline) == candidate
+

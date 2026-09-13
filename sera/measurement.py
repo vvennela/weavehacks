@@ -2,9 +2,10 @@
 
 import math
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from .storage import save_json
-from .config import Constraints, Objective
+from .config import Constraints, Objective, Workload
 
 
 def nearest_rank(values, percentile):
@@ -30,12 +31,34 @@ def reduce_requests(requests, elapsed_seconds):
             "p95_ttft_ms": None, "p95_queue_ms": None, "p95_time_per_output_token_ms": None}
 
 
-def collect_trial(model, prompts, trial_id, *, baseline=False):
-    """Warm up, measure three serial passes, then collect separate quality passes."""
+def reduce_loads(loads):
+    """Worst per-load latency; throughput across the declared measurement windows."""
+    metrics = [load["reduced"] for load in loads]
+    result = {key: sum(item[key] for item in metrics) for key in
+              ("request_count", "successful_requests", "generation_errors", "request_wall_seconds",
+               "output_tokens", "input_tokens")}
+    for key in ("p50_latency_ms", "p95_latency_ms", "p99_latency_ms"):
+        values = [item[key] for item in metrics]
+        result[key] = max(values) if values and all(value is not None for value in values) else None
+    elapsed = result["request_wall_seconds"]
+    result.update(output_tokens_per_second=result["output_tokens"] / elapsed if elapsed > 0 else None,
+                  input_tokens_per_second=result["input_tokens"] / elapsed if elapsed > 0 else None,
+                  p99_reliable=False, p95_ttft_ms=None, p95_queue_ms=None, p95_time_per_output_token_ms=None)
+    return result
+
+
+def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
+    """Measure each declared load separately, then collect serial quality passes."""
+    workload = Workload() if workload is None else Workload.model_validate(workload)
+    if max(workload.concurrency) > model.configuration.max_num_seqs:
+        raise ValueError("Workload concurrency exceeds the service sequence limit")
     folder = model.artifact_dir
     record = {"trial_id": trial_id, "status": "running", "runtime": model.record,
               "config_hash": model.configuration.config_hash, "requests": [],
-              "warmup": [], "quality": [], "self_check": [], "metrics": {}}
+              "warmup": [], "quality": [], "self_check": [], "metrics": {}, "loads": [],
+              "workload": {**workload.model_dump(), "quality_concurrency": 1,
+                           "latency_reduction": "worst-per-load-percentile",
+                           "throughput_reduction": "total-tokens-over-total-measured-window-seconds"}}
 
     def save():
         save_json(folder / "trial.json", record)
@@ -66,19 +89,36 @@ def collect_trial(model, prompts, trial_id, *, baseline=False):
     try:
         prepared = [model.prepare(prompt) for prompt in prompts]
         record["input_token_ids"] = [tokens for _, tokens in prepared]
-        for index in range(min(len(prompts), 16)):
-            record["warmup"].append(request(prepared[index], index))
+        for concurrency in workload.concurrency:
+            load = {"concurrency": concurrency, "warmup": [], "requests": []}
+            record["loads"].append(load)
+            for index in range(min(len(prompts), 16)):
+                item = request(prepared[index], index)
+                load["warmup"].append(item)
+                record["warmup"].append(item)
+            prefix = "" if workload.concurrency == [1] else f"concurrency-{concurrency}-"
+            snapshot(prefix + "before-measurement")
+
+            def measured_request(index):
+                prompt_index = index % len(prompts)
+                return request(prepared[prompt_index], prompt_index)
+
+            # Keep file writes and metric scraping outside every measured window.
+            started = time.perf_counter()
+            indices = range(min(3 * len(prompts), 96))
+            if concurrency == 1:
+                load["requests"] = [measured_request(index) for index in indices]
+            else:
+                with ThreadPoolExecutor(max_workers=concurrency) as executor:
+                    load["requests"] = list(executor.map(measured_request, indices))
+            elapsed = time.perf_counter() - started
+            load["reduced"] = reduce_requests(load["requests"], elapsed)
+            record["requests"].extend(load["requests"])
+            snapshot(prefix + "after-measurement")
+            load["metrics"] = {name: record["metrics"][prefix + name]
+                               for name in ("before-measurement", "after-measurement")}
             save()
-        snapshot("before-measurement")
-        # Exclude local evidence writes and metrics scraping from the measured interval.
-        started = time.perf_counter()
-        for index in range(min(3 * len(prompts), 96)):
-            prompt_index = index % len(prompts)
-            record["requests"].append(request(prepared[prompt_index], prompt_index))
-        elapsed = time.perf_counter() - started
-        record["reduced"] = reduce_requests(record["requests"], elapsed)
-        save()
-        snapshot("after-measurement")
+        record["reduced"] = reduce_loads(record["loads"])
         for phase in (["quality", "self_check"] if baseline else ["quality"]):
             for index, item in enumerate(prepared):
                 record[phase].append(request(item, index))

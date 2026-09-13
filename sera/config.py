@@ -33,6 +33,22 @@ class Constraints(BaseModel):
     max_memory_mib: int | None = Field(default=None, gt=0)
 
 
+class Workload(BaseModel):
+    """Declared closed-loop client loads; quality is always checked serially."""
+
+    model_config = ConfigDict(strict=True, frozen=True, extra="forbid")
+    concurrency: list[int] = Field(default_factory=lambda: [1], min_length=1, max_length=4)
+
+    @field_validator("concurrency")
+    @classmethod
+    def validate_loads(cls, values):
+        if any(type(value) is not int or value not in {1, 2, 4, 8} for value in values):
+            raise ValueError("Supported concurrency levels are 1, 2, 4, and 8")
+        if values != sorted(set(values)):
+            raise ValueError("Concurrency levels must be unique and increasing")
+        return values
+
+
 class RuntimeConfig(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid", allow_inf_nan=False)
 
@@ -86,9 +102,9 @@ class Candidate(BaseModel):
 SUPPORTED_CHANGES = {"kv_cache_dtype": ["fp8"], "max_num_batched_tokens": [2048]}
 
 
-def validate_candidate(candidate: Candidate) -> Candidate:
+def validate_candidate(candidate: Candidate, *, baseline=None) -> Candidate:
     candidate = Candidate.model_validate(candidate.model_dump())
-    baseline = RuntimeConfig().model_dump()
+    baseline = (baseline or RuntimeConfig()).model_dump()
     changed = {key: value for key, value in candidate.config.model_dump().items()
                if value != baseline[key]}
     if len(changed) != 1:

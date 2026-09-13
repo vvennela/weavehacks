@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from .config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, RuntimeConfig
+from .config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, RuntimeConfig, Workload
 from .memory import fits_memory
 from .measurement import collect_trial, select_candidate
 from .quality import evaluate_quality
@@ -61,9 +61,10 @@ def fit_review_evidence(plan, trial, decision):
 
 
 def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_version,
-                 constraints, agent, provider_check):
+                 constraints, agent, provider_check, workload=None):
     from .pipeline import SeraResult
     from .provider_check import require_provider_check
+    workload = Workload() if workload is None else Workload.model_validate(workload)
 
     if evaluation is None or constraints is None:
         raise ValueError("Fit-first loading requires a versioned task evaluator and explicit quality floor")
@@ -86,9 +87,9 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
               "model_id": LARGE_MODEL_ID, "model_revision": LARGE_MODEL_REVISION,
               "prompts": prompts, "workload_hash": content_hash(prompts),
               "generation": {**GENERATION, "enable_thinking": False},
-              "workload": {"prompt_count": len(prompts), "concurrency": 1,
-                           "warmup_requests": min(len(prompts), 16),
-                           "measured_requests": 3 * len(prompts), "quality_requests": len(prompts)},
+              "workload": {"prompt_count": len(prompts), "concurrency": workload.concurrency,
+                           "warmup_requests_per_load": min(len(prompts), 16),
+                           "measured_requests_per_load": 3 * len(prompts), "quality_requests": len(prompts)},
               "objective": objective.model_dump(), "constraints": constraints.model_dump(),
               "evaluation": {"version": evaluation_version}, "task_quality_verified": False,
               "provider_validation": provider_validation, "fit_plan": plan, "gpu": gpu,
@@ -131,7 +132,7 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
                                revision=LARGE_MODEL_REVISION, configuration=configuration)
             try:
                 active.start()
-                trial = collect_trial(active, prompts, "candidate")
+                trial = collect_trial(active, prompts, "candidate", workload=workload)
             except CleanupError:
                 raise
             except Exception as failure:

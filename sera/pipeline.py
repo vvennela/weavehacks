@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from .config import BASELINE_NAME, LARGE_MODEL_ID, MODEL_ID, MODEL_REVISION, Candidate, Constraints, Objective, RuntimeConfig, validate_candidate
+from .config import BASELINE_NAME, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, Candidate, Constraints, Objective, RuntimeConfig, Workload, validate_candidate
 from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
@@ -20,13 +20,16 @@ def agent_evidence(baseline, objective=None, constraints=None):
                    mean_ttft_ms=snapshot.get("mean_ttft_ms"),
                    preemptions=snapshot.get("preemptions"),
                    sampled_peak_memory_mib=baseline["runtime"].get("sampled_peak_memory_mib"))
-    return {"trial_id": "baseline", "model_id": MODEL_ID, "revision": MODEL_REVISION,
+    model_id = baseline["runtime"].get("model_id", MODEL_ID)
+    supported = SUPPORTED_CHANGES if model_id == MODEL_ID else {"max_num_batched_tokens": [2048]}
+    return {"trial_id": "baseline", "model_id": model_id,
+            "revision": baseline["runtime"].get("revision", MODEL_REVISION),
             "objective": (objective or Objective()).model_dump(),
             "constraints": constraints.model_dump() if constraints is not None else None,
             "quality_mode": "verified" if constraints is not None else "token-agreement",
             "task_quality": baseline.get("task_quality"),
             "configuration": baseline["runtime"]["configuration"],
-            "metrics": metrics, "remaining_trials": 1, "supported_changes": SUPPORTED_CHANGES,
+            "metrics": metrics, "remaining_trials": 1, "supported_changes": supported,
             "baseline_self_check": token_agreement(baseline["quality"], baseline["self_check"]),
             "limitations": ["No measured KV peak in this serial run; idle KV use is not pressure evidence.",
                             "Token agreement does not establish task correctness.",
@@ -124,13 +127,15 @@ def render_summary(report, output_dir):
 
 
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
-             objective=None, evaluation=None, evaluation_version=None, constraints=None):
+             objective=None, evaluation=None, evaluation_version=None, constraints=None,
+             workload=None, baseline_configuration=None):
     """One measured candidate, fixed or agent-proposed; no joint placement or search claim.
 
     Uses at most 32 supplied prompts, serial load, up to 16 warm-ups, three
     measured passes, and separate quality passes. The caller owns result.close().
     """
     objective = Objective() if objective is None else Objective.model_validate(objective)
+    workload = Workload() if workload is None else Workload.model_validate(workload)
     if evaluation is None:
         if constraints is not None or evaluation_version is not None:
             raise ValueError("Verified constraints require an evaluation callable and its version")
@@ -151,13 +156,24 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     for prompt in prompts:
         if not isinstance(prompt, (str, list)) or not prompt:
             raise ValueError("Each prompt must be nonempty text or chat messages")
-    if models == [LARGE_MODEL_ID]:
+    model_id = models[0]
+    revision = LARGE_MODEL_REVISION if model_id == LARGE_MODEL_ID else MODEL_REVISION
+    if model_id == LARGE_MODEL_ID and baseline_configuration is None:
         from .fit import optimize_fit
         if candidate is not None:
             raise ValueError("The fit-first path selects its candidate from the validated memory plans")
         return optimize_fit(prompts=prompts, output_dir=output_dir, objective=objective,
                             evaluation=evaluation, evaluation_version=evaluation_version,
-                            constraints=constraints, agent=agent, provider_check=provider_check)
+                            constraints=constraints, agent=agent, provider_check=provider_check,
+                            workload=workload)
+    baseline_config = RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(baseline_configuration)
+    if baseline_configuration is not None:
+        if model_id != LARGE_MODEL_ID or baseline_config != RuntimeConfig(quantization="fp8_per_tensor"):
+            raise ValueError("An explicit reference is supported only for the proven Qwen72B FP8 weight plan")
+        if evaluation is None:
+            raise ValueError("The Qwen72B comparison requires verified task requirements")
+    if max(workload.concurrency) > baseline_config.max_num_seqs:
+        raise ValueError("Workload concurrency exceeds the reference sequence limit")
     provider_validation = None
     if agent is not None:
         from .provider_check import require_provider_check
@@ -167,20 +183,29 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         history_start = len(agent.history)
     else:
         candidate = validate_candidate(candidate if candidate is not None else Candidate(
-            name="kv-fp8", reason="The predeclared first candidate changes only the checked KV precision",
-            config=RuntimeConfig(kv_cache_dtype="fp8")))
+            name="batch-2048" if model_id == LARGE_MODEL_ID else "kv-fp8",
+            reason="Test one predeclared supported change against the reference",
+            config=RuntimeConfig.model_validate(baseline_config.model_dump() | (
+                {"max_num_batched_tokens": 2048} if model_id == LARGE_MODEL_ID else {"kv_cache_dtype": "fp8"}))),
+            baseline=baseline_config)
+        if model_id == LARGE_MODEL_ID and candidate.config.kv_cache_dtype != "auto":
+            raise ValueError("Combined FP8 weights and FP8 KV are not enabled for Qwen72B")
     folder = Path(output_dir or Path("sera-runs") / uuid.uuid4().hex).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     report = {"schema_version": "sera-single-model-v1", "status": "running",
               "created_at": datetime.now(timezone.utc).isoformat(),
               "mode": "agent-guided" if agent is not None else "fixed-candidate",
-              "model_id": MODEL_ID, "model_revision": MODEL_REVISION,
-              "baseline_name": BASELINE_NAME, "candidate": candidate.model_dump() if candidate else None,
+              "model_id": model_id, "model_revision": revision,
+              "baseline_name": "sera-fp8-weight-reference-v1" if model_id == LARGE_MODEL_ID else BASELINE_NAME,
+              "baseline_configuration": baseline_config.model_dump(),
+              "candidate": candidate.model_dump() if candidate else None,
               "prompts": prompts, "workload_hash": content_hash(prompts),
               "generation": {**GENERATION, "enable_thinking": False},
-              "workload": {"prompt_count": len(prompts), "concurrency": 1,
-                           "warmup_requests": min(len(prompts), 16),
-                           "measured_requests": 3 * len(prompts), "quality_requests": len(prompts)},
+              "workload": {"prompt_count": len(prompts), "concurrency": workload.concurrency,
+                           "warmup_requests_per_load": min(len(prompts), 16),
+                           "measured_requests_per_load": 3 * len(prompts), "quality_requests": len(prompts),
+                           "quality_concurrency": 1, "latency_reduction": "worst-per-load-percentile",
+                           "throughput_reduction": "total-tokens-over-total-measured-window-seconds"},
               "task_quality_verified": False,
               "constraints": constraints.model_dump() if constraints is not None else None,
               "evaluation": {"version": evaluation_version, "signature": "evaluation(prompt, output) -> score in [0, 1]"}
@@ -196,9 +221,10 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     active = None
     result._save()
     try:
-        active = SeraModel(artifact_dir=folder / "baseline")
+        active = SeraModel(artifact_dir=folder / "baseline", model_id=model_id,
+                           revision=revision, configuration=baseline_config)
         active.start()
-        report["baseline"] = collect_trial(active, prompts, "baseline", baseline=True)
+        report["baseline"] = collect_trial(active, prompts, "baseline", baseline=True, workload=workload)
         if evaluation is not None:
             report["baseline"]["task_quality"] = evaluate_quality(report["baseline"], prompts, evaluation,
                 version=evaluation_version, floor=constraints.quality_floor)
@@ -230,10 +256,11 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         if baseline["status"] == "collected" and can_compare and candidate is not None:
             active.close()
             result._save()
-            active = SeraModel(artifact_dir=folder / "candidate", configuration=candidate.config)
+            active = SeraModel(artifact_dir=folder / "candidate", configuration=candidate.config,
+                               model_id=model_id, revision=revision)
             try:
                 active.start()
-                trial = collect_trial(active, prompts, "candidate")
+                trial = collect_trial(active, prompts, "candidate", workload=workload)
             except CleanupError:
                 raise
             except Exception as error:
@@ -278,7 +305,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             return result
         if report["decision"]["selected"] == "baseline" and trial is not None:
             active.close()
-            active = SeraModel(artifact_dir=folder / "returned-baseline")
+            active = SeraModel(artifact_dir=folder / "returned-baseline", configuration=baseline_config,
+                               model_id=model_id, revision=revision)
             active.start()
         if baseline["status"] != "collected":
             raise RuntimeError("Baseline measurement failed; see the saved trial before retrying")
