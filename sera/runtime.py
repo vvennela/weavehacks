@@ -5,6 +5,7 @@ import importlib.metadata
 import json
 import os
 from pathlib import Path
+import shlex
 import signal
 import socket
 import subprocess
@@ -52,6 +53,27 @@ def gpu_snapshot() -> dict:
             "total_mib": int(total), "used_mib": int(used), "driver": driver}
 
 
+def _cuda13_include_dirs(cuda_root: Path) -> list[Path]:
+    """Find installed CUDA-13 headers, including wheels in a visible base environment."""
+    include_dirs = set()
+    for package in importlib.metadata.distributions():
+        name = package.metadata.get("Name", "").lower().replace("_", "-")
+        if not name.startswith("nvidia-"):
+            continue
+        for entry in package.files or []:
+            if (entry.parts[:3] == ("nvidia", "cu13", "include")
+                    and entry.suffix in {".h", ".hpp", ".cuh"}
+                    and Path(package.locate_file(entry)).is_file()):
+                include_dirs.add(Path(package.locate_file(Path("nvidia/cu13/include"))))
+                break
+    compiler_include = cuda_root / "include"
+    ordered = ([compiler_include] if compiler_include.is_dir() else [])
+    ordered.extend(sorted(include_dirs - set(ordered)))
+    if not any((folder / "curand.h").is_file() for folder in ordered):
+        raise RuntimeError("Installed CUDA 13 wheels contain no available curand.h")
+    return ordered
+
+
 def _child_environment(folder: Path, gpu_uuid: str) -> dict:
     env = dict(os.environ, CUDA_VISIBLE_DEVICES=gpu_uuid, OMP_NUM_THREADS="2")
     # Apply the smoke-checked CUDA wheel linker fix only when that wheel exists.
@@ -67,6 +89,12 @@ def _child_environment(folder: Path, gpu_uuid: str) -> dict:
     library = cuda_root / "lib" / "libcudart.so.13"
     if not library.is_file():
         raise RuntimeError("CUDA 13 compiler/runtime libraries do not match the checked setup")
+    includes = _cuda13_include_dirs(cuda_root)
+    # NVCC supports these injected flags; do not copy headers into the compiler wheel.
+    # https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/#nvcc-environment-variables
+    include_flags = shlex.join([flag for path in includes for flag in ("-I", str(path))])
+    inherited_flags = env.get("NVCC_PREPEND_FLAGS", "")
+    env["NVCC_PREPEND_FLAGS"] = include_flags + (" " + inherited_flags if inherited_flags else "")
     link_dir = folder / "cuda-link"
     link_dir.mkdir()
     (link_dir / "libcudart.so").symlink_to(library)
