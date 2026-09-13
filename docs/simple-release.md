@@ -25,6 +25,10 @@ partner's independent `sera_loop` package; its rule-based loop and reports are
 not the measured investigator swarm documented here. Use `import sera` for this
 API.
 
+See the [checked GPU runtime contract](gpu-runtime-contract.md) for the recorded
+package versions and optional constraints. The broad `gpu` extra is not a
+tested clean-install recipe; keep the working GPU environment.
+
 Activate the virtual environment that contains the GPU runtime. Build from the
 release checkout, then install the wheel into that same environment:
 
