@@ -204,6 +204,10 @@ After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `
 
 `--swarm` enables three independent investigators: scheduling, memory/context, and output quality. They choose read-only inspections of persisted Weave records, work concurrently, then read the same shared findings board and refine their proposals. An arbiter can select at most one GPU experiment per round. GPU trials stay sequential.
 
+The investigators are not tied to one hosted model. Both `experiments.run_investigation` and `experiments.replay_failure_investigation` accept `--agent-model`. The default remains `openai/gpt-oss-20b`. Before selecting another W&B model, run `python -m sera.provider_check --project ENTITY/PROJECT --model MODEL_ID --output-dir NEW_DIRECTORY` and pass its matching certificate. A certificate for one model cannot authorize another. The format check does not certify factual reasoning.
+
+Swarm model requests now separate measured facts from peer opinions and omit old response objects. Full source evidence, the actual transmitted compact prompt, and both hashes remain in the audit record. The separate [Astra diagnostic](evidence/astra-swarm-diagnostic-v1/README.md) used Codex subagents, not this hosted runtime, and was not blind.
+
 Use `--swarm --auto-space --budget 2` with the live command below. Weave is required; `--swarm --no-weave` is rejected. The Python interface is `optimize(..., swarm=True, trace_reader=reader)` with a forkable agent and a budget. The command supplies the traced reader automatically. Ordinary calls keep the existing staged loop.
 
 Each inspection records its source call IDs and output hashes. Missing or incomplete remote evidence is marked as a failed inspection; it is not replaced by local outputs. Model answers and peer findings are data, not instructions. These analysis roles do not add multi-GPU controls or enable unverified precision settings.
