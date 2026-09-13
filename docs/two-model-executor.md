@@ -30,7 +30,11 @@ implementation does not change questions, scores, thresholds, or model choices.
 - A new output directory. Existing results are never overwritten.
 
 The plan keeps 10% of the declared budget outside service allocations. Each
-`gpu_memory_utilization` must equal service bytes divided by physical GPU bytes.
+`gpu_memory_utilization` must not exceed service bytes divided by physical GPU bytes.
+It can be lower to reserve process overhead inside the hard service allocation.
+The server fraction is not the process's total measured memory: the actual
+per-service and device memory gates remain unchanged. An overhead allowance is
+an explicit estimate, not a guarantee that the process will stay below its cap.
 Unsupported precision combinations remain disabled. No automatic calibration,
 new precision approval, or allocation choice occurs inside this call.
 

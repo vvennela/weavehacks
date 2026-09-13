@@ -79,8 +79,8 @@ class PlacementPlan(_PlacementRecord):
             if service.configuration.tensor_parallel_size != 1:
                 raise ValueError('Shared single-GPU placement requires tensor_parallel_size=1')
             fraction = service.allocation_bytes / self.physical_gpu_bytes
-            if service.configuration.gpu_memory_utilization != fraction:
-                raise ValueError('Service memory fraction must equal allocated bytes / physical GPU bytes')
+            if service.configuration.gpu_memory_utilization > fraction:
+                raise ValueError('Server memory fraction must not exceed allocated bytes / physical GPU bytes')
         return self
 
     @property

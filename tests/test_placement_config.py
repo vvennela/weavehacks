@@ -116,6 +116,22 @@ def test_fraction_uses_physical_capacity_not_declared_budget():
         validate(data)
 
 
+def test_server_fraction_can_reserve_process_overhead_inside_hard_service_allocation():
+    data = valid_plan()
+    data['services'][0]['configuration']['gpu_memory_utilization'] = .10
+    plan = validate(data)
+    assert plan.services[0].allocation_bytes == 200
+    assert plan.services[0].configuration.gpu_memory_utilization == .10
+    assert sum(service.allocation_bytes for service in plan.services) == 720
+
+
+def test_server_fraction_cannot_exceed_the_hard_service_allocation():
+    data = valid_plan()
+    data['services'][0]['configuration']['gpu_memory_utilization'] = .200001
+    with pytest.raises(ValidationError):
+        validate(data)
+
+
 @pytest.mark.parametrize('change', [
     {'kv_cache_memory_bytes': 100}, {'tensor_parallel_size': 2},
     {'max_model_len': 4097}, {'max_num_batched_tokens': 7},
