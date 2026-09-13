@@ -310,15 +310,95 @@ class Audit:
                     limitation='A recorded startup failure is feedback, not a measured quality or performance result. '
                                'Rejected raw reviews are preserved, not relabeled as validated or delivered to later agents.')
 
-    def trials(self, rounds, trials):
+    def plateau(self, rounds, trials, launch):
+        from sera.config import Constraints, Objective
+        from sera.investigation import objective_progress
+        from sera.measurement import measured_frontier, objective_value
+
+        search = self.report.get('search') or {}
+        stop = search.get('stop_reason')
+        result = dict(mode='until-plateau', confirmation_trial_executed=False,
+                      objective_plateau_confirmed=False, stop_reason=stop)
+        command = launch.get('command') if isinstance(launch, dict) else None
+        self.require(isinstance(command, list) and all(isinstance(part, str) for part in command)
+                     and 'experiments.run_investigation' in command and '--until-plateau' in command
+                     and not any(part == '--budget' or part.startswith('--budget=') for part in command)
+                     and 'total_trial_cap' in launch and launch['total_trial_cap'] is None
+                     and launch.get('stop_policy') == 'plateau-plus-one-confirmation-round',
+                     'plateau-launch', 'Uncapped search needs the actual uncapped GPU launch record.')
+        try:
+            objective = Objective.model_validate(self.report['objective'])
+            constraints = Constraints.model_validate(self.report['constraints'])
+            baseline = self.report['baseline']
+            state = dict(priority=objective.priority,
+                min_improvement_fraction=objective.min_improvement_fraction,
+                best_quality_valid_value=objective_value(baseline, objective.priority)
+                    if measured_frontier(baseline, None, constraints=constraints) else None,
+                consecutive_no_progress_rounds=0, confirmation_round_pending=False, history=[])
+            valid = isinstance(search.get('plateau'), dict)
+            for index, row in enumerate(rounds, 1):
+                pending = state['confirmation_round_pending']
+                valid &= row.get('round') == index and row.get('confirmation_round') is pending
+                for check in row.get('specialists', []):
+                    for key in ('initial_evidence', 'evidence'):
+                        supplied = check.get(key) or {}
+                        valid &= (supplied.get('search_policy') == 'until-plateau'
+                                  and 'total_trial_cap' in supplied and supplied['total_trial_cap'] is None
+                                  and 'remaining_trials' in supplied and supplied['remaining_trials'] is None
+                                  and supplied.get('round_trial_capacity') == 1
+                                  and supplied.get('plateau') == state)
+                executed = [trials[identifier] for identifier in row.get('trial_ids', [])]
+                if not executed:
+                    valid &= 'objective_progress' not in row and index == len(rounds)
+                    continue
+                valid &= state['consecutive_no_progress_rounds'] < 2
+                result['confirmation_trial_executed'] |= pending
+                progress = objective_progress(state, baseline, executed, objective=objective,
+                    constraints=constraints, round_number=index)
+                valid &= row.get('objective_progress') == progress
+            valid &= state == search.get('plateau')
+            self.require(valid, 'plateau-history',
+                         'Saved policy, per-round progress and confirmation state must recompute from measured trials.')
+            if stop == 'objective-plateau-confirmed':
+                result['objective_plateau_confirmed'] = (result['confirmation_trial_executed']
+                    and state['consecutive_no_progress_rounds'] >= 2)
+                self.require(result['objective_plateau_confirmed'], 'plateau-stop',
+                             'A plateau stop requires an executed confirmation without qualifying progress.')
+            else:
+                self.require(stop in {'arbiter-declined', 'specialists-abstained', 'no-legal-untested-candidate'}
+                             and state['consecutive_no_progress_rounds'] < 2, 'plateau-stop',
+                             'A different legitimate stop must remain distinct from a confirmed plateau.')
+        except (KeyError, TypeError, ValueError, AttributeError):
+            self.require(False, 'plateau-history', 'Malformed or missing plateau evidence cannot establish the policy.')
+        self.require(result['confirmation_trial_executed'], 'plateau-confirmation',
+                     'An actual new-candidate confirmation trial must follow the first plateau.')
+        return result
+
+    def trials(self, rounds, trials, *, launch=None):
         ids = [identifier for row in rounds for identifier in row.get('trial_ids', [])]
         search = self.report.get('search') or {}
         budget = (search.get('budget') or {}).get('max_candidate_trials')
-        self.require(all(len(row.get('trial_ids', [])) <= 1 for row in rounds)
-                     and 1 <= len(ids) <= 2 and len(set(ids)) == len(ids) and set(ids) == set(trials)
-                     and search.get('trials_used') == len(ids) + search.get('initial_trials_used', 0)
-                     and type(budget) is int and 1 <= search['trials_used'] <= budget <= 2,
-                     'trial-budget', 'One unique candidate per round, at most two, with matching saved trial counts.')
+        uncapped = budget is None and 'max_candidate_trials' in (search.get('budget') or {})
+        policy = None
+        if uncapped:
+            initial = 1 if self.report.get('deployment') else 0
+            self.require(all(len(row.get('trial_ids', [])) <= 1 for row in rounds)
+                         and bool(ids) and len(set(ids)) == len(ids) and set(ids) == set(trials)
+                         and len(trials) == len(self.report.get('search_trials', trials))
+                         and type(search.get('trials_used')) is int
+                         and type(search.get('initial_trials_used')) is int
+                         and search['initial_trials_used'] == initial
+                         and search['trials_used'] == initial + len(ids),
+                         'trial-budget', 'Uncapped search must count every unique executed trial, including deployment.')
+            policy = self.plateau(rounds, trials, launch)
+        else:
+            self.require('plateau' not in search, 'trial-budget',
+                         'A plateau policy requires an explicit null total trial cap.')
+            self.require(all(len(row.get('trial_ids', [])) <= 1 for row in rounds)
+                         and 1 <= len(ids) <= 2 and len(set(ids)) == len(ids) and set(ids) == set(trials)
+                         and search.get('trials_used') == len(ids) + search.get('initial_trials_used', 0)
+                         and type(budget) is int and 1 <= search['trials_used'] <= budget <= 2,
+                         'trial-budget', 'One unique candidate per round, at most two, with matching saved trial counts.')
         configs = [trial.get('config_hash') for trial in trials.values()]
         self.require(len(configs) == len(set(configs)) and
                      (self.report.get('baseline') or {}).get('config_hash') not in configs,
@@ -351,6 +431,7 @@ class Audit:
                 else:
                     self.require(len(metrics) == 1 and metrics[0]['output'].get('reduced') == trial.get('reduced'),
                                  'measured-trial', f'{identifier} needs matching persisted trial metrics.')
+        return policy
 
     def returned(self):
         report = self.report
@@ -403,7 +484,7 @@ class Audit:
                           'Matching diagnosis records do not prove the agents understood or used them.')
 
 
-def verify_swarm(report, calls_dump):
+def verify_swarm(report, calls_dump, *, launch=None):
     """Return independent execution, proposal-diversity and performance verdicts."""
     audit = Audit(report, calls_dump)
     rounds = (report.get('search') or {}).get('rounds') or []
@@ -423,7 +504,7 @@ def verify_swarm(report, calls_dump):
             for t in scoped_trials}
         audit.round(row, expected_scope)
         scoped_trials.extend(trials[identifier] for identifier in row.get('trial_ids', []) if identifier in trials)
-    audit.trials(rounds, trials)
+    policy = audit.trials(rounds, trials, launch=launch)
     feedback = audit.feedback(rounds, trials)
     audit.returned()
     diagnosis = audit.diagnoses(rounds, trials)
@@ -445,6 +526,9 @@ def verify_swarm(report, calls_dump):
                          and trial.get('decision', {}).get('selected') == 'candidate')
     initial = [_candidate_count(row.get('specialists', []), 'initial_proposal') for row in rounds]
     refined = [_candidate_count(row.get('specialists', []), 'proposal') for row in rounds]
+    source_hashes = dict(result=content_hash(report), calls=content_hash(calls_dump))
+    if launch is not None:
+        source_hashes['launch'] = content_hash(launch)
     return dict(schema_version='sera-swarm-evidence-verification-v1', execution_passed=not audit.issues,
         issues=audit.issues, decision_rounds=len(rounds), candidate_trials=len(trials),
         saved_profile=dict(model_id=report.get('model_id'), model_revision=report.get('model_revision'),
@@ -452,10 +536,10 @@ def verify_swarm(report, calls_dump):
             task_count=len(report.get('evaluation_cases') or []), constraints=report.get('constraints'),
             workload=report.get('workload'), baseline_configuration=(report.get('baseline') or {}).get(
                 'runtime', {}).get('configuration')),
-        source_hashes=dict(result=content_hash(report), calls=content_hash(calls_dump)),
+        source_hashes=source_hashes,
         root_call_id=audit.root_id, trace_id=audit.trace_id,
         normalized_call_references=audit.normalized_call_references,
-        feedback=feedback,
+        feedback=feedback, search_policy=policy,
         failure_diagnosis=diagnosis,
         proposal_diversity=dict(initial_distinct_candidates=initial, refined_distinct_candidates=refined,
             initial_alternatives_observed=any(n > 1 for n in initial),
@@ -473,8 +557,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--result', type=Path, required=True)
     parser.add_argument('--calls', type=Path, required=True)
+    parser.add_argument('--launch', type=Path, help='Actual GPU launch record; required for uncapped plateau runs')
     args = parser.parse_args(argv)
-    result = verify_swarm(json.loads(args.result.read_text()), json.loads(args.calls.read_text()))
+    result = verify_swarm(json.loads(args.result.read_text()), json.loads(args.calls.read_text()),
+                          launch=json.loads(args.launch.read_text()) if args.launch else None)
     print(json.dumps(result, indent=2, allow_nan=False))
     return 0 if result['execution_passed'] else 1
 

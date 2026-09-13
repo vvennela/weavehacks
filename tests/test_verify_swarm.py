@@ -24,6 +24,104 @@ def test_historical_token_summaries_can_be_absent_but_not_falsified():
 ROLES = ('scheduling', 'memory_context', 'output_quality')
 
 
+def plateau_trial_fixture(values=(99, 98)):
+    from sera.config import Constraints, Objective
+    from sera.investigation import objective_progress
+    baseline = dict(trial_id='baseline', status='collected', config_hash='baseline',
+        reduced={'p95_latency_ms': 100}, task_quality={'valid_outputs': True, 'mean': 1},
+        runtime={'configuration': {'max_num_batched_tokens': 4096}})
+    report = dict(baseline=baseline, deployment={'candidate_trial': {'trial_id': 'candidate'}},
+        objective={'priority': 'latency', 'min_improvement_fraction': .05},
+        constraints={'quality_floor': .99}, search={'budget': {'max_candidate_trials': None},
+        'initial_trials_used': 1, 'trials_used': 1 + len(values), 'rounds': [],
+        'stop_reason': 'objective-plateau-confirmed'})
+    state = dict(priority='latency', min_improvement_fraction=.05, best_quality_valid_value=100,
+                 consecutive_no_progress_rounds=0, confirmation_round_pending=False, history=[])
+    trials, calls = {}, []
+    for index, value in enumerate(values, 1):
+        config = {'max_num_batched_tokens': 4096 // (2 ** index)}
+        proposal = {'proposal_id': f'proposal-{index}', 'changed_lever': 'max_num_batched_tokens',
+                    'proposed_value': config['max_num_batched_tokens']}
+        trial = deepcopy(baseline) | dict(trial_id=f'trial-{index+1}', config_hash=content_hash(config),
+            reduced={'p95_latency_ms': value}, runtime={'configuration': config},
+            investigator_id='scheduling', arbiter_proposal_id=f'scheduling:{index}', proposal=proposal)
+        trials[trial['trial_id']] = trial
+        evidence = dict(search_policy='until-plateau', remaining_trials=None, total_trial_cap=None,
+                        round_trial_capacity=1, plateau=deepcopy(state))
+        row = dict(round=index, trial_ids=[trial['trial_id']],
+            confirmation_round=state['confirmation_round_pending'],
+            specialists=[dict(initial_evidence=deepcopy(evidence), evidence=deepcopy(evidence))],
+            arbiter={'ranked_proposal_ids': [trial['arbiter_proposal_id']]},
+            arbiter_evidence={'proposal_id_map': {trial['arbiter_proposal_id']: {
+                'investigator_id': 'scheduling', 'original_proposal_id': proposal['proposal_id']}}})
+        row['objective_progress'] = objective_progress(state, baseline, [trial],
+            objective=Objective.model_validate(report['objective']),
+            constraints=Constraints.model_validate(report['constraints']), round_number=index)
+        report['search']['rounds'].append(row)
+        calls.append(dict(id=f'call-{index}', op_name='recorded_trial_metrics', output={
+            'trial_id': trial['trial_id'], 'config_hash': trial['config_hash'], 'reduced': trial['reduced']}))
+    report['search']['plateau'] = state
+    launch = dict(command=['python', '-m', 'experiments.run_investigation', '--until-plateau'],
+        total_trial_cap=None, stop_policy='plateau-plus-one-confirmation-round')
+    return report, {'calls': calls}, trials, launch
+
+
+@pytest.mark.parametrize('values', [(99, 98), (90, 89, 88)])
+def test_uncapped_trial_accounting_and_confirmed_plateau(values):
+    from experiments.verify_swarm import Audit
+    report, dump, trials, launch = plateau_trial_fixture(values)
+    audit = Audit(report, dump)
+    policy = audit.trials(report['search']['rounds'], trials, launch=launch)
+    assert audit.issues == []
+    assert policy['confirmation_trial_executed'] is True
+    assert policy['objective_plateau_confirmed'] is True
+    assert report['search']['trials_used'] == 1 + len(values)
+
+
+@pytest.mark.parametrize('damage', [
+    'missing-policy', 'missing-launch', 'capped-launch', 'accounting', 'duplicate',
+    'fake-confirmation', 'progress', 'history', 'fake-agent-cap', 'premature-stop',
+])
+def test_uncapped_audit_rejects_false_policy_or_confirmation(damage):
+    from experiments.verify_swarm import Audit
+    report, dump, trials, launch = plateau_trial_fixture()
+    search = report['search']
+    if damage == 'missing-policy': search.pop('plateau')
+    elif damage == 'missing-launch': launch = None
+    elif damage == 'capped-launch': launch['command'] += ['--budget', '8']
+    elif damage == 'accounting': search['trials_used'] = 2
+    elif damage == 'duplicate': search['rounds'][1]['trial_ids'] = search['rounds'][0]['trial_ids'][:]
+    elif damage == 'fake-confirmation': search['rounds'][1]['confirmation_round'] = False
+    elif damage == 'progress': search['rounds'][0]['objective_progress']['qualifying_progress'] = True
+    elif damage == 'history': search['plateau']['history'].clear()
+    elif damage == 'fake-agent-cap': search['rounds'][0]['specialists'][0]['evidence']['total_trial_cap'] = 8
+    elif damage == 'premature-stop':
+        report, dump, trials, launch = plateau_trial_fixture((99,))
+    audit = Audit(report, dump)
+    audit.trials(report['search']['rounds'], trials, launch=launch)
+    assert audit.issues
+
+
+def test_abstention_before_confirmation_is_reported_not_established():
+    from experiments.verify_swarm import Audit
+    report, dump, trials, launch = plateau_trial_fixture((99,))
+    report['search']['stop_reason'] = 'arbiter-declined'
+    audit = Audit(report, dump)
+    policy = audit.trials(report['search']['rounds'], trials, launch=launch)
+    assert policy['confirmation_trial_executed'] is False
+    assert policy['objective_plateau_confirmed'] is False
+    assert policy['stop_reason'] == 'arbiter-declined'
+    assert any(issue['check'] == 'plateau-confirmation' for issue in audit.issues)
+
+
+def test_bounded_header_cannot_disguise_a_plateau_policy():
+    report, dump = fixture()
+    report['search']['plateau'] = {}
+    result = verify_swarm(report, dump)
+    assert result['execution_passed'] is False
+    assert any(issue['check'] == 'trial-budget' for issue in result['issues'])
+
+
 def fixture(with_diagnosis=False, query='load_metrics', task_diagnostics=False, failed_startup=False):
     calls = []
 
