@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Sera">
+  <title>Sera</title>
+  <rect width="32" height="32" rx="7" fill="#f6f5f0"/>
+  <g stroke="#286555" stroke-width="3" stroke-linecap="round">
+    <path d="M16 4.6V27.4"/>
+    <path d="M4.6 16H27.4"/>
+    <path d="M7.94 7.94 24.06 24.06"/>
+    <path d="M24.06 7.94 7.94 24.06"/>
+  </g>
+</svg>

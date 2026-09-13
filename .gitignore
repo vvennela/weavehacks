@@ -40,3 +40,7 @@ models/
 
 # Generated marimo WASM export (scripts/build_notebook.sh rebuilds it)
 output/notebook/
+
+# Local deploy staging. Rebuilt from output/ and web/; 28MB of copies, not source.
+build/
+deploy/vercel/api/__pycache__/

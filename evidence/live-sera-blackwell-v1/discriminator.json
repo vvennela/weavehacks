@@ -1,0 +1,83 @@
+{
+  "note": "Three producers run against the identical spec (runs/live_qwen3_8b_blackwell.yaml) and seed (7). Only one of them matches the ledger row.",
+  "spec": "runs/live_qwen3_8b_blackwell.yaml",
+  "seed": 7,
+  "ledger_row_p1_qwen3_8b_r0_2c41ad": {
+    "p50_latency_ms": 1781.0216717841954,
+    "p95_latency_ms": 2141.7419758694614,
+    "throughput_rps": 1.049701350585246,
+    "footprint_gb": 16.571187612267718,
+    "kv_occupancy": 0.0027898893785482486,
+    "preemptions": 0,
+    "mem_bandwidth_util": null,
+    "mean_batch_size": 2.267326732673267
+  },
+  "analytic_simulator_SimRunner": {
+    "p50_latency_ms": 2697.3019011060833,
+    "p95_latency_ms": 3708.2822570717144,
+    "throughput_rps": 1.0510782085839119,
+    "footprint_gb": 16.883626950793296,
+    "kv_occupancy": 0.007881797655501161,
+    "preemptions": 0,
+    "mem_bandwidth_util": 0.5248115179024175,
+    "mean_batch_size": 2.9628330995792425
+  },
+  "fake_vllm_server_VllmRunner_fake_launcher": {
+    "p50_latency_ms": 272.84001826434337,
+    "p95_latency_ms": 326.4498267379053,
+    "throughput_rps": 1.097096099369877,
+    "footprint_gb": 17.119393103448274,
+    "kv_occupancy": 0.011724137931034488,
+    "preemptions": 0,
+    "mem_bandwidth_util": null,
+    "mean_batch_size": 1.1724137931034482
+  },
+  "independent_gpu_baseline_sweep": {
+    "source": "evidence/live-blackwell-baseline-v1/summary.json",
+    "concurrency_2": {
+      "e2e_p50_ms": 1921.0,
+      "e2e_p95_ms": 1923.39,
+      "throughput_rps": 1.0406
+    },
+    "concurrency_4": {
+      "e2e_p50_ms": 2022.94,
+      "e2e_p95_ms": 2031.54
+    },
+    "concurrency_8": {
+      "e2e_p50_ms": 2269.91,
+      "e2e_p95_ms": 2278.19
+    }
+  },
+  "footprint_reconstruction": {
+    "formula": "weights_gb(model,cfg) + kv_cache_gb_per_token(model,cfg) * measured_kv_occupancy * _kv_capacity_tokens(...)  [vllm_runner.py:431-433]",
+    "weights_gb": 16.4,
+    "kv_capacity_tokens": 416124.1319444445,
+    "recomputed": 16.571187612267718,
+    "ledger_value": 16.571187612267718,
+    "exact_match": true
+  },
+  "arithmetic_fingerprints": {
+    "mean_batch_size": {
+      "value": 2.267326732673267,
+      "exact_fraction": "229/101",
+      "reading": "101 Prometheus gauge samples with vllm:num_requests_running > 0, summing to 229. At SAMPLE_INTERVAL_S=0.25s that is ~25.3s of in-flight sampling inside a ~31.4s wall."
+    },
+    "throughput_rps": {
+      "value": 1.049701350585246,
+      "trace_requests": 33,
+      "implied_wall_s": 31.437513137999986,
+      "trace_last_arrival_s": 29.8326,
+      "reading": "33/31.4375 s. Wall = last arrival 29.83s + ~1.6s drain. All 33 requests completed."
+    }
+  },
+  "timing": {
+    "run_start_utc": "2026-09-13T18:34:50Z",
+    "row_r0_utc": "2026-09-13T18:36:52Z",
+    "delta_s": 122.0,
+    "row_r1_utc": "2026-09-13T18:41:52Z",
+    "delta_from_r0_s": 300.054,
+    "HEALTH_TIMEOUT_S_in_code": 300.0,
+    "fake_launcher_startup_s": 0.02,
+    "fake_path_total_elapsed_s_measured_locally": 30.7
+  }
+}
