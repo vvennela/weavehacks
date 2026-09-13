@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
-from .config import BASELINE_NAME, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, Budget, Candidate, Constraints, Objective, RuntimeConfig, Workload, validate_candidate
+from .config import BASELINE_NAME, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, Budget, Candidate, Constraints, Objective, RuntimeConfig, Workload, resolve_investigation_space, validate_candidate
 from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
@@ -150,7 +150,7 @@ def render_summary(report, output_dir):
 
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
              objective=None, evaluation=None, evaluation_version=None, constraints=None,
-             workload=None, baseline_configuration=None, budget=None):
+             workload=None, baseline_configuration=None, budget=None, investigation_space=None):
     """One candidate, or an opt-in bounded agent investigation; no joint placement.
 
     Uses at most 32 supplied prompts, declared loads, up to 16 warm-ups, three
@@ -161,6 +161,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     budget = Budget.model_validate(budget) if budget is not None else None
     if budget is not None and (agent is None or candidate is not None):
         raise ValueError("An investigation budget requires an agent and no fixed candidate")
+    if investigation_space is not None and budget is None:
+        raise ValueError("An explicit investigation space requires an agent investigation budget")
     if evaluation is None:
         if constraints is not None or evaluation_version is not None:
             raise ValueError("Verified constraints require an evaluation callable and its version")
@@ -201,6 +203,9 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             raise ValueError("The Qwen72B comparison requires verified task requirements")
     if max(workload.concurrency) > baseline_config.max_num_seqs:
         raise ValueError("Workload concurrency exceeds the reference sequence limit")
+    if investigation_space is not None:
+        investigation_space = resolve_investigation_space(investigation_space, baseline=baseline_config,
+                                                          model_id=model_id, workload=workload)
     provider_validation = None
     if agent is not None:
         from .provider_check import require_provider_check
@@ -240,6 +245,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
               "objective": objective.model_dump(),
               "agent_selection": "enabled" if agent is not None else "not-enabled",
               "provider_validation": provider_validation,
+              "investigation_space": investigation_space,
               "limits": ["single model", "one candidate", "non-streaming requests",
                          "TTFT and queue percentiles unavailable",
                          "Quality is limited to the supplied evaluator and prompts" if evaluation else "no task-correctness claim"],

@@ -179,3 +179,59 @@ def validate_candidate(candidate: Candidate, *, baseline=None, supported_changes
                 or candidate.config.config_hash not in frozen_candidate_hashes):
             raise ValueError("Candidate is outside the frozen configuration universe")
     return candidate
+
+
+class InvestigationSpace(BaseModel):
+    """Explicit, bounded experiment values; not permission to skip runtime checks."""
+
+    model_config = ConfigDict(strict=True, frozen=True, extra="forbid")
+    supported_changes: dict[str, list[int | Literal['fp8']]]
+    candidate_hashes: list[str] | None = None
+
+    @field_validator('supported_changes')
+    @classmethod
+    def validate_values(cls, changes):
+        validate_supported_changes(changes)
+        if not changes or not 1 <= sum(len(values) for values in changes.values()) <= 32:
+            raise ValueError('An investigation space needs 1 to 32 single-setting candidates')
+        if any(not values or len(values) != len(set(values)) for values in changes.values()):
+            raise ValueError('Each active control needs a nonempty list of unique values')
+        return changes
+
+    @field_validator('candidate_hashes')
+    @classmethod
+    def validate_hashes(cls, hashes):
+        if hashes is not None and (not hashes or len(hashes) > 32 or len(hashes) != len(set(hashes))
+                or any(re.fullmatch('[0-9a-f]{64}', key) is None for key in hashes)):
+            raise ValueError('Candidate hashes must be unique configuration SHA-256 hashes')
+        return hashes
+
+
+def resolve_investigation_space(space, *, baseline, model_id, workload):
+    """Freeze legal full configurations before any provider call or GPU startup."""
+    # Revalidate nested collections too: frozen models do not freeze their lists.
+    space = InvestigationSpace.model_validate(
+        space.model_dump() if isinstance(space, InvestigationSpace) else space)
+    baseline = RuntimeConfig.model_validate(baseline)
+    workload = Workload.model_validate(workload)
+    candidates = {}
+    for lever, values in space.supported_changes.items():
+        for value in values:
+            config = RuntimeConfig.model_validate(baseline.model_dump() | {lever: value})
+            candidate = validate_candidate(Candidate(name=config.config_hash, reason='Declared investigation', config=config),
+                                           baseline=baseline, supported_changes=space.supported_changes)
+            if model_id == LARGE_MODEL_ID and config.kv_cache_dtype != 'auto':
+                raise ValueError('Combined FP8 weights and FP8 KV are not enabled for Qwen72B')
+            if max(workload.concurrency) > config.max_num_seqs:
+                raise ValueError('Workload concurrency exceeds a candidate sequence limit')
+            candidates[candidate.config.config_hash] = (lever, value)
+    selected = space.candidate_hashes if space.candidate_hashes is not None else sorted(candidates)
+    if any(key not in candidates for key in selected):
+        raise ValueError('A candidate hash is outside the declared investigation values')
+    changes = {}
+    for key in selected:
+        lever, value = candidates[key]
+        changes.setdefault(lever, []).append(value)
+    record = {'supported_changes': changes, 'candidate_hashes': sorted(selected)}
+    encoded = json.dumps(record, sort_keys=True, separators=(',', ':'))
+    return record | {'space_hash': hashlib.sha256(encoded.encode()).hexdigest()}
