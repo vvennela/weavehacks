@@ -217,6 +217,27 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
         report.update(mode='agent-investigation', search=search, search_trials=[],
                       limits=['single model', 'already-active single-setting controls',
                               'no combination trials', 'no live search-advantage claim'])
+        if report.get('automatic_space'):
+            from .config import resolve_investigation_space
+            from .search_policy import propose_search_space
+            from .storage import content_hash
+
+            if baseline.get('status') == 'collected':
+                policy = propose_search_space(baseline, model_id=report['model_id'], workload=workload)
+            else:
+                policy = dict(status='not-generated', space=None,
+                              reason='Baseline measurement did not complete')
+            report['candidate_policy'] = policy
+            if policy['space'] is not None:
+                report['investigation_space'] = resolve_investigation_space(policy['space'],
+                    baseline=baseline_config, model_id=report['model_id'], workload=workload)
+            else:
+                # InvestigationSpace requires at least one value. An explicit empty
+                # resolved pool means stop, never fall back to the legacy defaults.
+                empty = dict(supported_changes={}, candidate_hashes=[])
+                report['investigation_space'] = empty | {'space_hash': content_hash(empty)}
+            report['limits'][1] = 'evidence-generated single-setting controls'
+            save()
         initial = pipeline.agent_evidence(baseline, objective, constraints)
         if report.get('deployment'):
             initial['deployment_context'] = deployment_context(report['deployment'])

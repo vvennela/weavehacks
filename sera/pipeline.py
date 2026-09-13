@@ -169,12 +169,20 @@ def render_summary(report, output_dir):
 
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
              objective=None, evaluation=None, evaluation_version=None, constraints=None,
-             workload=None, baseline_configuration=None, budget=None, investigation_space=None):
+             workload=None, baseline_configuration=None, budget=None, investigation_space=None,
+             automatic_space=False):
     """One candidate, or an opt-in bounded agent investigation; no joint placement.
 
     Uses at most 32 supplied prompts, declared loads, up to 16 warm-ups, three
     measured passes, and separate quality passes. The caller owns result.close().
+    automatic_space derives normal-mode controls after measuring the reference;
+    it never expands an explicit investigation space and defaults to disabled.
     """
+    if type(automatic_space) is not bool:
+        raise ValueError('automatic_space must be a boolean')
+    if automatic_space and (investigation_space is not None or candidate is not None
+                            or budget is None or agent is None):
+        raise ValueError('Automatic space requires an agent investigation budget and no explicit space or fixed candidate')
     objective = Objective() if objective is None else Objective.model_validate(objective)
     workload = Workload() if workload is None else Workload.model_validate(workload)
     budget = Budget.model_validate(budget) if budget is not None else None
@@ -217,7 +225,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         return optimize_fit(prompts=prompts, output_dir=output_dir, objective=objective,
                             evaluation=evaluation, evaluation_version=evaluation_version,
                             constraints=constraints, agent=agent, provider_check=provider_check,
-                            workload=workload, budget=budget, investigation_space=investigation_space)
+                            workload=workload, budget=budget, investigation_space=investigation_space,
+                            automatic_space=automatic_space)
     baseline_config = RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(baseline_configuration)
     if baseline_configuration is not None:
         if model_id != LARGE_MODEL_ID or baseline_config != RuntimeConfig(quantization="fp8_per_tensor"):
@@ -269,6 +278,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
               "agent_selection": "enabled" if agent is not None else "not-enabled",
               "provider_validation": provider_validation,
               "investigation_space": investigation_space,
+              "automatic_space": automatic_space,
               "limits": ["single model", "one candidate", "non-streaming requests",
                          "TTFT and queue percentiles unavailable",
                          "Quality is limited to the supplied evaluator and prompts" if evaluation else "no task-correctness claim"],

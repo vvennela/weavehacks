@@ -127,7 +127,7 @@ def fit_review_evidence(plan, trial, decision):
 
 def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_version,
                  constraints, agent, provider_check, workload=None, budget=None,
-                 investigation_space=None):
+                 investigation_space=None, automatic_space=False):
     from .pipeline import SeraResult
     from .provider_check import require_provider_check
     workload = Workload() if workload is None else Workload.model_validate(workload)
@@ -159,6 +159,7 @@ def optimize_fit(*, prompts, output_dir, objective, evaluation, evaluation_versi
               "objective": objective.model_dump(), "constraints": constraints.model_dump(),
               "evaluation": {"version": evaluation_version}, "task_quality_verified": False,
               "provider_validation": provider_validation, "fit_plan": plan, "gpu": gpu,
+              "automatic_space": automatic_space,
               "baseline": {"trial_id": "baseline", "status": "infeasible",
                            "reason": "Estimated BF16 runtime exceeds the service memory budget",
                            "fit_estimate": plan["plans"][0]},
