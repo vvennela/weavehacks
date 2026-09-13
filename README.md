@@ -4,7 +4,9 @@ Sera measures a model configuration, rejects quality failures, and returns a liv
 
 ## Current implementation
 
-The first fixed-candidate path is implemented. It supports one pinned Qwen3-0.6B model on Linux with vLLM 0.26.0 and an NVIDIA GPU. BF16 and FP8 KV ran on the supplied RTX PRO 6000. The packaged runner and full optimization path still need live acceptance checks.
+The first fixed-candidate path is implemented. It supports one pinned Qwen3-0.6B model on Linux with vLLM 0.26.0 and an NVIDIA GPU. BF16 and FP8 KV ran on the supplied RTX PRO 6000. The packaged runner passed one live lifecycle check; the full optimization path still needs live acceptance.
+
+The latest runner check returned `2` for `2 + 3`. Its runtime worked, but its answer was wrong. See [the saved evidence](evidence/sera-runner-v1/README.md). Do not treat runtime success as model correctness.
 
 Agent selection, Weave traces, task-correctness acceptance, joint placement, and the search benchmark are not implemented. A fixed candidate is not an agent recommendation.
 
