@@ -227,3 +227,21 @@ def test_checkpoint_rejects_unverified_memory_samples(tmp_path, stage_runner, mo
         sera.optimize(**options(tmp_path))
     assert stage_runner[1][0].closed
     assert not (tmp_path / 'staged/checkpoints/001.json').exists()
+
+
+def test_checkpoint_hash_and_snapshot_use_one_copy_despite_later_sampling(tmp_path, stage_runner, monkeypatch):
+    from sera import stages
+    from sera.storage import content_hash
+    original = stages._checkpoint
+
+    def sample_after_checkpoint(current, *args):
+        result = original(current, *args)
+        current.trials[0]['runtime']['sampled_peak_memory_mib'] += 1
+        return result
+
+    monkeypatch.setattr(stages, '_checkpoint', sample_after_checkpoint)
+    with sera.optimize(**options(tmp_path)):
+        pass
+    checkpoint = json.loads((tmp_path / 'staged/checkpoints/001.json').read_text())
+    source = json.loads((tmp_path / 'staged' / checkpoint['source_trial_snapshot_path']).read_text())
+    assert content_hash(source) == checkpoint['source_trial_hash']

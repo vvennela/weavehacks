@@ -103,7 +103,7 @@ def _checkpoint(current, row, constraints, previous, models):
     matches = [trial for trial in current.trials if trial['trial_id'] == selected]
     if len(matches) != 1 or len(current.models) != 1:
         raise RuntimeError('Stage returned no unique measured winner')
-    trial = matches[0]
+    trial = deepcopy(matches[0])
     if current.report.get('task_quality_verified') is not True or constraint_failures(trial, constraints):
         raise RuntimeError('Stage winner violates verified constraints')
     if trial.get('reduced', {}).get('generation_errors', 0) != 0:
@@ -138,7 +138,7 @@ def _checkpoint(current, row, constraints, previous, models):
         'output_dir': str(current.output_dir), 'weave_url': current.weave_url,
         'constraints': constraints.model_dump()}
     record['checkpoint_hash'] = content_hash(record)
-    return record
+    return record, trial
 
 
 def run_stages(*, models, prompts, stages, k, min_improvement_pct, mode, options, run_stage):
@@ -191,9 +191,7 @@ def run_stages(*, models, prompts, stages, k, min_improvement_pct, mode, options
                 return result
             if baseline is not None and current.report.get('baseline_configuration') != baseline.model_dump():
                 raise RuntimeError('Stage did not start from the saved configuration')
-            checkpoint = _checkpoint(current, row, limits, result.report['checkpoints'], models)
-            source = deepcopy(next(trial for trial in current.trials
-                                   if trial['trial_id'] == checkpoint['source_trial_id']))
+            checkpoint, source = _checkpoint(current, row, limits, result.report['checkpoints'], models)
             save_json(folder / checkpoint['source_trial_snapshot_path'], source)
             save_json(folder / 'checkpoints' / f'{index:03d}.json', checkpoint)
             result.report['checkpoints'].append(checkpoint)
