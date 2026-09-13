@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"The baseline completed successfully with 12 successful requests, no generation errors, and token-agreement quality passing at 1.0. Latency is observed but the p99 is marked unreliable, while queue and TTFT snapshots are cumulative and do not establish a scheduling cause. No failure is observed; the effects of candidate scheduling changes remain unknown. Inspecting load metrics is the most useful legal read to characterize per-load latency and throughput before any later experiment.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14744,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 224,
+    "reasoning_output_tokens": 108
+  }
+}

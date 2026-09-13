@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"weight-fp8\"],\"reason\":\"Weight FP8 is the only legal plan estimated to fit, reducing estimated peak memory to 90.2 GB versus 160.4 GB for the infeasible BF16 baseline. This trades reduced weight precision for deployment feasibility; quality and latency remain unmeasured, and no speedup can be measured because the BF16 baseline cannot run. A real trial is useful to verify feasibility and assess quality and latency against the stated gates.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10611,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 154,
+    "reasoning_output_tokens": 40
+  }
+}

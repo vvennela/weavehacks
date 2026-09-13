@@ -28,12 +28,12 @@ from dataclasses import replace
 
 import pytest
 
-from sera.config import ACHIEVABLE_BW_FRACTION, InferenceConfig, baseline_config
-from sera.ledger import Measurement
-from sera.reduction import derive_bandwidth_util, reduce_metrics
-from sera.runner.base import Tenant
-from sera.runner.sim_runner import SimRunner
-from sera.spec import GpuSpec, ModelSpec, Slo, Workload
+from sera_loop.config import ACHIEVABLE_BW_FRACTION, InferenceConfig, baseline_config
+from sera_loop.ledger import Measurement
+from sera_loop.reduction import derive_bandwidth_util, reduce_metrics
+from sera_loop.runner.base import Tenant
+from sera_loop.runner.sim_runner import SimRunner
+from sera_loop.spec import GpuSpec, ModelSpec, Slo, Workload
 
 GPU = GpuSpec(
     id="gpu0",
@@ -228,6 +228,6 @@ def test_both_substrates_divide_by_the_same_denominator() -> None:
     They used to differ: the simulator divided by achievable bandwidth, the derivation
     by the spec sheet, a silent 20% disagreement feeding one shared threshold.
     """
-    from sera.runner import sim_runner
+    from sera_loop.runner import sim_runner
 
     assert sim_runner.DECODE_BW_EFFICIENCY == ACHIEVABLE_BW_FRACTION

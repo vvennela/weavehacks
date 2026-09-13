@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so the proposed p95 improvement and quality preservation were not measured. Deterministic selection chose baseline; the placement is unsupported for this single-model milestone, so the next proposal should abstain or provide a supported candidate trial.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10143,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 123,
+    "reasoning_output_tokens": 44
+  }
+}

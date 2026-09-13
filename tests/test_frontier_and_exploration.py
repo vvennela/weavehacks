@@ -7,10 +7,10 @@ another; exploration spends a slot on the lever the ranking would never reach.
 
 from __future__ import annotations
 
-from sera.arbiter import EXPLORATION_MIN_BUDGET, Arbiter
-from sera.config import InferenceConfig
-from sera.ledger import Ledger, Measurement, Prediction, Substrate, TrialRecord, Verdict
-from sera.specialists.base import Proposal
+from sera_loop.arbiter import EXPLORATION_MIN_BUDGET, Arbiter
+from sera_loop.config import InferenceConfig
+from sera_loop.ledger import Ledger, Measurement, Prediction, Substrate, TrialRecord, Verdict
+from sera_loop.specialists.base import Proposal
 
 
 def _row(tid, p95, fp, tput, verdict=Verdict.ACCEPTED, model="m", phase=1):

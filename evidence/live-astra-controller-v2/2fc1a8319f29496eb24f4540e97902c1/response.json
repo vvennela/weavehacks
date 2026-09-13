@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"keep-baseline\",\n  \"proposal_id\": \"memory-context-baseline-retain-01\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": null,\n  \"proposed_value\": null,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"generation_errors\",\n    \"successful_requests\",\n    \"request_count\",\n    \"sampled_peak_memory_mib\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\",\n    \"concurrency_8_cumulative_snapshot_preemptions\"\n  ],\n  \"predicted_metric_change\": \"Neither supported token budget is expected to improve p95_latency_ms by the required 5%. Prepared prompts at measured_facts.baseline.prepared_prompt_tokens span 85\u2013109 tokens; even eight maximum-length prompts total only 872 tokens, below both proposed budgets. Call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0, reduced.p95_latency_ms, reports 770.0346799997533 ms at concurrency 8. This is a prediction of limited benefit, not a measured comparison.\",\n  \"confidence\": 0.85,\n  \"expected_trial_cost\": 0,\n  \"falsification_condition\": \"A controlled comparison showing either supported budget achieves p95_latency_ms at or below 731.5329459997656 ms while preserving the 0.99 quality floor would refute the prediction. Compare against call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0 at reduced.p95_latency_ms and call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 at task_quality/per_prompt. No such comparison is supplied.\",\n  \"reason\": \"No failure is observed: call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 records an accepted, collected result at status and decision, with generation_errors=0 and passing measured quality at task_quality/per_prompt. The baseline completed 96/96 requests. A causal scheduling or memory bottleneck is not established. The 88687 MiB observation at runtime/sampled_peak_memory_mib does not establish KV pressure; concurrency_8_cumulative_snapshot_preemptions is zero and cumulative mean queue time is 0.007412273415496884 ms. These cumulative observations are limited evidence. The prepared prompt lengths already fit eight simultaneous prefills within the smaller supported 1024-token budget, so lowering max_num_batched_tokens from 4096 to 1024 or 2048 has no demonstrated workload constraint to relieve. Retain baseline rather than spend the remaining trial on an unsupported expectation of a 5% latency gain. No peer opinions were supplied.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17266,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 663,
+    "reasoning_output_tokens": 36
+  }
+}

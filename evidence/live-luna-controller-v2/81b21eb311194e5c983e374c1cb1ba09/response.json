@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The selected trial is baseline per the deterministic result. Although the candidate p95 was 80 ms versus 100 ms baseline, candidate quality failed, so the proposal's requirement to preserve quality was not met; a fast quality failure is not an improvement.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 9938,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 138,
+    "reasoning_output_tokens": 59
+  }
+}

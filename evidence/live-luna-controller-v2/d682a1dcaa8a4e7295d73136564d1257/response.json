@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested and has no measured p95 or quality result, so the proposed \u22655% p95 improvement cannot be confirmed or refuted. Deterministic selection chose baseline; the missing metric leaves this proposal unsupported for the single-model milestone and requires a valid candidate measurement before reconsideration.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10147,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 169,
+    "reasoning_output_tokens": 80
+  }
+}

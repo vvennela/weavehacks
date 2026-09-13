@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"keep-baseline\",\n  \"proposal_id\": \"scheduling-keep-baseline-01\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": null,\n  \"proposed_value\": null,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"generation_errors\",\n    \"successful_requests\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\",\n    \"concurrency_8_cumulative_snapshot_preemptions\",\n    \"p99_reliable\"\n  ],\n  \"predicted_metric_change\": \"Neither supported token budget is expected to reduce p95_latency_ms by the required 5%. Call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0, reduced/p95_latency_ms, reports 770.03468 ms at concurrency 8; baseline/prepared_prompt_tokens reports at most 109 tokens per prompt, so eight prompts total at most 872 tokens, below both proposed budgets. This is a scheduling hypothesis, not a measured comparison.\",\n  \"confidence\": 0.9,\n  \"expected_trial_cost\": 0,\n  \"falsification_condition\": \"A controlled comparison showing p95_latency_ms at or below 731.532946 ms for either supported budget, while preserving quality at least 0.99 and workload constraints, would refute the prediction. Compare against call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0 at reduced/p95_latency_ms and call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 at task_quality/per_prompt; no such comparison is supplied.\",\n  \"reason\": \"No failure is observed: call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 records accepted/collected at status and decision, with zero generation_errors at reduced and passing measured quality at task_quality/per_prompt. These observations establish no scheduling root cause. The baseline completed 96/96 requests; concurrency_8_cumulative_snapshot_mean_queue_ms is approximately 0.0074 and concurrency_8_cumulative_snapshot_preemptions is zero, though cumulative snapshots cannot establish causality. At baseline/prepared_prompt_tokens, the maximum prepared length is 109 tokens; eight such prompts fit within even the smallest supported budget, 1024. Consequently, neither 1024 nor 2048 has an evidenced mechanism for the required latency gain, supporting abstention. The unreliable p99 supplies no stronger justification.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17264,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 633,
+    "reasoning_output_tokens": 54
+  }
+}

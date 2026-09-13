@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"trial-2\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The executed candidate was collected and accepted: p95 latency decreased from 769.4799790006073 ms to 625.3724439993675 ms, a 0.187279122178598 improvement exceeding the 0.05 requirement; quality passed at 1.0, with 96 successful requests and 0 generation errors. Evidence is in the saved baseline and candidate request records and task_quality/per_prompt. The measured result supports retaining this configuration; concurrency-8 cumulative TTFT was not measured, so no TTFT-specific gain is claimed.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14920,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 398,
+    "reasoning_output_tokens": 255
+  }
+}

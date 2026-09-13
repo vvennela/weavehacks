@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from sera.ledger import Ledger, Measurement, Prediction, Substrate, TrialRecord, Verdict
+from sera_loop.ledger import Ledger, Measurement, Prediction, Substrate, TrialRecord, Verdict
 
 
 def _meas(p99: float, footprint: float, tput: float = 10.0) -> Measurement:

@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested, so the predicted p95 improvement and quality preservation were not measured. The active-batching placement is unsupported in this single-model milestone; abstain from confirming the proposal and require an eligible candidate trial before proceeding."}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"The observed outcome is a collected, quality-passing candidate with zero generation errors, but the persisted diagnosis reports baseline latency as null while recording candidate_value 770.991792 ms and no established root cause (source_call_id 01a09acf-b9a8-78aa-b625-b20ab8d42887). The cause of the missing baseline comparison is unknown. Inspecting load metrics is useful to clarify the measured baseline/candidate latency records before proposing any experiment.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12505,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 237,
+    "reasoning_output_tokens": 115
+  }
+}

@@ -61,7 +61,7 @@ def _():
         sys.path.insert(0, str(Path("src").resolve()))
 
     try:
-        import sera  # noqa: F401
+        import sera_loop  # noqa: F401
 
         _source = "local checkout"
     except ImportError:  # pragma: no cover - molab path
@@ -69,10 +69,10 @@ def _():
 
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "-q",
-             "git+https://github.com/vvennela/sera.git@test1"],
+             "git+https://github.com/vvennela/sera_loop.git@test1"],
             check=True,
         )
-        import sera  # noqa: F401
+        import sera_loop  # noqa: F401
 
         _source = "installed from git"
 
@@ -141,7 +141,7 @@ def _(mo):
 
 @app.cell
 def _(pd):
-    from sera.spec import load_spec
+    from sera_loop.spec import load_spec
 
     spec = load_spec("../specs/molab.yaml")
 
@@ -202,9 +202,9 @@ def _(spec):
     import tempfile
     from pathlib import Path as _P
 
-    from sera.ledger import Ledger
-    from sera.phase1 import Phase1
-    from sera.runner.sim_runner import SimRunner
+    from sera_loop.ledger import Ledger
+    from sera_loop.phase1 import Phase1
+    from sera_loop.runner.sim_runner import SimRunner
 
     run_dir = _P(tempfile.mkdtemp(prefix="sera-"))
     runner = SimRunner()
@@ -216,7 +216,7 @@ def _(spec):
 
 @app.cell
 def _(ledger, pd, spec):
-    from sera.config import InferenceConfig
+    from sera_loop.config import InferenceConfig
 
     rows = []
     for _i, _r in enumerate(ledger.all()):
@@ -327,9 +327,9 @@ def _(mo):
 
 @app.cell
 def _(ledger, pd, spec):
-    from sera.phase2 import Phase2
+    from sera_loop.phase2 import Phase2
 
-    _p2 = Phase2(spec, __import__("sera.runner.sim_runner", fromlist=["SimRunner"]).SimRunner(),
+    _p2 = Phase2(spec, __import__("sera_loop.runner.sim_runner", fromlist=["SimRunner"]).SimRunner(),
                  ledger, verbose=False)
 
     frontier_rows = []
@@ -501,7 +501,7 @@ def _(mo):
 def _(Ledger, pd, run_dir, runner, spec):
     import statistics
 
-    from sera.baseline import sweep
+    from sera_loop.baseline import sweep
 
     _agent_trials = {}
     for _m in spec.model_names:

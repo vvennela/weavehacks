@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The tested max_num_batched_tokens=2048 candidate (trial-3) was collected with zero generation errors and quality 1.0, but p95 latency worsened from 770.6006329999582 ms to 773.4014930001649 ms, an improvement fraction of -0.003634645340613017 versus the required 0.05. The deterministic selection result was no-safe-improvement due to p95-improvement-below-five-percent. The observed objective failure does not establish a scheduling or hardware cause; read call 01a09af5-b367-7553-8f98-aa52386d72f0 and the saved evidence paths record the result. Do not retry this tested configuration; use a different measured setting or abstain.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15172,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 226,
+    "reasoning_output_tokens": 38
+  }
+}

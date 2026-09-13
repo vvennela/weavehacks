@@ -12,20 +12,20 @@ from dataclasses import replace
 
 import pytest
 
-from sera.config import baseline_config
-from sera.runner.base import Tenant
-from sera.runner.fake_vllm import (
+from sera_loop.config import baseline_config
+from sera_loop.runner.base import Tenant
+from sera_loop.runner.fake_vllm import (
     FakeEngineProfile,
     FakeVllmServer,
     fake_launcher,
 )
-from sera.runner.vllm_runner import (
+from sera_loop.runner.vllm_runner import (
     UnsupportedConfig,
     VllmRunner,
     parse_prometheus,
     vllm_flags,
 )
-from sera.spec import GpuSpec, ModelSpec, load_spec
+from sera_loop.spec import GpuSpec, ModelSpec, load_spec
 
 SPEC = "specs/molab.yaml"
 
@@ -143,7 +143,7 @@ def test_kv_usage_tolerates_the_v0_to_v1_rename():
     Reading only one spelling against the other server yields 0.0 and the loop then
     believes the cache is permanently empty — a silent corruption of the evidence.
     """
-    from sera.runner.vllm_runner import _kv_usage
+    from sera_loop.runner.vllm_runner import _kv_usage
 
     assert _kv_usage({"vllm:kv_cache_usage_perc": 0.62}) == pytest.approx(0.62)
     assert _kv_usage({"vllm:gpu_cache_usage_perc": 0.44}) == pytest.approx(0.44)
@@ -255,7 +255,7 @@ def test_request_errors_are_counted_not_raised(spec):
     """Every request failing yields an empty-result measurement, never an exception."""
     from contextlib import contextmanager
 
-    from sera.runner.vllm_runner import Endpoint
+    from sera_loop.runner.vllm_runner import Endpoint
 
     @contextmanager
     def failing(tenant, gpu, port, n_tenants):

@@ -39,15 +39,15 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
 
-from sera import baseline
-from sera.arbiter import Arbiter
-from sera.config import InferenceConfig, baseline_config
-from sera.ledger import Ledger, TrialRecord, Verdict
-from sera.phase1 import Phase1
-from sera.quality import full_eval, smoke_check
-from sera.runner.base import Tenant, TrialRunner
-from sera.runner.sim_runner import SimRunner
-from sera.spec import ModelSpec, Spec, load_spec
+from sera_loop import baseline
+from sera_loop.arbiter import Arbiter
+from sera_loop.config import InferenceConfig, baseline_config
+from sera_loop.ledger import Ledger, TrialRecord, Verdict
+from sera_loop.phase1 import Phase1
+from sera_loop.quality import full_eval, smoke_check
+from sera_loop.runner.base import Tenant, TrialRunner
+from sera_loop.runner.sim_runner import SimRunner
+from sera_loop.spec import ModelSpec, Spec, load_spec
 
 SCHEMA_VERSION = 1
 
@@ -133,7 +133,7 @@ def _frozen_telemetry() -> Iterator[None]:
     consequence of the last trial is withheld. That isolates the feedback loop rather
     than lobotomising the specialists, which would prove nothing.
     """
-    from sera import phase1 as phase1_module
+    from sera_loop import phase1 as phase1_module
 
     real = phase1_module.reduce_metrics
     first: dict[str, Any] = {}
@@ -205,7 +205,7 @@ def oracle(spec: Spec, model: ModelSpec, runner: TrialRunner) -> dict[str, Any]:
     qualifying: list[tuple[float, InferenceConfig]] = []
 
     for cfg in configs:
-        from sera.validator import validate
+        from sera_loop.validator import validate
 
         if not validate(cfg, model, gpu, available_gpus=len(spec.gpus)).ok:
             continue
@@ -259,7 +259,7 @@ def build(spec_path: str, seeds: int, out_path: Path) -> dict[str, Any]:
         )
 
     print("  sera         the agent loop")
-    sera_led = run_sera(spec, runner, work / "sera.jsonl")
+    sera_led = run_sera(spec, runner, work / "sera_loop.jsonl")
 
     print("  grid         fixed-order sweep")
     grid_led = run_sweep(spec, runner, work / "grid.jsonl", "grid")

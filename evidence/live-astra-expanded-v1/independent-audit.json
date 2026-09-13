@@ -1,0 +1,48 @@
+{
+  "measurement_checks_passed": true,
+  "full_loop_completed": true,
+  "stop_reason": "objective-plateau-confirmed",
+  "measured_trials": [
+    {
+      "trial_id": "candidate",
+      "quality_mean": 1,
+      "p95_latency_ms": 770.4877809992468
+    },
+    {
+      "trial_id": "trial-2",
+      "quality_mean": 1,
+      "p95_latency_ms": 625.3441509998083
+    },
+    {
+      "trial_id": "trial-3",
+      "quality_mean": 1,
+      "p95_latency_ms": 764.9130589998094
+    },
+    {
+      "trial_id": "trial-4",
+      "quality_mean": 1,
+      "p95_latency_ms": 619.8505379998096
+    }
+  ],
+  "verified_combinations": [
+    {
+      "trial_id": "trial-4",
+      "components": [
+        "trial-2",
+        "trial-3"
+      ]
+    }
+  ],
+  "bound_completed_codex_responses": 45,
+  "timed_out_attempts": 0,
+  "specialist_shortlists_checked": 18,
+  "all_shortlist_counts": [
+    8
+  ],
+  "accepted_p95_improvement_fraction": 0.19550893176277953,
+  "scope": "Repeated prompts after per-load warmup, not a cold/unseen-input benchmark.",
+  "returned_runner_task_passed": true,
+  "returned_runner_closed": true,
+  "source_result_sha256": "3ee1cadacd41ab6b177660fdad879f9004996800961bbccc1a17562982a4e370",
+  "limit": "Measured no-progress confirmation under the declared 5% threshold, not statistical proof or global optimality."
+}

@@ -1,0 +1,126 @@
+[36m[1mweave[0m: weave version 0.53.9 is available!  To upgrade, please run:
+[36m[1mweave[0m:  $ pip install weave --upgrade
+[36m[1mweave[0m: Logged in as Weights & Biases user: vvennela.
+[36m[1mweave[0m: View Weave data at https://wandb.ai/vvennela-n-a/wandb_agent_default_project/weave
+# Sera single-model result
+
+Status: ready
+Selection: baseline
+Reason: specialists-abstained
+
+Objective: {'priority': 'latency', 'min_improvement_fraction': 0.05}
+Measured frontier: ['baseline', 'trial-2']
+Task scores use the supplied versioned evaluator; see each trial's gate and constraints.
+This bounded search is not a statistically established advantage over other search methods.
+
+Baseline: collected; requests=96; p95=773.8035630000013 ms; throughput=26.099160494343657 output tokens/s; peak memory=88687 MiB; output tokens=660; startup=64.05791482100085 s.
+  concurrency=1; requests=24; p95=575.6152140002087 ms; throughput=13.599669817622122 output tokens/s.
+  concurrency=2; requests=24; p95=652.5040970000191 ms; throughput=23.622147116570932 output tokens/s.
+  concurrency=4; requests=24; p95=728.7614520000716 ms; throughput=41.42542210156258 output tokens/s.
+  concurrency=8; requests=24; p95=773.8035630000013 ms; throughput=75.42890445364048 output tokens/s.
+trial-2: collected; requests=96; p95=773.4960869993301 ms; throughput=26.093338433548265 output tokens/s; peak memory=88561 MiB; output tokens=660; startup=62.06144057900019 s.
+  concurrency=1; requests=24; p95=575.415090000206 ms; throughput=13.60454933702452 output tokens/s.
+  concurrency=2; requests=24; p95=651.9227269991461 ms; throughput=23.621653389802724 output tokens/s.
+  concurrency=4; requests=24; p95=729.0261749994897 ms; throughput=41.339769008688805 output tokens/s.
+  concurrency=8; requests=24; p95=773.4960869993301 ms; throughput=75.37393261502268 output tokens/s.
+
+Selection latency is the worst per-load p95; percentiles are not pooled. Aggregate throughput divides all output tokens by the sum of measured load durations.
+Hard limits: {'quality_floor': 0.99, 'p95_latency_ms': None, 'max_memory_mib': None}; failures: {}.
+
+Investigation trials: 2/3; stop: specialists-abstained.
+Each round records proposals, arbitration, measurements, gates, and prediction review.
+This bounded investigation is not proof of a search advantage.
+
+Workload: {'prompt_count': 8, 'concurrency': [1, 2, 4, 8], 'warmup_requests_per_load': 8, 'measured_requests_per_load': 24, 'quality_requests': 8}
+Generation: {'temperature': 0, 'top_p': 1, 'top_k': -1, 'seed': 0, 'max_tokens': 64, 'enable_thinking': False}
+Record: /marimo/sera-evidence/live-team-investigation-v1/result.json
+
+## Agent investigation
+
+Agents propose experiments. Deterministic checks decide which results are eligible.
+Trial order and access to history do not prove a causal search advantage.
+Recorded specialist calls: quantization and batching. This covers two specialists, not the full product agent team.
+
+### Deployment stage
+
+Original BF16 baseline: infeasible (estimate only; not a measured BF16 run).
+Fit reason: Estimated BF16 runtime exceeds the service memory budget.
+Estimated BF16 runtime bytes: 160444792832.
+Quantization specialist status: accepted.
+Quantization specialist recommends: weight-fp8. Reason: The weight‑fp8 plan reduces the weight footprint from ~145 GB to ~75 GB and brings the estimated peak memory down to ~90 GB, comfortably within the service budget and the 0.9 GPU utilization target. Quantizing the linear weights to FP8 per‑tensor preserves the full‑precision BF16 storage for embeddings, output head, norms, and biases, mitigating most of the precision loss. Empirical evidence from similar models shows that this level of quantization typically stays above the 0.99 quality floor while offering a substantial memory savings that enables deployment on a single‑GPU or modest multi‑GPU setup. Therefore, weight‑fp8 is the most viable proposal for meeting the latency‑first objective without compromising quality.
+Deployment arbiter chose: weight-fp8. Reason: The baseline plan does not fit within the service budget (estimated peak 160 GB > 92 GB budget), whereas the weight‑fp8 plan’s estimated peak of ~90 GB is within budget and respects the 0.9 GPU‑utilization target. The trade‑off is a reduction in weight precision from BF16 to FP8 per‑tensor, which is expected to preserve quality above the 0.99 floor based on prior evidence for similar models. A trial is necessary to empirically verify that the quantized model meets the latency and quality constraints, as the current estimate is unmeasured and the impact on inference latency and accuracy can only be confirmed through real‑world testing.}
+Trial candidate: collected.
+Scheduled by: not recorded.
+Quality gate: passed; score=1.0; floor=0.99.
+p95: 773.8035630000013 ms; throughput: 26.099160494343657 output tokens/s; peak memory: 88687 MiB.
+Gate selection: candidate; reason: candidate-meets-constraints-baseline-does-not.
+Constraint failures: {'baseline': ['estimated-memory-does-not-fit'], 'candidate': []}.
+Prediction review: confirmed. The candidate trial ran successfully with 96 requests, all successful, and met the quality and resource constraints specified. The measured latency and memory usage are within the acceptable limits (no constraint failures reported for the candidate), confirming the deployment‑feasibility prediction that online FP8 weights allow the model to run on the GPU while satisfying the task and resource constraints.
+Deployment outcome: feasible; selected=candidate.
+Deployment prediction review: confirmed. The candidate trial ran successfully with 96 requests, all successful, and met the quality and resource constraints specified. The measured latency and memory usage are within the acceptable limits (no constraint failures reported for the candidate), confirming the deployment‑feasibility prediction that online FP8 weights allow the model to run on the GPU while satisfying the task and resource constraints.
+Deployment trials included in budget: 1.
+No BF16 speedup comparison is available: the BF16 baseline was not measured.
+The measured deployment becomes the reference for later batching trials. Specialists act in separate stages; this does not show competing proposals in one round.
+
+### Round 1
+
+Participation quantization: inactive; legal candidates=0; No control values are enabled for this specialist in this run..
+Participation batching: active; legal candidates=2; Legal untested candidates are available for this specialist..
+Participation parallelism: inactive; legal candidates=0; Single-GPU runtime fixes tensor_parallel_size at 1; parallelism controls are not enabled..
+Inactive roles were not called. Active means a legal untested setting was available.
+
+Specialist batching: accepted.
+History supplied: none.
+Proposal trial-001: trial; max_num_batched_tokens = 2048.
+Parent trial: baseline.
+Reason: Reducing the maximum number of batched tokens from 4096 to 2048 is expected to lower peak memory usage and reduce contention for GPU resources, which should lower queue times and first‑token latency, thereby improving overall p95 latency. The baseline shows high queue and TTFT metrics at concurrency 8, indicating potential memory pressure that can be alleviated by a smaller batch size.
+Prediction: p95_latency_ms decreases by at least 5%
+Would refute it: p95_latency_ms does not improve by ≥5% relative to baseline
+Cited metrics: concurrency_8_cumulative_snapshot_mean_ttft_ms, concurrency_8_cumulative_snapshot_mean_queue_ms, p95_latency_ms.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=192.19917058944702.
+Cited value: concurrency_8_cumulative_snapshot_mean_queue_ms=0.007604039055308931.
+Cited value: p95_latency_ms=773.8035630000013.
+Arbitration ID: batching:trial-001.
+
+Arbiter chose: batching:trial-001. Reason: The baseline run shows a high p95 latency (~774 ms) with no constraint violations. The proposed change to reduce max_num_batched_tokens from 4096 to 2048 is expected to lower peak memory usage and GPU contention, which should improve queue and first‑token latency. The prediction is a ≥5 % reduction in p95 latency, with a 0.6 confidence and a low trial cost of 1. No constraints are at risk, and the potential latency gain outweighs the modest risk of no improvement. Thus the proposal is ranked as the most promising experiment.
+Trials executed in this round: trial-2.
+
+Trial trial-2: collected.
+Scheduled by: arbiter.
+Quality gate: passed; score=1.0; floor=0.99.
+p95: 773.4960869993301 ms; throughput: 26.093338433548265 output tokens/s; peak memory: 88561 MiB.
+Gate selection: baseline; reason: p95-improvement-below-five-percent.
+Constraint failures: {'baseline': [], 'candidate': []}.
+Prediction review: refuted. The candidate trial reduced p95_latency_ms from 773.803563 ms to 773.496087 ms, a decrease of only ~0.04%, far below the predicted ≥5% improvement. The improvement fraction (≈0.0004) did not meet the objective threshold, so the prediction was refuted and the baseline was retained.
+
+### Round 2
+
+Participation quantization: inactive; legal candidates=0; No control values are enabled for this specialist in this run..
+Participation batching: active; legal candidates=1; Legal untested candidates are available for this specialist..
+Participation parallelism: inactive; legal candidates=0; Single-GPU runtime fixes tensor_parallel_size at 1; parallelism controls are not enabled..
+Inactive roles were not called. Active means a legal untested setting was available.
+
+Specialist batching: abstained.
+History supplied: trial-2.
+Proposal keep-001: keep-baseline; no setting change.
+Parent trial: baseline.
+Reason: The candidate trial reduced max_num_batched_tokens from 4096 to 2048, but the p95_latency_ms decreased only by ~0.04%, far below the required 5% improvement. Therefore the baseline remains the best configuration.
+Prediction: p95_latency_ms does not improve
+Would refute it: none
+Cited metrics: p95_latency_ms, concurrency_8_cumulative_snapshot_mean_ttft_ms, concurrency_8_cumulative_snapshot_mean_queue_ms.
+Cited value: p95_latency_ms=773.8035630000013.
+Cited value: concurrency_8_cumulative_snapshot_mean_ttft_ms=192.19917058944702.
+Cited value: concurrency_8_cumulative_snapshot_mean_queue_ms=0.007604039055308931.
+Prior feedback: trial-2: quality=passed; prediction=refuted.
+
+Arbiter choice: not recorded.
+Trials executed in this round: none.
+
+Final selection: baseline.
+Stop reason: specialists-abstained.
+Trials used: 2/3.
+Runner status: ready; closed=False.
+Raw evidence: result.json — search.rounds, search_trials, and agent_calls.
+
+
+[36m[1mweave[0m: 🍩 https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a0f-065b-7fcd-b076-d419fd5ae02d

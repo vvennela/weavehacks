@@ -1,0 +1,92 @@
+{
+  "mode": "offline-derived-evidence-check",
+  "gpu_trials": 0,
+  "provider_calls": 0,
+  "remote_reads": 0,
+  "source_hashes": {
+    "result.json": "96219626065f735566bff01aeb248d50d4068f1b55c30bd094b31da2ca631c42",
+    "weave-calls.json": "11477d5f437d04a56c9a2a4f0a8d6cee34928ed56cecb0841a9d4a5e628f328a"
+  },
+  "baseline_prepared_prompt_tokens": {
+    "source_path": "input_token_ids",
+    "unit": "tokens per prepared prompt",
+    "prompt_count": 8,
+    "minimum": 85,
+    "maximum": 109,
+    "mean": 94.375
+  },
+  "startup_failed_prepared_prompt_tokens": null,
+  "batch_trial_prepared_prompt_tokens": {
+    "source_path": "input_token_ids",
+    "unit": "tokens per prepared prompt",
+    "prompt_count": 8,
+    "minimum": 85,
+    "maximum": 109,
+    "mean": 94.375
+  },
+  "load_summaries": [
+    {
+      "call_id": "01a09a33-aa04-7eaf-ac8a-8fcbae158650",
+      "output_sha256": "1127ae461efab11ca2d000f27fe37bdea3c5f321286cee98264ffaf56bc8baca",
+      "concurrency": 1,
+      "input_token_summary": {
+        "total_input_tokens": 2265,
+        "successful_request_count": 24,
+        "mean_tokens_per_successful_request": 94.375,
+        "source_paths": [
+          "loads/0/reduced/input_tokens",
+          "loads/0/reduced/successful_requests"
+        ],
+        "scope": "Successful measured requests in this load; not a maximum prompt length."
+      }
+    },
+    {
+      "call_id": "01a09a33-aa04-7eaf-ac8a-8fcbae158650",
+      "output_sha256": "1127ae461efab11ca2d000f27fe37bdea3c5f321286cee98264ffaf56bc8baca",
+      "concurrency": 2,
+      "input_token_summary": {
+        "total_input_tokens": 2265,
+        "successful_request_count": 24,
+        "mean_tokens_per_successful_request": 94.375,
+        "source_paths": [
+          "loads/1/reduced/input_tokens",
+          "loads/1/reduced/successful_requests"
+        ],
+        "scope": "Successful measured requests in this load; not a maximum prompt length."
+      }
+    },
+    {
+      "call_id": "01a09a33-aa04-7eaf-ac8a-8fcbae158650",
+      "output_sha256": "1127ae461efab11ca2d000f27fe37bdea3c5f321286cee98264ffaf56bc8baca",
+      "concurrency": 4,
+      "input_token_summary": {
+        "total_input_tokens": 2265,
+        "successful_request_count": 24,
+        "mean_tokens_per_successful_request": 94.375,
+        "source_paths": [
+          "loads/2/reduced/input_tokens",
+          "loads/2/reduced/successful_requests"
+        ],
+        "scope": "Successful measured requests in this load; not a maximum prompt length."
+      }
+    },
+    {
+      "call_id": "01a09a33-aa04-7eaf-ac8a-8fcbae158650",
+      "output_sha256": "1127ae461efab11ca2d000f27fe37bdea3c5f321286cee98264ffaf56bc8baca",
+      "concurrency": 8,
+      "input_token_summary": {
+        "total_input_tokens": 2265,
+        "successful_request_count": 24,
+        "mean_tokens_per_successful_request": 94.375,
+        "source_paths": [
+          "loads/3/reduced/input_tokens",
+          "loads/3/reduced/successful_requests"
+        ],
+        "scope": "Successful measured requests in this load; not a maximum prompt length."
+      }
+    }
+  ],
+  "source_unchanged": true,
+  "passed": true,
+  "limits": "Checks evidence construction only. Does not establish improved agent reasoning."
+}

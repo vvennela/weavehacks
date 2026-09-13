@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The proposal's latency prediction was refuted: the measured p95 improvement was 0.235%, below the required 5% (769.162822 ms versus 770.977138 ms). Reliability and quality constraints passed, with 96/96 successful requests, zero generation errors, and quality mean 1.0. Evidence is recorded in read calls 01a09ab6-b8db-7676-a3a1-73d35c27c632 and 01a09ab6-b8e6-76b4-881a-6b030798a556 and paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. Do not retry this tested configuration; use a different setting or abstain.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15336,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 273,
+    "reasoning_output_tokens": 86
+  }
+}

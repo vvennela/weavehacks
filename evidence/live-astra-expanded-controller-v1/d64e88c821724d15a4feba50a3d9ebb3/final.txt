@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested because placement was unsupported in the single-model milestone. No candidate latency or quality measurements exist to assess the predicted improvement. Retain baseline per the deterministic selection; the next proposal must use supported placement."}

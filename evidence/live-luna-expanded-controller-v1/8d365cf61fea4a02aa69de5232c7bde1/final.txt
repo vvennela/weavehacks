@@ -1,0 +1,1 @@
+{"ranked_proposal_ids":[],"reason":"No legal proposals remain because the trial budget is exhausted."}

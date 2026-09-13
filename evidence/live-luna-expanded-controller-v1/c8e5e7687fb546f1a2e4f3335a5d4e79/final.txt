@@ -1,0 +1,1 @@
+{"ranked_proposal_ids":["weight-fp8"],"reason":"Weight-only FP8 reduces estimated weights from 145.4 GB to 75.2 GB and estimated peak memory to 90.2 GB, fitting the 92.4 GB service budget while retaining BF16 KV cache and other components. This is a deployment-feasibility recommendation only; latency and quality impact are unmeasured."}

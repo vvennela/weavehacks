@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested, so the proposed lower-p95 prediction was not measured and cannot be confirmed or refuted. Retain the baseline and abstain from claiming an improvement; a future proposal must execute a candidate trial with quality and p95 measurements."}

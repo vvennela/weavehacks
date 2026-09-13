@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09abd-596e-79f0-9f1d-a57486d4a8e3"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No failure is observed: successful_requests=96, generation_errors=0, trace_failed_task_count=0, and baseline quality mean=1.0 passed the 0.99 floor. p95_latency_ms=770.0346799997533, but no latency limit is specified. The cause of latency and benefit of smaller token budgets remain unknown; cumulative queue/TTFT snapshots do not establish causality. Inspect load_metrics for scheduling evidence relevant to the supported max_num_batched_tokens changes. No source call IDs or peer claims were supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":13750,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":134,"reasoning_output_tokens":0}}

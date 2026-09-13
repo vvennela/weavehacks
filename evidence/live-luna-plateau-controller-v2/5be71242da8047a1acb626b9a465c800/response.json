@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed latency is the active concern: measured p95 latency is 770.9917920001317 ms, while p99 is explicitly unreliable; all 96 requests succeeded and verified quality passed. The cause of the latency distribution is unknown, so inspecting latency outliers is the most useful legal read-only query. No peer claims are supplied.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11407,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 183,
+    "reasoning_output_tokens": 87
+  }
+}

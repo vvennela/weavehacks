@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09acf-da1c-7bb0-8a35-1e843c96ad57"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No failure is observed: all 96 requests succeeded with zero generation errors, verified quality mean 1.0 passed the 0.99 floor, and p95 latency was 770.9917920001317 ms; p99 is explicitly unreliable. The cause of the latency tail is unknown, so inspecting latency outliers is the most useful next read-only action.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":11410,"cached_input_tokens":8960,"cache_write_input_tokens":0,"output_tokens":209,"reasoning_output_tokens":107}}

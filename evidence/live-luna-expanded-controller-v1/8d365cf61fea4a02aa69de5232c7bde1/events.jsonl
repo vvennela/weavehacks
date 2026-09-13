@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aee-1856-75f3-ae45-efccfd1d3040"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[],\"reason\":\"No legal proposals remain because the trial budget is exhausted.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":9948,"cached_input_tokens":5888,"cache_write_input_tokens":0,"output_tokens":52,"reasoning_output_tokens":18}}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09af2-e448-7023-a92e-90b8a39c21a6"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed baseline latency is p95 770.6006329999582 ms and p99 is unreliable, while quality passed with mean 1.0 and no generation errors. The cause of the tail latency is unknown; the near-zero cumulative queue snapshots do not establish causality. Inspect latency outliers to identify which requests or concurrency conditions drive the worst percentile.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":14375,"cached_input_tokens":5888,"cache_write_input_tokens":0,"output_tokens":228,"reasoning_output_tokens":128}}

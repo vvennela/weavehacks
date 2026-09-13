@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The candidate was measured, but p95 latency was 770.3376119998211 ms, above the 732.4720865498875 ms target, despite 96 successful requests, zero generation errors, and quality 1.0. The cited load_metrics call 01a09ac7-4a16-7854-a84d-981e6016b017 and diagnosis call 01a09ac7-4a23-7d88-b724-afbfca240144 support objective-not-improved; the cause remains unestablished. Do not retry this tested configuration.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15311,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 213,
+    "reasoning_output_tokens": 62
+  }
+}

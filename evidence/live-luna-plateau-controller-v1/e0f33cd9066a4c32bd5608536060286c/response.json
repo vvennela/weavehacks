@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"The observed failure is objective-not-improved: trial-2 p95_latency_ms was 770.3376119998211 versus the baseline 771.0232489998816, an improvement fraction of 0.000889255934824125 below the required 0.05, while measured quality passed with mean 1.0 and no generation errors. The cause remains unknown; the diagnosis explicitly states that model, kernel, memory-pressure, and scheduling causes are not established. Inspecting load_metrics is useful to examine latency-related load measurements before any further decision, whereas quality_outputs is unlikely to add value because task quality is already verified.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13768,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 319,
+    "reasoning_output_tokens": 164
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed latency is summarized by p50 72.243492 ms and p95/p99 72.793829 ms, but p99_reliable is false with only 12 measured requests. No performance failure or causal bottleneck is established; queue snapshots are near zero but cumulative and non-causal. Inspect latency outliers to determine whether tail behavior is driven by a small number of requests before considering any experiment.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14431,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 192,
+    "reasoning_output_tokens": 81
+  }
+}

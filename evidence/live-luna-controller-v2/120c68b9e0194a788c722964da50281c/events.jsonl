@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ab0-203d-74a2-a5b3-4cfa05dfe9c1"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"p1\"],\"reason\":\"p1 is legal, fits the remaining budget, and has the lower predicted p95 latency.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":9951,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":67,"reasoning_output_tokens":22}}

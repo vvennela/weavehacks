@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[],\"reason\":\"No failure is observed: generation_errors=0, successful_requests=96/96, and baseline quality.mean=1.0 exceeds floor=0.99. Diagnosis 01a09adb-f244-7205-9635-c57562b736ec records acceptance and no constraint failures; output records 01a09adb-f22f-788b-aad1-1297e6bed097 and 01a09adb-f230-7d4c-bd4f-c70f2259df0b each show task_score=1.0 and output_truncated=false. Performance causes remain unestablished. With quality_outputs already inspected and no unresolved output-quality issue, neither remaining query offers a necessary quality follow-up.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15158,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 214,
+    "reasoning_output_tokens": 41
+  }
+}

@@ -1,0 +1,907 @@
+{
+  "schema_version": "sera-release-benchmark-audit-v1",
+  "evidence_kind": "offline-recheck-of-saved-real-output",
+  "gpu_trials": 0,
+  "provider_calls": 0,
+  "sources": [
+    {
+      "path": "evidence/verified-agent-v1/result.json",
+      "sha256": "e504c78cf21b23c0ecdf16f16830661ae52c7a7d72621e9de200e305469e265f",
+      "bytes": 175543
+    },
+    {
+      "path": "evidence/large-fit-v1/result.json",
+      "sha256": "d427c0d2a010adf6694e101253a29a63026304aa021c22b1bfb5c0b5e8415c15",
+      "bytes": 165146
+    },
+    {
+      "path": "evidence/demo-rehearsal-v1/result.json",
+      "sha256": "69847eb7f3f4cfd7d7d1f6ddf0bc52716e8cc56eab4a9f7ec4d6277184b3e8c8",
+      "bytes": 170216
+    },
+    {
+      "path": "evidence/large-batch-comparison-v1/result.json",
+      "sha256": "558980a5efed61fb722a9f1825f1a98f5fe460ba0b6cf788beef1d6c6a6a3041",
+      "bytes": 1543139
+    },
+    {
+      "path": "evidence/glm-bf16-v1/result.json",
+      "sha256": "d77fa0eff1a3a85810d9af5ab8aa5e99beeedcb17b222b5f3bcd664632627368",
+      "bytes": 223361
+    },
+    {
+      "path": "evidence/glm-fp8-weights-v1/result.json",
+      "sha256": "05355284be77cf4fe37cdff1079c301bca555897db0d9dd69666eeb49d67b2c7",
+      "bytes": 223474
+    },
+    {
+      "path": "evidence/qwen-fp8-placement-quality-v1/result.json",
+      "sha256": "9f3acf9e10b6038be2969c86a503c9bbee670151adf2d4e00fc77b9f531d420e",
+      "bytes": 244716
+    },
+    {
+      "path": "evidence/pressure-v1/result.json",
+      "sha256": "1c926dba8175ca0a0fcbedd9d0f4e760915f98606183bb53b6ae7e8479bd2731",
+      "bytes": 1631070
+    },
+    {
+      "path": "benchmarks/grade.py",
+      "sha256": "a7099dcbfcbb6e0bb51c74445a144dfd068338dccb262cdc70b7a47b125e9db3",
+      "bytes": 4307
+    },
+    {
+      "path": "benchmarks/search.py",
+      "sha256": "d4961ea8bc53d612ea8a80a30a52826eb0f1bd29afae34ac3c08904fd9fbc468",
+      "bytes": 14733
+    },
+    {
+      "path": "benchmarks/release_audit.py",
+      "sha256": "7aa487e69689b417c0fdd833a5529e88db18d9b6af3b32e7ea31edeec17d5e69",
+      "bytes": 8364
+    },
+    {
+      "path": "sera/measurement.py",
+      "sha256": "566f28a02a1e37848a80b6d6d68416b73aa28f7473bd59a65923de1d4784f940",
+      "bytes": 15132
+    }
+  ],
+  "task_evaluations": [
+    {
+      "source": "evidence/verified-agent-v1/result.json",
+      "trial": "baseline",
+      "model_id": "Qwen/Qwen3-0.6B",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": null,
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 2,
+      "total": 8,
+      "score": 0.25,
+      "floor": 0.99,
+      "gate_passed": false,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": false,
+          "format_valid": true,
+          "reason": "wrong_answer"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        }
+      ]
+    },
+    {
+      "source": "evidence/large-fit-v1/result.json",
+      "trial": "candidate_trial",
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 8,
+      "total": 8,
+      "score": 1,
+      "floor": 0.99,
+      "gate_passed": true,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        }
+      ]
+    },
+    {
+      "source": "evidence/demo-rehearsal-v1/result.json",
+      "trial": "candidate_trial",
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 8,
+      "total": 8,
+      "score": 1,
+      "floor": 0.99,
+      "gate_passed": true,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        }
+      ]
+    },
+    {
+      "source": "evidence/large-batch-comparison-v1/result.json",
+      "trial": "baseline",
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 8,
+      "total": 8,
+      "score": 1,
+      "floor": 0.99,
+      "gate_passed": true,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        }
+      ]
+    },
+    {
+      "source": "evidence/large-batch-comparison-v1/result.json",
+      "trial": "candidate_trial",
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 2048,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 8,
+      "total": 8,
+      "score": 1,
+      "floor": 0.99,
+      "gate_passed": true,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        }
+      ]
+    },
+    {
+      "source": "evidence/glm-bf16-v1/result.json",
+      "trial": "trial",
+      "model_id": "zai-org/glm-4-9b-chat-hf",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": null,
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 0,
+      "total": 8,
+      "score": 0,
+      "floor": 0.99,
+      "gate_passed": false,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        }
+      ]
+    },
+    {
+      "source": "evidence/glm-fp8-weights-v1/result.json",
+      "trial": "trial",
+      "model_id": "zai-org/glm-4-9b-chat-hf",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 0,
+      "total": 8,
+      "score": 0,
+      "floor": 0.99,
+      "gate_passed": false,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        }
+      ]
+    },
+    {
+      "source": "evidence/qwen-fp8-placement-quality-v1/result.json",
+      "trial": "trial",
+      "model_id": "Qwen/Qwen3-0.6B",
+      "configuration": {
+        "dtype": "bfloat16",
+        "quantization": "fp8_per_tensor",
+        "kv_cache_dtype": "auto",
+        "tensor_parallel_size": 1,
+        "max_model_len": 4096,
+        "max_num_seqs": 8,
+        "max_num_batched_tokens": 4096,
+        "gpu_memory_utilization": 0.9,
+        "enable_prefix_caching": false,
+        "enable_chunked_prefill": true,
+        "enforce_eager": true
+      },
+      "passed": 1,
+      "total": 8,
+      "score": 0.125,
+      "floor": 0.99,
+      "gate_passed": false,
+      "saved_gate_matches": true,
+      "per_case": [
+        {
+          "case_id": "easy-01-add",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-02-larger",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-03-length",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-04-index",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-05-increment",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        },
+        {
+          "case_id": "easy-06-copy",
+          "passed": true,
+          "format_valid": true,
+          "reason": "correct"
+        },
+        {
+          "case_id": "easy-07-filter",
+          "passed": false,
+          "format_valid": true,
+          "reason": "wrong_answer"
+        },
+        {
+          "case_id": "easy-08-upper",
+          "passed": false,
+          "format_valid": false,
+          "reason": "invalid_json_format"
+        }
+      ]
+    }
+  ],
+  "performance_comparison": {
+    "source": "evidence/large-batch-comparison-v1/result.json",
+    "scope": "One measured fixed comparison, not agent search or a statistical speedup",
+    "identity_hashes": {
+      "baseline": {
+        "model": "4f42323e3eb3a6acbfe40d1cb9969d425cfcd86407095cf3a458cca59b8cdbea",
+        "input_token_ids": "961ec04c0a5b387d9c15e7f6241549c9113623f21752c7a771b441bc56891309",
+        "runtime": "172e522a54abf4d864b72e01f04d8632a4ace73d07576210e40d0c7b71b8a0ed",
+        "hardware": "eb10695ed77b19d0944eee83c91ce3640e89b4e34153e448867c02a1727ae546",
+        "tokenizer": "1402e1075c469580a4cc61f0436a1c0c4fff139c501acc0fcfebd4968821522b",
+        "generation": "71413b941f4d766306ca6001d00b60dad1f78be674c090120a3b0e0bcbb28f13",
+        "workload": "c91e1866c66ccd0a4142b8c268e695b8318b2f950a12a5d818b422b4a91a3cd9"
+      },
+      "candidate": {
+        "model": "4f42323e3eb3a6acbfe40d1cb9969d425cfcd86407095cf3a458cca59b8cdbea",
+        "input_token_ids": "961ec04c0a5b387d9c15e7f6241549c9113623f21752c7a771b441bc56891309",
+        "runtime": "172e522a54abf4d864b72e01f04d8632a4ace73d07576210e40d0c7b71b8a0ed",
+        "hardware": "eb10695ed77b19d0944eee83c91ce3640e89b4e34153e448867c02a1727ae546",
+        "tokenizer": "1402e1075c469580a4cc61f0436a1c0c4fff139c501acc0fcfebd4968821522b",
+        "generation": "71413b941f4d766306ca6001d00b60dad1f78be674c090120a3b0e0bcbb28f13",
+        "workload": "c91e1866c66ccd0a4142b8c268e695b8318b2f950a12a5d818b422b4a91a3cd9"
+      }
+    },
+    "identity_matches": true,
+    "saved_metrics_match": true,
+    "baseline": {
+      "request_count": 96,
+      "successful_requests": 96,
+      "generation_errors": 0,
+      "request_wall_seconds": 25.19124539599943,
+      "output_tokens": 660,
+      "input_tokens": 9060,
+      "p50_latency_ms": 702.8731610007526,
+      "p95_latency_ms": 772.2824129996297,
+      "p99_latency_ms": 833.090299000105,
+      "output_tokens_per_second": 26.19957805281089,
+      "input_tokens_per_second": 359.648753270404,
+      "p99_reliable": false,
+      "p95_ttft_ms": null,
+      "p95_queue_ms": null,
+      "p95_time_per_output_token_ms": null
+    },
+    "candidate": {
+      "request_count": 96,
+      "successful_requests": 96,
+      "generation_errors": 0,
+      "request_wall_seconds": 25.18524634699861,
+      "output_tokens": 660,
+      "input_tokens": 9060,
+      "p50_latency_ms": 703.3013219988788,
+      "p95_latency_ms": 771.8916659996466,
+      "p99_latency_ms": 833.3644829999685,
+      "output_tokens_per_second": 26.205818712535798,
+      "input_tokens_per_second": 359.7344205084459,
+      "p99_reliable": false,
+      "p95_ttft_ms": null,
+      "p95_queue_ms": null,
+      "p95_time_per_output_token_ms": null
+    },
+    "candidate_throughput_gain_fraction": 0.0002381969553986174,
+    "required_gain_fraction": 0.05,
+    "meets_required_gain": false,
+    "latency_improvement_fraction": 0.0005059638720315007,
+    "saved_selection": "baseline",
+    "loads": [
+      {
+        "concurrency": 1,
+        "baseline": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 511.83457099978114,
+          "p95_latency_ms": 573.5373850002361,
+          "p99_latency_ms": 573.6886300001061,
+          "p99_reliable": false,
+          "request_wall_seconds": 12.081213872001172,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 13.657568001705185,
+          "input_tokens_per_second": 187.48116075068026,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        },
+        "candidate": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 511.72544099972583,
+          "p95_latency_ms": 573.2515370000328,
+          "p99_latency_ms": 573.260750999907,
+          "p99_reliable": false,
+          "request_wall_seconds": 12.072663591998207,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 13.667240766102555,
+          "input_tokens_per_second": 187.61394142558962,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        }
+      },
+      {
+        "concurrency": 2,
+        "baseline": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 589.9070649993519,
+          "p95_latency_ms": 649.5513819991174,
+          "p99_latency_ms": 677.1544179991906,
+          "p99_reliable": false,
+          "request_wall_seconds": 6.957796521999626,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 23.714404334517685,
+          "input_tokens_per_second": 325.53409586474277,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        },
+        "candidate": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 589.8397179989843,
+          "p95_latency_ms": 649.331403999895,
+          "p99_latency_ms": 676.4844079989416,
+          "p99_reliable": false,
+          "request_wall_seconds": 6.958621421999851,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 23.711593143772483,
+          "input_tokens_per_second": 325.495505882695,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        }
+      },
+      {
+        "concurrency": 4,
+        "baseline": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 630.5927339999471,
+          "p95_latency_ms": 729.21240299911,
+          "p99_latency_ms": 762.0813300000009,
+          "p99_reliable": false,
+          "request_wall_seconds": 3.971966290999262,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 41.54113804387033,
+          "input_tokens_per_second": 570.2465313294928,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        },
+        "candidate": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 632.7467430000979,
+          "p95_latency_ms": 728.0042700003833,
+          "p99_latency_ms": 764.5666710013757,
+          "p99_reliable": false,
+          "request_wall_seconds": 3.973238857000979,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 41.52783306980513,
+          "input_tokens_per_second": 570.0638903218704,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        }
+      },
+      {
+        "concurrency": 8,
+        "baseline": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 702.8731610007526,
+          "p95_latency_ms": 772.2824129996297,
+          "p99_latency_ms": 833.090299000105,
+          "p99_reliable": false,
+          "request_wall_seconds": 2.1802687109993713,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 75.67874508659477,
+          "input_tokens_per_second": 1038.8627734614374,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        },
+        "candidate": {
+          "request_count": 24,
+          "successful_requests": 24,
+          "generation_errors": 0,
+          "p50_latency_ms": 703.3013219988788,
+          "p95_latency_ms": 771.8916659996466,
+          "p99_latency_ms": 833.3644829999685,
+          "p99_reliable": false,
+          "request_wall_seconds": 2.1807224759995734,
+          "output_tokens": 165,
+          "input_tokens": 2265,
+          "output_tokens_per_second": 75.66299784403758,
+          "input_tokens_per_second": 1038.6466067681522,
+          "p95_ttft_ms": null,
+          "p95_queue_ms": null,
+          "p95_time_per_output_token_ms": null
+        }
+      }
+    ],
+    "limitation": "Saved measurement-window durations are reused; this does not retime model requests."
+  },
+  "pressure": {
+    "scenario": "not-established",
+    "status": "collected",
+    "peak_kv_percent": 93.65942028985508,
+    "measured_preemptions": 0,
+    "reason": "Required high KV use plus preemptions and reliable execution were not all observed"
+  },
+  "search_replay": {
+    "status": "blocked",
+    "grid_runs": 0,
+    "random_runs": 0,
+    "manifest_scan_scope": "evidence/**/*.json, excluding this audit directory",
+    "frozen_manifest_files": [],
+    "blockers": [
+      "No audited pre-collection frozen manifest and complete measured outcome envelopes were supplied.",
+      "The recorded strict Qwen3-0.6B baseline passes 2/8 tasks and fails its 0.99 quality floor.",
+      "The pressure pilot is not established: high KV use but zero preemptions.",
+      "Qwen72B has a fixed two-configuration comparison, not the required Qwen3-0.6B search universe.",
+      "Existing records do not bind every outcome to a common frozen manifest, all identity hashes, and the complete owned runtime interval required for GPU collection cost.",
+      "No frozen search-success rule or measured agent/ablation comparison establishes a search advantage."
+    ]
+  },
+  "conclusion": "Saved task and performance evidence is auditable; measured search superiority remains unproven.",
+  "limitations": [
+    "Regrading uses unchanged cases, raw outputs, and the existing strict JSON grader.",
+    "No outputs are normalized, no quality floors are lowered, and no candidate universe is invented.",
+    "Source hashes bind this report to saved files; they do not independently attest GPU execution.",
+    "Synthetic search tests validate software only and are not mixed with these real records."
+  ]
+}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aed-d4d2-7673-a3f5-cfcd765042a2"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection chose baseline, and the candidate was not tested, so the proposed at-least-5% p95 reduction while preserving quality was not measured. No read call IDs or saved evidence paths are available. The next proposal should require an eligible candidate trial; otherwise abstain from claiming an improvement.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10142,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":133,"reasoning_output_tokens":43}}

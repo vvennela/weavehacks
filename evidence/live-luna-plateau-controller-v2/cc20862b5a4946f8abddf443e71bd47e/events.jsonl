@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ad2-aa28-7960-8c08-5f86a681106f"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The attempted and measured candidate preserved quality (mean 1.0, above the 0.99 floor), generation_errors (0), and successful_requests (96), but p95 latency improved by only 0.096%, below the predicted minimum 5%. The fixed decision records selection_reason=p95-improvement-below-five-percent; see read call 01a09acf-b9a8-78aa-b625-b20ab8d42887 and evidence paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. This refutes the latency-improvement prediction, while the underlying cause remains unestablished.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":15344,"cached_input_tokens":5888,"cache_write_input_tokens":0,"output_tokens":210,"reasoning_output_tokens":51}}

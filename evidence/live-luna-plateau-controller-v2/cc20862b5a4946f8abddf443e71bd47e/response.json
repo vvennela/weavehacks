@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The attempted and measured candidate preserved quality (mean 1.0, above the 0.99 floor), generation_errors (0), and successful_requests (96), but p95 latency improved by only 0.096%, below the predicted minimum 5%. The fixed decision records selection_reason=p95-improvement-below-five-percent; see read call 01a09acf-b9a8-78aa-b625-b20ab8d42887 and evidence paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. This refutes the latency-improvement prediction, while the underlying cause remains unestablished.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15344,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 210,
+    "reasoning_output_tokens": 51
+  }
+}

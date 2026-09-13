@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ab0-e401-70e3-a3c1-4613c11ebe5d"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection is baseline, the only eligible trial. The candidate was not tested and has no quality or latency measurements, so the predicted 5% p95 reduction with preserved quality remains untested. Placement is unsupported in this milestone; the next proposal must use a supported configuration or abstain. No causal or speedup claim is supported.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12600,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":95,"reasoning_output_tokens":0}}

@@ -1,0 +1,1 @@
+{"ranked_proposal_ids":["latency_outliers"],"reason":"No failure is observed: all 96 requests succeeded with zero generation errors, verified quality mean 1.0 passed the 0.99 floor, and p95 latency was 770.9917920001317 ms; p99 is explicitly unreliable. The cause of the latency tail is unknown, so inspecting latency outliers is the most useful next read-only action."}

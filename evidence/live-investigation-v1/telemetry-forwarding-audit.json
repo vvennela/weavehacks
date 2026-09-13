@@ -1,0 +1,39 @@
+{
+  "schema_version": "sera-telemetry-forwarding-audit-v1",
+  "kind": "offline-reanalysis-no-agent-or-gpu-calls",
+  "source_result_sha256": "83bcab791cb736ec44f4fdf330d445a974fbdbe877e582ebfb1e2740a3718206",
+  "fix_revision": "71c7b86",
+  "baseline_cumulative_snapshots": {
+    "concurrency_1_cumulative_snapshot_mean_queue_ms": 0.006075468768074188,
+    "concurrency_1_cumulative_snapshot_mean_ttft_ms": 136.59660518169403,
+    "concurrency_1_cumulative_snapshot_preemptions": 0.0,
+    "concurrency_2_cumulative_snapshot_mean_queue_ms": 0.005681968751503064,
+    "concurrency_2_cumulative_snapshot_mean_ttft_ms": 159.50265154242516,
+    "concurrency_2_cumulative_snapshot_preemptions": 0.0,
+    "concurrency_4_cumulative_snapshot_mean_queue_ms": 0.005809593742374848,
+    "concurrency_4_cumulative_snapshot_mean_ttft_ms": 174.2580533027649,
+    "concurrency_4_cumulative_snapshot_preemptions": 0.0,
+    "concurrency_8_cumulative_snapshot_mean_queue_ms": 0.006811257799554937,
+    "concurrency_8_cumulative_snapshot_mean_ttft_ms": 192.38586723804474,
+    "concurrency_8_cumulative_snapshot_preemptions": 0.0
+  },
+  "trial_1_cumulative_snapshots": {
+    "concurrency_1_cumulative_snapshot_mean_queue_ms": 0.005992375015750895,
+    "concurrency_1_cumulative_snapshot_mean_ttft_ms": 137.37202435731888,
+    "concurrency_1_cumulative_snapshot_preemptions": 0.0,
+    "concurrency_2_cumulative_snapshot_mean_queue_ms": 0.005885671882310817,
+    "concurrency_2_cumulative_snapshot_mean_ttft_ms": 159.8740555346012,
+    "concurrency_2_cumulative_snapshot_preemptions": 0.0,
+    "concurrency_4_cumulative_snapshot_mean_queue_ms": 0.006094447916401198,
+    "concurrency_4_cumulative_snapshot_mean_ttft_ms": 174.56424484650293,
+    "concurrency_4_cumulative_snapshot_preemptions": 0.0,
+    "concurrency_8_cumulative_snapshot_mean_queue_ms": 0.007095945312229901,
+    "concurrency_8_cumulative_snapshot_mean_ttft_ms": 192.55856424570084,
+    "concurrency_8_cumulative_snapshot_preemptions": 0.0
+  },
+  "baseline_fields_forwarded": 12,
+  "history_fields_forwarded": 12,
+  "measured_request_metrics_unchanged": true,
+  "original_result_unchanged": true,
+  "limits": "These fields are cumulative snapshots, not window means. The historical agents did not receive them. No new live result or agent recommendation is established."
+}

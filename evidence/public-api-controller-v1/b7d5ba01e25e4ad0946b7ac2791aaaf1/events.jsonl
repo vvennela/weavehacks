@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b4a-081c-79d0-abf3-df532fbe68a5"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"trial-3\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The prediction was confirmed: trial-3 was collected and measured p95 latency of 50.06505999881483 ms versus the baseline 72.79382900014753 ms, a 31.22% improvement exceeding the required 5%, with generation_errors=0 and the fixed quality gate passed. This is supported by diagnosis call 01a09b47-3296-77b3-bb96-2fb0b5c36332 and evidence paths status, decision, reduced, runtime/sampled_peak_memory_mib, and decision/candidate_quality. The cause remains not established; preserve the quality floor and workload constraints for the next proposal.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12705,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":256,"reasoning_output_tokens":91}}

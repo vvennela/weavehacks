@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aaf-81bf-7980-b5f2-7892c28603e5"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so the proposed p95 improvement and quality preservation were not evaluated. The deterministic selection chose baseline, and active batching is not supported in this single-model milestone; abstain from claiming a performance gain and revisit the placement in a later proposal.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10143,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":149,"reasoning_output_tokens":67}}

@@ -173,7 +173,7 @@ def _(PY, fetch_button, mo, model_select, subprocess):
 def _(SPECS, model_select):
     import pathlib, tempfile
 
-    from sera.spec import load_spec
+    from sera_loop.spec import load_spec
 
     # load_spec reads a file, which is the real entry point; writing the embedded
     # text out keeps that path rather than constructing Spec objects by hand.
@@ -223,15 +223,15 @@ def _(GPU, mo, spec):
     import tempfile as _tf
     import time as _time
 
-    from sera.ledger import Ledger
-    from sera.phase1 import Phase1
-    from sera.runner.sim_runner import SimRunner
+    from sera_loop.ledger import Ledger
+    from sera_loop.phase1 import Phase1
+    from sera_loop.runner.sim_runner import SimRunner
 
     def _runner():
         """Real vLLM when there is a device, the simulator otherwise. Never silent."""
         if not GPU:
             return SimRunner(), "analytic simulator (no GPU attached)"
-        from sera.runner.vllm_runner import VllmRunner
+        from sera_loop.runner.vllm_runner import VllmRunner
         r = VllmRunner()
         if not r.available():
             return SimRunner(), "analytic simulator (vLLM not runnable here)"

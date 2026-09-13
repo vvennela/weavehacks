@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"Observed trial-2 improved p95 latency from 769.479979 ms to 625.3724439993675 ms with 96 successful requests, zero generation errors, and quality mean 1.0; the inspected latency outliers do not establish the cause of this improvement. Per-load metrics are the most useful remaining read-only inspection because the objective is the worst per-load percentile and aggregate metrics cannot show whether the gain is consistent across concurrency levels.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 16841,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 248,
+    "reasoning_output_tokens": 131
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No quality failure was observed: all 96 requests succeeded, verified quality mean was 1.0, and the quality floor passed. The measured latency baseline has p95 770.991792 ms and p99 831.035051 ms, but no latency limit or causal performance diagnosis is available. The queue and TTFT snapshots are small cumulative samples and do not establish a cause. Inspect latency outliers to determine whether tail behavior is concentrated in identifiable requests before considering any experiment.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11407,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 198,
+    "reasoning_output_tokens": 73
+  }
+}

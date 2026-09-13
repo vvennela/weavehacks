@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"weight-fp8\"],\"reason\":\"Recommend a trial for deployment feasibility: estimated peak memory is 90,248,921,088 bytes, leaving only 2,128,841,932 bytes within the service budget. FP8 weights save memory at potential precision cost while selected parameters and KV remain BF16. The trial is useful to measure actual memory, latency, and quality because workspace and fit are estimates. The 0.99 quality floor is unverified. BF16 cannot run within budget, so speedup and the 5% improvement objective cannot be established against that baseline.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13292,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 136,
+    "reasoning_output_tokens": 0
+  }
+}

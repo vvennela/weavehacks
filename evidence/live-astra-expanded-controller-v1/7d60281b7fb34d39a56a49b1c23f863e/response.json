@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No failure is observed: baseline and trial-2 each have successful_requests=96 and generation_errors=0; both measured quality means are 1.0. Trial-2 reduced p95_latency_ms from 770.4877809992468 to 625.3441509998083. Memory pressure is not established: cumulative snapshot preemptions are zero at every supplied concurrency, and sampled_peak_memory_mib alone does not establish a bottleneck. Inspect load_metrics to compare latency and memory across loads before assessing allocation or context changes. No source call IDs or peer claims were supplied.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17983,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 142,
+    "reasoning_output_tokens": 0
+  }
+}

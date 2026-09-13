@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[],\"reason\":\"No observed failure requires diagnosis: trial-2 was collected successfully with zero generation errors, quality mean 1.0 passing the 0.99 floor, and p95 latency improving 18.85% from 770.60 ms to 625.34 ms. The root cause of the improvement is unknown, but no further read-only inspection is useful for this accepted outcome.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15291,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 188,
+    "reasoning_output_tokens": 89
+  }
+}

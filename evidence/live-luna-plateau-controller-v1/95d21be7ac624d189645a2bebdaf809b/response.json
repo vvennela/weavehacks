@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"proposal-scheduling-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"p50_latency_ms\",\"concurrency_8_cumulative_snapshot_mean_ttft_ms\",\"concurrency_8_cumulative_snapshot_mean_queue_ms\",\"concurrency_8_cumulative_snapshot_preemptions\",\"successful_requests\",\"generation_errors\",\"sampled_peak_memory_mib\"],\"predicted_metric_change\":\"If tested, p95_latency_ms may decrease modestly at concurrency 8, but a >=5% improvement is uncertain; quality should remain at or above the verified 0.99 floor. This is a prediction, not a measured gain. Evidence: load_metrics call 01a09ac7-4a16-7854-a84d-981e6016b017, paths reduced and task_quality/per_prompt.\",\"confidence\":0.45,\"expected_trial_cost\":1,\"falsification_condition\":\"The prediction is refuted if p95_latency_ms fails to improve by at least 5%, or if successful_requests decreases, generation_errors becomes nonzero, or verified quality falls below 0.99. Evidence should be read from load_metrics call 01a09ac7-4a16-7854-a84d-981e6016b017 and trial_diagnosis call 01a09ac7-4a23-7d88-b724-afbfca240144, paths reduced, task_quality/per_prompt, and decision.\",\"reason\":\"No execution failure was observed: the inspected candidate was collected with generation_errors 0 and verified quality mean 1.0, as recorded by trial_diagnosis call 01a09ac7-4a23-7d88-b724-afbfca240144 at status, decision, and task_quality/per_prompt. The unknown cause of the candidate outcome is explicitly not established, so I do not attribute latency behavior to a specific kernel, memory, or scheduling mechanism. Baseline p95_latency_ms is 771.0232489998816, concurrency_8_cumulative_snapshot_mean_ttft_ms is 191.59426726400852, queue is 0.007856265590078237, and preemptions are 0; these show little queue pressure but do not prove a causal gain. I therefore propose the legal untested max_num_batched_tokens=2048 as a bounded scheduling test, using load_metrics call 01a09ac7-4a16-7854-a84d-981e6016b017 and fixed evidence paths reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. I reject any inference that the observed accepted candidate establishes a scheduling cause.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14891,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1188,
+    "reasoning_output_tokens": 586
+  }
+}

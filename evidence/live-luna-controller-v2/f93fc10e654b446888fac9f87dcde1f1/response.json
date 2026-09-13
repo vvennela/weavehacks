@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"candidate\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The candidate was tested, passed quality, and measured p95 latency of 80 ms versus the 100 ms baseline, a 20% reduction exceeding the predicted 5% while preserving quality. The result is not supported for placement in a single-model milestone, so the next proposal should target a supported placement or abstain.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10142,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 160,
+    "reasoning_output_tokens": 67
+  }
+}

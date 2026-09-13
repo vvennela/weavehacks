@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ad9-f395-7f80-8984-8f8d6930cff1"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"weight-fp8\"],\"reason\":\"Recommend weight-fp8 for deployment feasibility: estimated weights of 75,216,535,552 bytes, BF16 KV of 10,737,418,240 bytes and workspace of 4,294,967,296 bytes total 90,248,921,088 bytes, leaving 2,128,841,932 bytes within the service budget. BF16 baseline exceeds the budget. FP8 linear weights reduce memory at potential precision cost while retaining selected parameters and KV at BF16. Headroom is limited and workspace is unmeasured. No latency improvement or quality-floor compliance is established; the independent arbiter and deterministic gates must decide deployment.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12959,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":158,"reasoning_output_tokens":0}}

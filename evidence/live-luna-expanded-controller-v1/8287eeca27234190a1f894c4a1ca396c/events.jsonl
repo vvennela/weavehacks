@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09af6-2e90-7961-b0f7-6314a12f9e4a"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No runtime or quality failure was observed: trial-2 collected 96/96 successful requests with zero generation errors, quality mean 1.0 passing the 0.99 floor, and p95 latency improved from 770.6006329999582 ms to 625.3442630004429 ms (source 01a09af5-b367-7553-8f98-aa52386d72f0). The cause of the improvement remains unknown, and cumulative queue/TTFT snapshots do not establish per-load causality. Inspecting load_metrics is useful to examine the latency behavior at each declared concurrency before further decisions.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":16834,"cached_input_tokens":8960,"cache_write_input_tokens":0,"output_tokens":311,"reasoning_output_tokens":156}}

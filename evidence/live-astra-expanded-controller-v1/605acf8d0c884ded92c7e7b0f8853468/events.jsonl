@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aec-de04-75d3-86af-749a053ad861"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested because placement was unsupported in the single-model milestone. No candidate latency or quality result measures the predicted 5% p95 reduction while preserving quality. The deterministic selection is baseline, the only eligible trial. A next proposal must use supported placement; no performance or hardware-cause conclusion is justified.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12601,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":90,"reasoning_output_tokens":0}}

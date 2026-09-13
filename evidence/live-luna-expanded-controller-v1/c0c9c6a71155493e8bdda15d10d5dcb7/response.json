@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so its predicted p95 improvement and quality preservation were not measured. The deterministic selection was baseline; no read call ID or saved evidence path was supplied.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10140,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 119,
+    "reasoning_output_tokens": 54
+  }
+}

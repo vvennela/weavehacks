@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"scheduling:proposal-scheduling-256\"],\"reason\":\"The observed failure is insufficient latency improvement: trial-2 p95 latency was 770.2487169999586 ms versus the 770.9917920001317 ms baseline, only a 0.096% improvement, although all 96 requests succeeded, generation errors were zero, and verified quality was 1.0. The cause is not established; the measurements do not prove a scheduling, memory, kernel, or model cause. I accept the peers' shared proposal to test max_model_len=256 because it is legal, differs from the tested trial-2 setting, and provides a useful latency hypothesis without claiming an unmeasured gain or deployment approval.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 16478,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 327,
+    "reasoning_output_tokens": 161
+  }
+}

@@ -26,8 +26,8 @@ app = marimo.App(width="medium")
 def _():
     import marimo as mo
 
-    import sera
-    from sera import fixtures, report
+    import sera_loop
+    from sera_loop import fixtures, report
 
     return fixtures, mo, report, sera
 
@@ -138,8 +138,8 @@ def _(fixtures, models_input, prompts_input, sera, source_input):
     run_error = None
     if source_input.value == "live":
         try:
-            result = sera.optimize(models=_models, prompts=_prompts)
-        except (sera.SeraError, ValueError) as exc:
+            result = sera_loop.optimize(models=_models, prompts=_prompts)
+        except (sera_loop.SeraError, ValueError) as exc:
             run_error = str(exc)
             result = fixtures.demo_result()
     elif source_input.value == "negative":

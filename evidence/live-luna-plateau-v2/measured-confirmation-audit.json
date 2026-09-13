@@ -1,0 +1,11 @@
+{
+  "schema_version": "sera-measured-confirmation-audit-v1",
+  "measured_confirmation_established": false,
+  "confirmation_trials": [
+    {"trial_id": "trial-3", "status": "startup-failed", "objective_value": null}
+  ],
+  "total_trial_attempts": 3,
+  "collected_trials": 2,
+  "internal_stop_reason": "objective-plateau-confirmed",
+  "interpretation": "A startup-failed confirmation is an attempted experiment, not a measured performance plateau."
+}

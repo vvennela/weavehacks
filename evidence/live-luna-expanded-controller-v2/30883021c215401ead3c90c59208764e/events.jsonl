@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b26-dc20-74c0-afdc-3a0dfd664330"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No failure was observed: trial-2 was collected with zero generation errors, quality mean 1.0 passing the 0.99 floor, and p95 latency improved from 769.4799790006073 ms to 625.3724439993675 ms. The cause of the improvement is not established by the recorded metrics. Inspecting latency outliers is useful to characterize the observed tail-latency change before any further action.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":15242,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":241,"reasoning_output_tokens":124}}

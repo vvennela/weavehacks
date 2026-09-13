@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-scheduling-prefix-001\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"enable_prefix_caching\",\"proposed_value\":true,\"evidence_used\":[\"p95_latency_ms\",\"concurrency_1_cumulative_snapshot_mean_ttft_ms\",\"concurrency_8_cumulative_snapshot_mean_ttft_ms\",\"generation_errors\",\"successful_requests\"],\"predicted_metric_change\":\"For repeated prompts after per-load warmup, p95_latency_ms and mean TTFT at concurrency 1 and 8 are predicted to decrease; generation_errors should remain 0 and successful_requests should remain 96. This is a hypothesis, not a measured gain.\",\"confidence\":0.68,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute if p95_latency_ms and either concurrency_1_cumulative_snapshot_mean_ttft_ms or concurrency_8_cumulative_snapshot_mean_ttft_ms do not improve versus baseline, or if generation_errors becomes nonzero or successful_requests falls below 96. Compare with source call 01a09af2-b7cd-7592-bb62-086f453314a0 and fixed paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt.\",\"reason\":\"No execution failure was observed: source call 01a09af2-b7cd-7592-bb62-086f453314a0 records status=collected, generation_errors=0, and verified quality mean 1.0 at fixed paths status, decision, and task_quality/per_prompt. The cause of the baseline latency is therefore unknown, not established as scheduling or memory pressure. Because the workload explicitly measures repeated prompts after warmup and baseline p95_latency_ms is 770.6006329999582 with concurrency_1_cumulative_snapshot_mean_ttft_ms 136.02256029844284 and concurrency_8_cumulative_snapshot_mean_ttft_ms 191.13211147487164, enabling prefix caching is a legal, untested experiment targeting repeated-prefill latency. Its result should be compared to the same baseline call and paths; no gain is claimed in advance.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 19165,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 612,
+    "reasoning_output_tokens": 146
+  }
+}

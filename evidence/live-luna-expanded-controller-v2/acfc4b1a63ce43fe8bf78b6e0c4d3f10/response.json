@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-scheduling-refine-001\",\"agent_role\":\"batching\",\"parent_trial_id\":\"trial-2\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"trial_3_p95_latency_ms\",\"successful_requests\",\"generation_errors\",\"trial_2_successful_requests\",\"trial_2_generation_errors\",\"trial_3_successful_requests\",\"trial_3_generation_errors\"],\"predicted_metric_change\":\"The untested combination retaining enable_prefix_caching and setting max_num_batched_tokens=2048 is predicted to remain quality-valid and collected, with p95_latency_ms improving by at least 5% versus baseline; no measured gain for this combination is claimed.\",\"confidence\":0.58,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute if the combination is not collected, generation_errors is nonzero, quality falls below 0.99, or p95_latency_ms is not at least 5% below baseline p95_latency_ms=769.4799790006073 ms. Also refute the scheduling hypothesis if it fails to improve over trial_2_p95_latency_ms=625.3724439993675 ms without another measured benefit.\",\"reason\":\"Observed failure: trial-3 was collected with 96 successful requests and zero generation_errors, but failed the latency gate because trial_3_p95_latency_ms=770.4907300012565 versus baseline p95_latency_ms=769.4799790006073; this is documented by diagnosis call 01a09b29-d886-7f1a-a219-45b31e47c021 at measured_facts.trials[].status, measured_facts.trials[].reduced, and decision. The cause remains unknown: that record explicitly says no model, kernel, memory-pressure, or scheduling cause was established, and runtime/sampled_peak_memory_mib is not causal evidence. Independently, trial-2 with enable_prefix_caching passed quality and achieved trial_2_p95_latency_ms=625.3724439993675 with zero errors, documented by call 01a09b26-af08-73d1-91c4-4ea6d7624968 at measured_facts.trials[].quality and measured_facts.trials[].reduced. I accept those measured outcomes but reject peer claims of an established mechanism. The proposed candidate is a legal, untested combination listed with parent_trial_id trial-2 and component_trial_ids [trial-2, trial-3]; it tests whether the 2048-token budget behaves differently when prefix reuse is retained. The prediction is conditional and must be checked against the fixed quality and latency gates.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 24512,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 973,
+    "reasoning_output_tokens": 382
+  }
+}

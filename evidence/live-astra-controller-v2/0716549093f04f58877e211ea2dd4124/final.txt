@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The deterministic selection is baseline, the only eligible trial. The candidate was not tested and has no quality or p95 measurements, so the predicted gain remains untested. Placement is unsupported in this single-model milestone; the next proposal must use a supported placement or abstain."}

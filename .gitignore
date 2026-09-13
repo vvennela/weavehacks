@@ -21,6 +21,7 @@ sera-runs/
 *.jsonl
 !tests/fixtures/*.jsonl
 .marimo/
+__marimo__/
 wandb/
 
 # model caches

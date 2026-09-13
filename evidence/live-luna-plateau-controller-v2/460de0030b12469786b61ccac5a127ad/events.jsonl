@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ad2-ed0a-74f0-be4a-8b696a06781f"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[],\"reason\":\"The observed failure is objective-not-improved: trial-2 reduced p95 latency was 770.2487169999586 ms versus the 770.9917920001317 ms baseline, an improvement of 0.000963791064812003, below the required 0.05; quality was measured and passed at mean 1.0. The diagnosis source call 01a09ad2-a453-7318-a50a-814abddd8e22 states that the root cause is not established. Both quality_outputs and load_metrics would duplicate already available measured quality, latency, memory, and concurrency metrics, so no further read-only inspection is useful.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":13771,"cached_input_tokens":5888,"cache_write_input_tokens":0,"output_tokens":317,"reasoning_output_tokens":158}}

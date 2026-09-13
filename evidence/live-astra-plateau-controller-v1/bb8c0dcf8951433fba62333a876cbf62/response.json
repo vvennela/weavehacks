@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"keep-baseline\",\n  \"proposal_id\": \"scheduling-baseline-retain-01\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": null,\n  \"proposed_value\": null,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"generation_errors\",\n    \"successful_requests\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\",\n    \"concurrency_8_cumulative_snapshot_preemptions\",\n    \"sampled_peak_memory_mib\"\n  ],\n  \"predicted_metric_change\": \"Neither supported change is expected to reduce p95_latency_ms by 5%, although neither has been measured. Call 01a09adb-f237-7329-a107-f666d0c72696, reduced/p95_latency_ms, records 771.2070260004111 ms at concurrency 8. Prepared lengths at measured_facts/baseline/prepared_prompt_tokens suggest the 2048-token budget would remain nonbinding; call 01a09adb-f244-7205-9635-c57562b736ec, runtime/sampled_peak_memory_mib, supplies no comparative allocation evidence supporting a benefit from max_model_len=256.\",\n  \"confidence\": 0.8,\n  \"expected_trial_cost\": 0,\n  \"falsification_condition\": \"A controlled measurement of either supported setting achieving p95_latency_ms at or below 732.6466747003905 ms while preserving the 0.99 quality floor and workload constraints would refute this prediction. Compare against call 01a09adb-f237-7329-a107-f666d0c72696 at reduced/p95_latency_ms and call 01a09adb-f244-7205-9635-c57562b736ec at task_quality/per_prompt; a memory-based explanation additionally requires comparative runtime/sampled_peak_memory_mib and allocation evidence.\",\n  \"reason\": \"No failure was observed: call 01a09adb-f244-7205-9635-c57562b736ec records accepted collection at status and decision, zero generation_errors at reduced, and passing quality at task_quality/per_prompt. The latency cause remains unknown. Prepared prompts span 85\u2013109 tokens at measured_facts/baseline/prepared_prompt_tokens; eight maximum-length prompts total only 872 tokens, below both batching budgets. Thus max_num_batched_tokens=2048 has little demonstrated opportunity to change scheduling. The concurrency_8_cumulative_snapshot_mean_queue_ms is 0.007519640639941372 and concurrency_8_cumulative_snapshot_preemptions is zero; these cumulative snapshots do not establish causality. Lowering max_model_len to 256 does not establish smaller reserved KV allocation at fixed gpu_memory_utilization, and runtime/sampled_peak_memory_mib from the diagnosis call provides no comparative evidence. These observations support retaining baseline rather than spending a trial on a weakly motivated change. No peer claims were supplied.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17551,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 679,
+    "reasoning_output_tokens": 31
+  }
+}

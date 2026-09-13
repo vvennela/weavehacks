@@ -1,0 +1,246 @@
+{
+  "profile_version": "sera-easy-structured-json-v1",
+  "dataset_hash": "2f3c6687cf2a19bde4c3f5b60ab56cb24ac67c6755e999ad98227b04e42d95a7",
+  "system_prompt": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals.",
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "sera-answer-v1",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null",
+              "array",
+              "object"
+            ]
+          }
+        },
+        "required": [
+          "answer"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "generation": {
+    "temperature": 0,
+    "top_p": 1,
+    "top_k": -1,
+    "seed": 0,
+    "max_tokens": 64
+  },
+  "enable_thinking": false,
+  "configuration": {
+    "dtype": "bfloat16",
+    "quantization": null,
+    "kv_cache_dtype": "auto",
+    "tensor_parallel_size": 1,
+    "max_model_len": 4096,
+    "max_num_seqs": 8,
+    "max_num_batched_tokens": 4096,
+    "gpu_memory_utilization": 0.9,
+    "enable_prefix_caching": false,
+    "enable_chunked_prefill": true,
+    "enforce_eager": true
+  },
+  "quality_floor": 0.99,
+  "concurrency": 1,
+  "passes": 1,
+  "warmup_requests": 0,
+  "profile_hash": "de2e8336cd41275c729db2051f8416e892de34e7d29880b7f8aad8c67c192d86",
+  "response_schema_hash": "653263940f1bcdce9b68aa838e9e7be3fe0989dc0f4e1ccf7b475ce0838afaa8",
+  "created_at": "2026-09-13T07:48:13.173867+00:00",
+  "status": "fail",
+  "model_id": "Qwen/Qwen3-0.6B",
+  "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "evaluation_cases": [
+    {
+      "id": "easy-01-add",
+      "category": "reasoning",
+      "difficulty": "easy",
+      "task_type": "exact_answer",
+      "prompt": "What is 2 + 3? Return the integer in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": 5,
+      "rationale": "Two plus three is five."
+    },
+    {
+      "id": "easy-02-larger",
+      "category": "reasoning",
+      "difficulty": "easy",
+      "task_type": "exact_answer",
+      "prompt": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": 9,
+      "rationale": "Nine is greater than four."
+    },
+    {
+      "id": "easy-03-length",
+      "category": "coding",
+      "difficulty": "easy",
+      "task_type": "trace",
+      "prompt": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": 3,
+      "rationale": "The list contains three elements."
+    },
+    {
+      "id": "easy-04-index",
+      "category": "coding",
+      "difficulty": "easy",
+      "task_type": "trace",
+      "prompt": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": 10,
+      "rationale": "Python index zero selects the first element."
+    },
+    {
+      "id": "easy-05-increment",
+      "category": "coding",
+      "difficulty": "easy",
+      "task_type": "trace",
+      "prompt": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": 3,
+      "rationale": "Incrementing two once gives three."
+    },
+    {
+      "id": "easy-06-copy",
+      "category": "extraction",
+      "difficulty": "easy",
+      "task_type": "structured_answer",
+      "prompt": "Read this record: {\"name\":\"job\",\"count\":4}. What is count? Return its integer value in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": 4,
+      "rationale": "Copy the count field without transformation."
+    },
+    {
+      "id": "easy-07-filter",
+      "category": "extraction",
+      "difficulty": "easy",
+      "task_type": "structured_answer",
+      "prompt": "Records: [{\"id\":\"a\",\"ok\":true},{\"id\":\"b\",\"ok\":false}]. Return the IDs with ok equal to true, in order. Put the array in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": [
+        "a"
+      ],
+      "rationale": "Only record a has ok equal to true."
+    },
+    {
+      "id": "easy-08-upper",
+      "category": "coding",
+      "difficulty": "easy",
+      "task_type": "trace",
+      "prompt": "In Python, what does 'cat'.upper() return? Return the string in a JSON object with one key named answer.",
+      "max_tokens": 64,
+      "expected": "CAT",
+      "rationale": "upper converts the three letters to uppercase."
+    }
+  ],
+  "requests": [],
+  "limits": "New decoding profile; does not replace earlier results. Eight serial requests, no retries or warmup. Request latency includes possible first-use grammar compilation, but excludes model startup and tokenization. No speedup, FP8 quality, or joint-placement claim.",
+  "error_type": "RuntimeError",
+  "runtime": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "configuration": {
+      "dtype": "bfloat16",
+      "quantization": null,
+      "kv_cache_dtype": "auto",
+      "tensor_parallel_size": 1,
+      "max_model_len": 4096,
+      "max_num_seqs": 8,
+      "max_num_batched_tokens": 4096,
+      "gpu_memory_utilization": 0.9,
+      "enable_prefix_caching": false,
+      "enable_chunked_prefill": true,
+      "enforce_eager": true
+    },
+    "config_hash": "9753f8db399fcf16336961bff61184383da95c3960b1d937f2f44e90090f2216",
+    "status": "startup-failed",
+    "generation": {
+      "temperature": 0,
+      "top_p": 1,
+      "top_k": -1,
+      "seed": 0,
+      "max_tokens": 64
+    },
+    "enable_thinking": false,
+    "sampled_peak_memory_mib": 88235,
+    "telemetry_errors": 0,
+    "versions": {
+      "vllm": "0.26.0",
+      "torch": "2.11.0",
+      "transformers": "5.17.0",
+      "flashinfer-python": "0.6.14"
+    },
+    "gpu": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-5e3cde45-6576-3bc3-fba4-dafa77928dc2",
+      "compute_capability": "12.0",
+      "total_mib": 97887,
+      "used_mib": 0,
+      "driver": "595.71.05"
+    },
+    "memory_before_mib": 0,
+    "command": [
+      "/tmp/uv-venv/bin/python",
+      "-m",
+      "vllm.entrypoints.openai.api_server",
+      "--model",
+      "Qwen/Qwen3-0.6B",
+      "--revision",
+      "c1899de289a04d12100db370d81485cdf75e47ca",
+      "--tokenizer-revision",
+      "c1899de289a04d12100db370d81485cdf75e47ca",
+      "--served-model-name",
+      "sera-model",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "35481",
+      "--dtype",
+      "bfloat16",
+      "--kv-cache-dtype",
+      "auto",
+      "--tensor-parallel-size",
+      "1",
+      "--max-model-len",
+      "4096",
+      "--max-num-seqs",
+      "8",
+      "--max-num-batched-tokens",
+      "4096",
+      "--gpu-memory-utilization",
+      "0.9",
+      "--no-enable-prefix-caching",
+      "--enable-chunked-prefill",
+      "--enforce-eager",
+      "--generation-config",
+      "vllm",
+      "--seed",
+      "0",
+      "--cpu-offload-gb",
+      "0",
+      "--enable-tokenizer-info-endpoint",
+      "--shutdown-timeout",
+      "15"
+    ],
+    "pid": 2033,
+    "error": "RuntimeError: vLLM exited with code 1; see server.log",
+    "memory_after_mib": 0,
+    "cleanup_pass": true
+  },
+  "task_quality": {
+    "correct": 0,
+    "total": 8,
+    "score": 0.0,
+    "floor": 0.99,
+    "passed": false
+  }
+}

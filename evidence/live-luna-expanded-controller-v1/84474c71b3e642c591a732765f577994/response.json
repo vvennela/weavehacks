@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No observed quality failure: all 96 requests succeeded with zero generation errors, and verified quality passed with mean 1.0 against the 0.99 floor. Latency remains the optimization objective, with p95 at 770.6006329999582 ms and p99 reliability false; the cause and distribution of tail latency are unknown. Inspecting latency outliers is therefore the most useful next read-only query.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14325,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 242,
+    "reasoning_output_tokens": 130
+  }
+}

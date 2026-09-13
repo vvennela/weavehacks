@@ -1,6 +1,6 @@
 # Sera Technical Specification
 
-Status: Hackathon specification; Qwen BF16 and FP8 KV runtime checks passed; task-quality acceptance is under review after the pilot; FP8 weights, GLM, and agent-provider checks are unverified
+Status: The single-model expanding swarm is demonstrated on pinned Qwen72B. Separate three-investigator Astra and Luna runs each completed three rounds and four GPU trials, including a measured combination and confirmation stop. Both passed the saved full-loop audit and returned a tested runner. Gains were 19.55% and 18.73% on repeated prompts after warmup. Luna needed one manual controller reconnection. See [the comparison](evidence/expanded-swarm-comparison/README.md). Simple-API defaults, clean-install packaging, controller transport recovery, and frozen benchmark collection/replay are now implemented; 917 tests pass. The installed API's quick-mode live rehearsal passed runtime acceptance, returned a runner, and cleaned up; it explicitly did not pass task correctness. Live outage recovery and a measured search-efficiency comparison are not established. Two-model placement, multi-GPU execution, full optimizer resume, and original full 32-prompt acceptance remain incomplete. See [release acceptance](docs/release-acceptance.md).
 
 ## 1. Purpose
 
@@ -72,7 +72,7 @@ The verified environment provides:
 - One NVIDIA RTX Pro 6000 Blackwell GPU
 - 96 GB GPU memory
 - Four CPUs
-- 32 GB host memory
+- 160 GiB host memory in the measured session (cgroup limit 171,798,691,840 bytes); the initial 32 GB assumption was incorrect
 - A maximum session length of 12 hours
 - Linux and Python package installation through uv
 
@@ -152,6 +152,8 @@ Quick mode supplies:
 
 Quick mode must state that task quality was not verified.
 
+The caller can supply `objective=sera.Objective(priority="latency" | "throughput" | "memory", min_improvement_fraction=0.05)`. Latency is the unchanged default. The priority is part of the agent evidence, deterministic decision, and saved report. Throughput means measured output tokens per second; memory means sampled peak total GPU memory during the trial, including runtime reservation. The current priority selector does not implement cost accounting or additional hardware support.
+
 ### 6.2 Verified mode
 
     result = sera.optimize(
@@ -172,6 +174,10 @@ Verified mode requires:
 - A quality floor
 - A latency requirement for each model
 - A workload definition
+
+The implemented single-model subset accepts `evaluation(prompt, output_text)` returning a boolean or finite score in [0, 1], a required nonempty `evaluation_version`, and one `Constraints` record (directly or in a one-element list). The quality floor is explicit; p95 latency and sampled-peak-memory limits are optional. `Workload(concurrency=[1, 2, 4, 8])` enables a measured load sweep; the default remains `[1]` for the existing quick path. The evaluator receives the original prompt and unmodified output; Sera does not repair formatting or execute model-produced code. Quality checks remain serial. Selection latency is the worst per-load p95; aggregate throughput is total output tokens divided by the sum of measured load-window durations. Every per-load result is retained.
+
+In verified mode, task scores replace the token-agreement acceptance proxy. The proxy can remain diagnostic. A baseline with a low task score may still provide measurements for a candidate trial. A baseline evaluator error stops the run. If only the candidate passes the requirements, return it with outcome `feasible`, without claiming improvement over an eligible baseline. If neither passes, close the runtime and return `no-safe-configuration` with no models. Never mark an ineligible fallback runner verified.
 
 ### 6.3 Result types
 
@@ -205,11 +211,12 @@ The defaults exist to keep the minimum call small.
 - Default concurrency sweep: 1, 2, 4, and 8
 - Default warm-up requests: one full pass through the prompt sample, capped at 16 requests
 - Default measured requests: three passes through the prompt sample, capped at 96 requests
-- Default candidate budget: eight trials across both phases
-- Reserved phase-two budget for two models: two trials
+- Normal optimization target: no fixed total candidate-trial limit; use the measured plateau rule below
+- An explicit candidate budget remains available for bounded comparisons and benchmarks; it is not a requirement to stop normal optimization after eight trials
+- For explicitly budgeted two-model runs, reserve two phase-two trials
 - Default quality tolerance: candidate proxy score must be at least 0.99 relative to the baseline
 - Default objective: pass quality first, then minimize p95 end-to-end latency, then minimize peak GPU memory
-- Default stop rule: stop after two rounds without frontier improvement or when the budget ends
+- Normal stop rule: after a round without qualifying objective progress, allow one confirmation round; stop if that round also makes no qualifying progress, or reset the check if it does
 
 Defaults must be printed in the summary and stored in the ledger.
 
@@ -257,11 +264,13 @@ Sera uses five AI roles:
 4. Arbiter
 5. Frontier reader
 
-The agents use W&B Inference through its OpenAI-compatible API. The user supplies the W&B API key through the environment. The agent model is configurable. openai/gpt-oss-20b is the proposed default, pending the provider check below.
+The hosted provider uses W&B Inference through its OpenAI-compatible API. The user supplies the W&B API key through the environment. The demonstrated expanded swarms use a separate Codex relay provider with three Astra or three Luna investigators; the local controller uses an existing Codex login. Provider and model choice are explicit. A W&B key is still needed for Weave. No provider is interchangeable with another provider's compatibility certificate.
 
 Each agent receives structured evidence and returns data that conforms to a fixed schema. An agent cannot execute commands, edit the ledger, approve a result, or bypass the validator.
 
-Before connecting agents to GPU trials, run a manual provider check with the actual proposal, arbiter, and frontier-reader schemas. Use response_format.type=json_schema with strict=true and validate responses locally. Run 30 recorded requests covering active levers, inactive levers, rejection history, ranking, and placement. Require at least 29 of 30 schema-valid first responses and 30 of 30 after at most one retry per failed response. Record first-pass validity, retries, truncation, API errors, and latency; do not repair malformed output silently. This is a small compatibility sample, not a reliability guarantee.
+The current typed controls are `max_num_batched_tokens` (integer 1–65,536), `max_num_seqs` (integer 1–256), `max_model_len` (integer 65–4,096), `kv_cache_dtype="fp8"`, the three booleans `enable_prefix_caching`, `enable_chunked_prefill`, and `enforce_eager`, and `gpu_memory_utilization` (greater than zero and at most 0.9). Reject booleans where a numeric value is required, no-op changes against the actual parent, and invalid coupled settings. Normal-mode values come from the validated generator or an explicit allowed space; benchmark proposals remain inside the frozen configuration universe. Schema capability alone does not authorize a live setting. Synthetic provider fixtures exercise each control and a nondefault parent; they are not measured GPU results.
+
+Before connecting agents to GPU trials, run the provider check with the actual proposal, arbiter, and frontier-reader schemas. Use strict structured output and validate responses locally; the Codex relay's documented decoder projection is also checked against the complete local schema. The expanded check has 34 recorded requests: 30 original conditions and four added control cases. Require at least 33 of 34 schema-valid first responses, 34 of 34 after at most one retry per failed response, and passing evidence-reference/context checks. Record first-pass validity, retries, truncation, API errors, and latency; do not repair malformed output silently. Both expanded Codex providers passed 34/34 first responses. Historical 30-case certificates do not certify these schemas. This is a small compatibility sample, not a reliability guarantee or a joint-placement provider check.
 
 If the model fails this check, keep agent selection disabled until another configured model passes the same check. Continue the fixed-candidate measured path. Missing credentials leave the check unverified. The [W&B structured-output example](https://docs.wandb.ai/inference/response-settings/structured-output) uses openai/gpt-oss-20b, but does not verify Sera's schemas.
 
@@ -512,14 +521,28 @@ Each round works as follows:
 8. Results enter the ledger.
 9. The next round receives a digest of successful, failed, and reverted trials.
 
-The scheduler selects one exploration trial from an untested legal proposal when the budget contains at least three remaining trials. This prevents the arbiter from testing only one familiar lever.
+For a bounded search, the scheduler selects one exploration trial from an untested legal proposal when the budget contains at least three remaining trials. This prevents the arbiter from testing only one familiar lever. In uncapped plateau mode, authorize at most one trial per round so its result informs the next decision; this per-round limit is not a total trial cap.
 
-The loop stops when:
+Normal optimization uses measured objective progress, not a fixed trial count, to decide when to stop. Compare the best quality-valid objective measurement after a round with the best quality-valid measurement before it. A qualifying improvement must be positive and reach the declared objective's minimum improvement fraction (five percent for the current latency workload). Throughput improves upward; latency and memory improve downward. A failed trial, missing objective measurement, or failed quality gate cannot establish progress. Changes only to other frontier dimensions do not reset this objective-specific check.
 
-- The candidate budget is exhausted.
-- Two complete rounds produce no frontier improvement.
-- No legal untested proposal remains.
-- The session has insufficient time for another trial and teardown.
+After the first round without qualifying progress, record the plateau and allow one confirmation round. If the confirmation round also makes no qualifying progress, stop with `objective-plateau-confirmed`. A qualifying improvement resets the check. Include the measurements, relative change, threshold, and confirmation state in the next round's evidence and the saved report. There is no fixed total trial-count limit in this mode.
+
+Other stop conditions remain explicit:
+
+- No legal untested proposal remains, or the agents explicitly decline further experiments. Do not claim a measured confirmation round occurred when none ran.
+- The user cancels, or a runtime safety failure prevents another trial.
+- An optional user-supplied candidate budget is exhausted in bounded mode.
+- The session has insufficient time for another trial and teardown; automatic session-time budgeting remains an implementation gap.
+
+These stop reasons do not establish global optimality. The result states what was measured, which user requirements passed, and why Sera stopped. The fixed section 19 benchmark budget and universe are unchanged.
+
+Implementation checkpoint: the single-model swarm now refreshes normal-mode candidates after measured outcomes. Three investigators inspect Weave records in parallel, share findings, refine proposals, and send them to an arbiter. Each receives up to eight legal candidate options, not eight GPU trials. Eight typed controls cover cache precision, batch tokens, sequence/context limits, prefix caching, chunked prefill, eager/graph execution, and GPU memory fraction. The 20-family sourced catalog marks missing adapters and incompatible hardware as unavailable. Qwen72B's combined FP8 weights/KV path remains disabled.
+
+Pairwise combination eligibility currently requires two separately measured, task-quality-passing single changes. The combination retains both component IDs and its actual measured parent, then passes through measurement and all selection gates again. A component need not meet the objective-improvement target alone; the graph-only Astra trial passed quality but missed that target. No combination gain is inferred without measurement.
+
+The [verified Astra run](evidence/live-astra-expanded-v1/README.md) completed four GPU trials across three swarm rounds, including a caching/graph combination and a measured confirmation stop. The returned winner passed all eight tasks and reduced worst-load p95 by 19.55% on repeated prompts after warmup. The returned-runner and full-loop audits pass. This does not establish search superiority or global optimality. Luna and Astra each passed the current 34-case Codex-relay provider check without retries; historical 30-case certificates do not certify the expanded schema. The local suite passes 851 tests. Joint placement, multi-GPU execution, cross-run failure reuse, combinations of more than two changes, and automatic session-time budgeting remain gaps. Omitting `Budget` preserves the original one-candidate milestone.
+
+An explicit `InvestigationSpace` can supply up to 32 legal single-setting values and an optional subset of full configuration hashes. Sera records and enforces this pool; the agent cannot add settings outside it. Defaults do not change when the parameter is omitted. Candidate sequence limits must cover the declared load, and reduced context limits must cover the baseline input tokens plus the unchanged output allowance. This is explicit scoped search, not automatic policy-generated values or exhaustive collection. The local offline rehearsal uses scripted agents and synthetic measurements and must be labeled as such.
 
 ## 14. Validation
 
@@ -589,10 +612,14 @@ The recommendation is selected from the frontier in this order:
 
 1. Pass the quality gate.
 2. Pass the latency requirement when supplied.
-3. Minimize p95 end-to-end latency.
+3. Apply the declared objective: minimize p95 end-to-end latency by default, maximize output throughput, or minimize sampled peak GPU memory.
 4. Minimize peak GPU memory as a tie-breaker.
 
 Phase two re-scores the frontier for the smallest configurations that still satisfy the model requirements.
+
+For the implemented one-candidate path, the default required relative improvement remains five percent, now against the declared objective. Callers can declare another nonnegative threshold below one before a run; an exact tie retains the baseline. Missing or invalid objective measurements cannot approve a candidate. Quality and reliability gates apply before selection under every objective. Report measured latency changes even for rejected candidates; reporting a change is not approval. Keep nondominated quality-valid trials as alternatives, including candidates that do not beat the selected objective's threshold. Incomplete measurements cannot establish dominance and must stay visibly unavailable.
+
+The section 19 benchmark and the original first-milestone acceptance remain latency-first with their existing thresholds. Changing a benchmark objective requires a separately declared benchmark; do not reinterpret saved runs as a new passing result.
 
 ## 17. Joint placement
 
@@ -790,6 +817,23 @@ The milestone is complete when a real run:
 - Stops the runner through close and confirms cleanup.
 
 Check the rejection branch manually with an explicitly labeled empty or altered output fixture; it must select the baseline. Fixture results do not count as measured model quality. A safe baseline return completes the milestone even when the candidate does not improve performance.
+
+### 23.1a Minimum agent-pipeline acceptance
+
+The fixed-candidate first milestone proves runtime infrastructure, not Sera's agent recommendation claim. The smallest demonstration of that claim adds one real recommendation agent; it does not require all five roles, joint placement, or a search-efficiency win.
+
+Accept the core pipeline when one saved real run shows:
+
+1. Sera measures a pinned baseline and supplies its actual metrics, supported settings, and budget to the agent.
+2. The agent returns a schema-valid recommendation with a reason tied to supplied evidence. It proposes one supported change or explicitly recommends keeping the baseline. A hard-coded candidate is not evidence of agent recommendation.
+3. Deterministic code validates the recommendation before execution. The agent cannot approve its own proposal, quality result, or final selection.
+4. For a proposed change, Sera measures that candidate with the same workload and applies the configured quality gate. The agent receives the measured outcome and produces a final recommendation that records whether its prediction held. A keep-baseline decision avoids an unnecessary candidate trial and is recorded as such.
+5. The existing improvement rule governs application: zero generation errors, a passing quality gate, and at least 5% lower measured p95. Otherwise Sera returns the baseline with the rejection reason. An agent recommendation is not automatic permission to apply a change.
+6. Sera returns a working runner, answers one fresh request, saves the report, and closes successfully. Preserve the agent input/output, validation, trial outcome, and final decision in the run record and in Weave when connected.
+
+A rejected recommendation with a usable baseline is a successful pipeline outcome. It does not establish an optimization win or evidence-driven search superiority. Provider reliability and the full benchmark claims remain separate checks; do not manufacture them from one agent call.
+
+Use the simpler questions in benchmarks/easy_cases.json for the bounded task-quality workload. Their Qwen72B FP8 deployment and four-load batching results are saved under evidence/large-fit-v1 and evidence/large-batch-comparison-v1. The first milestone's original measurement contract is not silently replaced by this eight-case dataset. A task-based evaluator must report absolute baseline/candidate correctness and newly failed cases separately from format compliance; a candidate must not be accepted merely because it matches an incorrect baseline answer.
 
 ### 23.2 Full MVP target
 

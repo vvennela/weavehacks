@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"keep-baseline\",\"proposal_id\":\"proposal-scheduling-confirmation-abstain\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":null,\"proposed_value\":null,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"trial_2_successful_requests\",\"trial_2_generation_errors\"],\"predicted_metric_change\":\"No validated metric improvement is predicted because no GPU trial is authorized. The observed trial-2 p95 latency was 770.3376119998211 ms versus baseline 771.0232489998816 ms, an observed improvement of only 0.0889%, below the required 5%. Evidence: diagnosis call 01a09aca-4cd8-73a9-bb1e-79bf88ddab44, paths decision and reduced.\",\"confidence\":0.99,\"expected_trial_cost\":0,\"falsification_condition\":\"This abstention is refuted only if an authorized, independently measured untested setting achieves at least 5% lower p95_latency_ms than 771.0232489998816 ms while preserving quality and workload constraints; the relevant fixed evidence paths are decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt in diagnosis call 01a09aca-4cd8-73a9-bb1e-79bf88ddab44.\",\"reason\":\"Observed failure: trial-2 was collected successfully with 96 successful requests and 0 generation errors, but its p95 latency improvement was 0.000889255934824125, so it failed the latency objective; diagnosis call 01a09aca-4cd8-73a9-bb1e-79bf88ddab44 and paths status, decision, reduced, runtime/sampled_peak_memory_mib, task_quality/per_prompt support this. The root cause remains not established, so no causal scheduling claim is made. Because the request does not authorize a GPU trial and the prior measured change did not meet the 5% threshold, keep the baseline.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17419,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 711,
+    "reasoning_output_tokens": 260
+  }
+}

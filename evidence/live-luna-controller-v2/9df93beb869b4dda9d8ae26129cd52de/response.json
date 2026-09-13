@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so the proposed p95 improvement and quality preservation were not evaluated. The deterministic selection chose baseline, and active batching is not supported in this single-model milestone; abstain from claiming a performance gain and revisit the placement in a later proposal.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10143,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 149,
+    "reasoning_output_tokens": 67
+  }
+}

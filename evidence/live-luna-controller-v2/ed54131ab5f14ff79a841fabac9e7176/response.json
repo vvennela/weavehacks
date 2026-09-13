@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection is baseline and the candidate was not tested, so the proposal's p95 and quality prediction was not evaluated. No measured candidate result or evidence path is available; the next proposal should address the unsupported single-model milestone placement.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10140,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 134,
+    "reasoning_output_tokens": 58
+  }
+}

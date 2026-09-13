@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-scheduling-prefix-caching-001\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"enable_prefix_caching\",\"proposed_value\":true,\"evidence_used\":[\"p95_latency_ms\",\"concurrency_1_cumulative_snapshot_mean_ttft_ms\",\"concurrency_4_cumulative_snapshot_mean_ttft_ms\",\"successful_requests\",\"generation_errors\"],\"predicted_metric_change\":\"At the measured repeated-prompt-after-warmup scope, enable_prefix_caching is hypothesized to reduce p95_latency_ms and concurrency_1_cumulative_snapshot_mean_ttft_ms relative to baseline; no gain is claimed before measurement.\",\"confidence\":0.62,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute the hypothesis if quality remains valid but p95_latency_ms and concurrency_1_cumulative_snapshot_mean_ttft_ms do not decrease, or if p95_latency_ms worsens materially; reject operationally if generation_errors becomes nonzero or successful_requests declines.\",\"reason\":\"Observed failure: none. Baseline recorded successful_requests=12 and generation_errors=0, with zero preemptions in the concurrency_1 and concurrency_4 cumulative snapshots; inspection read call 01a09b42-fd9f-7971-8e32-f2596be0a51a completed load_metrics, and model-request reads 01a09b42-fd9d-7a36-a4cd-cd77a14d5941 and 01a09b42-fd99-7b71-ade1-9837d99bc1a8 completed without errors. The fixed evidence path input_token_ids reports one prepared prompt of 25 tokens, so repeated-prompt reuse is plausible, but its causal benefit is unknown. I reject copying the memory_context and output_quality peer choices because their proposed gains address memory or graph execution rather than the scheduling evidence; prefix caching is an available-for-trial, untested batching control aligned with the declared repeated-prompt scope. The trial should compare p95_latency_ms and concurrency_1_cumulative_snapshot_mean_ttft_ms against baseline while checking successful_requests and generation_errors.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18664,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 581,
+    "reasoning_output_tokens": 113
+  }
+}

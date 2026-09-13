@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No failure was observed: trial-1 was collected with zero generation errors, quality mean 1.0 passed the 0.99 floor, and p95 latency improved from 72.79382900014753 ms to 44.00240399991162 ms. The cause of the improvement is unknown, while p99 is explicitly unreliable with only 12 measured requests. Inspecting latency outliers is therefore useful to determine whether the observed latency result is stable or driven by anomalous requests.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15400,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 242,
+    "reasoning_output_tokens": 114
+  }
+}

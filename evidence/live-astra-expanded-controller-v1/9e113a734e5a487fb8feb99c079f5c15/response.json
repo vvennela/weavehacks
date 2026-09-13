@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"prefix-caching-format-check\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"enable_prefix_caching\",\"proposed_value\":true,\"evidence_used\":[\"p95_latency_ms\",\"generation_errors\"],\"predicted_metric_change\":\"With reusable prompt prefixes under matched load, predict p95_latency_ms below the baseline 100 ms, with generation_errors remaining 0.\",\"confidence\":0.4,\"expected_trial_cost\":1,\"falsification_condition\":\"Under matched load with reusable prompt prefixes, p95_latency_ms is at least 100 ms or generation_errors exceeds 0.\",\"reason\":\"The synthetic fixture requests a trial. Enabling prefix caching changes the parent's false setting to the sole supported value and uses the one remaining trial. Prefix reuse is unverified; this is a testable hypothesis, not a measured performance claim or gate approval.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13991,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 205,
+    "reasoning_output_tokens": 0
+  }
+}

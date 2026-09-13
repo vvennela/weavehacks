@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"The observed failure is objective non-improvement for trial-3: p95 latency was 770.4907300012565 ms versus the 769.4799790006073 ms baseline, yielding an improvement fraction of -0.001313550746261043 against the required 0.05, while quality passed and generation_errors was 0 (diagnosis source 01a09b29-d886-7f1a-a219-45b31e47c021). Trial-2 did improve p95 latency to 625.3724439993675 ms, but its diagnosis also states that root cause was not established (source 01a09b26-af08-73d1-91c4-4ea6d7624968). The cause of the latency outcome is therefore unknown; the recorded cumulative snapshots do not establish causality. Inspect load_metrics to examine persisted per-load behavior relevant to the latency objective before any later experiment decision.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18272,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 354,
+    "reasoning_output_tokens": 133
+  }
+}

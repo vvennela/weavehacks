@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "scope": "Installed API, agent provenance, trace completion, runner ownership, cleanup",
+  "task_correctness_passed": false,
+  "live_outage_recovery_exercised": false,
+  "rounds": 3,
+  "candidate_trials": 3,
+  "baseline_measurements": 1,
+  "trace_calls": 175,
+  "typed_responses_bound_to_cli_and_trace": 41,
+  "source_sha256": {
+    "result.json": "25023ab354a85d4f2046e12993e47afbd4cb5d67285fd474ff3fb63e8d32a070",
+    "rehearsal.json": "a3288595301b302a04e6b7459ca5795c62314ae6d12620026d6e274d4bd4f6a5",
+    "weave-calls-normalized.json": "8ac4e97470e41f3940253dfb5d6b08a0e8c8b9863da80fd34cdad0ed3be13ec0"
+  },
+  "limits": [
+    "One prompt; token agreement is not task correctness.",
+    "Declared concurrency levels do not prove sustained load.",
+    "No search-efficiency or general speedup claim.",
+    "Caller generation and cleanup occur after the optimization root span ends."
+  ]
+}

@@ -6,7 +6,7 @@ Sera is a Python library that gives any developer fast model inference without r
 
 ## Central pitch
 
-Give Sera your models and representative prompts. Sera finds a fast, memory-efficient configuration on the available hardware and returns a model that is ready to use.
+Give Sera your models, representative prompts, and priorities. Sera tests ways to run the workload on the available hardware and returns usable models with the best measured configuration for those priorities. Latency, throughput, and memory can favor different plans; quality remains a hard constraint.
 
 Behind one simple call, a team of inference specialists chooses useful experiments, learns from failed trials, and avoids wasting GPU time on a full grid search. Sera does not guess that an optimization works. It runs the model and proves what changed.
 
@@ -33,6 +33,7 @@ import sera
 result = sera.optimize(
     models=["org/model-a", "org/model-b"],
     prompts=prompts,
+    objective=sera.Objective(priority="latency"),
 )
 
 result.print_summary()
@@ -53,9 +54,17 @@ Sera establishes a baseline for each model. It then measures the run and gives a
 - The batching specialist changes how requests are grouped and scheduled.
 - The parallelism specialist changes how model work is divided.
 
-An arbiter ranks the proposals and spends the experiment budget on the strongest candidates. A deterministic validator rejects illegal settings and configurations that cannot fit before they consume GPU time.
+An arbiter ranks the proposals and selects the strongest useful experiments. A deterministic validator rejects illegal settings and configurations that cannot fit before they consume GPU time.
+
+Normal optimization has no fixed total trial count. The orchestrator measures progress against the user's objective while preserving the quality requirements. A round without a qualifying objective improvement starts a plateau check. Sera allows one further round; qualifying progress resets the check, while a second round without progress ends the search. An experiment failure is evidence for the next round, not a reason to restart the same experiment. No legal proposal, an explicit agent abstention, cancellation, or a runtime safety failure can stop the run earlier, with its actual reason recorded. An optional user limit and the fixed benchmark budget remain separate controls.
 
 Each surviving candidate is loaded, warmed up, tested with representative work, and checked for quality. Sera records successful trials, failed trials, and reverts. It keeps a frontier of useful configurations instead of selecting only the fastest result.
+
+The user can prioritize latency, throughput, or memory. Latency remains the default. The selected priority reaches the agents and the deterministic selector, and is saved with the evidence. Cost optimization requires explicit resource prices and accounting; Sera must not infer a dollar cost from memory use alone.
+
+A model that cannot fit before optimization needs a separate fit-first path: reject impossible loading plans before execution, propose supported weight quantization and placement, then verify a feasible plan against the user's task requirements. An unavailable unquantized baseline cannot supply local latency or token-agreement evidence. The prototype implements this path for pinned Qwen2.5-72B using online FP8 weights on one GPU. It requires a task evaluator and explicit quality floor.
+
+The current single-GPU swarm investigates scheduling, memory/context, and output quality/execution. Each specialist receives up to eight legal candidate options. The menu expands from measured feedback and can combine two separately quality-passing changes. The [verified Astra loop](evidence/live-astra-expanded-v1/README.md) completed three swarm rounds and four GPU trials, then returned a caching/graph configuration with all eight tasks passing and 19.55% lower p95 latency. This gain applies to the measured repeated-prompt workload after warmup. Multi-GPU placement, global optimality, and search superiority over simpler methods are not established.
 
 ### Phase 2: optimize the models together
 

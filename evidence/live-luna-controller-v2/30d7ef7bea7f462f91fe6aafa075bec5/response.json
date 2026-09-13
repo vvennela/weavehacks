@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"proposal-scheduling-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"p50_latency_ms\",\"successful_requests\",\"generation_errors\",\"request_count\",\"sampled_peak_memory_mib\",\"trace_failed_task_count\"],\"predicted_metric_change\":\"p95_latency_ms is predicted to decrease by at least 5% from the baseline 770.9771380000348 ms, while successful_requests remains equal to request_count and generation_errors remains zero. This is a hypothesis, not a measured gain; candidate load evidence is from read call 01a09ab6-b8db-7676-a3a1-73d35c27c632 and fixed path runtime/sampled_peak_memory_mib.\",\"confidence\":0.62,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute if p95_latency_ms is not at least 5% below 770.9771380000348 ms, or if successful_requests falls below request_count, generation_errors becomes nonzero, trace_failed_task_count rises, or verified quality falls below 0.99. Check read call 01a09ab6-b8e6-76b4-881a-6b030798a556 and fixed paths status, decision, reduced, and task_quality/per_prompt.\",\"reason\":\"Observed failure: none was established. The prior candidate was collected and accepted with generation_errors=0 and verified quality mean=1.0 at read call 01a09ab6-b8e6-76b4-881a-6b030798a556; its load measurements are recorded at read call 01a09ab6-b8db-7676-a3a1-73d35c27c632. The underlying performance cause is unknown, and the diagnosis explicitly states that no model, kernel, memory-pressure, or scheduling cause was established. Independently of peer suggestions, 2048 is the legal untested batching setting most directly aligned with the latency objective. The baseline has p95_latency_ms=770.9771380000348, successful_requests=96, generation_errors=0, and trace_failed_task_count=0; the fixed evidence paths are status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. This supports one bounded trial but does not authorize claiming improvement before measurement.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 16064,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 799,
+    "reasoning_output_tokens": 263
+  }
+}

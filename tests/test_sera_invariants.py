@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from sera.arbiter import Arbiter
-from sera.config import InferenceConfig, baseline_config
-from sera.ledger import Ledger, Prediction
-from sera.phase1 import Phase1
-from sera.reduction import reduce_metrics
-from sera.runner.base import Tenant
-from sera.runner.sim_runner import SimRunner
-from sera.spec import load_spec
-from sera.specialists import ALL_SPECIALISTS
-from sera.specialists.base import Context, Dead, Proposal
+from sera_loop.arbiter import Arbiter
+from sera_loop.config import InferenceConfig, baseline_config
+from sera_loop.ledger import Ledger, Prediction
+from sera_loop.phase1 import Phase1
+from sera_loop.reduction import reduce_metrics
+from sera_loop.runner.base import Tenant
+from sera_loop.runner.sim_runner import SimRunner
+from sera_loop.spec import load_spec
+from sera_loop.specialists import ALL_SPECIALISTS
+from sera_loop.specialists.base import Context, Dead, Proposal
 
 SPEC = "specs/demo.yaml"
 
@@ -53,7 +53,7 @@ def test_arbiter_respects_slot_budget(tmp_path):
 
 def test_calibration_reorders_the_queue(tmp_path):
     """A specialist that has been wrong loses the contested slot to one that hasn't."""
-    from sera.ledger import Measurement, Substrate, TrialRecord, Verdict
+    from sera_loop.ledger import Measurement, Substrate, TrialRecord, Verdict
 
     led = Ledger(tmp_path / "l.jsonl")
     for i in range(4):
@@ -151,7 +151,7 @@ def test_dead_lever_is_reported_when_no_devices_are_free(tmp_path):
     )
     ctx = Context(digest=digest, config=cfg, model=model, gpu=gpu,
                   ledger=Ledger(tmp_path / "l.jsonl"), available_gpus=1)
-    from sera.specialists import ParallelismSpecialist
+    from sera_loop.specialists import ParallelismSpecialist
 
     verdicts = ParallelismSpecialist().propose(ctx)
     assert len(verdicts) == 1 and isinstance(verdicts[0], Dead)

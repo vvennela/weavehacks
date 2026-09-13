@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ab1-bd40-7112-8135-6a4e0797aac2"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"p1\"],\"reason\":\"Both proposals are legal and cost 1. With one trial remaining, p1 has the lower predicted p95 latency (90 ms versus 95 ms); no measured latency is supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12414,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":97,"reasoning_output_tokens":34}}

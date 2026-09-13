@@ -1,5 +1,21 @@
 # Vishnu: Backend Work
 
+## Current checkpoint
+
+The current implementation has a verified full Qwen72B swarm loop. Astra completed three investigation rounds and four GPU trials: FP8 deployment, prefix caching, graph execution, and their combination. All four passed the eight-task quality gate. The returned combination lowered p95 by 19.55% on repeated prompts after warmup, passed a fresh request, and released the GPU. Its full-loop audit passes with no issues; see [the saved run](evidence/live-astra-expanded-v1/README.md).
+
+Normal-mode candidates refresh after results. Each specialist gets up to eight legal options across the active typed controls; combinations retain their measured parents and are re-tested. Luna and Astra both passed 34/34 current schema cases without retries. The [completed Luna repeat](evidence/live-luna-expanded-v2/README.md) passes the full-loop audit and returned caching alone for an 18.73% gain after measuring its caching/batching combination. It needed one manual controller reconnection. The first interrupted Luna run remains preserved. The local suite passes 851 tests. Unattended long-outage recovery remains unproven.
+
+Priority is the single-model multi-agent product. Joint placement and the search-superiority benchmark remain unfinished. GLM passed the structured eight-task profile; Qwen0.6B passed 7/8 with both BF16 and FP8 weights. Do not lower the task gate or describe either Qwen result as eligible. The sections below preserve the original broader work scope; old checkpoint text is historical, not current release status.
+
+## Historical checkpoints
+
+Parallel agent-loop work is merged from three isolated worktrees. The controller now handles lifecycle errors, budgets, scoped proposal IDs, failure history, measured-frontier stopping, and explicit frozen candidate spaces. A plain-English report and a synthetic offline rehearsal are available. The integrated suite passes 271 tests and the wheel builds. The provider citation constraint is fixed locally; its new hosted check and a real multi-round GPU investigation have not run. No live search advantage is claimed.
+
+The narrow Qwen72B deployment and interactive rehearsal passed. A live four-load FP8-reference batching comparison also passed quality and returned the unchanged reference because the alternative did not meet the improvement threshold. Load sweeps, deterministic selection, raw evidence, and the delegated saved-outcome benchmark harness are implemented; 221 tests pass.
+
+An opt-in bounded investigation controller is now connected to the production runner and passes local tests: proposals, arbitration, measurement, gates, prediction review, history, and best-runner return. It has not run live. The approved schema expansion adds bounded batch-token, sequence, and context controls while preserving the existing live defaults. The new provider check reached 30/30 valid JSON responses, but four citation failures keep new agent-controlled runs blocked. Context-varying benchmark universes and the exact no-telemetry ablation still need contract decisions. Joint placement has not been implemented or executed: the specified Qwen0.6B/GLM pair failed isolated task requirements, so that path is blocked pending user direction. See plan.md and evidence/placement-prerequisites-v1/README.md. The work sections below describe the broader target, not a claim that all items are complete.
+
 ## Mission
 
 Build the measured optimization system behind Sera's simple public interface.

@@ -1,0 +1,175 @@
+{
+  "status": "complete",
+  "source_commit": "c4a914c074ceea59564ae2053d05c217c76deca3",
+  "checks": [
+    {
+      "label": "glm-bf16-v1",
+      "exit_code": 1,
+      "status": "fail",
+      "quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 0.0,
+        "valid_outputs": true,
+        "passed": false,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 0.0,
+            "error": null
+          }
+        ]
+      },
+      "cleanup_pass": true
+    },
+    {
+      "label": "glm-fp8-weights-v1",
+      "exit_code": 1,
+      "status": "fail",
+      "quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 0.0,
+        "valid_outputs": true,
+        "passed": false,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 0.0,
+            "error": null
+          }
+        ]
+      },
+      "cleanup_pass": true
+    },
+    {
+      "label": "qwen-fp8-placement-quality-v1",
+      "exit_code": 0,
+      "status": "fail",
+      "quality": {
+        "version": "sera-easy-strict-json-v1",
+        "floor": 0.99,
+        "mean": 0.125,
+        "valid_outputs": true,
+        "passed": false,
+        "task_quality_verified": true,
+        "per_prompt": [
+          {
+            "prompt_index": 0,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 1,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 2,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 3,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 4,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 5,
+            "score": 1.0,
+            "error": null
+          },
+          {
+            "prompt_index": 6,
+            "score": 0.0,
+            "error": null
+          },
+          {
+            "prompt_index": 7,
+            "score": 0.0,
+            "error": null
+          }
+        ]
+      },
+      "cleanup_pass": true
+    }
+  ],
+  "joint_trial_started": false
+}

@@ -1,0 +1,1 @@
+{"ranked_proposal_ids":[],"reason":"No observed failure requires diagnosis: trial-2 was collected successfully with zero generation errors, quality mean 1.0 passing the 0.99 floor, and p95 latency improving 18.85% from 770.60 ms to 625.34 ms. The root cause of the improvement is unknown, but no further read-only inspection is useful for this accepted outcome."}

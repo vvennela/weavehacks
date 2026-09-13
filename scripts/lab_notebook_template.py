@@ -39,11 +39,11 @@ def _():
         ).extractall(SERA_ROOT)
         _sys.path.insert(0, SERA_ROOT)
 
-    import sera
-    from sera.ledger import Ledger
-    from sera.phase1 import Phase1
-    from sera.runner.sim_runner import SimRunner
-    from sera.spec import load_spec
+    import sera_loop
+    from sera_loop.ledger import Ledger
+    from sera_loop.phase1 import Phase1
+    from sera_loop.runner.sim_runner import SimRunner
+    from sera_loop.spec import load_spec
     return Ledger, Phase1, SERA_ROOT, SimRunner, load_spec, sera
 
 
@@ -58,7 +58,7 @@ def _(mo, sera):
         anything that breaks the latency target or the quality floor is reverted
         and recorded as such.
 
-        This executes `sera` **{sera.__version__}** in your browser. Nothing below
+        This executes `sera` **{sera_loop.__version__}** in your browser. Nothing below
         is replayed — pressing Run calls `Phase1.run()` and the tables are built
         from the ledger it writes.
         """
@@ -317,7 +317,7 @@ def _(mo, model_select, rows):
                 "deterministic, so a re-run reproduces exactly. The loop, the specialists, "
                 "the arbiter and the gates are the real ones; the substrate underneath "
                 "them is a model rather than hardware. For measured numbers, run "
-                "`python -m sera --spec <spec> --vllm` on a GPU node." + _extra
+                "`python -m sera_loop --spec <spec> --vllm` on a GPU node." + _extra
             )
         }
     )

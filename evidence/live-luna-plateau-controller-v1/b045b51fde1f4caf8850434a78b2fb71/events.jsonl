@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ac7-6c9f-7380-86cb-67f990b2f1fc"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Baseline completed 96/96 requests with verified quality mean 1.0 and passed the 0.99 floor. The observed latency result is p95 771.023 ms, while p99 is explicitly unreliable; no trial evidence identifies the source of tail latency. Inspecting latency outliers is therefore the most useful next read-only action to characterize the measured tail before proposing a change.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":11371,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":234,"reasoning_output_tokens":128}}

@@ -1,0 +1,1 @@
+{"ranked_proposal_ids":["p1"],"reason":"p1 has the lower predicted p95 latency among the legal proposals."}

@@ -1,0 +1,80 @@
+{
+  "kind": "live-installed-package-quick-rehearsal",
+  "source_revision": "d8c7304",
+  "wheel_sha256": "1617374eb978c15f67c85fa0464af2d288474af1721c2a9be240500a80982e6a",
+  "python": "3.13.11 (main, Feb  3 2026, 03:08:54) [GCC 14.2.0]",
+  "installed_module": "/tmp/uv-venv/lib/python3.13/site-packages/sera/__init__.py",
+  "versions": {
+    "sera-inference": "0.2.0",
+    "weave": "0.53.2",
+    "vllm": "0.26.0",
+    "torch": "2.11.0"
+  },
+  "required_inputs": {
+    "models": [
+      "Qwen/Qwen3-0.6B"
+    ],
+    "prompts": [
+      "What is 1 + 1? Return only the number."
+    ]
+  },
+  "optional_inputs": {
+    "output_dir": "/marimo/sera-evidence/public-api-release-v1"
+  },
+  "passed": true,
+  "scope": "Quick-mode package and runner rehearsal; task quality and performance superiority are not established.",
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09b42-073e-7c8e-ab79-386fa285b4fa",
+  "returned_model_count": 1,
+  "post_return_probe": {
+    "text": "2",
+    "token_ids": [
+      17,
+      151645
+    ],
+    "prompt_token_ids": [
+      151644,
+      872,
+      198,
+      3838,
+      374,
+      220,
+      17,
+      488,
+      220,
+      17,
+      30,
+      3411,
+      1172,
+      279,
+      1372,
+      13,
+      151645,
+      198,
+      151644,
+      77091,
+      198,
+      151667,
+      271,
+      151668,
+      271
+    ],
+    "prompt_text": "<|im_start|>user\nWhat is 2 + 2? Return only the number.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+    "finish_reason": "stop",
+    "latency_ms": 72.34392999998818,
+    "usage": {
+      "prompt_tokens": 25,
+      "total_tokens": 27,
+      "completion_tokens": 2,
+      "prompt_tokens_details": null
+    }
+  },
+  "post_return_nonempty": true,
+  "probe_matches_four": false,
+  "returned_runner_closed": true,
+  "cleanup_passed": true,
+  "search": {
+    "trials_used": 3,
+    "stop_reason": "objective-plateau-confirmed"
+  },
+  "trace_status": "enabled"
+}

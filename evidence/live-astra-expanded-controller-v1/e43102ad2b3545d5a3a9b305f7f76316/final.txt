@@ -1,0 +1,23 @@
+{
+  "action": "trial",
+  "proposal_id": "output_quality-refine-graph-01",
+  "agent_role": "batching",
+  "parent_trial_id": "baseline",
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "changed_lever": "enforce_eager",
+  "proposed_value": false,
+  "evidence_used": [
+    "p95_latency_ms",
+    "generation_errors",
+    "successful_requests",
+    "sampled_peak_memory_mib",
+    "concurrency_8_cumulative_snapshot_mean_queue_ms",
+    "concurrency_8_cumulative_snapshot_preemptions",
+    "p99_reliable"
+  ],
+  "predicted_metric_change": "Hypothesis: enabling graph execution reduces worst-per-load p95_latency_ms by at least 5%, from 770.4877809992468 to at most 731.9633919492844 ms, relative to read 01a09b0e-fa43-74de-aea6-433da8a3162a at reduced/p95_latency_ms. Predict generation_errors remains zero and quality remains >=0.99, referenced to read 01a09b0e-fa51-74b9-86c4-c713021cc983 at reduced and task_quality/per_prompt. Graph startup and memory costs remain unmeasured.",
+  "confidence": 0.6,
+  "expected_trial_cost": 1,
+  "falsification_condition": "The latency prediction is refuted if the identical workload yields worst-per-load p95_latency_ms above 731.9633919492844 ms against read 01a09b0e-fa43-74de-aea6-433da8a3162a at reduced/p95_latency_ms. Startup failure makes the setting unusable without establishing a latency result. Any generation_errors, invalid outputs, or quality below 0.99 defeats the preservation prediction; compare read 01a09b0e-fa51-74b9-86c4-c713021cc983 at status, reduced, and task_quality/per_prompt. Record sampled_peak_memory_mib against that read's runtime/sampled_peak_memory_mib reference.",
+  "reason": "No observed failure is supplied: read 01a09b0e-fa51-74b9-86c4-c713021cc983 at status, decision, reduced, and task_quality/per_prompt records accepted collection, zero generation_errors, and quality mean 1.0. The cause of remaining latency is unknown. Read 01a09b0e-fa43-74de-aea6-433da8a3162a at reduced/p95_latency_ms shows latency rising from 572.3665739997159 ms at concurrency 1 to 770.4877809992468 ms at concurrency 8. Negligible cumulative queue snapshots and zero preemptions make execution overhead worth testing, but do not establish causality. I accept memory_context's graph proposal as a useful hypothesis based independently on these observations and the supplied available-for-trial graph-execution technique. I accept scheduling's prefix-reuse rationale for warmed repeated prompts, but its relative benefit is unmeasured; graph execution is the selected execution-focused experiment. The legal untested configuration changes only enforce_eager to false. The measured 88687 MiB peak warrants tracking capture costs; it does not establish spare memory. Unreliable p99 is not the decision target, and quality must be remeasured."
+}

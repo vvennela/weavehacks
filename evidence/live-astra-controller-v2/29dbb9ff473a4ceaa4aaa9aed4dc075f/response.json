@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"baseline-fp8-format-check\",\"agent_role\":\"quantization\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"kv_cache_dtype\",\"proposed_value\":\"fp8\",\"evidence_used\":[\"kv_cache_percent\",\"generation_errors\"],\"predicted_metric_change\":\"Hypothesis: changing kv_cache_dtype from auto to fp8 will reduce kv_cache_percent below 40 while generation_errors remains 0 under the same workload.\",\"confidence\":0.5,\"expected_trial_cost\":1,\"falsification_condition\":\"The hypothesis is falsified if kv_cache_percent is at least 40 or generation_errors exceeds 0 under the same workload.\",\"reason\":\"The synthetic fixture requests a trial shape. Switching the parent's auto KV cache dtype to the supported fp8 value costs one trial, matching the remaining budget. This is a testable proposal, not a measured result or gate approval.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13618,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 204,
+    "reasoning_output_tokens": 0
+  }
+}

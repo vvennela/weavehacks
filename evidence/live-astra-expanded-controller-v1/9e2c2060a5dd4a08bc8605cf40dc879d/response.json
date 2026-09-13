@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No failure is observed: source 01a09b0e-fa51-74b9-86c4-c713021cc983 reports accepted status, generation_errors=0, and quality.mean=1.0 above floor=0.99. Aggregate p95_latency_ms is 770.4877809992468; the inspected requests show concurrency-8 latency, but establish no kernel or scheduling cause. Inspect load_metrics as the second distinct query to compare latency across concurrency levels and identify which load determines the worst-per-load percentile. Cumulative queue/TTFT snapshots alone cannot establish causality.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17710,
+    "cached_input_tokens": 8448,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 145,
+    "reasoning_output_tokens": 0
+  }
+}

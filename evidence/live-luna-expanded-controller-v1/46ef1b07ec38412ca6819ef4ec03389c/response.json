@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so the proposed lower-p95 prediction was not measured and cannot be confirmed or refuted. Retain the baseline and abstain from claiming an improvement; a future proposal must execute a candidate trial with quality and p95 measurements.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 10145,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 132,
+    "reasoning_output_tokens": 52
+  }
+}

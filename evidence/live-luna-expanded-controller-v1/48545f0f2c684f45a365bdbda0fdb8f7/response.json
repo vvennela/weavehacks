@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"keep-baseline\",\"proposal_id\":\"baseline-format-check\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":null,\"proposed_value\":null,\"evidence_used\":[\"generation_errors\",\"kv_cache_percent\",\"mean_queue_ms\",\"p95_latency_ms\"],\"predicted_metric_change\":\"No metric change is predicted; p95_latency_ms remains 109 ms or within measurement variation.\",\"confidence\":0.99,\"expected_trial_cost\":0,\"falsification_condition\":\"A rerun of the unchanged baseline changes p95_latency_ms materially or records generation_errors above 0.\",\"reason\":\"The supplied format_check_action is keep-baseline; supported_changes is empty, generation_errors is 0, kv_cache_percent is 40, and mean_queue_ms is 0.1.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11550,
+    "cached_input_tokens": 7936,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 341,
+    "reasoning_output_tokens": 153
+  }
+}

@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested, so the prediction of at least 5% lower p95 while preserving quality was not evaluated. The baseline was selected under the supplied deterministic result; no performance gain or quality preservation can be confirmed."}

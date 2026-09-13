@@ -1,0 +1,9 @@
+{
+  "observed_at_utc": "2026-09-13T14:30:34Z",
+  "reason": "The original controller exited after three failed read-only connection attempts. The GPU process remained active.",
+  "action": "Restarted the same controller command against the same relay and output directories. The pending request had no local attempt directory. No GPU process or trial was restarted.",
+  "first_request_after_restart": "38d95a3cc8d647ee9d12f6e98fcc944c",
+  "controller_code_changed": false,
+  "automatic_recovery_established": false,
+  "underlying_connection_failure_cause": "not established"
+}

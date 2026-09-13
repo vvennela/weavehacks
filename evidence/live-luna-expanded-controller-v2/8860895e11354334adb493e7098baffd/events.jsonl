@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b26-dc24-7d11-85b5-1d6a6b0378ad"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No experiment failure was observed: trial-2 collected successfully, had zero generation errors, passed quality at mean 1.0, and improved p95 latency from 769.4799790006073 ms to 625.3724439993675 ms. The cause of that improvement remains unknown, and aggregate metrics do not show which concurrency load contributes to the worst-per-load latency objective. Inspect latency outliers next to obtain load-specific tail evidence; quality and load inspections are less directly useful because quality already passed and queue/preemption snapshots are near zero.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":15286,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":322,"reasoning_output_tokens":183}}

@@ -1,0 +1,40 @@
+{
+  "gpu_execution": false,
+  "checks": [
+    {
+      "label": "mixed-I-and-isystem",
+      "command": [
+        "/tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13/bin/nvcc",
+        "-isystem",
+        "/tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13/include",
+        "-arch=sm_120",
+        "-c",
+        "/marimo/sera-evidence/cuda-header-order-v1/probe.cu",
+        "-o",
+        "/marimo/sera-evidence/cuda-header-order-v1/mixed-I-and-isystem.o"
+      ],
+      "nvcc_prepend_flags": "-I /tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13/include -I /usr/local/lib/python3.13/site-packages/nvidia/cu13/include",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "In file included from tmpxft_00001304_00000000-6_probe.cudafe1.stub.c:1:\n/tmp/tmpxft_00001304_00000000-6_probe.cudafe1.stub.c:13:196: error: macro \"__cudaLaunch\" passed 2 arguments, but takes just 1\n   13 | __attribute__((visibility(\"hidden\"))) void __device_stub__Z5probePf(float *__par0){__cudaLaunchPrologue(1);__cudaSetupArgSimple(__par0, 0UL);__cudaLaunch(((char *)((void ( *)(float *))probe)), 0U);}\n      |                                                                                                                                                                                                    ^\nIn file included from /tmp/tmpxft_00001304_00000000-6_probe.cudafe1.stub.c:8:\n/usr/local/lib/python3.13/site-packages/nvidia/cu13/include/crt/host_runtime.h:130:9: note: macro \"__cudaLaunch\" defined here\n  130 | #define __cudaLaunch(fun) \\\n      |         ^~~~~~~~~~~~\n/tmp/tmpxft_00001304_00000000-6_probe.cudafe1.stub.c: In function \u2018void __device_stub__Z5probePf(float*)\u2019:\n/tmp/tmpxft_00001304_00000000-6_probe.cudafe1.stub.c:13:142: error: \u2018__cudaLaunch\u2019 was not declared in this scope; did you mean \u2018__cudaLaunchKernel\u2019?\n   13 | __attribute__((visibility(\"hidden\"))) void __device_stub__Z5probePf(float *__par0){__cudaLaunchPrologue(1);__cudaSetupArgSimple(__par0, 0UL);__cudaLaunch(((char *)((void ( *)(float *))probe)), 0U);}\n      |                                                                                                                                              ^~~~~~~~~~~~\n      |                                                                                                                                              __cudaLaunchKernel\n"
+    },
+    {
+      "label": "uniform-isystem",
+      "command": [
+        "/tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13/bin/nvcc",
+        "-isystem",
+        "/tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13/include",
+        "-arch=sm_120",
+        "-c",
+        "/marimo/sera-evidence/cuda-header-order-v1/probe.cu",
+        "-o",
+        "/marimo/sera-evidence/cuda-header-order-v1/uniform-isystem.o"
+      ],
+      "nvcc_prepend_flags": "-isystem /tmp/uv-venv/lib/python3.13/site-packages/nvidia/cu13/include -isystem /usr/local/lib/python3.13/site-packages/nvidia/cu13/include",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ac7-6ca6-7683-a5dd-96b0100fa652"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No quality failure is observed: verified quality passed with mean 1.0 and all 8 scored prompts valid. Latency is measured at p50 701.75 ms and p95 771.02 ms, while p99 is explicitly unreliable. The cause of the latency tail is unknown, so inspecting latency outliers is the most useful legal read-only next action.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":11383,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":216,"reasoning_output_tokens":113}}

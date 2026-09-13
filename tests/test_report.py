@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-import sera
-from sera import fixtures, report
+import sera_loop
+from sera_loop import fixtures, report
 
 # Functions that take a SeraResult and must never raise.
 RENDERERS = [
@@ -30,9 +30,9 @@ RENDERERS = [
 ]
 
 
-def empty_result(state: sera.RunState) -> sera.SeraResult:
+def empty_result(state: sera_loop.RunState) -> sera_loop.SeraResult:
     """The worst case: a run that produced nothing at all."""
-    return sera.SeraResult(state=state)
+    return sera_loop.SeraResult(state=state)
 
 
 ALL_RESULTS = [
@@ -40,7 +40,7 @@ ALL_RESULTS = [
     pytest.param(fixtures.no_safe_improvement_result(), id="no-safe-improvement"),
     *[
         pytest.param(empty_result(state), id=f"empty-{state.value}")
-        for state in sera.RunState
+        for state in sera_loop.RunState
     ],
 ]
 
@@ -136,7 +136,7 @@ class TestCopyableOutput:
     def test_usage_snippet_works_when_nothing_was_recommended(self):
         """The baseline models still come back and are still usable."""
         snippet = report.usage_snippet(fixtures.no_safe_improvement_result())
-        assert "sera.optimize(" in snippet
+        assert "sera_loop.optimize(" in snippet
         assert "generate(" in snippet
 
     def test_config_snippet_is_valid_python_literal(self):

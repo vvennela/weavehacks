@@ -1,0 +1,23 @@
+{
+  "action": "trial",
+  "proposal_id": "scheduling-disable-chunked-prefill",
+  "agent_role": "batching",
+  "parent_trial_id": "baseline",
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "changed_lever": "enable_chunked_prefill",
+  "proposed_value": false,
+  "evidence_used": [
+    "p95_latency_ms",
+    "trial_2_p95_latency_ms",
+    "trial_3_p95_latency_ms",
+    "trial_3_generation_errors",
+    "concurrency_8_cumulative_snapshot_mean_queue_ms",
+    "concurrency_8_cumulative_snapshot_mean_ttft_ms",
+    "concurrency_8_cumulative_snapshot_preemptions"
+  ],
+  "predicted_metric_change": "Hypothesis: disabling chunked prefill reduces scheduling overhead for these short prompts, lowering p95_latency_ms relative to 770.4877809992468 ms, with uncertain magnitude. Reference: call 01a09b0e-fa43-74de-aea6-433da8a3162a, reduced/p95_latency_ms. Beating the incumbent by 5% requires approximately 594.077 ms, based on call 01a09b12-5113-7563-b9bf-84b638c36485, reduced and decision; that gain is unmeasured and unlikely.",
+  "confidence": 0.3,
+  "expected_trial_cost": 1,
+  "falsification_condition": "The directional hypothesis is refuted if worst-per-load p95_latency_ms is unchanged or higher than baseline under the same workload (call 01a09b0e-fa43-74de-aea6-433da8a3162a, reduced/p95_latency_ms). A result above approximately 594.077 ms fails the incumbent-relative 5% progress target (call 01a09b12-5113-7563-b9bf-84b638c36485, decision and reduced). Quality below 0.99 or generation errors makes the candidate unacceptable; check task_quality/per_prompt and reduced using the same evidence structure.",
+  "reason": "Observed failure: trial-3 failed the improvement objective, with p95 764.9130589998094 ms versus baseline 770.4877809992468 ms, only 0.7235% better. It completed with zero generation errors and quality 1.0; this was not a startup or quality failure (call 01a09b17-cb99-7c6e-95a4-275a8f36a473; status, decision, reduced, task_quality/per_prompt). Its cause remains unknown. This supports testing a different execution strategy rather than repeating enforce_eager=false. Prepared prompts contain 85–109 tokens, so eight maximum-length prompts total only 872 tokens; changing batch budgets may leave actual scheduling unchanged, and sequence capacity already covers offered concurrency. Tiny cumulative queue measurements and zero preemptions provide little support for increasing capacity, though they do not establish causality. The supplied available-for-trial chunked-prefill technique supports this legal experiment: the unchanged 4096-token budget covers max_model_len=4096. Disabling chunking could reduce scheduling overhead, but short prompts may already avoid splitting. Trial-2 remains the measured incumbent (call 01a09b12-5113-7563-b9bf-84b638c36485; decision, reduced); this candidate is explicitly baseline-parented and does not inherit prefix caching. No peer claims were supplied."
+}

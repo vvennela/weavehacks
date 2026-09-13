@@ -1,0 +1,50 @@
+{
+  "measurement_checks_passed": true,
+  "full_loop_completed": true,
+  "manual_controller_reconnections": 1,
+  "unattended_transport_recovery_established": false,
+  "stop_reason": "objective-plateau-confirmed",
+  "measured_trials": [
+    {
+      "trial_id": "candidate",
+      "quality_mean": 1,
+      "p95_latency_ms": 769.4799790006073
+    },
+    {
+      "trial_id": "trial-2",
+      "quality_mean": 1,
+      "p95_latency_ms": 625.3724439993675
+    },
+    {
+      "trial_id": "trial-3",
+      "quality_mean": 1,
+      "p95_latency_ms": 770.4907300012565
+    },
+    {
+      "trial_id": "trial-4",
+      "quality_mean": 1,
+      "p95_latency_ms": 625.5590509990725
+    }
+  ],
+  "verified_combinations": [
+    {
+      "trial_id": "trial-4",
+      "components": [
+        "trial-2",
+        "trial-3"
+      ]
+    }
+  ],
+  "bound_completed_codex_responses": 45,
+  "timed_out_attempts": 1,
+  "specialist_shortlists_checked": 18,
+  "all_shortlist_counts": [
+    8
+  ],
+  "accepted_p95_improvement_fraction": 0.187279122178598,
+  "scope": "Repeated prompts after per-load warmup, not a cold/unseen-input benchmark.",
+  "returned_runner_task_passed": true,
+  "returned_runner_closed": true,
+  "source_result_sha256": "0b14aea1d5b56216d012116343831d0a5be1f2e9998ff9c66dc544d20154f8b5",
+  "limit": "Measured no-progress confirmation under the declared 5% threshold, not statistical proof or global optimality."
+}

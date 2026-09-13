@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aee-2083-73d2-aab9-79c1cf71bd18"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"p1\"],\"reason\":\"Both legal proposals fit the remaining trial budget; p1 has the lower predicted p95 latency (90 ms versus 95 ms).\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12415,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":50,"reasoning_output_tokens":0}}

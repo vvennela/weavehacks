@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"quality_outputs\"],\"reason\":\"No runtime failure was observed: trial-1 was collected with 12 successful requests and zero generation errors, and its diagnosis reports a passed quality gate with a 39.55% p95 latency improvement. However, measured_facts.trials records quality as measured=false, creating an unresolved quality-evidence inconsistency. The cause and validity of the accepted quality result are unknown, so inspecting quality_outputs is useful before any later experiment.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 15130,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 364,
+    "reasoning_output_tokens": 252
+  }
+}

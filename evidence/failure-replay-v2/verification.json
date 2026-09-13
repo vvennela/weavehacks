@@ -1,0 +1,224 @@
+{
+  "schema_version": "failure-replay-audit-v2",
+  "recorded_source_commit": "679cfa4",
+  "passed": false,
+  "mechanical_passed": false,
+  "factual_reasoning_passed": false,
+  "gpu_trials_executed": 0,
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a6d-0185-7238-98bd-7e43a144b336",
+  "trace_id": "01a09a6d-0184-7631-bb97-9bc1274bad5b",
+  "files": {
+    "result.json": {
+      "bytes": 12708553,
+      "sha256": "fc0141e693022d7b15ccd68326c519b34f75442e8db3ea9f1bc6b926424d6649"
+    },
+    "revealed-trial-2.json": {
+      "bytes": 696927,
+      "sha256": "b34def34fda10c8d08e336bd8cb533e55105a492c1a2c97dcae749e76a868f66"
+    },
+    "console.log": {
+      "bytes": 823,
+      "sha256": "ffe5ad413432af3366b9640f1161913d87d3e7cc23085be2e6f687426b0efcb3"
+    },
+    "weave-calls.json": {
+      "bytes": 22779194,
+      "sha256": "ca6a55b5d9ce504d9db5b284809305b09490b47abeacd5681629f1a1dd09c5a3"
+    },
+    "revealed-trial-1.json": {
+      "bytes": 26324,
+      "sha256": "f63a7231196a60c0fcd0a91ec3b5dc9c124f597288e10c1264e8d8271e696212"
+    }
+  },
+  "checks": {
+    "persisted_calls": 374,
+    "provider_attempts": 28,
+    "provider_matches": {
+      "messages": 28,
+      "parsed": 25,
+      "empty_content": 3,
+      "user_evidence": 28,
+      "semantic_content_reasoning_role": 28
+    },
+    "copied_original_payloads_matching": 282,
+    "copy_issues": [],
+    "round_trace_issues": [],
+    "round_trace_checks": "Scoped inspection source IDs, payload hashes/projections, exact proposal evidence/outputs, shared boards, and initial/refinement overlap passed in both rounds."
+  },
+  "investigator_phases": [
+    {
+      "round": 1,
+      "investigator": "scheduling",
+      "successful_reads": 1,
+      "read_status": "degraded",
+      "failed_queries": [
+        "task_quality"
+      ],
+      "prepared_prompt_tokens": {
+        "source_path": "input_token_ids",
+        "unit": "tokens per prepared prompt",
+        "prompt_count": 8,
+        "minimum": 85,
+        "maximum": 109,
+        "mean": 94.375
+      },
+      "remaining_trials": 1,
+      "initial_action": "trial",
+      "initial_lever": "max_num_batched_tokens",
+      "refined_status": "rejected",
+      "refined_lever": "kv_cache_dtype",
+      "false_2265_per_request": true,
+      "cutlass_initial_proposal": false,
+      "cutlass_refined_proposal": false
+    },
+    {
+      "round": 1,
+      "investigator": "memory_context",
+      "successful_reads": 1,
+      "read_status": "complete",
+      "failed_queries": [],
+      "prepared_prompt_tokens": {
+        "source_path": "input_token_ids",
+        "unit": "tokens per prepared prompt",
+        "prompt_count": 8,
+        "minimum": 85,
+        "maximum": 109,
+        "mean": 94.375
+      },
+      "remaining_trials": 1,
+      "initial_action": "trial",
+      "initial_lever": "kv_cache_dtype",
+      "refined_status": "accepted",
+      "refined_lever": "max_num_batched_tokens",
+      "false_2265_per_request": true,
+      "cutlass_initial_proposal": false,
+      "cutlass_refined_proposal": false
+    },
+    {
+      "round": 1,
+      "investigator": "output_quality",
+      "successful_reads": 1,
+      "read_status": "complete",
+      "failed_queries": [],
+      "prepared_prompt_tokens": {
+        "source_path": "input_token_ids",
+        "unit": "tokens per prepared prompt",
+        "prompt_count": 8,
+        "minimum": 85,
+        "maximum": 109,
+        "mean": 94.375
+      },
+      "remaining_trials": 1,
+      "initial_action": "trial",
+      "initial_lever": "kv_cache_dtype",
+      "refined_status": "accepted",
+      "refined_lever": "max_num_batched_tokens",
+      "false_2265_per_request": true,
+      "cutlass_initial_proposal": false,
+      "cutlass_refined_proposal": false
+    },
+    {
+      "round": 2,
+      "investigator": "scheduling",
+      "successful_reads": 2,
+      "read_status": "complete",
+      "failed_queries": [],
+      "prepared_prompt_tokens": {
+        "source_path": "input_token_ids",
+        "unit": "tokens per prepared prompt",
+        "prompt_count": 8,
+        "minimum": 85,
+        "maximum": 109,
+        "mean": 94.375
+      },
+      "remaining_trials": 0,
+      "initial_action": "trial",
+      "initial_lever": "kv_cache_dtype",
+      "refined_status": "rejected",
+      "refined_lever": "kv_cache_dtype",
+      "false_2265_per_request": true,
+      "cutlass_initial_proposal": false,
+      "cutlass_refined_proposal": false
+    },
+    {
+      "round": 2,
+      "investigator": "memory_context",
+      "successful_reads": 1,
+      "read_status": "degraded",
+      "failed_queries": [
+        "trial_diagnosis"
+      ],
+      "prepared_prompt_tokens": {
+        "source_path": "input_token_ids",
+        "unit": "tokens per prepared prompt",
+        "prompt_count": 8,
+        "minimum": 85,
+        "maximum": 109,
+        "mean": 94.375
+      },
+      "remaining_trials": 0,
+      "initial_action": "trial",
+      "initial_lever": "kv_cache_dtype",
+      "refined_status": "rejected",
+      "refined_lever": "kv_cache_dtype",
+      "false_2265_per_request": true,
+      "cutlass_initial_proposal": false,
+      "cutlass_refined_proposal": false
+    },
+    {
+      "round": 2,
+      "investigator": "output_quality",
+      "successful_reads": 2,
+      "read_status": "complete",
+      "failed_queries": [],
+      "prepared_prompt_tokens": {
+        "source_path": "input_token_ids",
+        "unit": "tokens per prepared prompt",
+        "prompt_count": 8,
+        "minimum": 85,
+        "maximum": 109,
+        "mean": 94.375
+      },
+      "remaining_trials": 0,
+      "initial_action": "trial",
+      "initial_lever": "kv_cache_dtype",
+      "refined_status": "rejected",
+      "refined_lever": "kv_cache_dtype",
+      "false_2265_per_request": true,
+      "cutlass_initial_proposal": false,
+      "cutlass_refined_proposal": false
+    }
+  ],
+  "recorded_criteria": {
+    "all_investigators_read": true,
+    "round_one_proposal": true,
+    "round_two_abstention": false,
+    "no_trace_errors": true,
+    "source_unchanged": true
+  },
+  "audit_scope": "Offline audit of saved files only. No provider, network, or GPU calls.",
+  "facts": {
+    "input_tokens_per_load": 2265,
+    "successful_requests_per_load": 24,
+    "mean_input_tokens_per_request": 94.375,
+    "maximum_prepared_prompt_tokens": 109,
+    "trial_1": "Startup failed; no measured quality or latency. Observed CUTLASS internal error does not establish root cause.",
+    "trial_2_quality": "8/8",
+    "baseline_p95_latency_ms": 774.183014999835,
+    "trial_2_p95_latency_ms": 773.7631910003984,
+    "trial_2_improvement_percent": 0.05422800439980201,
+    "required_improvement_percent": 5
+  },
+  "reasoning_failures": [
+    "All six refined proposals treat 2265 total load input tokens as per-request tokens despite explicit corrected summaries.",
+    "Accepted batching proposals and arbiter claim reducing the batch-token limit shrinks KV allocation and relieves pressure; the evidence does not establish this.",
+    "Round two proposes unavailable FP8 KV at budget zero rather than abstaining. Local validation rejects all three proposals.",
+    "FP8 KV proposals infer quality preservation from prompt length and guess auto KV means fp16. Neither is established by the saved evidence."
+  ],
+  "limitations": [
+    "Startup interpretation is explicitly coached; this is not blind root-cause discovery.",
+    "The earlier future trial-2 outcome sentence is absent; historical trial-2 evidence is revealed only for round two.",
+    "The replay forces a zero-budget second round and reveals historical results independently of the chosen proposal.",
+    "No new GPU measurements, prediction-review calls, or returned-runner checks occur in this replay.",
+    "Three provider attempts have empty content; the other 25 parse to the saved typed output. Successful transport and legal-action rejection do not establish good reasoning."
+  ]
+}

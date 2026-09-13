@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aee-b2f8-7550-8bda-360a2733300f"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection is baseline, the only eligible trial. The budget was exhausted and the candidate was not tested, so neither the predicted 5% p95 reduction nor preserved quality was measured. Abstain from a new proposal under the exhausted budget; no causal diagnosis is supported.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12600,"cached_input_tokens":8576,"cache_write_input_tokens":0,"output_tokens":82,"reasoning_output_tokens":0}}

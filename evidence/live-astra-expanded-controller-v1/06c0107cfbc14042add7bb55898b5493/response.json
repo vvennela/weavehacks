@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"trial\",\n  \"proposal_id\": \"memory-context-graph-trial-1\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": \"enforce_eager\",\n  \"proposed_value\": false,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"generation_errors\",\n    \"sampled_peak_memory_mib\",\n    \"concurrency_8_cumulative_snapshot_preemptions\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\"\n  ],\n  \"predicted_metric_change\": \"Hypothesis: permitting graph execution reduces execution overhead enough to lower p95_latency_ms by at least 5%, from 770.4877809992468 to at most 731.9633919492845 ms. The reference comes from read 01a09b0e-fa43-74de-aea6-433da8a3162a, reduced/p95_latency_ms. Memory may increase relative to 88687 MiB recorded in read 01a09b0e-fa51-74b9-86c4-c713021cc983 at runtime/sampled_peak_memory_mib; compatibility and gain remain unmeasured.\",\n  \"confidence\": 0.55,\n  \"expected_trial_cost\": 1,\n  \"falsification_condition\": \"Failure to start or p95_latency_ms above 731.9633919492845 ms refutes the proposed useful latency improvement against read 01a09b0e-fa43-74de-aea6-433da8a3162a, reduced/p95_latency_ms. Any generation_errors, invalid outputs, or quality below 0.99 rejects the candidate; compare read 01a09b0e-fa51-74b9-86c4-c713021cc983 at status, reduced, and task_quality/per_prompt. Measure runtime/sampled_peak_memory_mib again to assess graph allocation costs.\",\n  \"reason\": \"No failed trial is observed: read 01a09b0e-fa51-74b9-86c4-c713021cc983 at status, decision, reduced, and task_quality/per_prompt records an accepted result, zero generation_errors, and quality 1.0. Its root cause is explicitly not established. The supplied zero preemptions and negligible cumulative queue time do not establish memory pressure; sampled_peak_memory_mib alone does not establish an allocation bottleneck. Prepared prompts are only 85\u2013109 tokens, and lowering max_model_len at fixed gpu_memory_utilization would not prove smaller reserved KV memory. Consequently, choose the legal untested enforce_eager=false configuration to test execution overhead while preserving context and cache capacity. Read 01a09b0e-fa43-74de-aea6-433da8a3162a at reduced/p95_latency_ms establishes the latency reference, not the hypothesis's cause. Graph memory headroom remains uncertain. No peer claims were supplied.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 20816,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 685,
+    "reasoning_output_tokens": 39
+  }
+}

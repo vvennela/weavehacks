@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The candidate's p95 was 20% lower (80 ms versus 100 ms), but it failed quality, refuting the prediction of lower latency while preserving quality. The deterministic selection retains baseline, the only eligible trial. No causal diagnosis or evidence references were supplied; the next proposal must address quality preservation before claiming improvement.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12602,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 92,
+    "reasoning_output_tokens": 0
+  }
+}

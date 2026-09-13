@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aee-91f5-7a32-90a4-29dfd2ab5e6a"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so the proposed lower-p95 prediction was not measured and cannot be confirmed or refuted. Retain the baseline and abstain from claiming an improvement; a future proposal must execute a candidate trial with quality and p95 measurements.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10145,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":132,"reasoning_output_tokens":52}}

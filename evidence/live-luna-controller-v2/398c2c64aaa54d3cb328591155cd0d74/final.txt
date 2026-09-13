@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The deterministic selection is baseline and the candidate was not tested, so the proposed p95 improvement while preserving quality was not evaluated. The next proposal should provide an eligible candidate trial with measured latency and quality results."}

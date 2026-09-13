@@ -1,7 +1,7 @@
 """The notebook must stay on the public API, and must actually run.
 
 Two different failures are guarded here. The first is silent drift: someone adds
-`from sera.phase2 import Phase2` to get at a number quickly, and the notebook
+`from sera_loop.phase2 import Phase2` to get at a number quickly, and the notebook
 then breaks whenever the backend is refactored. The second is the demo dying on
 stage, which only an execution test can catch — importing the file proves
 nothing, because marimo cell bodies do not run at import time.
@@ -83,7 +83,7 @@ def test_notebook_only_uses_approved_sera_submodules():
         parts = module.split(".")
         if parts[0] != "sera" or len(parts) < 2:
             continue
-        # `from sera import fixtures` yields both "sera" and "sera.fixtures".
+        # `from sera_loop import fixtures` yields both "sera" and "sera_loop.fixtures".
         if parts[1] in ALLOWED_SERA_SUBMODULES:
             continue
         # Names imported from the top-level package are public API.
@@ -98,7 +98,7 @@ def test_notebook_has_a_single_switch_point():
     """B2's win condition: swapping to the real backend touches one place."""
     text = NOTEBOOK.read_text()
     assert text.count("THE SWITCH") == 1, "the construction point must be marked exactly once"
-    assert "sera.optimize(" in text, "the notebook must call the public entry point"
+    assert "sera_loop.optimize(" in text, "the notebook must call the public entry point"
 
 
 def test_notebook_executes_and_renders(tmp_path):

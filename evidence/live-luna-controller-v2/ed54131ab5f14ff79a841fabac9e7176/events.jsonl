@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09ab0-381f-7871-b6e8-dd8f9bfb0140"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The deterministic selection is baseline and the candidate was not tested, so the proposal's p95 and quality prediction was not evaluated. No measured candidate result or evidence path is available; the next proposal should address the unsupported single-model milestone placement.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10140,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":134,"reasoning_output_tokens":58}}

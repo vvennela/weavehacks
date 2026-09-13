@@ -21,7 +21,7 @@ def bundle() -> str:
     """Sera's source plus the lab specs, as one base64 zip."""
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-        for path in sorted((ROOT / "src" / "sera").rglob("*.py")):
+        for path in sorted((ROOT / "src" / "sera_loop").rglob("*.py")):
             # The vLLM runner needs subprocess and urllib, neither of which a
             # browser can offer. Nothing in the Phase 1 path imports it.
             if "vllm" in path.name or "__pycache__" in str(path):

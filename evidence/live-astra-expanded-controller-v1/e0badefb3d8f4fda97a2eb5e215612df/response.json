@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"trial\",\n  \"proposal_id\": \"scheduling-refine-prefix-cache-01\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": \"enable_prefix_caching\",\n  \"proposed_value\": true,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"generation_errors\",\n    \"successful_requests\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\",\n    \"concurrency_8_cumulative_snapshot_mean_ttft_ms\",\n    \"concurrency_8_cumulative_snapshot_preemptions\"\n  ],\n  \"predicted_metric_change\": \"Hypothesis, not a measured gain: enabling prefix caching under repeated-prompts-after-per-load-warmup reduces worst-per-load p95_latency_ms by at least 5%, from 770.4877809992468 to at most 731.9633919492844 ms. Reference: read call 01a09b0e-fa43-74de-aea6-433da8a3162a, reduced/p95_latency_ms. Predict generation_errors remains zero and quality remains at least 0.99, referencing read call 01a09b0e-fa51-74b9-86c4-c713021cc983, reduced and task_quality/per_prompt. This prediction applies to the declared warm repeated workload only.\",\n  \"confidence\": 0.56,\n  \"expected_trial_cost\": 1,\n  \"falsification_condition\": \"The predicted useful gain is refuted if matched-workload worst-per-load p95_latency_ms exceeds 731.9633919492844 ms against read call 01a09b0e-fa43-74de-aea6-433da8a3162a, reduced/p95_latency_ms. Startup failure, generation_errors above zero, invalid outputs, or quality below 0.99 makes the candidate unacceptable; compare read call 01a09b0e-fa51-74b9-86c4-c713021cc983 at status, reduced, and task_quality/per_prompt. Performance and quality require measurement.\",\n  \"reason\": \"No observed failure is supplied: read call 01a09b0e-fa51-74b9-86c4-c713021cc983 records accepted/collected at decision and status, zero generation_errors at reduced, and passing quality at task_quality/per_prompt. The performance bottleneck remains unknown. Read call 01a09b0e-fa43-74de-aea6-433da8a3162a at reduced/p95_latency_ms shows latency increasing with concurrency. Near-zero cumulative queue time and zero preemptions do not establish a scheduling bottleneck. Prepared prompts contain 85\u2013109 tokens, and the sequence cap already matches maximum offered concurrency, weakening the case for larger batching limits. I accept the scheduling peer's prefix-reuse hypothesis independently because the declared workload repeats prompts after warmup and the supplied available-for-trial prefix-reuse technique directly targets that work. I accept the other peers' graph-execution suggestion as plausible, but reject prioritizing it here because no supplied measurement isolates execution overhead. Prefix caching is a legal untested single change with a workload-specific mechanism; its compatibility and gain remain unmeasured.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 21785,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 746,
+    "reasoning_output_tokens": 41
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"scheduling:sera-refine-prefix-001\"],\"reason\":\"Observed baseline performance is p95 latency of 769.479979 ms with verified quality mean 1.0 and no generation errors; no execution failure or root cause was established. Because the workload uses repeated prompts after warmup, prefix caching is a legal, untested hypothesis for reducing latency, while its gain and compatibility remain unknown and must be measured before any gate decision.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17263,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 206,
+    "reasoning_output_tokens": 98
+  }
+}

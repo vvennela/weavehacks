@@ -1,0 +1,22 @@
+{
+  "action": "keep-baseline",
+  "proposal_id": "scheduling-keep-baseline-01",
+  "agent_role": "batching",
+  "parent_trial_id": "baseline",
+  "model_id": "Qwen/Qwen2.5-72B-Instruct",
+  "changed_lever": null,
+  "proposed_value": null,
+  "evidence_used": [
+    "p95_latency_ms",
+    "generation_errors",
+    "successful_requests",
+    "concurrency_8_cumulative_snapshot_mean_queue_ms",
+    "concurrency_8_cumulative_snapshot_preemptions",
+    "p99_reliable"
+  ],
+  "predicted_metric_change": "Neither supported token budget is expected to reduce p95_latency_ms by the required 5%. Call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0, reduced/p95_latency_ms, reports 770.03468 ms at concurrency 8; baseline/prepared_prompt_tokens reports at most 109 tokens per prompt, so eight prompts total at most 872 tokens, below both proposed budgets. This is a scheduling hypothesis, not a measured comparison.",
+  "confidence": 0.9,
+  "expected_trial_cost": 0,
+  "falsification_condition": "A controlled comparison showing p95_latency_ms at or below 731.532946 ms for either supported budget, while preserving quality at least 0.99 and workload constraints, would refute the prediction. Compare against call 01a09abd-3185-79bc-8c4e-d36fe0bc8aa0 at reduced/p95_latency_ms and call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 at task_quality/per_prompt; no such comparison is supplied.",
+  "reason": "No failure is observed: call 01a09abd-3192-7b8c-bc3c-6f509a2cd724 records accepted/collected at status and decision, with zero generation_errors at reduced and passing measured quality at task_quality/per_prompt. These observations establish no scheduling root cause. The baseline completed 96/96 requests; concurrency_8_cumulative_snapshot_mean_queue_ms is approximately 0.0074 and concurrency_8_cumulative_snapshot_preemptions is zero, though cumulative snapshots cannot establish causality. At baseline/prepared_prompt_tokens, the maximum prepared length is 109 tokens; eight such prompts fit within even the smallest supported budget, 1024. Consequently, neither 1024 nor 2048 has an evidenced mechanism for the required latency gain, supporting abstention. The unreliable p99 supplies no stronger justification."
+}

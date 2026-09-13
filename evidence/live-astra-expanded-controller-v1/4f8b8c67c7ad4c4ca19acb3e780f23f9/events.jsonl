@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b0f-25b8-7e02-95a4-b788b9639e79"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No failure is observed: successful_requests=96, generation_errors=0, and baseline quality.mean=1.0 with passed=true. The measured p95_latency_ms=770.4877809992468 establishes baseline latency, but its causes remain unknown; cumulative queue/TTFT snapshots do not establish a bottleneck. Inspect latency_outliers for request-level evidence to guide a later execution-strategy proposal. No source call IDs or peer claims were supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":16597,"cached_input_tokens":8448,"cache_write_input_tokens":0,"output_tokens":117,"reasoning_output_tokens":0}}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"proposal-memory-context-2048\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_num_batched_tokens\",\"proposed_value\":2048,\"evidence_used\":[\"p95_latency_ms\",\"p50_latency_ms\",\"generation_errors\",\"successful_requests\",\"sampled_peak_memory_mib\",\"concurrency_8_cumulative_snapshot_mean_ttft_ms\"],\"predicted_metric_change\":\"May modestly reduce p95_latency_ms and p50_latency_ms while preserving successful_requests, generation_errors, and the 0.99 quality floor; no measured gain is claimed.\",\"confidence\":0.62,\"expected_trial_cost\":1,\"falsification_condition\":\"Refuted if the trial fails the fixed 0.99 quality floor, generation_errors increases, successful_requests falls below 96, or p95_latency_ms does not improve by at least 5% versus the baseline 770.9917920001317.\",\"reason\":\"No observed runtime failure exists: read call 01a09acf-b9a8-78aa-b625-b20ab8d42887 records status=collected, generation_errors=0, and verified quality mean 1.0; the prior candidate was accepted, not failed. Its recorded evidence paths status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt do not establish a causal memory or scheduling explanation. Baseline p95_latency_ms is 770.9917920001317, p50_latency_ms is 701.4812399997936, successful_requests is 96, and sampled_peak_memory_mib is 88687. The scheduling and output_quality peer suggestions for max_num_batched_tokens=2048 are consistent with this independently observed latency objective, but are not treated as evidence of gain. The setting is legal and untested in the current trials list; the trial should test whether the lower batch-token cap improves latency without violating quality or reliability gates.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 16209,
+    "cached_input_tokens": 6912,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 624,
+    "reasoning_output_tokens": 197
+  }
+}

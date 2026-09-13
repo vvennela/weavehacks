@@ -1,0 +1,14 @@
+{
+  "mode": "isolated-local-wheel-install",
+  "python": "3.11.15",
+  "sera_version": "0.1.0",
+  "pydantic_version": "2.13.5",
+  "wheel_sha256": "c1e6b9dae912ddf4b9927aebc09d0de12abbebccc69dd7fffe9215c5250f9cfd",
+  "import_outside_repository": true,
+  "default_config_validation": true,
+  "installed_token_summary": true,
+  "gpu_trials": 0,
+  "provider_calls": 0,
+  "passed": true,
+  "limits": "Core wheel import/config/evidence checks only; not a Linux GPU runtime or Molab clean-install acceptance."
+}

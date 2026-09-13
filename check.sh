@@ -26,8 +26,8 @@ step() {
 step "Test suite" "$PY" -m pytest -q
 
 step "Public API imports cleanly" "$PY" -c "
-import sera
-from sera import fixtures, report
+import sera_loop as sera
+from sera_loop import fixtures, report
 assert callable(sera.optimize)
 for fn in (fixtures.demo_result, fixtures.no_safe_improvement_result):
     r = fn()
@@ -40,10 +40,10 @@ print('public surface ok')
 # other half of the team and are edited concurrently; linting them here would
 # report failures that are neither ours to fix nor a reason to hold the demo.
 PRODUCT_FILES=(
-    src/sera/types.py
-    src/sera/fixtures.py
-    src/sera/report.py
-    src/sera/__init__.py
+    src/sera_loop/types.py
+    src/sera_loop/fixtures.py
+    src/sera_loop/report.py
+    src/sera_loop/__init__.py
     tests/test_contract.py
     tests/test_report.py
     tests/test_notebook.py

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"The observed failure is objective-not-improved: trial-2 reduced p95 latency from 771.0232489998816 ms to 770.3376119998211 ms, an improvement of 0.000889255934824125, below the required 0.05, while measured quality passed at mean 1.0 and generation_errors were 0. The cause remains unknown; the diagnosis explicitly does not establish a model, kernel, memory-pressure, or scheduling cause. Inspecting load metrics is useful to examine the measured runtime and memory-related evidence before making another decision; no causal performance claim is assumed.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 13771,
+    "cached_input_tokens": 8960,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 346,
+    "reasoning_output_tokens": 195
+  }
+}

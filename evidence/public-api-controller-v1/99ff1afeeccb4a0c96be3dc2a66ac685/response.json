@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"memory-context-prefix-caching-01\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"enable_prefix_caching\",\"proposed_value\":true,\"evidence_used\":[\"p95_latency_ms\",\"concurrency_1_cumulative_snapshot_mean_ttft_ms\",\"successful_requests\",\"generation_errors\",\"input_tokens\"],\"predicted_metric_change\":\"At the measured repeated-prompts-after-per-load-warmup scope, p95_latency_ms and concurrency_1_cumulative_snapshot_mean_ttft_ms may decrease while successful_requests remains 12 and generation_errors remains 0; no gain is claimed before measurement.\",\"confidence\":0.58,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute the prediction if quality passes but p95_latency_ms or concurrency_1_cumulative_snapshot_mean_ttft_ms does not decrease, or if generation_errors rises or successful_requests falls; also reject it if repeated-prompt reuse is not observable in the measured scope.\",\"reason\":\"Observed failure: none. Baseline completed 12 successful_requests with 0 generation_errors, zero preemptions at all listed concurrency levels, and input_tokens totaled 300; the latency-outlier and quality inspections completed via read call 01a09b42-073d-7d46-8a5c-1fb1ac3e99f1, while load metrics came from 01a09b42-fd9f-7971-8e32-f2596be0a51a and prepared prompt lengths are recorded at fixed evidence path input_token_ids (25 tokens per prepared prompt). The cause of baseline p95_latency_ms=72.79382900014753 is therefore unknown, and sampled_peak_memory_mib=88303 with no preemptions does not establish cache pressure. I reject the peer memory_context suggestion of fp8 as a first latency-focused test because its predicted benefit is memory reduction without observed pressure. The scheduling peer's prefix-caching hypothesis is relevant because the declared workload explicitly measures repeated prompts after warmup; this candidate is legal, untested, and directly tests a latency mechanism. These read-call and fixed-path observations support testing reuse rather than abstaining.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18884,
+    "cached_input_tokens": 6912,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 637,
+    "reasoning_output_tokens": 164
+  }
+}

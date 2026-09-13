@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09af0-ee61-7b23-be4a-4c8bb9fc2606"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"weight-fp8\"],\"reason\":\"Weight-only FP8 is the only legal and estimated-feasible plan: it reduces estimated peak memory to 90.2 GB within the 92.4 GB service budget while retaining BF16 KV cache, but latency and quality are unmeasured. A real trial is useful to assess the latency objective and verify the 0.99 quality floor; no speedup can be claimed because the BF16 baseline will not run.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10590,"cached_input_tokens":8960,"cache_write_input_tokens":0,"output_tokens":148,"reasoning_output_tokens":35}}

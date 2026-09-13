@@ -1,0 +1,1 @@
+{"ranked_proposal_ids":[],"reason":"No legal proposals are eligible because the remaining trial budget is zero."}

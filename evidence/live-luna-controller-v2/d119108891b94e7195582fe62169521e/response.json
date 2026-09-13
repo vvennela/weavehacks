@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"candidate\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The deployment-feasibility prediction was confirmed: the candidate completed collection with 96/96 successful requests, no generation errors, task quality 1.0 meeting the 0.99 floor, and no candidate constraint failures. Recorded evidence: status, decision, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. Baseline was not measured and no speedup claim is supported; do not retry this configuration in the bounded search.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11588,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 163,
+    "reasoning_output_tokens": 46
+  }
+}
