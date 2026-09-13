@@ -1,0 +1,84 @@
+[
+  {
+    "id": "easy-01-add",
+    "category": "reasoning",
+    "difficulty": "easy",
+    "task_type": "exact_answer",
+    "prompt": "What is 2 + 3? Return the integer in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": 5,
+    "rationale": "Two plus three is five."
+  },
+  {
+    "id": "easy-02-larger",
+    "category": "reasoning",
+    "difficulty": "easy",
+    "task_type": "exact_answer",
+    "prompt": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": 9,
+    "rationale": "Nine is greater than four."
+  },
+  {
+    "id": "easy-03-length",
+    "category": "coding",
+    "difficulty": "easy",
+    "task_type": "trace",
+    "prompt": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": 3,
+    "rationale": "The list contains three elements."
+  },
+  {
+    "id": "easy-04-index",
+    "category": "coding",
+    "difficulty": "easy",
+    "task_type": "trace",
+    "prompt": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": 10,
+    "rationale": "Python index zero selects the first element."
+  },
+  {
+    "id": "easy-05-increment",
+    "category": "coding",
+    "difficulty": "easy",
+    "task_type": "trace",
+    "prompt": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": 3,
+    "rationale": "Incrementing two once gives three."
+  },
+  {
+    "id": "easy-06-copy",
+    "category": "extraction",
+    "difficulty": "easy",
+    "task_type": "structured_answer",
+    "prompt": "Read this record: {\"name\":\"job\",\"count\":4}. What is count? Return its integer value in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": 4,
+    "rationale": "Copy the count field without transformation."
+  },
+  {
+    "id": "easy-07-filter",
+    "category": "extraction",
+    "difficulty": "easy",
+    "task_type": "structured_answer",
+    "prompt": "Records: [{\"id\":\"a\",\"ok\":true},{\"id\":\"b\",\"ok\":false}]. Return the IDs with ok equal to true, in order. Put the array in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": [
+      "a"
+    ],
+    "rationale": "Only record a has ok equal to true."
+  },
+  {
+    "id": "easy-08-upper",
+    "category": "coding",
+    "difficulty": "easy",
+    "task_type": "trace",
+    "prompt": "In Python, what does 'cat'.upper() return? Return the string in a JSON object with one key named answer.",
+    "max_tokens": 64,
+    "expected": "CAT",
+    "rationale": "upper converts the three letters to uppercase."
+  }
+]

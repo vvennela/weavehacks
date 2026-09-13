@@ -2,6 +2,25 @@
 
 Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
 
+## Start here: clone the notebook
+
+Clone the [Molab quickstart](notebooks/molab_quickstart.py) into your own workspace.
+**Add your keys here:** use its empty OpenAI and W&B password fields, then check
+setup and run either example. Both latency-only and latency → throughput code
+are preserved. Use the prepared GPU runtime; the notebook does not create compute.
+
+```python
+with sera.optimize(**demo_config, stages=["latency", "throughput"], k=3.0,
+                   min_improvement_pct=5.0) as y:
+    y.print_summary()
+
+sera.visualize(y)  # Replay this result, not a fixed demo recording.
+```
+
+Downloadable scripts and installation commands are in [examples/](examples/README.md).
+The package comes from this GitHub repository and imports as `sera`.
+Live GPU and provider usage can cost money; the saved replay makes no API calls.
+
 See [completion.md](completion.md) for the current verified status, remaining work,
 and local/cloud setup. The rehearsal sections below preserve historical results.
 
