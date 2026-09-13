@@ -101,25 +101,60 @@ def test_unsupported_config_fails_the_trial_without_starting_a_server(spec):
 # ---- metrics parser against real-shaped vLLM output ----------------------
 
 
+# Real v0.29 exposition shape: BOTH labels present, emitted alphabetically
+# (engine, then le, then model_name), values rendered as floats.
 SAMPLE_METRICS = """\
-# HELP vllm:num_requests_running Number of requests currently running on GPU.
+# HELP vllm:num_requests_running Number of requests in model execution batches.
 # TYPE vllm:num_requests_running gauge
-vllm:num_requests_running{model_name="Qwen/Qwen3-0.6B"} 3.0
-# HELP vllm:gpu_cache_usage_perc GPU KV-cache usage. 1 means 100 percent usage.
-# TYPE vllm:gpu_cache_usage_perc gauge
-vllm:gpu_cache_usage_perc{model_name="Qwen/Qwen3-0.6B"} 0.4217
-# HELP vllm:num_preemptions_total Cumulative number of preemptions from the engine.
+vllm:num_requests_running{engine="0",model_name="Qwen/Qwen3-0.6B"} 3.0
+# HELP vllm:kv_cache_usage_perc KV-cache usage. 1 means 100 percent usage.
+# TYPE vllm:kv_cache_usage_perc gauge
+vllm:kv_cache_usage_perc{engine="0",model_name="Qwen/Qwen3-0.6B"} 0.4217
+# HELP vllm:num_preemptions_total Cumulative number of preemption from the engine.
 # TYPE vllm:num_preemptions_total counter
-vllm:num_preemptions_total{model_name="Qwen/Qwen3-0.6B"} 17.0
+vllm:num_preemptions_total{engine="0",model_name="Qwen/Qwen3-0.6B"} 17.0
+# HELP vllm:time_to_first_token_seconds Histogram of time to first token in seconds.
+# TYPE vllm:time_to_first_token_seconds histogram
+vllm:time_to_first_token_seconds_bucket{engine="0",le="0.01",model_name="Qwen/Qwen3-0.6B"} 2.0
+vllm:time_to_first_token_seconds_bucket{engine="0",le="+Inf",model_name="Qwen/Qwen3-0.6B"} 64.0
+vllm:time_to_first_token_seconds_count{engine="0",model_name="Qwen/Qwen3-0.6B"} 64.0
+vllm:time_to_first_token_seconds_sum{engine="0",model_name="Qwen/Qwen3-0.6B"} 2.9481
 """
 
 
 def test_parser_reads_labelled_metrics_and_skips_comments():
     parsed = parse_prometheus(SAMPLE_METRICS)
     assert parsed["vllm:num_requests_running"] == 3.0
-    assert parsed["vllm:gpu_cache_usage_perc"] == pytest.approx(0.4217)
+    assert parsed["vllm:kv_cache_usage_perc"] == pytest.approx(0.4217)
     assert parsed["vllm:num_preemptions_total"] == 17.0
     assert not any(k.startswith("#") for k in parsed)
+
+
+def test_parser_handles_histogram_sample_names():
+    """Histograms are where a naive parser breaks — `le` is a label, not a value."""
+    parsed = parse_prometheus(SAMPLE_METRICS)
+    assert parsed["vllm:time_to_first_token_seconds_count"] == 64.0
+    assert parsed["vllm:time_to_first_token_seconds_sum"] == pytest.approx(2.9481)
+
+
+def test_kv_usage_tolerates_the_v0_to_v1_rename():
+    """V1 renamed gpu_cache_usage_perc to kv_cache_usage_perc.
+
+    Reading only one spelling against the other server yields 0.0 and the loop then
+    believes the cache is permanently empty — a silent corruption of the evidence.
+    """
+    from sera.runner.vllm_runner import _kv_usage
+
+    assert _kv_usage({"vllm:kv_cache_usage_perc": 0.62}) == pytest.approx(0.62)
+    assert _kv_usage({"vllm:gpu_cache_usage_perc": 0.44}) == pytest.approx(0.44)
+    assert _kv_usage({}) == 0.0
+
+
+def test_launch_flags_omit_the_removed_log_flag(spec):
+    """--disable-log-requests was removed from vLLM; passing it fails startup."""
+    m = spec.model("qwen3_06b")
+    args = vllm_flags(m, baseline_config(m), spec.gpu("gpu0"), 8000)
+    assert "--disable-log-requests" not in args
 
 
 def test_parser_tolerates_junk_without_raising():
@@ -136,9 +171,12 @@ def test_fake_server_metrics_round_trip_through_the_parser():
     with FakeVllmServer("m", FakeEngineProfile(startup_s=0.0)) as s:
         text = urllib.request.urlopen(f"{s.base_url}/metrics", timeout=5).read().decode()
     parsed = parse_prometheus(text)
-    for metric in ("vllm:num_requests_running", "vllm:gpu_cache_usage_perc",
-                   "vllm:num_preemptions_total", "vllm:generation_tokens_total"):
+    for metric in ("vllm:num_requests_running", "vllm:kv_cache_usage_perc",
+                   "vllm:num_preemptions_total", "vllm:generation_tokens_total",
+                   "vllm:time_to_first_token_seconds_count"):
         assert metric in parsed, f"{metric} missing from fake output"
+    # Both labels must be present or the fake is not exercising real parsing.
+    assert 'engine="0"' in text and "model_name=" in text
 
 
 # ---- the runner, against the fake ----------------------------------------

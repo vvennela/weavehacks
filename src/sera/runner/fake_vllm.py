@@ -29,15 +29,27 @@ from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
-# Metric names as vLLM actually exposes them. Kept in one place: if a vLLM release
-# renames one, this is the only edit, and the runner's parser is driven off the same
-# constants so the fake and the parser can never drift apart.
+# Metric names as vLLM actually exposes them, verified against the v0.29 source.
+# Kept in one place so a rename is a single edit, and the runner's parser reads the
+# same constants — the fake and the parser can never drift apart.
+#
+# Note the V0 -> V1 renames. Reading the old name against a V1 server returns nothing,
+# the parser defaults to 0.0, and the loop then believes the KV cache is permanently
+# empty — a silent corruption of the evidence every specialist reasons from. The
+# runner therefore accepts either spelling (see KV_USAGE_NAMES).
 METRIC_RUNNING = "vllm:num_requests_running"
 METRIC_WAITING = "vllm:num_requests_waiting"
-METRIC_KV_USAGE = "vllm:gpu_cache_usage_perc"
+METRIC_KV_USAGE = "vllm:kv_cache_usage_perc"            # V1. V0 said gpu_cache_usage_perc
+METRIC_KV_USAGE_LEGACY = "vllm:gpu_cache_usage_perc"    # V0, still seen on older servers
 METRIC_PREEMPTIONS = "vllm:num_preemptions_total"
 METRIC_PROMPT_TOKENS = "vllm:prompt_tokens_total"
 METRIC_GENERATION_TOKENS = "vllm:generation_tokens_total"
+
+# Counters are declared without _total; prometheus_client appends it on exposition.
+# Every metric carries BOTH labels — `engine` is the engine index — and
+# prometheus_client emits label pairs in alphabetical order, so `engine` precedes
+# `le` precedes `model_name`.
+ENGINE_LABEL = "0"
 
 
 @dataclass
@@ -219,9 +231,11 @@ class _Handler(BaseHTTPRequestHandler):
         self.wfile.flush()
 
     def _render_metrics(self) -> str:
-        """Prometheus text exposition, in the shape vLLM actually emits."""
+        """Prometheus text exposition, in the shape vLLM v0.29 actually emits."""
         st = self.state
-        labels = f'{{model_name="{self.server.served_model_name}"}}'  # type: ignore[attr-defined]
+        model = self.server.served_model_name  # type: ignore[attr-defined]
+        # Alphabetical label order, both labels present, floats with a decimal point.
+        labels = f'{{engine="{ENGINE_LABEL}",model_name="{model}"}}'
         return "\n".join([
             f"# HELP {METRIC_RUNNING} Number of requests currently running on GPU.",
             f"# TYPE {METRIC_RUNNING} gauge",
@@ -229,7 +243,7 @@ class _Handler(BaseHTTPRequestHandler):
             f"# HELP {METRIC_WAITING} Number of requests waiting to be processed.",
             f"# TYPE {METRIC_WAITING} gauge",
             f"{METRIC_WAITING}{labels} {st.waiting}.0",
-            f"# HELP {METRIC_KV_USAGE} GPU KV-cache usage. 1 means 100 percent usage.",
+            f"# HELP {METRIC_KV_USAGE} KV-cache usage. 1 means 100 percent usage.",
             f"# TYPE {METRIC_KV_USAGE} gauge",
             f"{METRIC_KV_USAGE}{labels} {st.kv_usage}",
             f"# HELP {METRIC_PREEMPTIONS} Cumulative number of preemptions from the engine.",
@@ -241,8 +255,39 @@ class _Handler(BaseHTTPRequestHandler):
             f"# HELP {METRIC_GENERATION_TOKENS} Number of generation tokens processed.",
             f"# TYPE {METRIC_GENERATION_TOKENS} counter",
             f"{METRIC_GENERATION_TOKENS}{labels} {st.generation_tokens}.0",
+            *self._ttft_histogram(model),
             "",
         ])
+
+    def _ttft_histogram(self, model: str) -> list[str]:
+        """A histogram family, with vLLM's real TTFT bucket boundaries.
+
+        Included so the parser is exercised against `_bucket` / `_sum` / `_count`
+        sample names and the `le` label, which is where a naive parser breaks.
+        """
+        st = self.state
+        buckets = [0.001, 0.005, 0.01, 0.02, 0.04, 0.06, 0.08, 0.1, 0.25, 0.5,
+                   0.75, 1.0, 2.5, 5.0, 7.5, 10.0, 20.0, 40.0, 80.0, 160.0, 640.0, 2560.0]
+        name = "vllm:time_to_first_token_seconds"
+        ttft = st.profile.base_ttft_s
+        lines = [
+            f"# HELP {name} Histogram of time to first token in seconds.",
+            f"# TYPE {name} histogram",
+        ]
+        for b in buckets:
+            n = float(st.completed) if ttft <= b else 0.0
+            lines.append(
+                f'{name}_bucket{{engine="{ENGINE_LABEL}",le="{b}",model_name="{model}"}} {n}'
+            )
+        lines += [
+            f'{name}_bucket{{engine="{ENGINE_LABEL}",le="+Inf",model_name="{model}"}} '
+            f"{float(st.completed)}",
+            f'{name}_count{{engine="{ENGINE_LABEL}",model_name="{model}"}} '
+            f"{float(st.completed)}",
+            f'{name}_sum{{engine="{ENGINE_LABEL}",model_name="{model}"}} '
+            f"{st.completed * ttft:.4f}",
+        ]
+        return lines
 
 
 class FakeVllmServer:

@@ -40,6 +40,7 @@ from .base import Tenant, TrialOutcome, TrialRunner
 from .fake_vllm import (
     METRIC_GENERATION_TOKENS,
     METRIC_KV_USAGE,
+    METRIC_KV_USAGE_LEGACY,
     METRIC_PREEMPTIONS,
 )
 
@@ -94,7 +95,9 @@ def vllm_flags(
         "--max-num-batched-tokens", str(cfg.max_num_batched_tokens),
         "--tensor-parallel-size", str(cfg.tensor_parallel_size),
         "--pipeline-parallel-size", str(cfg.pipeline_parallel_size),
-        "--disable-log-requests",
+        # NOTE: --disable-log-requests was removed from vLLM and replaced by
+        # --enable-log-requests, which already defaults to False. Passing the old flag
+        # makes the server fail to start, so pass neither.
     ]
 
     # vLLM's --gpu-memory-utilization is a fraction of the WHOLE card, not of this
@@ -126,6 +129,10 @@ def parse_prometheus(text: str) -> dict[str, float]:
     Labels are discarded: a single-model server emits one series per metric, which is
     all this needs. Comment lines and unparseable values are skipped rather than
     raising, because a metrics endpoint that grew a new field should not fail a trial.
+
+    Known limitation: repeated sample names collapse to the last one seen, so a
+    histogram's `_bucket` series is not usable from this dict. `_sum` and `_count`
+    are distinct names and survive, which is all the runner reads.
     """
     out: dict[str, float] = {}
     for line in text.splitlines():
@@ -395,7 +402,7 @@ class VllmRunner(TrialRunner):
             results, errors = replayed[name]
             b, a = before[name], after[name]
 
-            kv = a.get(METRIC_KV_USAGE, 0.0)
+            kv = _kv_usage(a)
             preempts = int(a.get(METRIC_PREEMPTIONS, 0.0) - b.get(METRIC_PREEMPTIONS, 0.0))
             gen_tokens = a.get(METRIC_GENERATION_TOKENS, 0.0) - b.get(
                 METRIC_GENERATION_TOKENS, 0.0
@@ -427,6 +434,20 @@ class VllmRunner(TrialRunner):
         return TrialOutcome(
             measurements=measurements, substrate=self.substrate, ok=True, notes=notes
         )
+
+
+def _kv_usage(metrics: dict[str, float]) -> float:
+    """KV-cache occupancy, tolerating the V0/V1 rename.
+
+    vLLM V1 renamed `vllm:gpu_cache_usage_perc` to `vllm:kv_cache_usage_perc`. Reading
+    only one spelling against the other server silently yields 0.0, and the loop then
+    believes the cache is permanently empty — so try both and only fall back to zero when
+    neither is present.
+    """
+    for name in (METRIC_KV_USAGE, METRIC_KV_USAGE_LEGACY):
+        if name in metrics:
+            return metrics[name]
+    return 0.0
 
 
 def _kv_capacity_tokens(
