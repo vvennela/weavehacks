@@ -1,11 +1,13 @@
 """Owned vLLM server lifecycle for the smoke-checked single-GPU runtime."""
 
 from dataclasses import asdict, dataclass
+import hashlib
 import importlib.metadata
 import json
 import os
 from pathlib import Path
 import shlex
+import re
 import signal
 import socket
 import subprocess
@@ -22,6 +24,50 @@ from .storage import save_json
 
 GENERATION = {"temperature": 0, "top_p": 1, "top_k": -1, "seed": 0, "max_tokens": 64}
 SERVED_MODEL = "sera-model"
+STARTUP_FAILURE_MESSAGES = {
+    "cutlass-internal-error": "cutlass_gemm_caller reported Error Internal.",
+    "cuda-out-of-memory": "The server log reports CUDA out of memory.",
+    "unclassified": "No supported startup error signature is available.",
+}
+
+
+def classify_startup_failure(artifact_dir):
+    """Classify fixed signatures, retaining source hashes instead of arbitrary log text."""
+    result = dict(category="unclassified", stage="startup", callsite=None,
+                  kernel_source=None, kernel_line=None, source=None,
+                  root_cause_status="not-established")
+    digest = hashlib.sha256()
+    matches = []
+    try:
+        with (Path(artifact_dir) / "server.log").open("rb") as log:
+            for number, raw in enumerate(log, 1):
+                digest.update(raw)
+                line = raw.decode("utf-8", errors="replace")
+                category = None
+                if "cutlass_gemm_caller" in line and re.search(r"Error\s*Internal", line):
+                    category = "cutlass-internal-error"
+                elif "CUDA out of memory" in line or "CUDA error: out of memory" in line:
+                    category = "cuda-out-of-memory"
+                if category is None:
+                    continue
+                if category != result["category"]:
+                    matches = []
+                result.update(category=category, callsite=None, kernel_source=None, kernel_line=None)
+                if category == "cutlass-internal-error":
+                    result["callsite"] = "cutlass_gemm_caller"
+                    location = re.search(r"cutlass_gemm_caller\.cuh:([0-9]{1,6})\b", line)
+                    if location:
+                        result.update(kernel_source="cutlass_gemm_caller.cuh", kernel_line=int(location[1]))
+                matches.append((number, hashlib.sha256(raw).hexdigest()))
+                matches = matches[-8:]
+        result["source"] = dict(path="server.log", sha256=digest.hexdigest(),
+            line_numbers=[number for number, _ in matches],
+            matched_line_sha256=[digest for _, digest in matches])
+    except OSError:
+        # Missing/unreadable source is explicit and must not mask the startup error.
+        result.update(category="unclassified", callsite=None, kernel_source=None, kernel_line=None)
+    result["known_message"] = STARTUP_FAILURE_MESSAGES[result["category"]]
+    return result
 
 
 class CleanupError(RuntimeError):
@@ -225,7 +271,12 @@ class SeraModel:
         except BaseException as error:
             self.record.update(status="startup-failed", error=f"{type(error).__name__}: {error}")
             self._save()
-            self.close()
+            try:
+                self.close()
+            finally:
+                # Hash the final log after the owned process has stopped writing.
+                self.record["startup_failure"] = classify_startup_failure(self.artifact_dir)
+                self._save()
             raise
 
     def _require_ready(self):
