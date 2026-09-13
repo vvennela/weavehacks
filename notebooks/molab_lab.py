@@ -6,11 +6,17 @@
 #     "pyyaml",
 # ]
 # ///
+
 """Sera Lab, on molab.
 
 Runs the real optimization loop against real vLLM on molab's RTX Pro 6000
 Blackwell. Attach the GPU with the notebook specs button in the app header before
 pressing Run; without one the notebook still works and says it is simulating.
+
+Two controls, deliberately: pick a model, press Run. Installing Sera and vLLM and
+pulling the weights used to be separate buttons pressed in the right order. They
+are stages of the run now — the run cell does them in order and says which stage
+it is on, so there is nothing to get wrong on stage.
 """
 
 import marimo
@@ -23,24 +29,6 @@ app = marimo.App(width="medium", app_title="Sera Lab — molab")
 def _():
     import marimo as mo
     return (mo,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(
-        """
-        # Sera Lab
-
-        Pick an open-weight model and press **Run**. Sera's specialist agents propose
-        one configuration change at a time, every trial is measured on the GPU, and
-        anything that breaks the latency target or the quality floor is reverted and
-        recorded as such.
-
-        Attach a GPU first: **notebook specs** in the app header → RTX Pro 6000
-        Blackwell. Without one this still runs, on the analytic simulator, and says so.
-        """
-    )
-    return
 
 
 @app.cell(hide_code=True)
@@ -68,46 +56,13 @@ def _(mo):
     PY = sys.executable
 
     mo.md(
-        f"### Environment\n\n**GPU** {GPU[0]}, {GPU[1]} GB VRAM"
+        f"**{GPU[0]}, {GPU[1]} GB** attached — trials are measured on real vLLM."
         if GPU else
-        "### Environment\n\n**No GPU attached.** Use the notebook specs button in the "
-        "app header to attach an RTX Pro 6000 Blackwell, then re-run this cell. "
-        "Everything below still works on the analytic simulator meanwhile."
+        "**No GPU attached.** Use the *notebook specs* button in the app header to "
+        "attach an RTX Pro 6000 Blackwell, then re-run this cell. Run still works "
+        "meanwhile, on the analytic simulator, and says so in the results."
     )
     return GPU, PY, subprocess
-
-
-@app.cell(hide_code=True)
-def _(GPU, PY, mo, subprocess):
-    # Sera comes from the public repo rather than being vendored, so the notebook
-    # tracks whatever is on the branch. vLLM is only worth installing when there is
-    # a device to run it on; it is a large wheel.
-    setup = mo.ui.run_button(label="⚙  Install Sera" + (" and vLLM" if GPU else ""))
-    setup
-    return (setup,)
-
-
-@app.cell(hide_code=True)
-def _(GPU, PY, mo, setup, subprocess):
-    mo.stop(not setup.value, mo.md("*Install once per session, then press Run below.*"))
-
-    _pkgs = ["git+https://github.com/vvennela/weavehacks.git@test1"]
-    if GPU:
-        _pkgs.append("vllm")
-
-    _log = []
-    with mo.status.spinner(title="Installing…") as _s:
-        for _pkg in _pkgs:
-            _s.update(title=f"Installing {_pkg.split('/')[-1]}…")
-            _r = subprocess.run([PY, "-m", "pip", "install", "-q", _pkg],
-                                capture_output=True, text=True)
-            _log.append(f"{'ok  ' if _r.returncode == 0 else 'FAIL'} {_pkg}")
-            if _r.returncode:
-                _log.append(_r.stderr[-1500:])
-
-    mo.callout(mo.md("```\n" + "\n".join(_log) + "\n```"),
-               kind="success" if all(l.startswith("ok") for l in _log if l[:2] in ("ok", "FA")) else "danger")
-    return
 
 
 @app.cell(hide_code=True)
@@ -333,9 +288,9 @@ budget:
 
 @app.cell(hide_code=True)
 def _(GPU, mo):
-    # Time estimates are for a cold run on one Blackwell: weight download, then a
-    # vLLM engine start plus CUDA graph capture per trial. They are honest rather
-    # than encouraging.
+    # Time estimates are for a cold run on one Blackwell: install, weight download,
+    # then a vLLM engine start plus CUDA graph capture per trial. They are honest
+    # rather than encouraging.
     CATALOG = {
         "Qwen3-8B  ·  16GB  ·  ~15-20 min": ("lab_qwen3_8b", "Qwen/Qwen3-8B"),
         "DeepSeek-R1-Distill-Qwen-14B  ·  30GB  ·  ~25-35 min": (
@@ -346,140 +301,174 @@ def _(GPU, mo):
     model_select = mo.ui.dropdown(
         options=CATALOG, value=list(CATALOG)[0], label="Model",
     )
-    fetch_button = mo.ui.run_button(label="⬇  Download weights")
     run_button = mo.ui.run_button(label="▶  Run Sera")
 
     mo.vstack([
-        model_select,
-        mo.hstack([fetch_button, run_button], justify="start", gap=1),
+        mo.hstack([model_select, run_button], justify="start", gap=1.5),
         mo.md(
-            "*Downloading first keeps the transfer out of the timed run.*"
+            "*Run installs Sera and vLLM, pulls the weights, then tunes. Each stage "
+            "reports itself; the timings above are for all three from cold.*"
             if GPU else
-            "*No GPU attached — Run will use the analytic simulator and finish in seconds.*"
+            "*No GPU attached — Run will use the analytic simulator and finish in "
+            "seconds.*"
         ),
     ])
-    return fetch_button, model_select, run_button
+    return CATALOG, model_select, run_button
 
 
 @app.cell(hide_code=True)
-def _(PY, fetch_button, mo, model_select, subprocess):
-    mo.stop(not fetch_button.value, mo.md(""))
-    _key, _hf = model_select.value
+def _(SPECS, mo, model_select):
+    import yaml as _yaml
 
-    with mo.status.spinner(title=f"Downloading {_hf}…"):
-        _r = subprocess.run(
-            [PY, "-c",
-             "import sys;from huggingface_hub import snapshot_download;"
-             "snapshot_download(sys.argv[1])", _hf],
-            capture_output=True, text=True,
-        )
-    mo.callout(
-        mo.md(f"Weights for `{_hf}` are local." if _r.returncode == 0
-              else f"Download failed:\n\n```\n{_r.stderr[-1500:]}\n```"),
-        kind="success" if _r.returncode == 0 else "danger",
-    )
-    return
+    # Read straight from the embedded YAML rather than through sera_loop: this has
+    # to render before Run, and Sera is not installed until Run installs it.
+    SPEC_KEY, HF_ID = model_select.value
+    _s = _yaml.safe_load(SPECS[SPEC_KEY])
+    _m, _g = _s["models"][0], _s["gpus"][0]
+    _w, _slo = _s["workloads"][0], _s["slos"][0]
+    _floor = _s["quality_floors"][0]
 
-
-@app.cell(hide_code=True)
-def _(SPECS, model_select):
-    import pathlib, tempfile
-
-    from sera_loop.spec import load_spec
-
-    # load_spec reads a file, which is the real entry point; writing the embedded
-    # text out keeps that path rather than constructing Spec objects by hand.
-    _key, _hf = model_select.value
-    _dir = pathlib.Path(tempfile.mkdtemp())
-    _path = _dir / f"{_key}.yaml"
-    _path.write_text(SPECS[_key])
-    spec = load_spec(str(_path))
-    model, gpu_spec = spec.models[0], spec.gpus[0]
-    slo, floor = spec.slos[0], spec.quality_floors[0]
-    workload = spec.workloads[0]
-    return floor, gpu_spec, model, slo, spec, workload
-
-
-@app.cell(hide_code=True)
-def _(floor, gpu_spec, mo, model, slo, workload):
     mo.md(
         f"""
         | | |
         |---|---|
-        | **Model** | `{model.hf_id}` |
-        | **Size** | {model.params_b}B parameters, {model.num_layers} layers, {model.num_kv_heads} KV heads x {model.head_dim} |
-        | **Target device** | {gpu_spec.name}, {gpu_spec.vram_gb:.0f} GB |
-        | **Workload** | {workload.request_rate_rps} req/s, {workload.input_len_mean} in / {workload.output_len_mean} out, {workload.duration_s}s |
-        | **Latency target** | p95 under {slo.p95_latency_ms:.0f} ms |
-        | **Quality floor** | {floor.min_score:.3f} |
+        | **Model** | `{_m['hf_id']}` |
+        | **Size** | {_m['params_b']}B parameters, {_m['num_layers']} layers, {_m['num_kv_heads']} KV heads x {_m.get('head_dim_override', _m['hidden_size'] // _m['num_attn_heads'])} |
+        | **Target device** | {_g['name']}, {_g['vram_gb']:.0f} GB |
+        | **Workload** | {_w['request_rate_rps']} req/s, {_w['input_len_mean']} in / {_w['output_len_mean']} out, {_w['duration_s']}s |
+        | **Latency target** | p95 under {_slo['p95_latency_ms']:.0f} ms |
+        | **Quality floor** | {_floor['min_score']:.3f} |
         """
     )
-    return
+    return HF_ID, SPEC_KEY
 
 
 @app.cell(hide_code=True)
-def _(mo, model_select, run_button):
-    mo.stop(
-        not run_button.value,
-        mo.callout(
-            mo.md(f"Press **Run Sera** to tune **{model_select.value[1]}**."),
-            kind="neutral",
-        ),
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(GPU, mo, spec):
+def _(GPU, HF_ID, PY, SPEC_KEY, SPECS, mo, run_button, subprocess):
+    import importlib
     import pathlib as _pl
     import tempfile as _tf
     import time as _time
 
-    from sera_loop.ledger import Ledger
-    from sera_loop.phase1 import Phase1
-    from sera_loop.runner.sim_runner import SimRunner
+    # One button, three stages. The gate lives in this cell rather than a cell of
+    # its own because marimo stops a cell's descendants, and descendants are found
+    # through variables — a gate cell that defines nothing has none. Reading
+    # run_button here is also what makes pressing the button re-run this, and what
+    # makes changing the model clear the results rather than silently keep stale
+    # ones: `run_button.value` has reset to False by then.
+    mo.stop(
+        not run_button.value,
+        mo.callout(
+            mo.md(f"Press **Run Sera** to tune `{HF_ID}`."),
+            kind="neutral",
+        ),
+    )
 
-    def _runner():
-        """Real vLLM when there is a device, the simulator otherwise. Never silent."""
-        if not GPU:
-            return SimRunner(), "analytic simulator (no GPU attached)"
-        from sera_loop.runner.vllm_runner import VllmRunner
-        r = VllmRunner()
-        if not r.available():
-            return SimRunner(), "analytic simulator (vLLM not runnable here)"
-        return r, f"vLLM on {GPU[0]}"
-
-    runner, substrate_label = _runner()
-
-    class StreamingLedger(Ledger):
-        """Render each trial the moment it lands, so a long run stays watchable."""
-
-        def __init__(self, path, on_append):
-            super().__init__(path)
-            self._on_append = on_append
-
-        def append(self, record):
-            record = super().append(record)
-            self._on_append(record)
-            return record
-
-    _lines = []
-
-    def _show(record):
-        _v = str(getattr(record.verdict, "value", record.verdict))
-        _m = record.measurement
-        _lines.append(
-            f"{len(_lines) + 1:>2}. {record.proposing_specialist or 'baseline':<14} "
-            f"{_v:<18} "
-            + (f"p95 {_m.p95_latency_ms:>8,.0f} ms   {_m.footprint_gb:>6.2f} GB"
-               if _m else "not run")
-        )
-        mo.output.replace(mo.md("```\n" + "\n".join(_lines) + "\n```"))
+    def _have(module):
+        try:
+            importlib.import_module(module)
+            return True
+        except ImportError:
+            return False
 
     _t0 = _time.time()
-    ledger = StreamingLedger(_pl.Path(_tf.mkdtemp()) / "molab.jsonl", _show)
-    with mo.status.spinner(title=f"Running on {substrate_label}…"):
+    _lines = []
+
+    def _log(line):
+        _lines.append(line)
+        mo.output.replace(mo.md("```\n" + "\n".join(_lines) + "\n```"))
+
+    with mo.status.spinner(title="Installing Sera…") as _spin:
+        # Stage 1: install. Skipped outright on a warm session, so pressing Run a
+        # second time goes straight to the tuning.
+        _pkgs = []
+        if not _have("sera_loop"):
+            _pkgs.append("git+https://github.com/vvennela/weavehacks.git@test1")
+        if GPU and not _have("vllm"):
+            _pkgs.append("vllm")
+        if not _pkgs:
+            _log("ok   Sera" + (" and vLLM" if GPU else "") + " already installed")
+        for _pkg in _pkgs:
+            _spin.update(title=f"Installing {_pkg.split('/')[-1]}…")
+            _r = subprocess.run([PY, "-m", "pip", "install", "-q", _pkg],
+                                capture_output=True, text=True)
+            _log(f"{'ok  ' if _r.returncode == 0 else 'FAIL'} {_pkg}")
+            if _r.returncode:
+                _log(_r.stderr[-1500:])
+                raise RuntimeError(f"pip install {_pkg} failed")
+        importlib.invalidate_caches()
+
+        # Stage 2: weights. Only worth doing when there is a device to serve them
+        # from, and kept ahead of the loop so the transfer stays out of the
+        # measured trials.
+        if GPU:
+            _spin.update(title=f"Downloading {HF_ID}…")
+            _r = subprocess.run(
+                [PY, "-c",
+                 "import sys;from huggingface_hub import snapshot_download;"
+                 "snapshot_download(sys.argv[1])", HF_ID],
+                capture_output=True, text=True,
+            )
+            if _r.returncode:
+                _log(f"FAIL weights for {HF_ID}")
+                _log(_r.stderr[-1500:])
+                raise RuntimeError(f"downloading {HF_ID} failed")
+            _log(f"ok   weights for {HF_ID} are local")
+
+        # Stage 3: the loop itself.
+        from sera_loop.ledger import Ledger
+        from sera_loop.phase1 import Phase1
+        from sera_loop.runner.sim_runner import SimRunner
+        from sera_loop.spec import load_spec
+
+        # load_spec reads a file, which is the real entry point; writing the
+        # embedded text out keeps that path rather than building Spec objects.
+        _dir = _pl.Path(_tf.mkdtemp())
+        _path = _dir / f"{SPEC_KEY}.yaml"
+        _path.write_text(SPECS[SPEC_KEY])
+        spec = load_spec(str(_path))
+
+        def _runner():
+            """Real vLLM when there is a device, the simulator otherwise. Never silent."""
+            if not GPU:
+                return SimRunner(), "analytic simulator (no GPU attached)"
+            from sera_loop.runner.vllm_runner import VllmRunner
+            r = VllmRunner()
+            if not r.available():
+                return SimRunner(), "analytic simulator (vLLM not runnable here)"
+            return r, f"vLLM on {GPU[0]}"
+
+        runner, substrate_label = _runner()
+
+        class StreamingLedger(Ledger):
+            """Render each trial the moment it lands, so a long run stays watchable."""
+
+            def __init__(self, path, on_append):
+                super().__init__(path)
+                self._on_append = on_append
+
+            def append(self, record):
+                record = super().append(record)
+                self._on_append(record)
+                return record
+
+        _trials = []
+
+        def _show(record):
+            _v = str(getattr(record.verdict, "value", record.verdict))
+            _m = record.measurement
+            _trials.append(
+                f"{len(_trials) + 1:>2}. {record.proposing_specialist or 'baseline':<14} "
+                f"{_v:<18} "
+                + (f"p95 {_m.p95_latency_ms:>8,.0f} ms   {_m.footprint_gb:>6.2f} GB"
+                   if _m else "not run")
+            )
+            mo.output.replace(mo.md("```\n" + "\n".join(_lines + [""] + _trials) + "\n```"))
+
+        _spin.update(title=f"Running on {substrate_label}…")
+        ledger = StreamingLedger(_dir / "molab.jsonl", _show)
         Phase1(spec, runner, ledger, verbose=False).run()
+
     elapsed = _time.time() - _t0
     rows = ledger.all()
 
@@ -490,7 +479,7 @@ def _(GPU, mo, spec):
             kind="info",
         )
     )
-    return elapsed, ledger, rows, substrate_label
+    return elapsed, ledger, rows, spec, substrate_label
 
 
 @app.cell(hide_code=True)
@@ -532,7 +521,8 @@ def _(mo, rows):
 
 
 @app.cell(hide_code=True)
-def _(floor, mo, rows):
+def _(mo, rows, spec):
+    _floor = spec.quality_floors[0]
     _ok = [r for r in rows
            if str(getattr(r.verdict, "value", r.verdict)) == "accepted" and r.measurement]
     _base = rows[0]
@@ -563,7 +553,7 @@ def _(floor, mo, rows):
 
         **p95 latency** {_base.measurement.p95_latency_ms:,.0f} → **{_best.measurement.p95_latency_ms:,.0f} ms**  ({_lat:.0f}% faster)
         **Memory** {_base.measurement.footprint_gb:.2f} → **{_best.measurement.footprint_gb:.2f} GB**  ({_mem:.0f}% smaller)
-        **Quality** {_best.quality_score:.3f} against a {floor.min_score:.3f} floor
+        **Quality** {_best.quality_score:.3f} against a {_floor.min_score:.3f} floor
         """
         ),
         kind="success",

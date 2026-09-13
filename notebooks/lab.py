@@ -49,7 +49,13 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo, sera_loop):
+    # The style rides along with the first output rather than sitting in a cell of
+    # its own, which would cost an empty container at the top of the app. It drops
+    # marimo's notebook-actions menu: this is embedded as a product surface, and the
+    # page promises two controls. The "made with marimo" mark stays — this is
+    # marimo's runtime and it should say so.
     mo.md(
+        '<style>[data-testid="notebook-actions-dropdown"]{display:none!important}</style>'
         f"Running `sera` **{sera_loop.__version__}** in this browser. Nothing here is "
         "replayed — Run calls `Phase1.run()` and every table below is built from the "
         "ledger it writes."

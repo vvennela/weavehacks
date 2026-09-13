@@ -1,0 +1,650 @@
+<title>Sera Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650&family=Manrope:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<style>
+/* Sera deck — built on the useseraai.com design system (sera-landing.css). */
+:root{
+  color-scheme:light;
+  --bg:#f6f5f0; --text:#223a35; --muted:#62716a; --mint:#286555; --lilac:#57775e;
+  --line:#dce2d9; --card:#fffefb; --soft:#eaf0e6; --soft-line:#dce5d7;
+  --chip:#edf2e8; --chip-text:#526a49; --cost:#89533a; --deep:#223e35; --on-deep:#f5f6ef;
+  --deep-body:#c1d0c8; --deep-eye:#c9dcc7; --deep-line:#3a5a4d; --shadow:#263d3508;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:"DM Sans",system-ui,sans-serif;
+  --mark:"Manrope",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#101a17; --text:#e9f1e9; --muted:#a8b9ac; --mint:#afd9b6; --lilac:#a8c5a0;
+    --line:#34493c; --card:#1b2921; --soft:#22362a; --soft-line:#3b5140;
+    --chip:#304535; --chip-text:#c4dbba; --cost:#e6b69b; --deep:#1b3129; --on-deep:#e9f1e9;
+    --deep-body:#bccfc3; --deep-eye:#c9dcc7; --deep-line:#3d5d4e; --shadow:#0000001f;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101a17; --text:#e9f1e9; --muted:#a8b9ac; --mint:#afd9b6; --lilac:#a8c5a0;
+  --line:#34493c; --card:#1b2921; --soft:#22362a; --soft-line:#3b5140;
+  --chip:#304535; --chip-text:#c4dbba; --cost:#e6b69b; --deep:#1b3129; --on-deep:#e9f1e9;
+  --deep-body:#bccfc3; --deep-eye:#c9dcc7; --deep-line:#3d5d4e; --shadow:#0000001f;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-synthesis:none;overflow:hidden}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--mint);outline-offset:5px;border-radius:4px}
+
+/* ---------- stage ---------- */
+#fit{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center;background:var(--bg)}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:46px 68px 58px;font-size:16px}
+.slide.on{display:flex;animation:rise .24s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+
+/* ---------- rails ---------- */
+.rail{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:500;
+  letter-spacing:2px;text-transform:uppercase;color:var(--mint);flex:0 0 auto}
+.rail .bar{width:19px;height:1px;background:var(--mint)}
+.rail .sp{flex:1}
+.rail .mark{color:var(--muted);letter-spacing:1.4px;font-variant-numeric:tabular-nums}
+.foot{position:absolute;left:68px;right:68px;bottom:24px;display:flex;align-items:center;gap:14px;
+  font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.ticks{flex:1;display:flex;gap:4px;align-items:center}
+.tick{height:2px;flex:1;background:var(--line);border-radius:2px}
+.tick.done{background:var(--lilac);opacity:.55}
+.tick.now{background:var(--mint)}
+.tick.bk{flex:0 0 9px;background:var(--line);opacity:.5}
+
+/* ---------- type ---------- */
+h1,h2{margin:0;font-family:var(--serif);font-weight:400;text-wrap:balance}
+h2.head{font-size:52px;line-height:1.08;letter-spacing:-1.8px;max-width:20ch}
+h2.head.sm{font-size:42px;letter-spacing:-1.3px;max-width:25ch}
+h2 em{font-style:italic;color:var(--mint)}
+.sub{font-size:16px;line-height:1.8;color:var(--muted);max-width:62ch;margin:16px 0 0}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.note{margin-top:14px;font-size:13px;color:var(--muted);max-width:56ch;line-height:1.8}
+.note b{color:var(--text);font-weight:500}
+
+/* ---------- lever cards ---------- */
+.levers{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+.lev{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 22px 19px;
+  display:flex;flex-direction:column;gap:10px;box-shadow:0 15px 45px var(--shadow)}
+.lev .term{font-family:var(--serif);font-size:25px;letter-spacing:-.7px;line-height:1.1}
+.lev .gloss{font-size:14.5px;line-height:1.5;font-weight:500}
+.lev .expl{font-size:12.5px;line-height:1.75;color:var(--muted);flex:1}
+.tr{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.6;
+  padding-top:9px;border-top:1px solid var(--line)}
+.tr .k{font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;flex:0 0 34px;padding-top:4px;font-weight:500}
+.tr.g .k{color:var(--mint)} .tr.c .k{color:var(--cost)}
+.tr .v{color:var(--muted)}
+.lev .attack{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--lilac)}
+.also{margin-top:18px;display:flex;gap:14px;align-items:baseline;font-size:13px;color:var(--muted);
+  line-height:1.75;background:var(--chip);border-radius:8px;padding:12px 16px}
+.also b{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--chip-text);
+  font-weight:500;flex:0 0 auto}
+.also i{font-style:normal;color:var(--text);font-weight:500}
+
+/* ---------- interaction ---------- */
+.knots{display:grid;grid-template-columns:1fr 1fr;gap:16px 40px;margin-top:26px}
+.knot{display:flex;gap:15px;align-items:flex-start;font-size:14px;line-height:1.75;color:var(--muted)}
+.knot .n{font-size:10px;color:var(--lilac);letter-spacing:1.4px;padding-top:6px;flex:0 0 auto;font-weight:500}
+.knot b{color:var(--text);font-weight:500}
+.knot i{color:var(--muted);font-style:italic}
+.kicker{margin-top:28px;padding-top:22px;border-top:1px solid var(--line);
+  font-family:var(--serif);font-size:29px;letter-spacing:-.9px;line-height:1.3;max-width:36ch}
+.kicker em{font-style:italic;color:var(--mint)}
+
+/* ---------- product ---------- */
+.split{display:grid;grid-template-columns:1.02fr 1fr;gap:40px;align-items:start;margin-top:24px}
+pre{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.8;color:var(--muted);overflow-x:auto;
+  box-shadow:0 15px 45px var(--shadow)}
+pre .kw{color:var(--mint)} pre .st{color:var(--chip-text)} pre .cm{color:var(--lilac);font-style:italic}
+.loop{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:70px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.step .s{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mint);padding-top:4px;font-weight:500}
+.step.det .s{color:var(--lilac)}
+.step .t{font-size:13.5px;line-height:1.7;color:var(--muted)}
+.step .t b{color:var(--text);font-weight:500}
+.bigline{margin-top:26px;font-family:var(--serif);font-size:38px;letter-spacing:-1.2px}
+.bigline em{font-style:italic;color:var(--mint)}
+
+/* ---------- seven phases ---------- */
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+.ph{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;
+  display:flex;flex-direction:column;gap:7px}
+.ph.det{background:var(--soft);border-color:var(--soft-line);box-shadow:none}
+.ph .n{font-size:10px;letter-spacing:1.4px;color:var(--lilac);font-weight:500}
+.ph .t{font-family:var(--serif);font-size:19px;letter-spacing:-.5px;line-height:1.15}
+.ph .d{font-size:11.5px;line-height:1.7;color:var(--muted)}
+.ph .d b{color:var(--text);font-weight:500}
+.ph.wide{grid-column:span 2}
+.whobar{display:flex;gap:30px;margin-top:18px;padding-top:15px;border-top:1px solid var(--line);
+  font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);flex-wrap:wrap}
+.whobar b{color:var(--mint);font-weight:500}
+.whobar .dt b{color:var(--lilac)}
+.cta{display:flex;align-items:center;gap:22px;margin-top:24px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:34px;background:var(--mint);
+  border:1px solid var(--mint);color:#fffefb;padding:16px 23px;border-radius:8px;
+  font-size:15px;font-weight:550;transition:background .2s,transform .2s,box-shadow .2s}
+.btn:hover{background:#1e5244;transform:translateY(-2px);box-shadow:0 8px 25px #28655520}
+:root[data-theme="dark"] .btn,:root:not([data-theme="light"]) .btn{color:#13291c}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .btn{color:#fffefb}}
+.btn span{font-size:20px;line-height:1}
+.badge{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--cost);border:1px solid var(--line);border-radius:7px;padding:11px 14px}
+.badge .d{width:5px;height:5px;border-radius:50%;background:var(--cost)}
+
+/* ---------- demo holding ---------- */
+.deep{flex:0 0 auto;background:var(--deep);border-radius:18px;color:var(--on-deep);
+  display:flex;flex-direction:column;align-items:flex-start;gap:24px;margin:22px 0 auto;padding:42px 46px}
+.deep .big{font-family:var(--serif);font-size:58px;letter-spacing:-1.9px;line-height:1.08;margin:0}
+.deep .big em{font-style:italic;color:var(--deep-eye)}
+.deep-actions{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.btn.light{background:#fffefb;border-color:#fffefb;color:var(--deep)}
+.btn.light:hover{background:#e8eee4;box-shadow:0 8px 25px #0000002e}
+.deep .hint{font-size:13px;color:var(--deep-body);line-height:1.8}
+.phaserow{display:flex;gap:10px;flex-wrap:wrap}
+.phaserow span{display:inline-flex;align-items:baseline;gap:8px;font-size:11px;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--deep-body);border:1px solid var(--deep-line);
+  border-radius:7px;padding:9px 13px}
+.phaserow span b{color:var(--deep-eye);font-weight:500;font-size:10px}
+.deep .foot-note{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--deep-body);opacity:.75}
+
+/* ---------- closeout ---------- */
+.close{display:grid;grid-template-columns:1.3fr .7fr;gap:46px;align-items:center;flex:1}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+.stat{background:var(--soft);border:1px solid var(--soft-line);border-radius:12px;padding:16px 18px}
+.stat .k{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--lilac);font-weight:500}
+.stat .v{font-family:var(--serif);font-size:26px;letter-spacing:-.9px;margin-top:6px;
+  font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .v.g{color:var(--mint)}
+.stat .u{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+.qr{display:flex;flex-direction:column;align-items:center;gap:16px;background:var(--deep);
+  border-radius:18px;padding:28px 24px;color:var(--on-deep)}
+.qr .lab{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--deep-eye)}
+.qr .plate{background:#fffefb;padding:13px;border-radius:10px;line-height:0}
+.qr canvas{display:block;width:176px;height:176px;image-rendering:pixelated}
+.qr .url{font-family:var(--serif);font-size:22px;letter-spacing:-.6px}
+
+/* ---------- backup ---------- */
+table.t{width:100%;border-collapse:collapse;margin-top:22px;font-size:13.5px}
+table.t th{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--lilac);
+  text-align:left;padding:0 14px 11px 0;border-bottom:1px solid var(--line);font-weight:500}
+table.t td{padding:13px 14px 13px 0;border-bottom:1px solid var(--line);color:var(--muted);
+  font-variant-numeric:tabular-nums;vertical-align:top;line-height:1.6}
+table.t td b{color:var(--text);font-weight:500}
+table.t tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;
+  padding:4px 9px;border-radius:5px;font-weight:500}
+.pill.g{color:var(--chip-text);background:var(--chip)}
+.pill.c{color:var(--cost);background:var(--line)}
+.lim{display:grid;grid-template-columns:1fr 1fr;gap:16px 36px;margin-top:24px}
+.lim div{font-size:13.5px;line-height:1.8;color:var(--muted);padding-left:16px;
+  border-left:2px solid var(--soft-line)}
+.lim div b{color:var(--text);font-weight:500}
+.built{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px}
+.bcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.bcard .k{font-family:var(--serif);font-size:21px;letter-spacing:-.6px}
+.bcard .v{font-size:12.5px;color:var(--muted);margin-top:7px;line-height:1.75}
+
+/* ---------- title ---------- */
+.title-wrap{flex:1;display:flex;flex-direction:column;justify-content:center}
+.wordmark{font-family:var(--mark);font-size:104px;font-weight:600;letter-spacing:-7px;
+  display:flex;align-items:center;gap:14px;line-height:1}
+.wordmark>span{font-size:.7em;color:var(--mint);font-weight:400;letter-spacing:0}
+.tagline{font-family:var(--serif);font-size:46px;letter-spacing:-1.6px;line-height:1.14;
+  margin-top:26px;max-width:19ch}
+.tagline em{font-style:italic;color:var(--mint)}
+.who{display:flex;gap:56px;margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
+.who .p .n{font-size:17px;font-weight:550}
+.who .p .r{font-size:13px;color:var(--muted);margin-top:5px}
+.rig{position:absolute;right:68px;bottom:58px;text-align:right;font-size:10.5px;
+  letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);line-height:2}
+
+/* ---------- notes / hud ---------- */
+#notes{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+  padding:18px 26px 20px;max-height:44vh;overflow-y:auto;display:none;z-index:20;
+  box-shadow:0 -18px 45px var(--shadow)}
+#notes.on{display:block}
+#notes .nh{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--mint);
+  margin-bottom:10px;font-weight:500}
+#notes .say{font-size:16px;line-height:1.75;max-width:105ch;color:var(--text)}
+#notes .say p{margin:0 0 9px}
+#notes .say b{font-weight:600;color:var(--mint)}
+#notes .tip{font-size:13px;color:var(--muted);margin-top:12px;max-width:105ch;line-height:1.8}
+#hud{position:fixed;top:14px;right:16px;display:flex;gap:8px;align-items:center;z-index:21}
+#hud .t{background:var(--card);border:1px solid var(--line);border-radius:7px;padding:7px 12px;
+  font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);letter-spacing:.6px}
+#hud .t.run{color:var(--mint);border-color:var(--mint)}
+#hud .t.over{color:var(--cost);border-color:var(--cost)}
+#help{position:fixed;left:16px;bottom:14px;font-size:10px;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--muted);opacity:.7;z-index:21;transition:opacity .4s ease}
+#help.gone{opacity:0;pointer-events:none}
+
+/* ---------- grid overview ---------- */
+#grid{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;overflow-y:auto;padding:32px}
+#grid.on{display:block}
+#grid .gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:16px;max-width:1100px;margin:0 auto}
+#grid button{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 17px;
+  text-align:left;color:var(--text);font-family:var(--sans);cursor:pointer}
+#grid button:hover{background:var(--soft);border-color:var(--soft-line)}
+#grid button .i{font-size:10px;color:var(--lilac);letter-spacing:1.4px;font-weight:500}
+#grid button .n{font-family:var(--serif);font-size:18px;margin-top:8px;line-height:1.2;letter-spacing:-.5px}
+#grid button .m{font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:1.2px;text-transform:uppercase}
+#grid h3{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--mint);
+  max-width:1100px;margin:0 auto 16px;font-weight:500}
+
+/* ---------- narrow ---------- */
+@media (max-width:820px){
+  body{overflow:auto}
+  #fit{position:static;display:block;padding:16px 16px 60px}
+  #stage{width:100%;height:auto;transform:none!important;display:flex;flex-direction:column;gap:16px}
+  .slide{position:static;display:flex!important;font-size:12px;padding:24px 22px 26px;height:auto;
+    border:1px solid var(--line);border-radius:14px;animation:none;background:var(--card)}
+  .slide .foot{position:static;left:auto;right:auto;bottom:auto;margin-top:20px}
+  .wordmark{font-size:58px;letter-spacing:-4px} h2.head{font-size:31px;letter-spacing:-1px;max-width:none}
+  h2.head.sm{font-size:27px} .tagline{font-size:27px;letter-spacing:-1px;max-width:none}
+  .bigline{font-size:25px} .kicker{font-size:22px} .deep .big{font-size:40px}
+  .levers,.watch,.knots,.split,.close,.stats,.lim,.built,.phases{grid-template-columns:1fr}
+  .ph.wide{grid-column:auto}
+  .close{display:flex;flex-direction:column;align-items:stretch}
+  .rig{position:static;text-align:left;margin-top:20px}
+  .who{flex-direction:column;gap:18px}
+  #hud,#help{display:none}
+}
+</style>
+
+
+<div id="fit"><div id="stage">
+
+<!-- 1 ................................................................. -->
+<section class="slide" data-t="0" data-name="Title" data-live="1">
+  <div class="rail"><span class="bar"></span>CoreWeave Hacks 2026<span class="sp"></span><span class="mark">01</span></div>
+  <div class="title-wrap">
+    <div class="wordmark">sera<span>✳</span></div>
+    <div class="tagline">It finds a faster way to serve your model — and <em>proves it on the GPU.</em></div>
+    <div class="who">
+      <div class="p"><div class="n">Barrat Mohammad</div><div class="r">Product, API, notebook, site</div></div>
+      <div class="p"><div class="n">Vishnu Vennelakanti</div><div class="r">Engine, measurement, agent loop</div></div>
+    </div>
+  </div>
+  <div class="rig">1× NVIDIA RTX PRO 6000 Blackwell<br>96 GB · molab on CoreWeave</div>
+</section>
+
+<!-- 2 ................................................................. -->
+<section class="slide" data-t="10" data-name="Three levers" data-live="1">
+  <div class="rail"><span class="bar"></span>The problem<span class="sp"></span><span class="mark">02</span></div>
+  <div class="body">
+    <h2 class="head">Three choices decide <em>how fast a model serves.</em></h2>
+    <p class="sub">A GPU stalls for three different reasons. Each lever attacks one of them — and charges you for it.</p>
+    <div class="levers">
+      <div class="lev">
+        <div class="term">Quantization</div>
+        <div class="gloss">Store the weights in fewer bits.</div>
+        <div class="expl">Every number in the model is 16 bits. Make it 8. The model halves in size, and half as much has to cross the card for every token you generate.</div>
+        <div class="tr g"><span class="k">Buys</span><span class="v">It fits — and it moves faster.</span></div>
+        <div class="tr c"><span class="k">Costs</span><span class="v">Less precision. Push too far and the answers degrade.</span></div>
+        <div class="attack">Attacks · memory + bandwidth</div>
+      </div>
+      <div class="lev">
+        <div class="term">Caching</div>
+        <div class="gloss">Don't recompute what you already computed.</div>
+        <div class="expl">Reading a prompt builds a working memory. When the next request opens with the same text — the same system prompt, the same document — reuse it instead of redoing it.</div>
+        <div class="tr g"><span class="k">Buys</span><span class="v">Skips the expensive first pass. Answers start sooner.</span></div>
+        <div class="tr c"><span class="k">Costs</span><span class="v">It occupies GPU memory, and only pays when text repeats.</span></div>
+        <div class="attack">Attacks · repeated work</div>
+      </div>
+      <div class="lev">
+        <div class="term">Batching</div>
+        <div class="gloss">Run many requests through the card at once.</div>
+        <div class="expl">A GPU is enormously wide. One request at a time leaves most of it idle. Batching groups requests so a single pass over the weights serves many people.</div>
+        <div class="tr g"><span class="k">Buys</span><span class="v">Far more total throughput from the same card.</span></div>
+        <div class="tr c"><span class="k">Costs</span><span class="v">Requests wait for the group. The slowest one gets slower.</span></div>
+        <div class="attack">Attacks · idle compute</div>
+      </div>
+    </div>
+    <div class="also"><b>Also in the run</b><span><i>Graph execution</i> — pre-record the GPU's steps so it doesn't re-plan them for every single token.</span></div>
+  </div>
+</section>
+
+<!-- 3 ................................................................. -->
+<section class="slide" data-t="22" data-name="They interact" data-live="1">
+  <div class="rail"><span class="bar"></span>The problem<span class="sp"></span><span class="mark">03</span></div>
+  <div class="body">
+    <h2 class="head">Turn one, and <em>the others move.</em></h2>
+    <div class="knots">
+      <div class="knot"><span class="n">01</span><span>Quantize the weights and you free memory — so there's <b>room for a much bigger cache</b>. Which only pays off if your traffic actually repeats.</span></div>
+      <div class="knot"><span class="n">02</span><span>Batch harder and throughput climbs — while <b>the slowest request gets slower</b>. Two goals, one dial, opposite directions.</span></div>
+      <div class="knot"><span class="n">03</span><span>Cache aggressively and you spend the memory quantization just saved. <b>The levers compete for the same card.</b></span></div>
+      <div class="knot"><span class="n">04</span><span>Every combination is legal on paper. <b>Most are not legal on your hardware</b> — and you find out by waiting for a load that fails.</span></div>
+    </div>
+    <div class="kicker">So people guess. Or they grid-search — and <em>burn GPU hours on settings that were never going to fit.</em></div>
+  </div>
+</section>
+
+<!-- 4 ................................................................. -->
+<section class="slide" data-t="32" data-name="One call" data-live="1">
+  <div class="rail"><span class="bar"></span>The product<span class="sp"></span><span class="mark">04</span></div>
+  <div class="body">
+    <h2 class="head sm">One call. Then it earns <em>every change.</em></h2>
+    <div class="split">
+      <div>
+        <pre><span class="kw">import</span> sera
+
+result = sera.optimize(
+    models=[<span class="st">"Qwen/Qwen2.5-72B-Instruct"</span>],
+    prompts=prompts,
+    objective=sera.Objective(priority=<span class="st">"latency"</span>),
+)
+
+model = result.models[<span class="st">0</span>]  <span class="cm"># running, tuned, measured</span></pre>
+        <div class="note">A model, and prompts that look like your traffic. That's the whole input — no flags, no settings, no list of things to try.</div>
+      </div>
+      <div class="loop">
+        <div class="step"><span class="s">Agents</span><span class="t">Three investigators read the same measurements and <b>propose experiments</b>. They review each other and revise.</span></div>
+        <div class="step det"><span class="s">Code</span><span class="t">Deterministic software <b>validates, runs, measures and grades</b> — then picks. No agent ever declares a result.</span></div>
+        <div class="step det"><span class="s">Gate</span><span class="t">Quality is a floor, not a score. <b>Faster but wrong is rejected</b>, and the last good configuration comes back.</span></div>
+        <div class="step"><span class="s">Loop</span><span class="t">Each round's measurement <b>changes what gets proposed next</b> — and the search stops itself when gains stop earning their GPU time.</span></div>
+      </div>
+    </div>
+    <div class="bigline">Agents propose. <em>Measurements decide.</em></div>
+  </div>
+</section>
+
+<!-- 5 ................................................................. -->
+<section class="slide" data-t="44" data-name="Seven phases" data-live="1">
+  <div class="rail"><span class="bar"></span>The run you're about to watch<span class="sp"></span><span class="mark">05</span></div>
+  <div class="body">
+    <h2 class="head sm">Seven phases. <em>Three times over.</em></h2>
+    <p class="sub">Qwen2.5-72B — about 135 GB of weights at 16-bit, on a 96 GB card. The baseline is already FP8; that is the only way it loads at all.</p>
+    <div class="phases">
+      <div class="ph"><div class="n">01</div><div class="t">Inspect</div><div class="d">All three investigators read the <b>same evidence at once</b> — load metrics, latency outliers, where requests wait. Nobody gets a private view.</div></div>
+      <div class="ph"><div class="n">02</div><div class="t">Propose</div><div class="d">Each proposes <b>one</b> configuration change and what it expects to happen. These are hypotheses — none of them is a result.</div></div>
+      <div class="ph"><div class="n">03</div><div class="t">Peer review</div><div class="d">They read each other and revise. In round one an agent <b>withdrew its own memory change</b> — zero preemptions, no evidence of a memory constraint.</div></div>
+      <div class="ph"><div class="n">04</div><div class="t">Arbiter</div><div class="d">One experiment is selected. When agents converge on the same change it <b>costs one trial, not three</b>.</div></div>
+      <div class="ph det"><div class="n">05</div><div class="t">GPU trial</div><div class="d">The runner loads that configuration on the Blackwell, warms it, and drives <b>fixed loads of 1, 2, 4 and 8</b> concurrent requests.</div></div>
+      <div class="ph det"><div class="n">06</div><div class="t">Measure</div><div class="d">96 timed requests and 8 strict-JSON quality checks per configuration. The result goes <b>back to the investigators</b>.</div></div>
+      <div class="ph det wide"><div class="n">07</div><div class="t">Stop / return</div><div class="d">A round with no qualifying gain buys <b>one confirmation round</b>. When that also misses the 5% bar, Sera stops, returns the best quality-valid configuration, verifies the runner answers a fresh request, and releases the GPU.</div></div>
+    </div>
+    <div class="whobar">
+      <span>Phases <b>01–04</b> agents</span><span class="dt">Phases <b>05–07</b> deterministic code</span>
+      <span class="dt">Investigators <b>gpt-6-astra</b></span><span class="dt">Recorded <b>13 Sep 2026</b></span>
+    </div>
+    <div class="cta">
+      <a class="btn" id="demolink" href="https://useseraai.com/#demo" target="_blank" rel="noopener">Watch the recorded run<span>↗</span></a>
+      <span class="badge"><span class="d"></span>Recorded · real vLLM, real GPU, saved with its Weave trace</span>
+    </div>
+  </div>
+</section>
+
+<!-- 6 ................................................................. -->
+<section class="slide" data-t="60" data-name="Demo playing" data-live="1">
+  <div class="rail"><span class="bar"></span>Demo · 1:45 at 8×<span class="sp"></span><span class="mark">06</span></div>
+  <div class="deep">
+    <h2 class="big">The recorded <em>run.</em></h2>
+    <div class="deep-actions">
+      <a class="btn light" id="demolink2" href="https://useseraai.com/#demo" target="_blank" rel="noopener">Open the recorded run<span>↗</span></a>
+      <span class="hint">Set the speed selector to <b>8×</b> and press Play.<br>The first 20 seconds is the baseline measuring — talk over it.</span>
+    </div>
+    <div class="phaserow">
+      <span><b>01</b> Inspect</span><span><b>02</b> Propose</span><span><b>03</b> Peer review</span><span><b>04</b> Arbiter</span><span><b>05</b> GPU trial</span><span><b>06</b> Measure</span><span><b>07</b> Stop / return</span>
+    </div>
+    <div class="foot-note">Qwen2.5-72B · 1× RTX PRO 6000 Blackwell · recorded 13 Sep 2026</div>
+  </div>
+</section>
+
+<!-- 7 ................................................................. -->
+<section class="slide" data-t="165" data-name="Closeout" data-live="1">
+  <div class="rail"><span class="bar"></span>Closeout<span class="sp"></span><span class="mark">07</span></div>
+  <div class="close">
+    <div>
+      <h2 class="head sm">So that's <em>what we built.</em></h2>
+      <p class="sub">You hand Sera a model and your prompts. It works out how to serve them, proves every change on the GPU, and hands back a working model — and the record of why.</p>
+      <div class="stats">
+        <div class="stat"><div class="k">Worst-load p95 latency</div><div class="v g">771.05 → 618.59 ms</div><div class="u">−19.77% against its own measured baseline</div></div>
+        <div class="stat"><div class="k">Quality</div><div class="v">8 / 8 tasks</div><div class="u">on every configuration · 96 timed requests each</div></div>
+        <div class="stat"><div class="k">The search</div><div class="v">3 rounds · 4 configs</div><div class="u">stopped itself under no trial cap</div></div>
+        <div class="stat"><div class="k">Settings chosen by hand</div><div class="v g">0</div><div class="u">every experiment proposed, reviewed and selected by agents</div></div>
+      </div>
+    </div>
+    <div class="qr">
+      <div class="lab">Scan to try it</div>
+      <div class="plate"><canvas id="qr" width="184" height="184" aria-label="QR code for useseraai.com"></canvas></div>
+      <div class="url"><a href="https://useseraai.com" target="_blank" rel="noopener">useseraai.com</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- B1 backup ......................................................... -->
+<section class="slide" data-name="Backup · The four measurements">
+  <div class="rail"><span class="bar" style="background:var(--cost)"></span>Backup · not in the 3:00<span class="sp"></span><span class="mark">B1</span></div>
+  <div class="body">
+    <h2 class="head sm">Every configuration <em>it measured.</em></h2>
+    <table class="t">
+      <thead><tr><th style="width:74px">Round</th><th>Experiment</th><th style="width:118px">Worst p95</th><th style="width:118px">vs baseline</th><th style="width:96px">Quality</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td><b>—</b></td><td><b>Baseline</b><br><span style="color:var(--lilac)">FP8 weights, BF16 KV cache, eager, no prefix cache</span></td><td>771.046 ms</td><td>—</td><td><span class="pill g">8/8</span></td><td>The reference</td></tr>
+        <tr><td><b>01</b></td><td><b>Prefix caching</b></td><td>624.785 ms</td><td><b>−18.97%</b></td><td><span class="pill g">8/8</span></td><td>Kept — clears the 5% bar</td></tr>
+        <tr><td><b>02</b></td><td><b>Graph execution alone</b><br><span style="color:var(--lilac)">tested on the baseline, to isolate it</span></td><td>764.072 ms</td><td>−0.905%</td><td><span class="pill g">8/8</span></td><td><span class="pill c">Misses</span> triggers a confirmation round</td></tr>
+        <tr><td><b>03</b></td><td><b>Caching + graphs</b><br><span style="color:var(--lilac)">the interaction, on the best parent</span></td><td>618.588 ms</td><td><b>−19.77%</b></td><td><span class="pill g">8/8</span></td><td><span class="pill c">Stop</span> only 0.99% over the prior best</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:18px">Worst p95 across loads of 1, 2, 4 and 8 concurrent requests. Nothing here was rejected for quality — every configuration passed all eight strict-JSON checks. The two that did not survive <b>missed the 5% improvement rule</b>. Stop reason on record: <code style="font-family:var(--mono);font-size:12px;color:var(--chip-text);background:var(--chip);padding:2px 7px;border-radius:4px">objective-plateau-confirmed</code>.</div>
+  </div>
+</section>
+
+<!-- B2 backup ......................................................... -->
+<section class="slide" data-name="Backup · Peer review">
+  <div class="rail"><span class="bar" style="background:var(--cost)"></span>Backup · not in the 3:00<span class="sp"></span><span class="mark">B2</span></div>
+  <div class="body">
+    <h2 class="head sm">What peer review <em>actually changed.</em></h2>
+    <p class="sub">Phase 03 is the one people ask about. These are paraphrased from the recorded reasoning.</p>
+    <div class="knots" style="margin-top:20px">
+      <div class="knot"><span class="n">R1</span><span>Agent B opened with <b>“GPU memory allocation → 85%”</b> and withdrew it after reading its peers: <i style="color:var(--muted)">zero preemptions and no observed memory constraint.</i> It backed A's caching test instead.</span></div>
+      <div class="knot"><span class="n">R2</span><span>Agent A opened with <b>“disable chunked prefill”</b> and dropped it: <i style="color:var(--muted)">small queue time gives little support for a scheduling bottleneck.</i> All three converged on the graph test.</span></div>
+      <div class="knot"><span class="n">R3</span><span>Agent B withdrew the allocation change a second time and accepted C's <b>interaction test on the best parent</b> — keep the measured cache win, change only graph execution.</span></div>
+      <div class="knot"><span class="n">→</span><span>Convergence is not waste. <b>Three agents agreeing costs one GPU trial</b>, because the arbiter deduplicates identical proposals rather than running each one.</span></div>
+    </div>
+    <div class="note" style="margin-top:22px">We are not claiming the swarm beats a single agent — one run per model, and the investigators often agreed. What is on record is that <b>peer feedback changed the proposals</b>, and that unmeasured hypotheses got withdrawn instead of tested.</div>
+  </div>
+</section>
+
+<!-- B3 backup ......................................................... -->
+<section class="slide" data-name="Backup · What this isn't">
+  <div class="rail"><span class="bar" style="background:var(--cost)"></span>Backup · not in the 3:00<span class="sp"></span><span class="mark">B3</span></div>
+  <div class="body">
+    <h2 class="head sm">What we are <em>not claiming.</em></h2>
+    <p class="sub">Say these before a judge finds them.</p>
+    <div class="lim">
+      <div><b>Not 19.77% faster than “normal”.</b> It is 19.77% against Sera's own FP8 baseline. The 16-bit model never ran — it does not fit on the card, which is why the baseline is FP8.</div>
+      <div><b>Not proven faster than grid search.</b> One exploratory three-candidate comparison. The specified benchmark is not finished.</div>
+      <div><b>Not your traffic.</b> Eight easy tasks on warmed, repeated prompts. This establishes nothing about cold-cache performance or broad model quality.</div>
+      <div><b>Not a global optimum.</b> The stopping rule ends the search when gains stop clearing 5%. That is a budget policy, not a proof.</div>
+      <div><b>Not a live endpoint.</b> The recorded runner was verified, then closed, and the GPU released.</div>
+      <div><b>Not multi-GPU.</b> One card. Two-model placement and broader hardware are later work.</div>
+    </div>
+  </div>
+</section>
+
+<!-- B4 backup ......................................................... -->
+<section class="slide" data-name="Backup · How it's built">
+  <div class="rail"><span class="bar" style="background:var(--cost)"></span>Backup · not in the 3:00<span class="sp"></span><span class="mark">B4</span></div>
+  <div class="body">
+    <h2 class="head sm">What it <em>runs on.</em></h2>
+    <div class="built">
+      <div class="bcard"><div class="k">CoreWeave · molab</div><div class="v">A sandbox with a free NVIDIA RTX PRO 6000 Blackwell — 96 GB, compute capability 12.0. Every measurement came off that card.</div></div>
+      <div class="bcard"><div class="k">vLLM</div><div class="v">The real serving engine. Sera owns the process: it loads, warms, load-tests and tears down each configuration itself.</div></div>
+      <div class="bcard"><div class="k">marimo</div><div class="v">The notebook is a live kernel on the sandbox, not an export — the same loop a user would run.</div></div>
+      <div class="bcard"><div class="k">Weave</div><div class="v">Every proposal, peer review, trial, gate and revert is traced. You can open an evidence read, then the decision that cites it.</div></div>
+    </div>
+    <div class="note" style="margin-top:20px">Two suites pass locally — 917 tests on the swarm line, 204 on the two-phase loop. Tests are software checks; they are not evidence for the performance numbers.</div>
+  </div>
+</section>
+
+</div></div>
+
+<div id="hud"><span class="t" id="clock">3:00</span></div>
+<div id="help">← → move · N notes · G grid · T timer · D theme · F full</div>
+
+<div id="notes"><div class="nh" id="nh">Notes</div><div class="say" id="say"></div><div class="tip" id="tip"></div></div>
+
+<div id="grid"><h3>All slides — click to jump</h3><div class="gg" id="gg"></div></div>
+
+<script>
+(function(){
+  "use strict";
+  // ── The two links on slides 5 and 6 both read DEMO. Change it here only. ──
+  var SITE = "https://useseraai.com";
+  var DEMO = "https://useseraai.com/#demo";
+  ["demolink","demolink2"].forEach(function(id){
+    var a = document.getElementById(id); if(a) a.href = DEMO;
+  });
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var stage = document.getElementById("stage"), fit = document.getElementById("fit");
+  var i = 0;
+
+  var NOTES = [
+    {t:"0:00 — who we are · 10s", say:"<p>I'm Barrat. This is Vishnu. We built Sera.</p><p>Vishnu built the engine — the runner, the measurements, the agent loop. I built everything you touch.</p>",
+     tip:"Look at Vishnu on his line. Don't read the tagline aloud — the room already has it."},
+    {t:"0:10 — the three levers · 14s", say:"<p>How fast a model serves comes down to three choices. <b>Quantization</b> — store the weights in fewer bits. <b>Caching</b> — reuse work you've already done instead of recomputing it. <b>Batching</b> — run requests together so the card isn't sitting idle.</p>",
+     tip:"Name the three and gesture at the cards. The slide does the teaching — do not read the cards out. Every card has a Buys and a Costs line: that pairing is the whole argument for why this needs measuring."},
+    {t:"0:22 — they interact · 10s", say:"<p>Every one is a trade — and they interact. So people guess, or grid-search and burn GPU hours on settings that were never going to fit.</p>",
+     tip:"Land 'never going to fit'. It sets up why the very first thing in the run is a 135 GB model on a 96 GB card."},
+    {t:"0:32 — what Sera is · 12s", say:"<p>Sera is one function call. Agents propose experiments and review each other. Deterministic code runs them on the GPU, measures, and grades every answer.</p><p><b>Agents propose. Measurements decide.</b></p>",
+     tip:"Pause before the last line and say it slowly — it's the line the room should keep. The agents never declare a result; that's the entire safety argument."},
+    {t:"0:44 — the seven phases · 16s", say:"<p>What you're about to watch is that loop — seven phases, three times over — on a 72-billion-parameter model that doesn't fit on the card.</p><p>Watch phase three. The agents read each other and withdraw ideas they can't support. And it's a recorded run.</p>",
+     tip:"Say 'recorded' here, out loud. Then click the green button — it opens the run on useseraai.com. Phases 01–04 are agents, 05–07 are ordinary code: that split is worth pointing at with your hand."},
+    {t:"1:00 — the demo runs · 1:45 at 8×", say:"<p><b>Set the speed selector to 8× and press Play.</b> If the video narrates itself, stay quiet. If it's silent, these are your cues — the times are into the video:</p><p><b>0:00–0:20</b> — 'It measures the unchanged model first. FP8 weights, no cache. 771 milliseconds, eight out of eight quality checks. Everything after this is measured against that.'</p><p><b>0:21–0:40</b> — 'Round one. Three proposals, then peer review: one agent withdraws its own memory change because there were zero preemptions. The arbiter picks caching. 625 milliseconds — nineteen percent off the baseline.'</p><p><b>0:44–1:02</b> — 'Round two tests graph execution on its own, to isolate it. Under one percent. It misses the bar — so Sera buys one confirmation round.'</p><p><b>1:06–1:29</b> — 'Round three combines the two. 619 milliseconds, the best measured result — but only one percent over caching alone. Under the five percent bar, so it stops.'</p><p><b>1:29–1:45</b> — 'It returns the winning configuration, checks the runner answers a fresh request, and releases the GPU.'</p>",
+     tip:"Safety net slide — you'll be on the website. The first 20 seconds of the video is the baseline measuring, so that's your window to talk. Be back on the closeout by 2:45 whatever happens. If you're late, cut to the closeout — never let the ending get squeezed."},
+    {t:"2:45 — closeout · 15s", say:"<p>So that's what we built. You hand Sera a model and your prompts; it works out how to serve them, proves every change on the GPU, and hands back a working model — and the record of why.</p><p>No inference expertise required. Thank you.</p>",
+     tip:"Point at the QR on the last line and leave this slide up through Q&A. Add nothing after 'thank you'."},
+    {t:"Backup — the four measurements", say:"<p>Use this when asked what actually moved.</p>",
+     tip:"Nothing was rejected for quality — all four configurations passed 8/8. The two that didn't survive missed the 5% improvement rule. Never merge these numbers with any other run's."},
+    {t:"Backup — peer review", say:"<p>Use this for 'what do the three agents actually add?'</p>",
+     tip:"The honest answer: peer feedback changed proposals and got unmeasured hypotheses withdrawn. We have not tested the swarm against a single agent, so don't claim it wins."},
+    {t:"Backup — what this isn't", say:"<p>Volunteer these before a judge digs for them. Saying them costs nothing and buys every other number credibility.</p>",
+     tip:"The one that matters most: 19.77% is against Sera's own FP8 baseline, not a normal 16-bit deployment. There is no 16-bit comparison — it doesn't fit."},
+    {t:"Backup — how it's built", say:"<p>For the sponsor-tool question: CoreWeave's Blackwell via molab, real vLLM, a live marimo kernel, and Weave for the trace.</p>",
+     tip:"Tests are software checks. Don't offer 917 tests as evidence the performance numbers hold — different claims."}
+  ];
+
+
+  function scale(){
+    if (window.innerWidth <= 820){ stage.style.transform = ""; return; }
+    var pad = 0, s = Math.min((window.innerWidth-pad)/1280, (window.innerHeight-pad)/720);
+    stage.style.transform = "scale(" + s + ")";
+  }
+
+  function show(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    slides.forEach(function(s,k){ s.classList.toggle("on", k===i); });
+    var nt = NOTES[i] || {t:"",say:"",tip:""};
+    document.getElementById("nh").textContent = nt.t;
+    document.getElementById("say").innerHTML = nt.say;
+    document.getElementById("tip").innerHTML = nt.tip;
+    paintFoot();
+  }
+
+  // footer ticks: where this slide sits in the 3:00
+  function paintFoot(){
+    slides.forEach(function(s,k){
+      var f = s.querySelector(".foot"); if(!f) return;
+      f.innerHTML = "";
+      var left = document.createElement("span");
+      left.textContent = s.dataset.live ? "Sera" : "Backup";
+      var ticks = document.createElement("span"); ticks.className = "ticks";
+      slides.forEach(function(o,j){
+        var d = document.createElement("span");
+        d.className = "tick" + (o.dataset.live ? (j<k?" done":(j===k?" now":"")) : " bk");
+        ticks.appendChild(d);
+      });
+      f.appendChild(left); f.appendChild(ticks);
+    });
+  }
+  function fmt(sec){ var m=Math.floor(sec/60), r=sec%60; return m+":"+(r<10?"0":"")+r; }
+
+  slides.forEach(function(s){ var f=document.createElement("div"); f.className="foot"; s.appendChild(f); });
+
+  // ---- timer: 3:00 countdown, red when the current slide is behind target
+  var running=false, t0=0, iv=null, clock=document.getElementById("clock");
+  function tick(){
+    var el = running ? (Date.now()-t0)/1000 : 0, left = 180-el;
+    var sign = left<0 ? "-" : "";
+    clock.textContent = sign + fmt(Math.abs(Math.round(left)));
+    clock.className = "t" + (running ? " run" : "");
+    var s = slides[i];
+    if (running && s && s.dataset.live && el > (+s.dataset.t + 25)) clock.className = "t over";
+  }
+  function toggleTimer(){
+    if(running){ running=false; clearInterval(iv); iv=null; }
+    else { running=true; t0=Date.now(); iv=setInterval(tick,250); }
+    tick();
+  }
+
+  // ---- grid overview
+  var grid=document.getElementById("grid"), gg=document.getElementById("gg");
+  slides.forEach(function(s,k){
+    var b=document.createElement("button");
+    b.innerHTML = '<div class="i">'+(s.dataset.live?String(k+1).padStart(2,"0"):"BK")+'</div>'+
+                  '<div class="n">'+s.dataset.name+'</div>'+
+                  '<div class="m">'+(s.dataset.live?fmt(+s.dataset.t):"not in the 3:00")+'</div>';
+    b.addEventListener("click", function(){ grid.classList.remove("on"); show(k); });
+    gg.appendChild(b);
+  });
+
+  // ---- keys
+  document.addEventListener("keydown", function(e){
+    var k=e.key;
+    if(k==="ArrowRight"||k==="PageDown"||k===" "||k==="Enter"){ e.preventDefault(); show(i+1); }
+    else if(k==="ArrowLeft"||k==="PageUp"){ e.preventDefault(); show(i-1); }
+    else if(k==="Home"){ show(0); } else if(k==="End"){ show(slides.length-1); }
+    else if(k==="n"||k==="N"){ document.getElementById("notes").classList.toggle("on"); }
+    else if(k==="g"||k==="G"){ grid.classList.toggle("on"); }
+    else if(k==="t"||k==="T"){ toggleTimer(); }
+    else if(k==="d"||k==="D"){
+      var cur=document.documentElement.getAttribute("data-theme");
+      var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme:dark)").matches;
+      document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+    }
+    else if(k==="f"||k==="F"){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); }
+    else if(k==="Escape"){ grid.classList.remove("on"); }
+    else if(/^[0-9]$/.test(k)){ show(parseInt(k,10)-1); }
+  });
+  var helpEl = document.getElementById("help"), hid = false;
+  function hideHelp(){ if(!hid){ hid=true; helpEl.classList.add("gone"); } }
+  document.addEventListener("keydown", hideHelp, {once:false});
+  document.addEventListener("click", hideHelp, {once:false});
+  setTimeout(hideHelp, 8000);
+
+  fit.addEventListener("click", function(e){
+    if(e.target.closest("a,button")) return;
+    if(window.innerWidth<=820) return;
+    show(i+1);
+  });
+
+  // ---- QR
+  function qr(){
+    var c = document.getElementById("qr");
+    if(!c) return;
+    if(typeof QRious === "undefined"){
+      var p = c.parentNode;
+      p.innerHTML = '<div style="font-family:var(--mono);font-size:13px;color:#080E12;padding:22px 14px;text-align:center;line-height:1.6">useseraai.com</div>';
+      return;
+    }
+    new QRious({ element:c, value:SITE, size:368, level:"M", background:"#E9F2F5", foreground:"#080E12", padding:0 });
+  }
+
+  window.addEventListener("resize", scale);
+  scale(); paintFoot(); show(0); tick(); qr();
+})();
+</script>

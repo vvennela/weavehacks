@@ -33,7 +33,7 @@ except ImportError:
 NOTEBOOK_DIR = ROOT / 'output' / 'notebook'
 # Which molab notebook the GPU tab embeds. Override with SERA_MOLAB_URL once the
 # synced notebook exists; molab mints a new id when you create one from GitHub.
-DEFAULT_MOLAB_URL = 'https://molab.marimo.io/notebooks/nb_uP6EwkHWvZnXf4PnegaHhY/app'
+DEFAULT_MOLAB_URL = 'https://molab.marimo.io/notebooks/nb_QELFTU8UbjWvKPpNe5ezQT'
 MOLAB_URL = os.environ.get('SERA_MOLAB_URL', DEFAULT_MOLAB_URL)
 NOTEBOOK_TYPES = ('.html', '.css', '.js', '.json', '.map', '.wasm', '.whl', '.zip',
                   '.woff', '.woff2', '.ttf', '.png', '.svg', '.ico', '.webmanifest', '.txt')
@@ -360,7 +360,8 @@ class Handler(SimpleHTTPRequestHandler):
                   '/lab': 'sera-lab-preview.html', '/designs': 'sera-design-directions.html',
                   '/product': 'product.html', '/solutions': 'solutions.html',
                   '/models': 'models.html', '/resources': 'resources.html',
-                  '/notebook': 'lab-notebook.html'}
+                  '/notebook': 'lab-notebook.html',
+                  '/demo': 'recorded-loop.html'}
         legacy = {'/' + filename: route for route, filename in routes.items()}
         routes.update({route: 'sera-lab-preview.html' for route in ('/lab/performance', '/lab/models', '/lab/trials')})
         legacy['/sera-design-preview.html'] = '/'

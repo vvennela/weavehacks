@@ -167,7 +167,8 @@ print(snapshot_download("Qwen/Qwen3-8B"))
 PY
 ```
 
-In the notebook UI this is the **Download weights** button.
+In the notebook UI this is the weight-download stage of the **Run Sera** button,
+which pulls the weights before it starts timing anything.
 
 ## 8. Start the vLLM server
 
