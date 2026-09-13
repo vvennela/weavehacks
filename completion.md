@@ -19,7 +19,7 @@ with an 18.73% gain on that workload; it required one controller reconnection.
 Neither result proves general reasoning reliability or globally optimal settings.
 
 The combined source suite passes **1,360 tests**, with one optional marimo skip
-(44.88 s). The final focused placement/runtime/recovery/portable/API check passes
+(`uv run --frozen --extra dev pytest -q`, 45.97 s). The final focused placement/runtime/recovery/portable/API check passes
 149 tests. Clean installation checks are separate from live GPU acceptance.
 
 The [README quick check](README.md#quick-test-does-the-loop-work) passes 45 offline
