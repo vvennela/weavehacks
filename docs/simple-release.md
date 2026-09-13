@@ -14,14 +14,24 @@ shortlists, not 24 distinct features and not eight GPU trials.
 Use Linux with one supported NVIDIA GPU. The checked GPU runtime is vLLM 0.26.0.
 Install that runtime separately in the same Python environment; the small wheel
 does not install CUDA or model weights. The existing live runs used Python 3.13,
-vLLM 0.26.0, and an RTX PRO 6000 Blackwell. Other backends, general model loading,
-joint placement, and multiple GPUs remain unsupported by this public path.
+vLLM 0.26.0, and an RTX PRO 6000 Blackwell. This page covers single-model
+`sera.optimize`, not the separate placement or explicit hardware APIs. Other
+backends and arbitrary model loading are not supported by this path.
 
-Build from the release checkout, then install the wheel:
+The separate `sera.optimize_placement` API has a
+[passing constrained two-model run](../evidence/live-placement-total-v1/README.md).
+Actual multiple-GPU validation remains unproven. The wheel also contains the
+partner's independent `sera_loop` package; its rule-based loop and reports are
+not the measured investigator swarm documented here. Use `import sera` for this
+API.
+
+Activate the virtual environment that contains the GPU runtime. Build from the
+release checkout, then install the wheel into that same environment:
 
 ```sh
 uv build --wheel
-uv pip install 'dist/sera_inference-0.2.0-py3-none-any.whl[swarm]'
+uv pip install --python "$VIRTUAL_ENV/bin/python" \
+  'dist/sera_inference-0.2.0-py3-none-any.whl[swarm]'
 sera-provider-check --help
 ```
 
@@ -56,6 +66,9 @@ sera-provider-check --provider codex-relay --model "$SERA_AGENT_MODEL" \
   --output-dir /absolute/path/to/new-provider-check
 ```
 
+If that check passes, set `SERA_PROVIDER_CHECK` to its
+`/absolute/path/to/new-provider-check/result.json` before calling Sera.
+
 This command makes provider requests. The local controller must already be
 running and connected to the GPU notebook. It remains **repository tooling**, not
 part of the wheel. On the logged-in Codex machine, use the same release checkout
@@ -70,7 +83,9 @@ python -m experiments.codex_relay_controller \
   --max-requests none --idle-timeout 1800
 ```
 
-The controller and GPU process need the same relay directory. Keep the controller
+The controller's `--relay-dir` names the directory on the remote GPU notebook;
+it must match the GPU process's `SERA_RELAY_DIR`. It is not a local shared folder.
+Keep the controller
 connected throughout optimization. Codex inference uses the controller machine's
 existing login; `WANDB_API_KEY` is still required on the GPU machine for Weave.
 Installing the wheel alone does not create this local controller connection.
@@ -173,11 +188,16 @@ measurement, or a live GPU rehearsal.
 ```sh
 uv venv /absolute/path/to/clean-venv
 uv pip install --python /absolute/path/to/clean-venv/bin/python \
-  'dist/sera_inference-0.2.0-py3-none-any.whl[swarm]'
-/absolute/path/to/clean-venv/bin/python -I tests/installed_package_smoke.py
+  '/absolute/path/to/release-checkout/dist/sera_inference-0.2.0-py3-none-any.whl[swarm]'
+cd /tmp
+/absolute/path/to/clean-venv/bin/python -I \
+  /absolute/path/to/release-checkout/tests/installed_package_smoke.py
 ```
 
-Before tagging the final merged release, run the documented task-verified API on
-the live GPU, test the returned runner, close it, and save the exact source and
-wheel hashes with the report. Earlier successful loops prove the existing swarm;
-they do not replace that final live packaging rehearsal.
+The [latest recorded wheel checks](simple-release-validation.md) pass offline.
+The task-verified joint run used an explicitly selected source checkout, not an
+installed wheel. The older installed-wheel quick-mode run proved runtime wiring,
+not task correctness. A task-verified GPU rehearsal of the final installed wheel
+remains a separate release check: save its wheel hash, test the returned runners,
+close them, and record cleanup. See the [release checklist](release-acceptance.md)
+for current acceptance and limits.

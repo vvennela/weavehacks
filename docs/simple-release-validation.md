@@ -1,6 +1,36 @@
 # Local release validation
 
-## Merged candidate
+## Latest recorded package check
+
+The [final combined package audit](../evidence/final-package-release-v3/README.md)
+checks source `6130d9e60a91e558c9dff6130ed608066dbe818f`:
+
+- Package: `sera-inference` 0.2.0.
+- Wheel SHA-256: `7be439e26fc5f68aacc35ae2f49e261e3198769c818e90549061357a8a43b6bf`.
+- All 66 packaged Python files match that source tree.
+- Clean Python 3.11.15 base and swarm installs pass dependency checks: nine and
+  68 packages, respectively. These are macOS installation checks, not CUDA tests.
+- Base imports work without Weave, OpenAI, vLLM, Torch, or repository modules.
+- Both environments pass SQLite storage, owner-lock, unsafe recovery rejection,
+  and explicit total-device accounting checks. Service execution is stubbed.
+- The installed swarm API smoke and provider-check help pass outside the checkout.
+- The recorded focused source suite passes 147 tests. Exact commands and outputs
+  are saved in [result.json](../evidence/final-package-release-v3/result.json).
+
+The [task-verified joint run](../evidence/live-placement-total-v1/README.md) used
+the same source revision through an explicitly selected checkout. Both models
+passed quality and latency gates, returned usable runners, and closed cleanly.
+That is source-runtime evidence, not an installed-wheel GPU rehearsal. The older
+installed-wheel check below establishes runtime wiring but not task correctness.
+
+The wheel contains both `sera` and the partner's independent `sera_loop` package.
+The investigator swarm and placement evidence above concern `import sera`;
+they do not certify the other package's loop. See the
+[current release checklist](release-acceptance.md) and
+[completion checkpoint](../completion.md) for scope and unproven acceptance.
+Use the wheel hash, not only version 0.2.0, to identify the tested artifact.
+
+## Historical merged API candidate
 
 The merged API and recovery wheel was checked again outside the checkout.
 
@@ -14,10 +44,10 @@ The merged API and recovery wheel was checked again outside the checkout.
 
 The [separate live installed-package check](../evidence/public-api-release-v1/README.md) passed its runtime acceptance: three investigation rounds, a returned runner, a Weave trace, and cleanup. It used quick-mode token agreement and failed arithmetic correctness. Do not treat either the local smoke or that runtime acceptance as task-quality validation.
 
-## Original API worker check
+## Historical original API worker check
 
-These checks validate the 0.2.0 package candidate. They do not replace the final
-live GPU rehearsal after all worker branches are merged.
+These checks validate an earlier 0.2.0 package candidate. They do not replace the
+latest package check or a task-verified installed-wheel GPU rehearsal.
 
 - Full local suite: **876 passed**, 12.74 seconds.
 - `git diff --check`: passed.
@@ -37,6 +67,6 @@ The installed extra resolved Weave 0.53.2, OpenAI 3.13.0, Pydantic 2.13.5, and
 prometheus-client 0.26.0. This is an install record, not a new hosted-provider
 certificate. Certificate request schemas and cases were not changed.
 
-The final merged wheel can have a different hash. Save its hash with the live
-rehearsal before tagging the release. The Codex controller remains separate
+Later 0.2.0 wheels have different hashes, including the artifact listed above.
+Save the exact hash with each live rehearsal. The Codex controller remains separate
 repository tooling; its restart behavior is not certified by this package smoke.
