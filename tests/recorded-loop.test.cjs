@@ -49,5 +49,7 @@ test('play, pause, restart, speed and scrub operate offline', () => {
   replay.nodes.get('restart').click();
   assert.equal(replay.run('elapsed'), 0);
   assert.doesNotMatch(replay.html, /<script[^>]+src=|fetch\(|XMLHttpRequest|WebSocket/);
-  assert.match(replay.html, /Schematic pacing/);
+  assert.match(replay.html, /schematic stage timing/);
+  assert.match(replay.html, /8 tasks · warm cache · repeated prompts/);
+  assert.doesNotMatch(replay.html, /global optimum|Scope of the result/);
 });

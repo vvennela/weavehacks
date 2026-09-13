@@ -1,10 +1,22 @@
 # Save and run these examples
 
-For Molab, **clone the [clean notebook](../notebooks/molab_quickstart.py) into your
-own workspace first**. Add your keys in its empty password fields, check setup,
-then run either example. It keeps both examples and displays their own replays.
-Use the prepared Linux GPU runtime with vLLM 0.26.0. Installing the Python library
-does not create a GPU or install its driver.
+For Molab, **clone [FAST_START](../notebooks/FAST_START.py) into your
+own workspace first**. Select the RTX PRO 6000 GPU, enter your keys and Weave
+team/project, then Shift+Enter on either workflow cell. The notebook installs its
+pinned dependencies and downloads missing model files. Each workflow saves its
+own 8× and 16× HTML replays plus a task for an ARIA browser agent. The plain Python
+scripts below still require a prepared Linux GPU runtime with vLLM 0.26.0.
+Installing the Python library does not create a GPU or install its driver.
+
+Weave is used by the live loop. ARIA is a separate review through your signed-in
+W&B UI, either manually or with a browser-capable agent; it is not a callable
+investigator in this package. Run in your own Molab account and use a W&B team
+project where ARIA is enabled. Do not claim that generating the task runs ARIA.
+
+```python
+from sera.demo import aria_agent_task
+print(aria_agent_task(y))  # Give this task to your browser-capable agent after the run.
+```
 
 ## Download Sera
 

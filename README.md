@@ -4,10 +4,21 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 ## Start here: clone the notebook
 
-Clone the [Molab quickstart](notebooks/molab_quickstart.py) into your own workspace.
-**Add your keys here:** use its empty OpenAI and W&B password fields, then check
-setup and run either example. Both latency-only and latency → throughput code
-are preserved. Use the prepared GPU runtime; the notebook does not create compute.
+Open [FAST_START in Molab](https://molab.marimo.io/github/vvennela/weavehacks/blob/main/notebooks/FAST_START.py),
+then clone it into your own workspace and select the RTX PRO 6000 GPU runtime.
+**Add your keys here:** use its blank OpenAI and W&B password fields and your
+Weave team/project. Press **Shift+Enter** on either the latency cell or the
+latency → throughput cell. Molab installs the declared dependencies; the run cell
+downloads missing pinned model files, runs the loop, tests the returned runner,
+and saves separate 8× and 16× HTML demos. Entering keys alone starts no experiment.
+
+Weave records outputs, measurements, and decisions that investigators can inspect.
+Each workflow also creates an **ARIA browser-agent task** using its own trace links.
+Give it to a browser-capable agent signed into your W&B account, or paste the
+review request into Ask ARIA. ARIA is an optional read-only advisor, not the swarm
+or GPU executor. An ARIA-enabled W&B team project is required. The replay labels
+ARIA as not reviewed until a real review is recorded separately; generating a
+handoff does not mean ARIA ran. See [ARIA access requirements](https://docs.wandb.ai/aria/overview).
 
 ```python
 with sera.optimize(**demo_config, stages=["latency", "throughput"], k=3.0,

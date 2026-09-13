@@ -49,7 +49,8 @@ def test_replay_snapshots_actual_result_and_saves_offline(tmp_path):
     assert stage['rounds'][0]['agents'][0]['final']['reason'] == 'Peer review changed my proposal'
     assert stage['returned_runner_closed'] is False
     assert '19.773' not in replay.html
-    assert 'Schematic pacing' in replay.html
+    assert 'schematic stage timing' in replay.html
+    assert 'global optimum' not in replay.html
     saved = replay.save(tmp_path / 'replay.html')
     assert saved.read_text() == replay.html
     assert 'sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"' in replay._repr_html_()
@@ -70,6 +71,20 @@ def test_saved_stages_use_their_own_measurements_and_limits(tmp_path):
     assert payload['stages'][0]['constraints']['p95_latency_ms'] == 206
     assert payload['stages'][0]['trials'][1]['metrics']['p95_latency_ms'] == 150
     assert (tmp_path / 'out.html').exists()
+
+
+def test_replay_labels_weave_reads_and_unrun_aria():
+    source = report()
+    source['weave_url'] = 'https://wandb.ai/team/project/r/call/123'
+    source['search']['rounds'][0]['swarm'] = {'investigators': [{
+        'inspections': [{'status': 'complete', 'result': {'source': 'weave'}},
+                        {'status': 'failed', 'result': {'source': 'weave'}}]}]}
+    replay = sera.visualize(SimpleNamespace(report=source))
+    stage = data(replay)['stages'][0]
+    assert stage['weave_reads'] == 1
+    assert data(replay)['aria_review']['status'] == 'not-recorded'
+    assert 'Weave' in replay.html and 'ARIA' in replay.html
+    assert 'did not select or execute GPU experiments' in replay.html
 
 
 @pytest.mark.parametrize('path', ['../secret', '/etc', 'https://example.com/report'])

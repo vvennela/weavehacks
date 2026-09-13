@@ -91,3 +91,43 @@ def test_wrong_vllm_version_fails_before_provider_checks(monkeypatch):
     monkeypatch.setattr(demo.importlib.metadata, 'version', lambda name: 'unsupported')
     with pytest.raises(RuntimeError, match='vLLM 0.26.0'):
         demo._check_gpu()
+
+
+def test_download_uses_pinned_revision_and_reuses_cache(prepared, monkeypatch):
+    demo, _events, folder = prepared
+    commands = []
+    monkeypatch.setattr(demo.subprocess, 'run', lambda command, **kw: commands.append(command))
+    prepare_demo(project='test/project', certificate=folder/'certificate.json', download=True)
+    from sera.config import LARGE_MODEL_ID, LARGE_MODEL_REVISION
+    assert len(commands) == 1
+    assert commands[0][1:5] == ['download', LARGE_MODEL_ID, '--revision', LARGE_MODEL_REVISION]
+    assert '--force-download' not in commands[0]
+    assert '*.safetensors' in commands[0]
+
+
+def test_failed_provider_does_not_download_weights(prepared, monkeypatch):
+    demo, _events, folder = prepared
+    monkeypatch.setattr(demo, 'check_provider', lambda **kw: {'passed': False})
+    monkeypatch.setattr(demo.subprocess, 'run', lambda *a, **kw: pytest.fail('Unexpected download'))
+    with pytest.raises(RuntimeError, match='Provider check failed'):
+        prepare_demo(project='test/project', evidence_root=folder, download=True)
+
+
+def test_aria_handoff_contains_trace_and_limits_not_keys_or_prompts():
+    from sera.demo import aria_review_prompt
+    report = {'weave_url': 'https://wandb.ai/team/project/r/call/test',
+              'decision': {'selected': 'baseline', 'outcome': 'no-improvement'},
+              'constraints': {'quality_floor': .99}, 'prompts': ['private task'],
+              'agent': {'api_key': 'private key'}}
+    text = aria_review_prompt(SimpleNamespace(report=report))
+    assert report['weave_url'] in text and '0.99' in text
+    assert 'Do not launch' in text and 'manual' in text
+    assert 'private task' not in text and 'private key' not in text
+
+
+def test_browser_agent_handoff_requires_real_aria_and_no_execution():
+    from sera.demo import aria_agent_task
+    task = aria_agent_task(SimpleNamespace(report={'weave_url': 'https://wandb.ai/t/p/r/call/1'}))
+    assert 'browser-capable agent' in task
+    assert 'Ask ARIA' in task and 'Do not invent an ARIA response' in task
+    assert 'https://wandb.ai/t/p/r/call/1' in task

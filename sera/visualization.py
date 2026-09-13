@@ -115,6 +115,13 @@ def _summary(report, name=None, limits=None, record_status='loaded'):
         trials.append(_trial(report['candidate_trial']))
     search = _mapping(report.get('search'))
     rounds = [_round(row) for row in _rows(search.get('rounds'))]
+    weave_reads = sum(
+        inspection.get('status') == 'complete'
+        and _mapping(inspection.get('result')).get('source') == 'weave'
+        for row in _rows(search.get('rounds'))
+        for investigator in _rows(_mapping(row.get('swarm')).get('investigators'))
+        for inspection in _rows(investigator.get('inspections'))
+    )
     if not rounds and isinstance(report.get('proposal'), dict):
         rounds = [_round({'round': 1, 'specialists': [{'role': 'agent',
             'proposal': report['proposal'], 'status': report.get('proposal_validation')}],
@@ -131,7 +138,7 @@ def _summary(report, name=None, limits=None, record_status='loaded'):
         returned_runtimes=[_pick(row, ('status', 'cleanup_pass', 'memory_after_mib'))
                            for row in _rows(report.get('returned_runtimes'))],
         task_quality_verified=_scalar(report.get('task_quality_verified')),
-        weave_url=_link(report.get('weave_url')))
+        weave_url=_link(report.get('weave_url')), weave_reads=weave_reads)
 
 
 def _read(path):
@@ -218,6 +225,7 @@ def visualize(result, output_path=None, speed=8):
     else:
         stages.append(_summary(report))
     payload = dict(speed=speed, stages=stages, k_percent=_number(report.get('k_percent')),
+                   aria_review={'status': 'not-recorded'},
                    min_improvement_percent=_number(report.get('min_improvement_percent')),
                    status=_scalar(report.get('status')),
                    returned_runner_closed=report.get('returned_runner_closed')
