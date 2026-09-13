@@ -7,5 +7,10 @@ from .runtime import SeraModel, SeraResponse
 from .agent import WandbAgent
 from .hardware import HardwareAssignment, ModelDescriptor
 from .portable_runtime import PortableSeraModel
+from .placement import place, PlacementResult, PlacementWorkload, PlacementMemoryEstimate
+from .placement_config import PlacementPlan, PlacementService, PlacementConstraints
 
-__all__ = ["Budget", "Candidate", "Constraints", "InvestigationSpace", "Objective", "RuntimeConfig", "Workload", "SeraModel", "SeraResponse", "SeraResult", "WandbAgent", "optimize", "HardwareAssignment", "ModelDescriptor", "PortableSeraModel"]
+__all__ = ["Budget", "Candidate", "Constraints", "InvestigationSpace", "Objective", "RuntimeConfig", "Workload", "SeraModel", "SeraResponse", "SeraResult", "WandbAgent", "optimize"]
+__all__ += ["HardwareAssignment", "ModelDescriptor", "PortableSeraModel"]
+__all__ += ["place", "PlacementResult", "PlacementWorkload", "PlacementMemoryEstimate",
+            "PlacementPlan", "PlacementService", "PlacementConstraints"]

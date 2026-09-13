@@ -158,13 +158,14 @@ class SeraModel:
     """Start once, generate many times, then explicitly close (or use `with`)."""
 
     def __init__(self, *, artifact_dir, configuration=None, model_id=MODEL_ID,
-                 revision=MODEL_REVISION):
+                 revision=MODEL_REVISION, placement_owner=None):
         pinned = {MODEL_ID: MODEL_REVISION, LARGE_MODEL_ID: LARGE_MODEL_REVISION,
                   GLM_MODEL_ID: GLM_MODEL_REVISION}
         if pinned.get(model_id) != revision:
             raise ValueError("The runner requires a supported, pinned model revision")
         self.model_id = model_id
         self.revision = revision
+        self.placement_owner = placement_owner
         self.configuration = RuntimeConfig.model_validate(
             (configuration or RuntimeConfig()).model_dump())
         self.artifact_dir = Path(artifact_dir).resolve()
@@ -187,9 +188,12 @@ class SeraModel:
     def _sample_memory(self):
         while not self._stop_monitor.is_set():
             try:
-                used = gpu_snapshot()["used_mib"]
-                self.record["sampled_peak_memory_mib"] = max(
-                    self.record["sampled_peak_memory_mib"] or 0, used)
+                if self.placement_owner is not None:
+                    self.placement_owner.sample()
+                else:
+                    used = gpu_snapshot()["used_mib"]
+                    self.record["sampled_peak_memory_mib"] = max(
+                        self.record["sampled_peak_memory_mib"] or 0, used)
             except (OSError, ValueError, subprocess.SubprocessError):
                 self.record["telemetry_errors"] += 1
             self._stop_monitor.wait(1)
@@ -219,7 +223,9 @@ class SeraModel:
                 raise RuntimeError("The checked runtime is vLLM 0.26.0; other versions are unverified")
             gpu = gpu_snapshot()
             self.record.update(gpu=gpu, memory_before_mib=gpu["used_mib"])
-            if gpu["used_mib"] > 128:
+            if self.placement_owner is not None:
+                self.placement_owner.before_start(self, gpu)
+            elif gpu["used_mib"] > 128:
                 raise RuntimeError("GPU 0 is already in use; refusing an isolated trial")
             if ((self.configuration.kv_cache_dtype == "fp8" or self.configuration.quantization is not None)
                     and gpu["compute_capability"] != "12.0"):
@@ -252,6 +258,8 @@ class SeraModel:
             self.process = subprocess.Popen(command, env=env, stdout=self._log,
                                             stderr=subprocess.STDOUT, start_new_session=True)
             self.record["pid"] = self.process.pid
+            if self.placement_owner is not None:
+                self.placement_owner.register(self)
             self._monitor = threading.Thread(target=self._sample_memory, daemon=True)
             self._monitor.start()
             self._save()
@@ -284,6 +292,8 @@ class SeraModel:
     def _require_ready(self):
         if not self._ready or self.process is None or self.process.poll() is not None:
             raise RuntimeError("The runner is not live; call start() before generate()")
+        if getattr(self, 'placement_owner', None) is not None:
+            self.placement_owner.ensure_healthy()
 
     def prepare(self, prompt):
         """Validate context length without generating or truncating any tokens."""
@@ -370,6 +380,10 @@ class SeraModel:
                 signal_group(signal.SIGKILL)
                 process.wait(timeout=10)
             signal_group(signal.SIGTERM)
+            if self.placement_owner is not None:
+                signal_group(signal.SIGKILL)
+                self.placement_owner.verify_service_cleanup(self)
+                return self.record
             after = gpu_snapshot()["used_mib"]
             deadline = time.monotonic() + 15
             while after > self.record["memory_before_mib"] + 128 and time.monotonic() < deadline:

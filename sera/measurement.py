@@ -85,7 +85,7 @@ def export_trial_events(record, prompts):
         export.update(status='failed', error_type=error.error_type, failed_event=error.event_name)
 
 
-def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
+def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None, phase_hook=None):
     """Measure each declared load separately, then collect serial quality passes."""
     workload = Workload() if workload is None else Workload.model_validate(workload)
     if max(workload.concurrency) > model.configuration.max_num_seqs:
@@ -141,6 +141,8 @@ def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
                 record["warmup"].append(item)
             prefix = "" if workload.concurrency == [1] else f"concurrency-{concurrency}-"
             snapshot(prefix + "before-measurement")
+            if phase_hook is not None:
+                phase_hook('before-measurement', concurrency)
 
             def measured_request(index):
                 prompt_index = index % len(prompts)
@@ -155,6 +157,10 @@ def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
                 with ThreadPoolExecutor(max_workers=concurrency) as executor:
                     load["requests"] = list(executor.map(measured_request, indices))
             elapsed = time.perf_counter() - started
+            load['measurement_window'] = {'started': started, 'ended': started + elapsed,
+                                          'clock': 'process-perf-counter'}
+            if phase_hook is not None:
+                phase_hook('after-measurement', concurrency)
             load["reduced"] = reduce_requests(load["requests"], elapsed)
             record["requests"].extend(load["requests"])
             snapshot(prefix + "after-measurement")
@@ -163,9 +169,13 @@ def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
             save()
         record["reduced"] = reduce_loads(record["loads"])
         for phase in (["quality", "self_check"] if baseline else ["quality"]):
+            if phase_hook is not None:
+                phase_hook('before-' + phase, 1)
             for index, item in enumerate(prepared):
                 record[phase].append(request(item, index))
                 save()
+            if phase_hook is not None:
+                phase_hook('after-' + phase, 1)
         record["generation_errors"] = sum(bool(item.get("error"))
             for phase in ("warmup", "requests", "quality", "self_check") for item in record[phase])
         record["status"] = "collected" if record["generation_errors"] == 0 else "request-errors"

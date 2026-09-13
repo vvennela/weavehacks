@@ -1,7 +1,12 @@
 # Two-model placement readiness
 
-This is an implementation plan, not evidence that two-model placement works.
+This is a placement readiness plan, not evidence that two-model placement works.
 It follows product phase two and specification sections 14, 17, and 23.3.
+
+The explicit execution path is now implemented as `sera.place`: isolated gates,
+shared ownership, synchronized measurements, two returned runners, and rollback
+are covered by offline tests. See [the executor contract](two-model-executor.md).
+The steps below retain the live gates and the remaining autonomous-selector work.
 
 ## Current state
 
@@ -10,11 +15,11 @@ The approved pair is `Qwen/Qwen3-0.6B` and `zai-org/glm-4-9b-chat-hf`, using the
 Two separate gaps remain:
 
 1. **Task quality:** no tested configuration of the pair passes the current eight-task, strict JSON contract at the fixed 0.99 quality floor. The original isolated results remain preserved: Qwen BF16 passed 2/8, Qwen FP8 weights passed 1/8, GLM BF16 passed 0/8, and GLM FP8 weights passed 0/8. These are task failures, not proof of broken quantization kernels. See [the original prerequisite record](../evidence/placement-prerequisites-v1/README.md).
-2. **Joint execution:** the current runtime requires an idle GPU. It rejects a second service once GPU use exceeds 128 MiB. Joint ownership, concurrent measurement, pair selection, and pair rollback are not implemented.
+2. **Live joint execution:** the default isolated runtime still requires an idle GPU. The new explicit placement owner permits only its registered peer process groups and measures shared workloads. This has offline tests, not a passing joint GPU trial. Automatic pair selection is not implemented.
 
 A new native structured-output profile was tested. Qwen completed at 7/8: all answers were valid JSON, but the filtering answer remained wrong. GLM passed 8/8, including filtering. A passing pair at the fixed 0.99 floor is not established. The new profile does not replace or regrade the original failures. See [Qwen's result](../evidence/qwen-structured-quality-v3/README.md) and [GLM's result](../evidence/glm-structured-quality-v1/README.md).
 
-Even if both isolated quality pilots pass, phase two remains unfinished. They do not establish shared-GPU fit, latency, interference, or two usable returned runners.
+Even if both isolated quality pilots pass, live phase two remains unfinished until the joint executor passes on the GPU. Isolated results do not establish shared-GPU fit, latency, interference, or two usable returned runners.
 
 ## Bounded implementation order
 
@@ -46,7 +51,7 @@ Use the same frozen limits for unquantized and quantized configurations, both al
 
 Touch `sera/config.py` and `sera/memory.py` for a validated plan containing exactly two pinned configurations, one GPU assignment, per-service allocations, per-model constraints, and the declared total budget.
 
-The structural portion is now implemented in `sera/placement_config.py`: `validate_placement_plan` requires the pinned pair, explicit allocations and per-model limits, matching physical-memory fractions, and the exact 10% shared reserve. It rejects unverified precision combinations and revalidates nested values. This does not prove fit, bind passing isolated evidence, choose allocations, or activate a shared runner. The remaining fit/evidence and runtime work below is still required.
+The structural portion is implemented in `sera/placement_config.py`: `validate_placement_plan` requires the pinned pair, explicit allocations and per-model limits, matching physical-memory fractions, and the exact 10% shared reserve. It rejects unverified precision combinations and revalidates nested values. `sera.place` now binds newly measured isolated evidence and shared execution to that plan. Neither API chooses allocations or proves live fit without a run.
 
 Touch `sera/runtime.py` to give one owner control of both service process groups. Permit only registered peer services; continue rejecting unrelated GPU use. Record per-service memory and total device memory separately. Device-wide memory samples cannot identify each service's use.
 
