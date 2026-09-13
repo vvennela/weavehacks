@@ -37,13 +37,11 @@ def _():
     ## Clone this notebook first
 
     **Clone this notebook into your own Molab workspace before adding your API keys.**
-    Select the **RTX PRO 6000 GPU** runtime. Molab installs the pinned Python
-    dependencies above. No terminal setup is needed. A CPU runtime cannot run this demo.
-
-    Enter your keys below, then **Shift+Enter on either workflow cell**.
-    Each cell checks setup, downloads missing Qwen72B files, runs Sera, tests the
-    returned runner, and creates its own downloadable 8× and 16× replay.
-    Run one workflow at a time. The first download is large; later runs reuse the cache.
+    Select the **RTX PRO 6000 GPU**, enter your keys below, then
+    **Shift+Enter on either workflow cell**. Run one workflow at a time.
+    Molab installs the dependencies. Each workflow downloads missing model files,
+    runs Sera, tests the returned runner, and saves 8× and 16× replays.
+    Later runs reuse cached model files.
 
     ## The loop you are running
 
@@ -51,28 +49,20 @@ def _():
     → quality and performance checks → Weave evidence → next round.**
 
     The investigators cover scheduling, memory/context, and output quality.
-    They use new measurements and trace evidence to revise their proposals.
-    Sera stops after confirmed lack of progress or another valid stop condition.
-    A failed proposal is evidence, not an improvement.
+    Each round uses new measurements to revise proposals. Sera stops after
+    confirmed lack of progress or another valid stop condition.
 
     **Weave** records the run and supplies trace evidence to the investigators.
-    **ARIA** is a separate read-only advisor. Run this notebook in your own Molab
-    account with your W&B key, then give the generated **ARIA agent task** to a
-    browser-capable agent signed into your W&B account. It opens the Weave trace,
-    asks ARIA for a review, and returns the advice. You can also paste the review
-    request into ARIA yourself. No automatic ARIA adapter is installed.
-    ARIA requires a team project in W&B Cloud with Smart features enabled;
-    owning a Molab account or a W&B key alone does not grant that access.
-    [ARIA access requirements](https://docs.wandb.ai/aria/overview).
-    The replay says "no review recorded" until a real review is separately recorded;
-    it does not credit ARIA with Sera's decisions or measured gains.
+    **ARIA** reviews the completed trace through your signed-in W&B chat.
+    Give the downloaded **ARIA agent task** to a browser-capable agent, or paste
+    the review request into Ask ARIA yourself. This is a separate advisory step.
+    [Requires an ARIA-enabled W&B Cloud team project](https://docs.wandb.ai/aria/overview).
 
-    These examples use Qwen72B with FP8 weights and BF16 cache, eight exact-answer
-    JSON questions, a 99% quality floor, and concurrency 1/2/4/8.
-    This is the tested workload, not support for arbitrary models or hardware.
+    **Workload:** Qwen72B · FP8 weights · BF16 cache · 8 exact-answer JSON tasks
+    · 99% quality floor · concurrency 1/2/4/8.
 
     **Cost:** GPU time and hosted investigator calls can cost money.
-    Replays run offline. Playback speed changes the animation, not GPU execution time.
+    **Replay:** offline · recorded results · schematic stage timing.
     """)
     return aria_agent_task, aria_review_prompt, mo, os, prepare_demo, sera
 
