@@ -6,7 +6,7 @@ import time
 from pydantic import ValidationError
 
 from sera.agent import Proposal, SCHEMAS, schema_hash, validate_proposal
-from sera.config import CONTROL_ROLES, MODEL_ID
+from sera.config import CONTROL_ROLES
 from sera.provider_check import require_provider_check
 from sera.storage import content_hash
 
@@ -54,7 +54,7 @@ def project_evidence(view, variant):
     metrics = {} if variant == 'no-reduced-telemetry' else _metrics(baseline)
     evidence = {
         'manifest_hash': view['manifest_hash'], 'identity': deepcopy(view['identity']),
-        'trial_id': baseline['candidate_id'], 'model_id': MODEL_ID,
+        'trial_id': baseline['candidate_id'], 'model_id': view['identity']['model_id'],
         'configuration': deepcopy(baseline['configuration']), 'metrics': metrics,
         'remaining_trials': view['remaining_trials'],
         'remaining_candidate_ids': list(view['remaining_candidate_ids']),
@@ -79,7 +79,7 @@ def project_evidence(view, variant):
     return evidence
 
 
-def _candidate_proposal(entry, baseline):
+def _candidate_proposal(entry, baseline, model_id):
     changed = {key: value for key, value in entry['configuration'].items()
                if value != baseline[key]}
     if len(changed) != 1:
@@ -88,7 +88,7 @@ def _candidate_proposal(entry, baseline):
     try:
         proposal = Proposal(
             action='trial', proposal_id=entry['candidate_id'], agent_role=CONTROL_ROLES.get(lever),
-            parent_trial_id='schema-preflight', model_id=MODEL_ID,
+            parent_trial_id='schema-preflight', model_id=model_id,
             changed_lever=lever, proposed_value=value, evidence_used=['p95_latency_ms'],
             predicted_metric_change='Schema preflight; no performance prediction', confidence=0.0,
             expected_trial_cost=1, falsification_condition='Not a model proposal', reason='Schema preflight',
@@ -118,6 +118,8 @@ class WandbSearchPolicy:
             [item['configuration'] for item in manifest['candidates']], budget=manifest['budget'],
             evidence_kind=manifest['evidence_kind'], compatibility=manifest['compatibility'],
             random_seeds=manifest['random_seeds'], max_proposals=manifest['max_proposals'],
+            model_exception=manifest.get('model_exception'),
+            comparison_scope=manifest.get('comparison_scope'),
         )
         if expected != manifest:
             raise ValueError('Manifest does not match its frozen configuration')
@@ -127,7 +129,8 @@ class WandbSearchPolicy:
         self.max_provider_requests = max_provider_requests
         self.round_robin_index = 0
         self.representable = {
-            item['candidate_id']: _candidate_proposal(item, manifest['baseline']['configuration'])
+            item['candidate_id']: _candidate_proposal(item, manifest['baseline']['configuration'],
+                                                     manifest['identity']['model_id'])
             for item in manifest['candidates']
         }
         self.provider_validation = require_provider_check(provider_check, client)
@@ -335,7 +338,8 @@ class FrozenSwarmPolicy:
             rows = []
             for outcome in cached:
                 identity = {'trial_id': outcome['candidate_id'], 'config_hash': outcome['config_hash'],
-                            'output_sha256': outcome['source_evidence_hash'], 'model_id': MODEL_ID,
+                            'output_sha256': outcome['source_evidence_hash'],
+                            'model_id': view['identity']['model_id'],
                             'revision': view['identity']['model_revision']}
                 if query == 'quality_outputs':
                     rows.append({**identity, 'call_id': f"cached:{outcome['candidate_id']}:quality",

@@ -179,6 +179,42 @@ def test_import_live_then_missing_collection_then_full_grid(tmp_path):
     assert comparison['performance_claim_allowed'] is False
 
 
+def test_live_replay_keeps_recorded_choices_and_twenty_seeds_auditable(tmp_path):
+    from benchmarks.live_comparison import import_live, collect_missing
+    from benchmarks.run_search import main
+    run_dir = tmp_path / 'run'
+    run_dir.mkdir()
+    _, entries, make_trial = campaign(run_dir)
+    import_live(run_dir)
+
+    def measure(entry, folder, bundle):
+        trial = make_trial(entry, entry['candidate_id'], 99)
+        trial['collection_identity'] = {key: bundle['records'][key] for key in ('hardware', 'runtime')}
+        trial['collection_seconds'] = 5
+        return trial
+
+    collect_missing(run_dir, measure=measure)
+    output = tmp_path / 'replay'
+    assert main(['replay', '--collection', str(run_dir), '--output-dir', str(output),
+                 '--live-run']) == 0
+    comparison = json.loads((output / 'comparison.json').read_text())
+    assert comparison['policies']['recorded-live-sera']['trials_to_near_oracle'] == 1
+    assert comparison['grid']['trials_to_near_oracle'] == 3
+    assert [row['seed'] for row in comparison['random']] == list(range(20))
+    assert comparison['strict_section_19_4_claim'] is False
+    assert comparison['benchmark_claim'] == 'not-assessed'
+    assert comparison['live_source']['weave_url'] == 'fixture://not-a-real-weave-trace'
+    assert comparison['live_source']['selected_candidate_ids'] == [entries[-1]['candidate_id']]
+
+    imported = json.loads((run_dir / 'live-import.json').read_text())
+    imported['selected_candidate_ids'] = [entries[1]['candidate_id']]
+    (run_dir / 'live-import.json').write_text(json.dumps(imported))
+    with pytest.raises(ValueError, match='sequence'):
+        main(['replay', '--collection', str(run_dir), '--output-dir', str(tmp_path / 'bad'),
+              '--live-run'])
+    assert not (tmp_path / 'bad').exists()
+
+
 @pytest.mark.parametrize('change', ['open', 'probe', 'timing'])
 def test_import_rejects_open_runner_bad_probe_or_missing_timing(tmp_path, change):
     from benchmarks.live_comparison import import_live

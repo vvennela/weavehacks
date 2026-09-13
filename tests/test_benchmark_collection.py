@@ -42,7 +42,8 @@ def fixture_measure(entry, folder, bundle):
         'input_token_ids': [[1, 2]], 'generation_errors': 0,
         'runtime': {'configuration': entry['configuration'], 'cleanup_pass': True,
                     'sampled_peak_memory_mib': 2000, 'startup_seconds': 2,
-                    'model_id': MODEL_ID, 'revision': MODEL_REVISION,
+                    'model_id': bundle['manifest']['identity']['model_id'],
+                    'revision': bundle['manifest']['identity']['model_revision'],
                     'generation': GENERATION, 'enable_thinking': False},
         'collection_identity': {'hardware': records['hardware'], 'runtime': records['runtime']},
         'workload': {'concurrency': [1, 2], 'quality_concurrency': 1,
@@ -221,8 +222,9 @@ def test_large_model_exception_is_explicit_and_full_grid_is_exploratory_only():
         freeze_collection(supplied)
 
 
+@pytest.mark.parametrize('large_model', [False, True])
 @pytest.mark.parametrize('variant', ['full-evidence', 'no-history', 'round-robin'])
-def test_current_swarm_replay_uses_production_investigators_and_hides_outcomes(monkeypatch, tmp_path, variant):
+def test_current_swarm_replay_uses_production_investigators_and_hides_outcomes(monkeypatch, tmp_path, variant, large_model):
     from benchmarks.search_policies import FrozenSwarmPolicy
     from sera.agent import ArbiterDecision, Proposal
 
@@ -240,6 +242,7 @@ def test_current_swarm_replay_uses_production_investigators_and_hides_outcomes(m
         def request(self, role, evidence, instruction):
             self.history.append({'role': role, 'evidence': deepcopy(evidence)})
             assert 'oracle' not in evidence
+            assert evidence['model_id'] == bundle['manifest']['identity']['model_id']
             if role == 'proposal':
                 from sera.investigation_prompt import build_investigation_prompt
                 prompt = build_investigation_prompt(evidence)
@@ -253,12 +256,22 @@ def test_current_swarm_replay_uses_production_investigators_and_hides_outcomes(m
             lever, value = next(iter(option['changed'].items()))
             from sera.config import CONTROL_ROLES
             return Proposal(action='trial', proposal_id='fixture', agent_role=CONTROL_ROLES[lever],
-                            parent_trial_id=evidence['trial_id'], model_id=MODEL_ID,
+                            parent_trial_id=evidence['trial_id'], model_id=evidence['model_id'],
                             changed_lever=lever, proposed_value=value, evidence_used=['p95_latency_ms'],
                             predicted_metric_change='fixture', confidence=0.5, expected_trial_cost=1,
                             falsification_condition='fixture', reason='fixture')
 
-    bundle = freeze_collection(plan())
+    supplied = plan()
+    if large_model:
+        from sera.config import LARGE_MODEL_ID, LARGE_MODEL_REVISION
+        supplied.update(model_id=LARGE_MODEL_ID, model_revision=LARGE_MODEL_REVISION,
+                        tokenizer_revision=LARGE_MODEL_REVISION,
+                        model_exception='user-approved-qwen72b-fp8-v1',
+                        comparison_scope='exploratory-live-vs-grid-v1')
+        supplied['baseline']['quantization'] = 'fp8_per_tensor'
+        for candidate in supplied['candidates']:
+            candidate['quantization'] = 'fp8_per_tensor'
+    bundle = freeze_collection(supplied)
     collect(bundle, tmp_path / 'collection', measure=fixture_measure)
     artifacts = json.loads((tmp_path / 'collection/outcomes.json').read_text())
     policy = FrozenSwarmPolicy(bundle['manifest'], Agent(), provider_check='fixture', variant=variant)
