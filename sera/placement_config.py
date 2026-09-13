@@ -17,6 +17,12 @@ from .storage import content_hash
 PINNED_PLACEMENT_MODELS = {MODEL_ID: MODEL_REVISION, GLM_MODEL_ID: GLM_MODEL_REVISION}
 
 
+def validate_memory_accounting(value):
+    if not isinstance(value, str) or value not in {'per-service', 'total-device'}:
+        raise ValueError('memory_accounting must be per-service or total-device')
+    return value
+
+
 class _PlacementRecord(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False,
                               revalidate_instances='always')

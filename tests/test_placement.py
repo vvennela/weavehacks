@@ -73,8 +73,9 @@ class FakeModel:
 
 
 class FakeOwner:
-    def __init__(self, plan):
+    def __init__(self, plan, *, memory_accounting='per-service'):
         self.plan = plan
+        self.memory_accounting = memory_accounting
         self.models = []
         self.record = dict(status='active', errors=[], sampled_peak_memory_mib=200,
             service_peak_memory_mib={MODEL_ID:100, GLM_MODEL_ID:100}, telemetry_errors=0,
@@ -120,6 +121,25 @@ def inputs(placement):
         kv_bytes=10*MIB, workspace_bytes=10*MIB, process_overhead_bytes=10*MIB,
         fragmentation_bytes=10*MIB) for model in workloads}
     return dict(plan=plan_data(), workloads=workloads, memory_estimates=estimates)
+
+
+def test_explicit_total_device_mode_reaches_owner_and_report(environment, tmp_path):
+    result = environment.place(**inputs(environment), output_dir=tmp_path/'run',
+                               memory_accounting='total-device')
+    assert result.owner.memory_accounting == 'total-device'
+    assert result.report['memory_accounting'] == 'total-device'
+    assert result.report['service_hard_caps_verified'] is False
+    assert 'not separately verified hard caps' in (tmp_path/'run/report.md').read_text()
+    assert all(gate['passed'] for gate in result.report['joint']['gates'].values())
+    result.close()
+
+
+@pytest.mark.parametrize('mode', ['automatic', '', None, True])
+def test_invalid_accounting_mode_starts_no_service(environment, tmp_path, mode):
+    with pytest.raises(ValueError, match='memory_accounting'):
+        environment.place(**inputs(environment), output_dir=tmp_path/'run', memory_accounting=mode)
+    assert not (tmp_path/'run').exists()
+    assert FakeModel.instances == []
 
 
 def test_pair_returns_both_live_runners_and_saves_overlapping_gated_measurements(environment, tmp_path):

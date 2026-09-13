@@ -13,7 +13,7 @@ from benchmarks.grade import BENCHMARK_VERSION, SYSTEM_PROMPT, dataset_hash, gra
 from sera import (Budget, Objective, PlacementMemoryEstimate, PlacementWorkload, Workload,
                   measure_placement_references, optimize_placement)
 from sera.api import _configured_agent
-from sera.placement_config import validate_placement_plan
+from sera.placement_config import validate_memory_accounting, validate_placement_plan
 from sera.storage import content_hash, save_json
 
 
@@ -24,7 +24,8 @@ def load_manifest(path):
     path = Path(path).resolve()
     manifest = json.loads(path.read_text())
     allowed = {'schema_version', 'plans', 'memory_estimates', 'isolated_references',
-               'concurrency', 'provider_check', 'weave_project', 'response_formats', 'response_format_version'}
+               'concurrency', 'provider_check', 'weave_project', 'response_formats', 'response_format_version',
+               'memory_accounting'}
     if set(manifest) - allowed or manifest.get('schema_version') != 'sera-placement-rehearsal-v1':
         raise ValueError('Use the explicit sera-placement-rehearsal-v1 manifest')
     plans = [validate_placement_plan(plan) for plan in manifest['plans']]
@@ -65,6 +66,7 @@ def load_manifest(path):
                   for plan_id,value in manifest.get('isolated_references', {}).items()}
     certificate = resolve(manifest['provider_check']) if manifest.get('provider_check') else None
     return dict(manifest=manifest, plans=plans, workloads=profiles, memory_estimates=estimates,
+                memory_accounting=validate_memory_accounting(manifest.get('memory_accounting', 'per-service')),
                 isolated_references=references, provider_check=certificate,
                 weave_project=manifest.get('weave_project'), cases=cases)
 
@@ -101,7 +103,8 @@ def run_search(loaded, output_dir, *, objective, budget):
     result = optimize_placement(plans=loaded['plans'], workloads=loaded['workloads'],
         memory_estimates=loaded['memory_estimates'], isolated_references=loaded['isolated_references'],
         provider_check=loaded['provider_check'], agent=_configured_agent(), output_dir=output_dir,
-        objective=objective, budget=budget, weave_project=loaded['weave_project'])
+        objective=objective, budget=budget, weave_project=loaded['weave_project'],
+        memory_accounting=loaded['memory_accounting'])
     probes = []
     with result:
         for model in result.models:

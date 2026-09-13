@@ -48,6 +48,10 @@ def capacity_evidence(selected_plan, rejected, plans, placement_report):
             physical_gpu_bytes=selected_plan.physical_gpu_bytes,
             measured_declared_headroom_bytes=selected_plan.declared_budget_bytes-peak*1024**2,
             measured_memory_savings_bytes=None,
+            memory_accounting=placement_report.get('memory_accounting', 'per-service'),
+            allocation_scope=('Configured vLLM budgets, not separately verified hard caps; '
+                'no claim that every possible BF16 allocation fails the total device budget'
+                if placement_report.get('memory_accounting') == 'total-device' else 'Per-service sampled hard caps'),
             scope='Measured passing quantized pair versus otherwise-matching BF16 plan rejected by the supplied memory estimate; '
                   'no measured BF16 joint latency or memory savings, no global-optimality claim')
     return unavailable

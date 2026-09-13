@@ -174,3 +174,15 @@ A quality-valid configuration and frozen
 calibration-backed service allocations are required before a passing joint run
 can be demonstrated. The approved 10% relative latency contract is now implemented;
 its numeric ceilings are derived from isolated results before joint startup.
+# Explicit Molab memory accounting
+
+Pass `memory_accounting="total-device"` to `sera.place` or
+`sera.optimize_placement` only when this scope is intended. The default remains
+`"per-service"`. The rehearsal manifest accepts the same field. Isolated
+references still bind the exact model, settings, workload, and quality rules.
+
+Total-device mode checks the declared device budget and final device cleanup.
+It does not verify separate joint service hard caps. Reports and agent evidence
+state that service allocations are configured vLLM budgets; per-service joint
+memory is unavailable, not zero or an isolated-memory estimate. No automatic
+fallback changes the accounting mode. Quality and latency rules do not change.

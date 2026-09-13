@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .config import Workload
 from .measurement import collect_trial
-from .placement_config import validate_placement_plan
+from .placement_config import validate_memory_accounting, validate_placement_plan
 from .placement_runtime import SharedGPUOwner
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
@@ -172,6 +172,8 @@ class PlacementResult:
                  'Memory peaks are sampled, not continuous allocation enforcement.',
                  'This executor tests one explicit plan; see the search report for agent selection. No global-optimality claim.',
                  'No quantization-enabled placement claim without an unchanged-budget unquantized comparison.']
+        if self.report.get('memory_accounting') == 'total-device':
+            lines.append('Total-device accounting: service allocations are configured vLLM budgets, not separately verified hard caps.')
         if self.report.get('weave_url'):
             lines.extend(['', f"Weave trace: {self.report['weave_url']}",
                           f"Trace export: {self.report.get('trace_status', 'unavailable')}"])
@@ -209,14 +211,15 @@ class PlacementResult:
 
 
 def place(*, plan, workloads, memory_estimates, output_dir, weave_project=None, isolated_reference=None,
-          trial_namespace=None):
+          trial_namespace=None, memory_accounting='per-service'):
     """Measure one caller-selected pair. Never silently return only one model.
 
     Failed quality returns an empty result with evidence. Cleanup errors raise and
     remain saved. The caller owns both successful runners and must close them.
     """
     arguments = dict(plan=plan, workloads=workloads, memory_estimates=memory_estimates,
-                     output_dir=output_dir, _isolated_reference=isolated_reference, _trial_namespace=trial_namespace)
+                     output_dir=output_dir, _isolated_reference=isolated_reference, _trial_namespace=trial_namespace,
+                     memory_accounting=validate_memory_accounting(memory_accounting))
     return _run_placement(arguments, weave_project)
 
 
@@ -236,9 +239,11 @@ def _run_placement(arguments, weave_project):
 
 
 def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=None,
-           _references_only=False, _isolated_reference=None, _trial_namespace=None):
+           _references_only=False, _isolated_reference=None, _trial_namespace=None,
+           memory_accounting='per-service'):
     import re
     from .placement_decoding import runner_for_profile
+    memory_accounting = validate_memory_accounting(memory_accounting)
     if _trial_namespace is not None and (not isinstance(_trial_namespace, str)
             or re.fullmatch(r'[A-Za-z0-9_-]{1,64}', _trial_namespace) is None):
         raise ValueError('trial_namespace must be a short stable identifier')
@@ -263,6 +268,7 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
     folder.mkdir(parents=True, exist_ok=False)
     manifest = {model: profile.manifest() for model, profile in profiles.items()}
     report = dict(schema_version='sera-placement-v1', status='running', plan=plan.model_dump(),
+        memory_accounting=memory_accounting, service_hard_caps_verified=False,
         plan_hash=plan.plan_hash, workloads=manifest, workload_hash=content_hash(manifest),
         memory_estimates={model:value.model_dump() for model,value in estimates.items()},
         memory_estimate_scope='caller-supplied estimates; not a measured fit guarantee',
@@ -338,7 +344,7 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
         report['derived_joint_latency_limits'] = limits
         result._save()
 
-        owner = SharedGPUOwner(plan)
+        owner = SharedGPUOwner(plan, memory_accounting=memory_accounting)
         result.owner = owner
         owner.acquire()
         if any(trial['runtime'].get('gpu', {}).get('uuid') != owner.record['gpu']['uuid']
@@ -384,6 +390,7 @@ def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=No
         else:
             result.models = models
             report.update(status='ready', returned_runner_closed=False,
+                          service_hard_caps_verified=memory_accounting == 'per-service',
                           decision=dict(outcome='safe-placement', reason='both-models-pass-measured-requirements'))
         result._save()
         return result

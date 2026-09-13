@@ -9,7 +9,7 @@ from pathlib import Path
 from .agent import ArbiterDecision
 from .config import Budget, Objective
 from .placement import PlacementMemoryEstimate, place
-from .placement_config import validate_placement_plan
+from .placement_config import validate_memory_accounting, validate_placement_plan
 from .placement_reference import bind_placement_reference
 from .provider_check import require_provider_check
 from .runtime import CleanupError
@@ -82,6 +82,8 @@ class PlacementSearchResult:
              if self.report.get('quantization_enabled_placement') else 'Quantization-enabled placement is not established.'),
             'No measured memory-savings claim without a measured matching BF16 pair; no global-optimality claim.',
             'Provider certificate proves existing schema formatting, not placement reasoning quality.']
+        if self.report.get('memory_accounting') == 'total-device':
+            lines.append('Total-device accounting: service allocations are configured vLLM budgets, not separately verified hard caps.')
         if self.report.get('weave_url'):
             lines.append(f"Weave: {self.report['weave_url']}")
         (self.output_dir/'report.md').write_text('\n'.join(lines)+'\n')
@@ -118,7 +120,8 @@ def _plan_evidence(plan, bound):
 
 
 def optimize_placement(*, plans, workloads, memory_estimates, isolated_references,
-                       agent, provider_check, output_dir, objective=None, budget=None, weave_project=None):
+                       agent, provider_check, output_dir, objective=None, budget=None, weave_project=None,
+                       memory_accounting='per-service'):
     """Choose and test measured eligible plans until plateau plus confirmation.
 
     No allocation or user requirement is generated here. Each plan must have a
@@ -126,21 +129,24 @@ def optimize_placement(*, plans, workloads, memory_estimates, isolated_reference
     A supplied finite menu can end before a confirmation when no legal plan
     remains. Restoring an earlier winner is a separate, fully gated joint run.
     """
+    memory_accounting = validate_memory_accounting(memory_accounting)
     if weave_project is not None:
         if not isinstance(weave_project, str) or not weave_project.strip():
             raise ValueError('weave_project must be a nonempty explicit project')
         from .placement_search_tracing import traced_placement_search
         arguments = dict(plans=plans, workloads=workloads, memory_estimates=memory_estimates,
             isolated_references=isolated_references, agent=agent, provider_check=provider_check,
-            output_dir=output_dir, objective=objective, budget=budget)
+            output_dir=output_dir, objective=objective, budget=budget, memory_accounting=memory_accounting)
         return traced_placement_search(_optimize_placement, arguments, weave_project)
     return _optimize_placement(plans=plans, workloads=workloads, memory_estimates=memory_estimates,
         isolated_references=isolated_references, agent=agent, provider_check=provider_check,
-        output_dir=output_dir, objective=objective, budget=budget)
+        output_dir=output_dir, objective=objective, budget=budget, memory_accounting=memory_accounting)
 
 
 def _optimize_placement(*, plans, workloads, memory_estimates, isolated_references,
-                       agent, provider_check, output_dir, objective=None, budget=None, _observe=None):
+                       agent, provider_check, output_dir, objective=None, budget=None, _observe=None,
+                       memory_accounting='per-service'):
+    memory_accounting = validate_memory_accounting(memory_accounting)
     if not isinstance(plans, list) or not plans:
         raise ValueError('Supply at least one explicit placement plan')
     checked = [validate_placement_plan(plan) for plan in plans]
@@ -171,6 +177,7 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
     folder = Path(output_dir).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     report = dict(schema_version='sera-placement-search-v1', status='running',
+        memory_accounting=memory_accounting,
         objective=objective.model_dump(), budget=budget.model_dump(),
         plan_ids=list(by_id), plans={key:plan.model_dump() for key,plan in by_id.items()},
         memory_estimates={plan_id:{model:value.model_dump() for model,value in services.items()}
@@ -230,7 +237,9 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
                 break
             evidence = dict(placement=True, legal_proposal_ids=remaining[:],
                 proposals=[eligible[key] for key in remaining], objective=objective.model_dump(),
-                rejected_plans=deepcopy(report['rejected']),
+                rejected_plans=deepcopy(report['rejected']), memory_accounting=memory_accounting,
+                allocation_scope=('configured vLLM budgets, not separately verified hard caps'
+                                  if memory_accounting == 'total-device' else 'per-service sampled hard caps'),
                 remaining_trials=None if budget.max_candidate_trials is None else budget.max_candidate_trials-len(report['trials']),
                 incumbent_plan_id=best_id, incumbent_objectives=best_values,
                 confirmation_round=report['no_progress_rounds'] == 1, history=deepcopy(history),
@@ -274,6 +283,7 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
             active = place(plan=by_id[selected], workloads=profiles, memory_estimates=estimates[selected],
                            isolated_reference=frozen_references[selected],
                            trial_namespace=f"trial-{trial_number:03d}",
+                           memory_accounting=memory_accounting,
                            output_dir=folder/f"trial-{trial_number:03d}")
             active_id = selected
             values = _measured_objectives(active.report)
@@ -305,6 +315,7 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
                     active = None
                 active = place(plan=by_id[best_id], workloads=profiles, memory_estimates=estimates[best_id],
                     isolated_reference=frozen_references[best_id], trial_namespace='return-validation',
+                    memory_accounting=memory_accounting,
                     output_dir=folder/'return-validation')
                 report['restoration'] = active.report
             if _measured_objectives(active.report) is not None and len(active.models) == 2:

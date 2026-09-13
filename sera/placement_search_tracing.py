@@ -10,7 +10,7 @@ def _summary(result):
     return {key:report.get(key) for key in ('schema_version', 'status', 'objective', 'budget',
         'plan_ids', 'workload_hash', 'rejected', 'references', 'rounds', 'selected_plan_id',
         'stop_reason', 'returned_runner_closed', 'weave_url', 'trace_status', 'error_type',
-        'capacity_evidence', 'quantization_enabled_placement')}
+        'capacity_evidence', 'quantization_enabled_placement', 'memory_accounting')}
 
 
 def traced_placement_search(execute, arguments, project):

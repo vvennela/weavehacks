@@ -98,6 +98,29 @@ def test_plateau_allows_one_confirmation_then_restores_validated_best(search_inp
     assert all(pair.closed for pair in live)
 
 
+def test_total_device_contract_reaches_trials_restoration_and_agent(search_inputs, monkeypatch):
+    search, args = search_inputs
+    execution_stub(search, monkeypatch, [100., 110., 120., 100.])
+    execute = search.place
+    modes = []
+    def recorded(**kwargs):
+        modes.append(kwargs['memory_accounting'])
+        return execute(**kwargs)
+    monkeypatch.setattr(search, 'place', recorded)
+    with search.optimize_placement(**args, memory_accounting='total-device') as result:
+        assert result.report['memory_accounting'] == 'total-device'
+        assert modes == ['total-device']*4
+        assert all(call['evidence']['memory_accounting'] == 'total-device' for call in args['agent'].history)
+        assert 'not separately verified hard caps' in (result.output_dir/'report.md').read_text()
+
+
+def test_unknown_accounting_mode_rejected_before_provider(search_inputs, monkeypatch):
+    search, args = search_inputs
+    monkeypatch.setattr(search, 'require_provider_check', lambda *_:pytest.fail('No provider check'))
+    with pytest.raises(ValueError, match='memory_accounting'):
+        search.optimize_placement(**args, memory_accounting='automatic')
+
+
 def test_qualifying_progress_resets_confirmation_and_returns_current_best(search_inputs, monkeypatch):
     search, args = search_inputs
     starts, live = execution_stub(search, monkeypatch, [100., 110., 90., 80.])

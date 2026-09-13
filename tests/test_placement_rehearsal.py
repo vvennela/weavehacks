@@ -36,3 +36,19 @@ def test_rehearsal_rejects_unapproved_task_or_latency_threshold(environment, tmp
     path.write_text(json.dumps(data))
     with pytest.raises(ValueError, match='approved'):
         load_manifest(path)
+
+
+def test_explicit_manifest_accounting_does_not_change_plan_or_workload(environment, tmp_path):
+    from experiments.run_placement import load_manifest
+    data = manifest(environment)
+    path = tmp_path/'manifest.json'
+    path.write_text(json.dumps(data))
+    strict = load_manifest(path)
+    data['memory_accounting'] = 'total-device'
+    path.write_text(json.dumps(data))
+    total = load_manifest(path)
+    assert strict['memory_accounting'] == 'per-service'
+    assert total['memory_accounting'] == 'total-device'
+    assert total['plans'] == strict['plans']
+    assert {m:p.manifest() for m,p in total['workloads'].items()} == {
+        m:p.manifest() for m,p in strict['workloads'].items()}

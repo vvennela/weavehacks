@@ -9,6 +9,8 @@ def _summary(result):
     report = result.report
     shared = report.get('shared_runtime') or {}
     return dict(plan_hash=report['plan_hash'], workload_hash=report['workload_hash'],
+        memory_accounting=report.get('memory_accounting', 'per-service'),
+        service_hard_caps_verified=report.get('service_hard_caps_verified', False),
         status=report['status'], decision=report['decision'],
         error_type=report.get('error_type'), cleanup_error=report.get('cleanup_error'),
         isolated_gates=report['isolated_gates'], joint_gates=report.get('joint', {}).get('gates'),
