@@ -279,12 +279,19 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                             workload=workload, budget=budget, investigation_space=investigation_space,
                             automatic_space=automatic_space, swarm=swarm, trace_reader=trace_reader)
     baseline_config = (_runtime_factory.baseline_configuration(baseline_configuration) if _runtime_factory is not None else
-                       RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(baseline_configuration))
+                       RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(
+                           baseline_configuration.model_dump() if isinstance(baseline_configuration, RuntimeConfig)
+                           else baseline_configuration))
     if _runtime_factory is None and baseline_configuration is not None:
-        if model_id != LARGE_MODEL_ID or baseline_config != RuntimeConfig(quantization="fp8_per_tensor"):
-            raise ValueError("An explicit reference is supported only for the proven Qwen72B FP8 weight plan")
         if evaluation is None:
-            raise ValueError("The Qwen72B comparison requires verified task requirements")
+            raise ValueError("An explicit reference requires verified task requirements")
+        if baseline_config.tensor_parallel_size != 1:
+            raise ValueError("Pinned Qwen stage references require one GPU")
+        if model_id == LARGE_MODEL_ID:
+            if baseline_config.quantization != 'fp8_per_tensor' or baseline_config.kv_cache_dtype != 'auto':
+                raise ValueError("Qwen72B references require FP8 weights and BF16 KV")
+        elif baseline_config.quantization is not None:
+            raise ValueError("Qwen0.6B stage references require BF16 weights")
     if max(workload.concurrency) > baseline_config.max_num_seqs:
         raise ValueError("Workload concurrency exceeds the reference sequence limit")
     if investigation_space is not None:
@@ -348,6 +355,9 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             hardware_assignment=_runtime_factory.hardware.model_dump(),
             tensor_parallel_selection='caller-fixed', memory_fit='requires-runtime-startup',
             precision_support='BF16-only', live_validation_scope='this run only')
+    elif baseline_configuration is not None and baseline_config != RuntimeConfig(
+            quantization='fp8_per_tensor' if model_id == LARGE_MODEL_ID else None):
+        report['baseline_name'] = 'sera-explicit-runtime-reference-v1'
     result = SeraResult(models=[], report=report, output_dir=folder)
     active = None
     result._save()
