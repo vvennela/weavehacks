@@ -76,3 +76,34 @@ def test_schema_valid_but_out_of_scope_response_does_not_certify_provider(tmp_pa
     message['content'] = json.dumps(response)
     with pytest.raises(ValueError, match='context'):
         verify(tmp_path, record)
+
+
+def test_request_explains_output_schema_to_model_as_well_as_decoder(monkeypatch):
+    import sys
+    from sera.agent import SCHEMAS, WandbAgent
+    case = provider_cases()[0]
+    captured = {}
+
+    def create(**payload):
+        captured.update(payload)
+        return SimpleNamespace(model_dump=lambda **_: {'choices': [{
+            'finish_reason': 'stop', 'message': {'content': json.dumps(valid_response(case))}}]})
+
+    class Client:
+        def __init__(self, **kwargs):
+            self.chat = SimpleNamespace(completions=SimpleNamespace(create=create))
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setenv('WANDB_API_KEY', 'not-a-real-test-key')
+    monkeypatch.setitem(sys.modules, 'openai', SimpleNamespace(OpenAI=Client))
+    parsed = WandbAgent(project='test/project').request('proposal', case['evidence'], 'Propose one trial.')
+    assert parsed is not None
+    system = captured['messages'][0]['content']
+    assert 'Output JSON schema:\n' in system
+    assert json.loads(system.split('Output JSON schema:\n', 1)[1]) == SCHEMAS['proposal'].model_json_schema()
+    assert captured['response_format']['json_schema']['strict'] is True

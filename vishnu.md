@@ -2,9 +2,9 @@
 
 ## Current checkpoint
 
-The narrow Qwen72B deployment and interactive rehearsal passed. A live four-load FP8-reference batching comparison also passed quality and returned the unchanged reference because the alternative did not meet the improvement threshold. Load sweeps, deterministic selection, raw evidence, and the delegated saved-outcome benchmark harness are implemented; 177 tests pass.
+The narrow Qwen72B deployment and interactive rehearsal passed. A live four-load FP8-reference batching comparison also passed quality and returned the unchanged reference because the alternative did not meet the improvement threshold. Load sweeps, deterministic selection, raw evidence, and the delegated saved-outcome benchmark harness are implemented; 207 tests pass.
 
-The full search loop and its performance claim remain incomplete. The current proposal schema blocks a useful multi-round benchmark and the no-telemetry ablation. Joint placement has not been implemented or executed: the specified Qwen0.6B/GLM pair failed isolated task requirements, so that path is blocked pending user direction. See plan.md and evidence/placement-prerequisites-v1/README.md. The work sections below describe the broader target, not a claim that all items are complete.
+The full search loop and its performance claim remain incomplete. The approved schema expansion adds bounded batch-token, sequence, and context controls while preserving the existing live defaults. Multi-round batching adapters pass local tests; the new provider check is running. Context-varying benchmark universes and the exact no-telemetry ablation still need contract decisions. Joint placement has not been implemented or executed: the specified Qwen0.6B/GLM pair failed isolated task requirements, so that path is blocked pending user direction. See plan.md and evidence/placement-prerequisites-v1/README.md. The work sections below describe the broader target, not a claim that all items are complete.
 
 ## Mission
 
