@@ -4,6 +4,9 @@ from copy import deepcopy
 import json
 from pathlib import Path
 
+import pytest
+
+from experiments.weave_evidence import _diagnosis
 from sera.investigation_prompt import build_investigation_prompt
 from sera.storage import content_hash
 
@@ -94,6 +97,49 @@ def test_empty_reader_quality_shape_does_not_turn_startup_failure_into_a_measure
             'mean':None,'floor':None,'per_prompt':[]}
     result=build_investigation_prompt(supplied)
     assert result['measured_facts']['inspection_records'][0]['diagnosis']['observed']['quality'] is None
+
+
+def test_reader_measurement_failure_without_quality_stays_unmeasured():
+    supplied = evidence()
+    diagnosis = supplied['history'][0]['diagnosis']
+    diagnosis['failure_kind'] = 'measurement-failed'
+    diagnosis['observed']['status'] = 'measurement-failed'
+    projected = _diagnosis(diagnosis)
+    assert projected['observed']['quality']['mean'] is None
+    for inspection in [supplied['inspections'][0], supplied['shared_findings'][0]['inspections'][0]]:
+        inspection['result']['records'][0]['diagnosis'] = deepcopy(projected)
+    result = build_investigation_prompt(supplied)
+    assert result['measured_facts']['inspection_records'][0]['diagnosis']['observed']['quality'] is None
+
+
+@pytest.mark.parametrize('gate', [None, {}, {'mean': None, 'floor': .99, 'per_prompt': []}])
+def test_missing_baseline_and_history_quality_gates_stay_unmeasured(gate):
+    supplied = evidence()
+    supplied['task_quality'] = gate
+    supplied['history'] = [{'trial': {'trial_id': 'trial-2', 'status': 'collected', 'task_quality': gate}}]
+    result = build_investigation_prompt(supplied)
+    assert result['measured_facts']['baseline']['quality']['measured'] is False
+    assert result['measured_facts']['trials'][0]['quality']['measured'] is False
+
+
+@pytest.mark.parametrize('score', [0, 1])
+def test_real_quality_scores_survive_separate_measurement_failure(score):
+    supplied = evidence()
+    gate = {'mean': score, 'floor': .99, 'passed': score == 1, 'per_prompt': []}
+    supplied.pop('task_quality')
+    supplied['baseline_self_check'] = gate
+    diagnosis = supplied['history'][0]['diagnosis']
+    diagnosis['failure_kind'] = 'measurement-failed'
+    diagnosis['observed'].update(status='measurement-failed', quality=gate)
+    supplied['history'][0]['trial'].update(status='measurement-failed', task_quality=gate)
+    for inspection in [supplied['inspections'][0], supplied['shared_findings'][0]['inspections'][0]]:
+        inspection['result']['records'][0]['diagnosis'] = _diagnosis(diagnosis)
+    result = build_investigation_prompt(supplied)
+    facts = result['measured_facts']
+    for quality in [facts['baseline']['quality'], facts['trials'][0]['quality'],
+                    facts['inspection_records'][0]['diagnosis']['observed']['quality']]:
+        assert quality['measured'] is True
+        assert quality['mean'] == score
 
 
 def test_bounded_examples_preserve_fixed_quality_facts_and_report_omissions():

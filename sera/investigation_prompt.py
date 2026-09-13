@@ -29,7 +29,8 @@ class _Projection:
 
     def quality(self, gate, measured=True):
         gate = gate or {}
-        if not measured:
+        mean = gate.get('mean')
+        if not measured or type(mean) not in (int, float) or not 0 <= mean <= 1:
             return dict(measured=False, floor=gate.get('floor'),
                         note='No quality measurement. Missing-output zeros are not model accuracy.')
         result = _pick(gate, ('version', 'floor', 'mean', 'passed', 'valid_outputs', 'task_quality_verified'))
@@ -48,8 +49,8 @@ class _Projection:
                                 'selection_reason', 'constraint_failures'))
         facts['objective'] = _pick(observed.get('objective') or {}, ('priority', 'baseline_value',
             'candidate_value', 'improvement_fraction', 'required_improvement_fraction'))
-        facts['quality'] = (self.quality(observed['quality']) if observed.get('quality') is not None
-                            and observed.get('status') != 'startup-failed' else None)
+        quality = self.quality(observed.get('quality'), observed.get('status') != 'startup-failed')
+        facts['quality'] = quality if quality['measured'] else None
         failure = runtime_failure_evidence(observed.get('runtime_failure'))
         if failure is not None:
             facts['runtime_failure'] = failure
