@@ -1,0 +1,283 @@
+{
+  "schema_version": "sera-failure-replay-audit-v1",
+  "recorded_source_commit": "4471c98",
+  "audit_scope": "Independent offline consistency and returned-reason audit; no provider, GPU or network calls.",
+  "passed": false,
+  "mechanical_passed": false,
+  "factual_reasoning_passed": false,
+  "gpu_trials_executed": 0,
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a63-0465-7324-8010-1db65f99d9cb",
+  "root_call_id": "01a09a63-0465-7324-8010-1db65f99d9cb",
+  "trace_id": "01a09a63-0465-78e6-9f3c-0b99bd054587",
+  "source_trace_id": "01a09a31-ec00-7428-a02b-80e40adcc79f",
+  "files": {
+    "console.log": {
+      "bytes": 823,
+      "sha256": "0cb38cbdb4a0022d9038b6bdf4f4f64e8fe0ab1d933fb69854a02edce2bbb474"
+    },
+    "result.json": {
+      "bytes": 13986657,
+      "sha256": "3851a41d0c9a0860d2df9e436e362794b59db8f84d0b22afa265bba09e21f913"
+    },
+    "revealed-trial-1.json": {
+      "bytes": 26324,
+      "sha256": "f63a7231196a60c0fcd0a91ec3b5dc9c124f597288e10c1264e8d8271e696212"
+    },
+    "revealed-trial-2.json": {
+      "bytes": 696927,
+      "sha256": "b34def34fda10c8d08e336bd8cb533e55105a492c1a2c97dcae749e76a868f66"
+    },
+    "weave-calls.json": {
+      "bytes": 24370005,
+      "sha256": "86674e69c3fe0f5f46415c7051acb7133bbb40fff32264912ece6d6ad4a5d942"
+    }
+  },
+  "original_source_file_sha256": {
+    "result.json": "96219626065f735566bff01aeb248d50d4068f1b55c30bd094b31da2ca631c42",
+    "weave-calls.json": "11477d5f437d04a56c9a2a4f0a8d6cee34928ed56cecb0841a9d4a5e628f328a",
+    "trial-1/server.log": "0ecab48aa5f47a86284b294135bf33bf523e13da139a06cac3aea0ba5901f065"
+  },
+  "checks": {
+    "source_files_match_recorded_hashes": true,
+    "all_calls_completed_without_trace_exception": true,
+    "all_calls_owned_by_replay_root": true,
+    "unique_call_ids": true,
+    "copied_request_and_metric_payloads_exact": true,
+    "copied_payload_count": 282,
+    "diagnosis_payloads_match_revealed_trials": true,
+    "diagnosis_payload_count": 2,
+    "provider_content_and_reasoning_exact": true,
+    "source_call_hashes_scope_boards_and_phase_overlap_verified": true,
+    "startup_log_sha256_matches": true,
+    "startup_matched_line_sha256_matches": true,
+    "startup_line_hash_method": "SHA256 of raw newline-delimited bytes, including line endings."
+  },
+  "consistency_issues": [],
+  "op_counts": {
+    "replay_failure_investigation": 1,
+    "recorded_model_request": 280,
+    "recorded_trial_metrics": 2,
+    "recorded_trial_diagnosis": 2,
+    "swarm_scheduling_inspection": 4,
+    "swarm_memory_context_inspection": 4,
+    "swarm_output_quality_inspection": 4,
+    "openai.chat.completions.create": 24,
+    "record_agent_response": 24,
+    "weave_inspect_load_metrics": 6,
+    "swarm_output_quality_proposal": 2,
+    "weave_inspect_quality_outputs": 2,
+    "swarm_scheduling_proposal": 2,
+    "weave_inspect_latency_outliers": 3,
+    "swarm_memory_context_proposal": 2,
+    "swarm_memory_context_peer_review": 2,
+    "swarm_scheduling_peer_review": 2,
+    "swarm_output_quality_peer_review": 2
+  },
+  "provider_response_count": 24,
+  "inspection_operation_count": 11,
+  "investigator_read_phases": [
+    {
+      "round": 1,
+      "investigator_id": "scheduling",
+      "completed_queries": [
+        "load_metrics",
+        "quality_outputs"
+      ],
+      "cache_statuses": [
+        "hit",
+        "hit"
+      ],
+      "rejected_queries": [],
+      "degraded": false,
+      "initial_action": "trial",
+      "refined_action": "keep-baseline",
+      "inspection_responses_acknowledge_cutlass": false,
+      "initial_proposal_reason_acknowledges_cutlass": false,
+      "initial_provider_reasoning_acknowledges_cutlass": false,
+      "refined_reason_acknowledges_cutlass": false,
+      "refined_reason_repeats_token_truncation_error": true,
+      "refined_provider_reasoning_notes_trial2": false,
+      "remaining_trials": 1
+    },
+    {
+      "round": 1,
+      "investigator_id": "memory_context",
+      "completed_queries": [
+        "load_metrics",
+        "latency_outliers"
+      ],
+      "cache_statuses": [
+        "miss",
+        "hit"
+      ],
+      "rejected_queries": [],
+      "degraded": false,
+      "initial_action": "trial",
+      "refined_action": "keep-baseline",
+      "inspection_responses_acknowledge_cutlass": true,
+      "initial_proposal_reason_acknowledges_cutlass": false,
+      "initial_provider_reasoning_acknowledges_cutlass": false,
+      "refined_reason_acknowledges_cutlass": false,
+      "refined_reason_repeats_token_truncation_error": true,
+      "refined_provider_reasoning_notes_trial2": false,
+      "remaining_trials": 1
+    },
+    {
+      "round": 1,
+      "investigator_id": "output_quality",
+      "completed_queries": [
+        "load_metrics"
+      ],
+      "cache_statuses": [
+        "hit"
+      ],
+      "rejected_queries": [
+        {
+          "query_id": "trial_diagnosis",
+          "error": "ValueError"
+        }
+      ],
+      "degraded": true,
+      "initial_action": "keep-baseline",
+      "refined_action": "keep-baseline",
+      "inspection_responses_acknowledge_cutlass": true,
+      "initial_proposal_reason_acknowledges_cutlass": false,
+      "initial_provider_reasoning_acknowledges_cutlass": true,
+      "refined_reason_acknowledges_cutlass": false,
+      "refined_reason_repeats_token_truncation_error": true,
+      "refined_provider_reasoning_notes_trial2": false,
+      "remaining_trials": 1
+    },
+    {
+      "round": 2,
+      "investigator_id": "scheduling",
+      "completed_queries": [
+        "load_metrics",
+        "latency_outliers"
+      ],
+      "cache_statuses": [
+        "hit",
+        "hit"
+      ],
+      "rejected_queries": [],
+      "degraded": false,
+      "initial_action": "keep-baseline",
+      "refined_action": "keep-baseline",
+      "inspection_responses_acknowledge_cutlass": true,
+      "initial_proposal_reason_acknowledges_cutlass": false,
+      "initial_provider_reasoning_acknowledges_cutlass": false,
+      "refined_reason_acknowledges_cutlass": false,
+      "refined_reason_repeats_token_truncation_error": true,
+      "refined_provider_reasoning_notes_trial2": false,
+      "remaining_trials": 0
+    },
+    {
+      "round": 2,
+      "investigator_id": "memory_context",
+      "completed_queries": [
+        "load_metrics",
+        "latency_outliers"
+      ],
+      "cache_statuses": [
+        "hit",
+        "hit"
+      ],
+      "rejected_queries": [],
+      "degraded": false,
+      "initial_action": "keep-baseline",
+      "refined_action": "keep-baseline",
+      "inspection_responses_acknowledge_cutlass": true,
+      "initial_proposal_reason_acknowledges_cutlass": false,
+      "initial_provider_reasoning_acknowledges_cutlass": false,
+      "refined_reason_acknowledges_cutlass": false,
+      "refined_reason_repeats_token_truncation_error": true,
+      "refined_provider_reasoning_notes_trial2": true,
+      "remaining_trials": 0
+    },
+    {
+      "round": 2,
+      "investigator_id": "output_quality",
+      "completed_queries": [
+        "load_metrics",
+        "quality_outputs"
+      ],
+      "cache_statuses": [
+        "miss",
+        "hit"
+      ],
+      "rejected_queries": [],
+      "degraded": false,
+      "initial_action": "keep-baseline",
+      "refined_action": "keep-baseline",
+      "inspection_responses_acknowledge_cutlass": true,
+      "initial_proposal_reason_acknowledges_cutlass": false,
+      "initial_provider_reasoning_acknowledges_cutlass": false,
+      "refined_reason_acknowledges_cutlass": false,
+      "refined_reason_repeats_token_truncation_error": true,
+      "refined_provider_reasoning_notes_trial2": true,
+      "remaining_trials": 0
+    }
+  ],
+  "recorded_criteria": {
+    "all_investigators_read": true,
+    "round_one_proposal": false,
+    "round_two_abstention": true,
+    "no_trace_errors": true,
+    "source_unchanged": true
+  },
+  "observed_startup_signature": {
+    "category": "cutlass-internal-error",
+    "stage": "startup",
+    "known_message": "cutlass_gemm_caller reported Error Internal.",
+    "source": {
+      "path": "server.log",
+      "sha256": "0ecab48aa5f47a86284b294135bf33bf523e13da139a06cac3aea0ba5901f065",
+      "line_numbers": [
+        404,
+        539
+      ],
+      "matched_line_sha256": [
+        "72fa7511d82faeb7451494d2f95c8933344cb8308bd365b628cfe7cf36ab0264",
+        "3b08cab0f38d5af01a3449796eb398b6d2e975d709f11109c2a821364ddecd7d"
+      ]
+    },
+    "root_cause_status": "not-established",
+    "callsite": "cutlass_gemm_caller",
+    "kernel_source": "cutlass_gemm_caller.cuh",
+    "kernel_line": 62
+  },
+  "facts": {
+    "prompt_token_lengths": [
+      85,
+      88,
+      92,
+      96,
+      101,
+      95,
+      109,
+      89
+    ],
+    "input_tokens_per_load": 2265,
+    "requests_per_load": 24,
+    "mean_prompt_tokens": 94.375,
+    "trial1_measured_quality": null,
+    "trial1_measured_latency": null,
+    "trial2_quality_passed": true,
+    "trial2_quality_mean": 1,
+    "baseline_p95_ms": 774.183014999835,
+    "trial2_p95_ms": 773.7631910003984,
+    "latency_gain_fraction": 0.0005422800439980201,
+    "required_gain_fraction": 0.05
+  },
+  "identical_refined_reason_count": 6,
+  "incorrect_refined_reason": "The baseline configuration satisfies the quality floor and the current latency metrics. No untested lever change is available that can be applied without risking a violation of the quality floor (the only supported change, max_num_batched_tokens to 2048, would truncate the 2265 input tokens per request). Therefore, keeping the baseline is the safest action to preserve constraints while awaiting further evidence that a safe improvement can be achieved.",
+  "limitations": [
+    "Coached diagnostic regression replay, not blind diagnosis or fresh performance evidence.",
+    "Initial instructions explicitly name CUTLASS/no-quality interpretation and disclose the later objective-miss category before trial2 metrics are revealed.",
+    "Round1 offers only batching2048; round2 has zero remaining trials and no legal candidate, so abstention is constrained.",
+    "No candidate is executed for a replay proposal and no new reviewer call occurs.",
+    "Cached inspection results retain remote source provenance but are not separate network fetches.",
+    "The leakage fix4211643 was merged after recorded commit4471c98; this evidence was not rerun."
+  ],
+  "call_count": 368
+}
