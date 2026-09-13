@@ -1,0 +1,146 @@
+[
+  {
+    "id": "code-01-slice", "category": "coding", "difficulty": "easy", "task_type": "trace",
+    "prompt": "In Python 3, what list does this expression produce?\n[8, 3, 9, 2, 7][1:4]\nReturn answer as an array of integers.",
+    "max_tokens": 128, "expected": [3, 9, 2],
+    "rationale": "A slice includes index 1 and excludes index 4."
+  },
+  {
+    "id": "code-02-default", "category": "coding", "difficulty": "easy", "task_type": "trace",
+    "prompt": "In Python 3, find the value of result.\ncounts = {'red': 2, 'blue': 5}\nresult = counts.get('green', 0) + counts['red']\nReturn answer as an integer.",
+    "max_tokens": 128, "expected": 2,
+    "rationale": "The missing green key contributes 0; red contributes 2."
+  },
+  {
+    "id": "code-03-filter", "category": "coding", "difficulty": "easy", "task_type": "trace",
+    "prompt": "In Python 3, find result.\nresult = [x * 2 for x in [1, 4, 3, 6] if x % 2 == 0]\nReturn answer as an array of integers in order.",
+    "max_tokens": 128, "expected": [8, 12],
+    "rationale": "Only 4 and 6 are even; doubling gives 8 and 12."
+  },
+  {
+    "id": "code-04-inclusive-repair", "category": "coding", "difficulty": "easy", "task_type": "repair_choice",
+    "prompt": "Repair this Python function to return the sum of integers from 1 through n, including n, for every integer n >= 0.\ndef total(n):\n    return sum(range(1, n))\nWhich replacement return statement is correct?\nA: return sum(range(n))\nB: return sum(range(1, n + 1))\nC: return sum(range(1, n + 2))\nD: return n\nReturn answer as the single-letter string.",
+    "max_tokens": 128, "expected": "B",
+    "rationale": "range excludes its stop; n+1 includes n, and n=0 yields an empty range."
+  },
+  {
+    "id": "code-05-stable-sort", "category": "coding", "difficulty": "moderate", "task_type": "trace",
+    "prompt": "In Python 3, find result. Python sorting is stable.\nrows = [('m', 2), ('a', 1), ('z', 2), ('b', 1)]\nresult = [name for name, score in sorted(rows, key=lambda row: row[1])]\nReturn answer as an array of strings in order.",
+    "max_tokens": 128, "expected": ["a", "b", "m", "z"],
+    "rationale": "Score-1 rows retain a,b order; score-2 rows retain m,z order."
+  },
+  {
+    "id": "code-06-alias", "category": "coding", "difficulty": "moderate", "task_type": "trace",
+    "prompt": "In Python 3, find result.\na = [1, 2]\nb = a\nc = a[:]\nb.append(3)\nc[0] = 9\nresult = [a, c]\nReturn answer as an array containing two integer arrays.",
+    "max_tokens": 128, "expected": [[1, 2, 3], [9, 2]],
+    "rationale": "b aliases a, but the slice creates a separate list c."
+  },
+  {
+    "id": "code-07-run-count", "category": "coding", "difficulty": "moderate", "task_type": "trace",
+    "prompt": "In Python 3, find result.\ndef runs(xs):\n    return sum(i == 0 or x != xs[i - 1] for i, x in enumerate(xs))\nresult = [runs([]), runs([2, 2, 5, 5, 2])]\nReturn answer as an array of integers.",
+    "max_tokens": 128, "expected": [0, 3],
+    "rationale": "The empty list has no runs. The nonempty list has runs 2,5,2."
+  },
+  {
+    "id": "code-08-fallback-repair", "category": "coding", "difficulty": "moderate", "task_type": "repair_choice",
+    "prompt": "Repair fallback(x), where x is an integer or None. Return 10 only when x is None; preserve all integers, including 0 and negatives.\ndef fallback(x):\n    return x or 10\nChoose the correct replacement.\nA: return 10 if x is None else x\nB: return 10 if not x else x\nC: return x if x > 0 else 10\nD: return 10 if x == 0 else x\nReturn answer as the single-letter string.",
+    "max_tokens": 128, "expected": "A",
+    "rationale": "An identity check distinguishes None from valid false-valued integer 0."
+  },
+  {
+    "id": "code-09-negative-divmod", "category": "coding", "difficulty": "harder", "task_type": "trace",
+    "prompt": "In Python 3, find result. Integer // uses floor division.\nresult = [-7 // 3, -7 % 3, 7 // -3, 7 % -3]\nReturn answer as an array of integers in order.",
+    "max_tokens": 128, "expected": [-3, 2, -3, -2],
+    "rationale": "Both quotients floor to -3; each remainder satisfies dividend=divisor*quotient+remainder."
+  },
+  {
+    "id": "code-10-default-list", "category": "coding", "difficulty": "harder", "task_type": "trace",
+    "prompt": "In Python 3, find result after all calls. This code runs once in a fresh interpreter.\ndef add(x, bucket=[]):\n    bucket.append(x)\n    return len(bucket)\nresult = [add('a'), add('b'), add('c', []), add('d')]\nReturn answer as an array of integers.",
+    "max_tokens": 128, "expected": [1, 2, 1, 3],
+    "rationale": "Calls without an explicit bucket share the default list. The third call uses a separate list."
+  },
+  {
+    "id": "code-11-bisect-repair", "category": "coding", "difficulty": "harder", "task_type": "repair_choice",
+    "prompt": "A binary search must return the first index i with a[i] >= target, or len(a) if none. a is sorted ascending and can contain duplicates or be empty.\ndef first_ge(a, target):\n    lo, hi = 0, len(a)\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if CONDITION:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\nChoose CONDITION.\nA: a[mid] <= target\nB: a[mid] > target\nC: a[mid] < target\nD: a[mid] == target\nReturn answer as the single-letter string.",
+    "max_tokens": 128, "expected": "C",
+    "rationale": "Only values strictly below target can be discarded on the left; equality must remain a candidate."
+  },
+  {
+    "id": "code-12-overlap-repair", "category": "coding", "difficulty": "harder", "task_type": "repair_choice",
+    "prompt": "Two nonempty integer intervals are half-open: [a,b) and [c,d), where a < b and c < d. Touching at one endpoint does not count as overlap. Which expression correctly reports whether they overlap for all such inputs?\nA: max(a,c) <= min(b,d)\nB: a <= c and d <= b\nC: a < d or c < b\nD: max(a,c) < min(b,d)\nReturn answer as the single-letter string.",
+    "max_tokens": 128, "expected": "D",
+    "rationale": "The intersection is nonempty exactly when its maximum start is below its minimum end."
+  },
+  {
+    "id": "reason-01-remainder", "category": "reasoning", "difficulty": "easy", "task_type": "exact_answer",
+    "prompt": "You have 47 records. Put them into batches of 6 records each. How many records remain after making as many full batches as possible? Return answer as an integer.",
+    "max_tokens": 128, "expected": 5,
+    "rationale": "47 = 7*6+5."
+  },
+  {
+    "id": "reason-02-unit-conversion", "category": "reasoning", "difficulty": "easy", "task_type": "exact_answer",
+    "prompt": "A timeout is 2 seconds plus 350 milliseconds. Express the total in milliseconds. Return answer as an integer.",
+    "max_tokens": 128, "expected": 2350,
+    "rationale": "2*1000+350 = 2350 milliseconds."
+  },
+  {
+    "id": "reason-03-inclusion", "category": "reasoning", "difficulty": "moderate", "task_type": "exact_answer",
+    "prompt": "There are 30 jobs. 18 need CPU, 14 need GPU, and 7 need both. How many need neither CPU nor GPU? Return answer as an integer.",
+    "max_tokens": 128, "expected": 5,
+    "rationale": "The union has 18+14-7=25 jobs, leaving 5."
+  },
+  {
+    "id": "reason-04-critical-path", "category": "reasoning", "difficulty": "moderate", "task_type": "exact_answer",
+    "prompt": "Jobs A and B start at time 0 on separate workers. A takes 3 seconds; B takes 5. C takes 4 seconds and starts only after both A and B finish. D takes 2 seconds and starts only after C finishes. Ignore scheduling overhead. At what time in seconds does D finish? Return answer as an integer.",
+    "max_tokens": 128, "expected": 11,
+    "rationale": "C starts at max(3,5)=5, finishes at 9, then D finishes at 11."
+  },
+  {
+    "id": "reason-05-modular", "category": "reasoning", "difficulty": "harder", "task_type": "exact_answer",
+    "prompt": "Find the smallest positive integer n such that n leaves remainder 2 when divided by 5 and remainder 3 when divided by 7. Return answer as an integer.",
+    "max_tokens": 128, "expected": 17,
+    "rationale": "Numbers 2,7,12,17 satisfy the first condition; 17 is the first with remainder 3 modulo 7."
+  },
+  {
+    "id": "reason-06-path-count", "category": "reasoning", "difficulty": "harder", "task_type": "exact_answer",
+    "prompt": "A robot goes from (0,0) to (3,2). Each move is either one unit right or one unit up. It must never visit (1,1). How many distinct valid paths exist? Return answer as an integer.",
+    "max_tokens": 128, "expected": 4,
+    "rationale": "There are choose(5,2)=10 paths; 2 paths reach (1,1), each followed by 3 suffix paths. 10-6=4."
+  },
+  {
+    "id": "extract-01-record", "category": "extraction", "difficulty": "easy", "task_type": "structured_answer",
+    "prompt": "Read this record: {\"job_id\":\"task-27\",\"owner\":\"Mina\",\"retries\":2,\"status\":\"queued\"}. Return answer as an object containing only job_id (string) and retries (integer), copied from the record.",
+    "max_tokens": 128, "expected": {"job_id": "task-27", "retries": 2},
+    "rationale": "Copy the two named fields and omit owner and status."
+  },
+  {
+    "id": "extract-02-status-filter", "category": "extraction", "difficulty": "easy", "task_type": "structured_answer",
+    "prompt": "Records in order: [{\"id\":\"r1\",\"status\":\"ok\"},{\"id\":\"r2\",\"status\":\"error\"},{\"id\":\"r3\",\"status\":\"ok\"}]. Return answer as an array of IDs whose status is exactly \"ok\", preserving input order.",
+    "max_tokens": 128, "expected": ["r1", "r3"],
+    "rationale": "r1 and r3 match; r2 does not."
+  },
+  {
+    "id": "extract-03-latest-event", "category": "extraction", "difficulty": "moderate", "task_type": "structured_answer",
+    "prompt": "Events: [{\"id\":\"A\",\"seq\":4,\"state\":\"queued\"},{\"id\":\"B\",\"seq\":3,\"state\":\"running\"},{\"id\":\"A\",\"seq\":9,\"state\":\"done\"},{\"id\":\"B\",\"seq\":2,\"state\":\"queued\"}]. For each ID, select the state from its event with the largest seq. Return answer as an object mapping each ID to its state.",
+    "max_tokens": 128, "expected": {"A": "done", "B": "running"},
+    "rationale": "A's largest sequence is 9; B's is 3. Input order is not timestamp order."
+  },
+  {
+    "id": "extract-04-null-zero", "category": "extraction", "difficulty": "moderate", "task_type": "structured_answer",
+    "prompt": "Records: [{\"id\":\"p\",\"count\":0},{\"id\":\"q\",\"count\":null},{\"id\":\"r\"},{\"id\":\"s\",\"count\":3}]. Use count when it is present and not null; otherwise use 10. Return answer as an object mapping each ID to its resulting integer count.",
+    "max_tokens": 128, "expected": {"p": 0, "q": 10, "r": 10, "s": 3},
+    "rationale": "Zero is a valid count; null and missing use the fallback."
+  },
+  {
+    "id": "extract-05-ledger", "category": "extraction", "difficulty": "harder", "task_type": "structured_answer",
+    "prompt": "Transactions in order: [{\"id\":\"t1\",\"account\":\"A\",\"delta\":5},{\"id\":\"t2\",\"account\":\"B\",\"delta\":7},{\"id\":\"t1\",\"account\":\"A\",\"delta\":5},{\"id\":\"t3\",\"account\":\"A\",\"delta\":-2},{\"id\":\"t4\",\"account\":\"B\",\"delta\":-3}]. Ignore every repeat of a transaction ID after its first occurrence. Both balances start at zero. Return answer as an object mapping A and B to their final integer balances.",
+    "max_tokens": 128, "expected": {"A": 3, "B": 4},
+    "rationale": "Ignore the repeated t1. A=5-2=3, B=7-3=4."
+  },
+  {
+    "id": "extract-06-latest-valid", "category": "extraction", "difficulty": "harder", "task_type": "structured_answer",
+    "prompt": "Records: [{\"name\":\"oak\",\"version\":1,\"valid\":true},{\"name\":\"elm\",\"version\":3,\"valid\":false},{\"name\":\"oak\",\"version\":4,\"valid\":true},{\"name\":\"elm\",\"version\":2,\"valid\":true},{\"name\":\"ash\",\"version\":5,\"valid\":false}]. First discard invalid records. For each remaining name, keep the largest version. Return answer as an array of [name, version] pairs sorted alphabetically by name.",
+    "max_tokens": 128, "expected": [["elm", 2], ["oak", 4]],
+    "rationale": "Only valid records count; elm has version 2 and oak has version 4. ash has none."
+  }
+]
