@@ -13,7 +13,7 @@ with sera.optimize(
     evaluation=evaluate_answer,
     evaluation_version="my-task-check-v1",
     constraints=sera.Constraints(quality_floor=0.99),
-    stages=["latency", "quantization"],
+    stages=["latency", "throughput"],
     k=3.0,
     output_dir="sera-runs/ordered-example",
 ) as result:
@@ -49,6 +49,7 @@ for different metrics are not subtracted to invent one overall score.
 | Stage | Objective | Available techniques |
 | --- | --- | --- |
 | `latency` | Lower worst-load p95 | Existing automatically generated legal controls |
+| `throughput` | Higher output tokens per measured second | Existing automatically generated legal controls |
 | `memory` | Lower sampled device-memory peak | Existing automatically generated legal controls |
 | `quantization` or `quant` | Lower sampled device-memory peak | Supported precision controls only; currently FP8 KV for Qwen3-0.6B |
 
@@ -58,13 +59,21 @@ disabled. A quantization stage with no untested supported precision change
 remeasures its baseline, records no improvement, and returns it if it passes.
 It never labels lower precision as a memory saving without a measured saving.
 
-Stage names can repeat, for example `['latency', 'memory', 'latency']`. Completed
+Stage names can repeat, for example `['latency', 'throughput', 'latency']`. Completed
 memory stages freeze their measured peak; later stages may exceed it only within
 `k`. Both latency and memory ceilings use frozen measurements, not a previous
 derived ceiling, so allowances do not accumulate. The tightest earlier limit
 remains, including stricter original hard limits.
-Staged throughput is not supported until an inherited throughput floor exists;
-throughput remains available as a standalone objective.
+Completed throughput stages freeze their measured output tokens per second.
+With `k=3`, a measured 100 tokens/second sets a 97 tokens/second floor for every
+later stage. The highest earlier floor applies, so repeated stages cannot
+compound the allowance. An explicit `Constraints(min_output_tokens_per_second=...,
+quality_floor=...)` can set a stricter original floor. Missing, zero, or nonfinite
+throughput cannot pass this floor or become a completed throughput checkpoint.
+For latency then throughput, the throughput stage must retain the earlier latency
+ceiling. For throughput then latency, the latency stage must retain the throughput
+floor. Only the `stages` list changes; the API carries the saved configuration and
+measured limits forward.
 
 Each stage stops under the existing progress-plus-confirmation rule or when no
 legal candidate remains. There is no default total trial cap. If the caller

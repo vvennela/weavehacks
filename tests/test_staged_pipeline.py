@@ -53,9 +53,16 @@ def staged_boundaries(monkeypatch):
         cache = config.kv_cache_dtype == 'fp8'
         latency = (state['cache_latency'] if cache else
                    {4096: 100.0, 2048: 98.0, 1024: 90.0}[config.max_num_batched_tokens])
+        prefix = config.enable_prefix_caching
+        if prefix:
+            latency += state.get('prefix_latency_delta', 1.0)
+        throughput = (state.get('prefix_throughputs', {}).get(config.max_num_batched_tokens, 120.0)
+                      if prefix else 100.0)
         model.record['sampled_peak_memory_mib'] = state['cache_memory'] if cache else 2000
         output = {'prompt_index': 0, 'text': 'wrong' if cache and not state['cache_correct'] else '5',
                       'token_ids': [5], 'prompt_token_ids': [1, 2], 'error': None}
+        if prefix and not state.get('prefix_correct', True):
+            output['text'] = 'wrong'
         state['measurements'].append({'folder': str(model.artifact_dir), 'baseline': baseline,
             'configuration': config.model_dump(), 'workload': workload.model_dump()})
         tokens = (state.get('second_stage_tokens', [[1, 2]])
@@ -64,7 +71,7 @@ def staged_boundaries(monkeypatch):
             'runtime': model.record, 'input_token_ids': tokens, 'quality': [output],
             'self_check': [deepcopy(output)] if baseline else [], 'loads': [], 'metrics': {},
             'provenance': 'synthetic', 'reduced': {'p95_latency_ms': latency,
-                'output_tokens_per_second': 100.0, 'generation_errors': 0}}
+                'output_tokens_per_second': throughput, 'generation_errors': 0}}
 
     class Agent:
         model, project = 'synthetic-stage-agent', 'offline/stage-test'
@@ -86,6 +93,9 @@ def staged_boundaries(monkeypatch):
             target = ({'kv_cache_dtype': 'fp8'} if quantization else
                       {'max_num_batched_tokens': 2048 if not history else 1024})
             done = (bool(history) if quantization else len(history) >= 2)
+            if evidence['objective']['priority'] == 'throughput':
+                target = {'enable_prefix_caching': True}
+                done = bool(history)
             option = None if done else next((item for item in evidence['candidate_options']
                 if item['changed'] == target and item['parent_trial_id'] == 'baseline'), None)
             lever, value = next(iter(target.items()))
@@ -230,3 +240,42 @@ def test_checkpoint_scope_drift_closes_runner_and_preserves_only_valid_checkpoin
     assert saved['stages'][1]['status'] == 'failed'
     assert (tmp_path/'stages/checkpoints/001.json').is_file()
     assert not (tmp_path/'stages/checkpoints/002.json').exists()
+
+
+@pytest.mark.parametrize('delta,correct,expected_prefix', [(1, True, True),
+    (4, True, False), (1, False, False)])
+def test_latency_then_throughput_keeps_latency_and_quality_gates(
+        tmp_path, staged_boundaries, delta, correct, expected_prefix):
+    staged_boundaries.update(prefix_latency_delta=delta, prefix_correct=correct)
+    with sera.optimize(models=[MODEL_ID], prompts=['2+3'], stages=['latency', 'throughput'],
+        k=3, output_dir=tmp_path/'stages', evaluation=lambda prompt, output: output == '5',
+        evaluation_version='synthetic-stages-v1', constraints=sera.Constraints(quality_floor=.99)) as result:
+        assert result.report['status'] == 'ready'
+        first, second = result.checkpoints
+        assert first['p95_latency_ms'] == 90
+        assert second['constraints']['p95_latency_ms'] == pytest.approx(92.7)
+        assert second['configuration']['enable_prefix_caching'] is expected_prefix
+        assert second['output_tokens_per_second'] == (120 if expected_prefix else 100)
+        stage = json.loads((tmp_path/'stages/002-throughput/result.json').read_text())
+        assert stage['search']['trials_used'] == 1
+        assert stage['search_trials'][0]['decision']['selected'] == ('candidate' if expected_prefix else 'baseline')
+
+
+@pytest.mark.parametrize('throughput,expected_tokens', [(117, 1024), (110, 2048)])
+def test_repeated_throughput_then_latency_preserves_floor(
+        tmp_path, staged_boundaries, throughput, expected_tokens):
+    staged_boundaries['prefix_throughputs'] = {1024: throughput}
+    with sera.optimize(models=[MODEL_ID], prompts=['2+3'],
+        stages=['throughput', 'throughput', 'latency'], k=3, output_dir=tmp_path/'stages',
+        evaluation=lambda prompt, output: output == '5', evaluation_version='synthetic-stages-v1',
+        constraints=sera.Constraints(quality_floor=.99)) as result:
+        assert result.report['status'] == 'ready'
+        assert len(result.checkpoints) == 3
+        assert result.checkpoints[-1]['configuration']['max_num_batched_tokens'] == expected_tokens
+        for checkpoint in result.checkpoints[1:]:
+            assert checkpoint['constraints']['min_output_tokens_per_second'] == pytest.approx(116.4)
+        stage = json.loads((tmp_path/'stages/003-latency/result.json').read_text())
+        last = stage['search_trials'][-1]['decision']
+        assert last['selected'] == ('candidate' if throughput == 117 else 'baseline')
+        if throughput == 110:
+            assert 'throughput-requirement-failed' in last['constraint_failures']['candidate']

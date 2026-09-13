@@ -110,7 +110,7 @@ def test_stage_guard_rejects_a_returned_runner_that_breaks_prior_limit(tmp_path,
 @pytest.mark.parametrize('extra', [{'evaluation': None}, {'evaluation_version': ''},
     {'constraints': None}, {'mode': 'fixed'}, {'objective': sera.Objective()},
     {'automatic_space': False}, {'stages': []}, {'k': True}, {'k': 100.0},
-    {'stages': ['throughput']}, {'trace_reader': lambda *args: None}])
+    {'stages': ['unknown']}, {'trace_reader': lambda *args: None}])
 def test_bad_stage_contract_fails_before_provider_or_gpu(tmp_path, monkeypatch, extra):
     monkeypatch.setattr('sera.api._configured_agent', lambda: pytest.fail('No provider setup'))
     args = options(tmp_path) | extra
@@ -245,3 +245,38 @@ def test_checkpoint_hash_and_snapshot_use_one_copy_despite_later_sampling(tmp_pa
     checkpoint = json.loads((tmp_path / 'staged/checkpoints/001.json').read_text())
     source = json.loads((tmp_path / 'staged' / checkpoint['source_trial_snapshot_path']).read_text())
     assert content_hash(source) == checkpoint['source_trial_hash']
+
+
+@pytest.mark.parametrize('stages', [['latency', 'throughput'], ['throughput', 'latency'],
+                                  ['throughput', 'throughput', 'latency']])
+def test_throughput_stage_order_and_saved_metrics(tmp_path, stage_runner, stages):
+    calls, _, _ = stage_runner
+    with sera.optimize(**(options(tmp_path) | {'stages': stages})) as result:
+        assert [call['objective'].priority for call in calls] == stages
+        assert all(checkpoint['output_tokens_per_second'] == 10 for checkpoint in result.checkpoints)
+        if stages[0] == 'throughput':
+            assert all(call['constraints'].min_output_tokens_per_second == pytest.approx(9.7)
+                       for call in calls[1:])
+        else:
+            assert calls[1]['constraints'].p95_latency_ms == 103
+
+
+@pytest.mark.parametrize('value', [None, 0, float('nan'), float('inf')])
+def test_throughput_checkpoint_rejects_missing_or_invalid_metric(
+        tmp_path, stage_runner, monkeypatch, value):
+    from sera import api
+    original = api._run_traced
+
+    def invalid_throughput(arguments):
+        result = original(arguments)
+        if value is None:
+            result.trials[0]['reduced'].pop('output_tokens_per_second')
+        else:
+            result.trials[0]['reduced']['output_tokens_per_second'] = value
+        return result
+
+    monkeypatch.setattr(api, '_run_traced', invalid_throughput)
+    with pytest.raises(RuntimeError, match='throughput'):
+        sera.optimize(**(options(tmp_path) | {'stages': ['throughput']}))
+    assert stage_runner[1][0].closed
+    assert not (tmp_path / 'staged/checkpoints/001.json').exists()

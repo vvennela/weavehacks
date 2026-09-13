@@ -34,6 +34,7 @@ class Constraints(BaseModel):
     quality_floor: float = Field(ge=0, le=1)
     p95_latency_ms: float | None = Field(default=None, gt=0)
     max_memory_mib: int | None = Field(default=None, gt=0)
+    min_output_tokens_per_second: float | None = Field(default=None, gt=0)
 
 
 class Workload(BaseModel):

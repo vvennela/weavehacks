@@ -129,9 +129,13 @@ def _checkpoint(current, row, constraints, previous, models):
     latency, memory = objective_value(trial, 'latency'), objective_value(trial, 'memory')
     if latency is None or type(memory) is not int or memory <= 0:
         raise RuntimeError('Stage winner is missing measured latency or memory')
+    throughput = objective_value(trial, 'throughput')
+    if row['stage'] == 'throughput' and throughput is None:
+        raise RuntimeError('Stage winner is missing positive finite measured throughput')
     record = {'stage': row['stage'], 'status': 'completed', 'index': row['index'],
         'configuration': config.model_dump(), 'config_hash': config.config_hash,
         'p95_latency_ms': latency, 'sampled_peak_memory_mib': memory,
+        'output_tokens_per_second': throughput,
         'source_trial_id': selected, 'source_trial_hash': content_hash(trial),
         'source_trial_snapshot_path': f"checkpoints/{row['index']:03d}-trial.json",
         'input_token_ids_hash': content_hash(tokens), 'runtime_identity': identity,

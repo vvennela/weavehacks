@@ -8,9 +8,9 @@ from sera.stage_config import inherited_constraints, validate_stage_options
 
 
 def test_stage_order_aliases_repeats_and_percentage_units():
-    stages = ['latency', 'quant', 'memory', 'latency']
+    stages = ['latency', 'quant', 'memory', 'throughput', 'throughput', 'latency']
     plan = validate_stage_options(stages, 3.0, 10)
-    assert plan.stages == ('latency', 'quantization', 'memory', 'latency')
+    assert plan.stages == ('latency', 'quantization', 'memory', 'throughput', 'throughput', 'latency')
     assert plan.regression_fraction == 0.03
     assert plan.min_improvement_fraction == 0.1
     assert stages[1] == 'quant'
@@ -19,7 +19,7 @@ def test_stage_order_aliases_repeats_and_percentage_units():
 
 
 @pytest.mark.parametrize('stages', [None, [], 'latency', ('latency',),
-                                   ['Latency'], ['unknown'], ['throughput'], [True], [[]]])
+                                   ['Latency'], ['unknown'], [True], [[]]])
 def test_invalid_stage_lists_fail(stages):
     with pytest.raises(ValueError):
         validate_stage_options(stages, 3, 0)
@@ -60,7 +60,7 @@ def test_no_completed_latency_stage_preserves_all_original_constraints():
     checkpoints = [dict(stage='latency', status='failed'),
                    dict(stage='latency', status='running', p95_latency_ms=1),
                    dict(stage='memory', status='failed', p95_latency_ms=1),
-                   dict(stage='throughput', status='completed', p95_latency_ms=1)]
+                   dict(stage='throughput', status='failed', p95_latency_ms=1)]
     assert inherited_constraints(original, checkpoints, 10) == original
 
 
@@ -163,3 +163,41 @@ def test_missing_completed_memory_measurement_fails_closed():
     with pytest.raises(ValueError):
         inherited_constraints(Constraints(quality_floor=0.99),
                               [dict(stage='memory', status='completed')], 0)
+
+
+@pytest.mark.parametrize('original_floor,expected', [(None, 108), (100, 108), (115, 115)])
+def test_throughput_floor_uses_tightest_frozen_measurement(original_floor, expected):
+    original = Constraints(quality_floor=.99, p95_latency_ms=100, max_memory_mib=2000,
+                           min_output_tokens_per_second=original_floor)
+    checkpoints = [{'stage': 'throughput', 'status': 'completed', 'output_tokens_per_second': 120},
+                   {'stage': 'latency', 'status': 'completed', 'p95_latency_ms': 95},
+                   {'stage': 'throughput', 'status': 'completed', 'output_tokens_per_second': 110}]
+    result = inherited_constraints(original, checkpoints, k=10)
+    assert result.min_output_tokens_per_second == expected
+    assert result.p95_latency_ms == 100
+    assert result.max_memory_mib == 2000
+    assert result.quality_floor == .99
+    assert inherited_constraints(original, checkpoints, k=10) == result
+
+
+@pytest.mark.parametrize('value', [None, True, '100', 0, -1, float('nan'), float('inf')])
+def test_throughput_checkpoint_requires_positive_finite_measurement(value):
+    with pytest.raises(ValueError):
+        inherited_constraints(Constraints(quality_floor=.99),
+            [{'stage': 'throughput', 'status': 'completed', 'output_tokens_per_second': value}])
+
+
+@pytest.mark.parametrize('value', [True, '100', 0, -1, float('nan'), float('inf')])
+def test_throughput_constraint_requires_positive_finite_number(value):
+    with pytest.raises(ValueError):
+        Constraints(quality_floor=.99, min_output_tokens_per_second=value)
+
+
+@pytest.mark.parametrize('value,expected', [(100, []), (101, []),
+    (99, ['throughput-requirement-failed']), (None, ['throughput-requirement-failed']),
+    (float('nan'), ['throughput-requirement-failed']), (0, ['throughput-requirement-failed'])])
+def test_throughput_floor_is_a_hard_gate(value, expected):
+    candidate = {'status': 'collected', 'task_quality': {'valid_outputs': True, 'mean': 1.0},
+                 'reduced': {'output_tokens_per_second': value}}
+    assert constraint_failures(candidate,
+        Constraints(quality_floor=.99, min_output_tokens_per_second=100)) == expected

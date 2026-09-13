@@ -242,6 +242,10 @@ def constraint_failures(trial, constraints):
             value = objective_value(trial, priority)
             if value is None or value > limit:
                 failures.append(f"{priority}-requirement-failed")
+    if constraints.min_output_tokens_per_second is not None:
+        throughput = objective_value(trial, "throughput")
+        if throughput is None or throughput < constraints.min_output_tokens_per_second:
+            failures.append("throughput-requirement-failed")
     return failures
 
 

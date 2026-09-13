@@ -6,7 +6,7 @@ from fractions import Fraction
 
 from .config import Constraints
 
-SUPPORTED_STAGES = frozenset({'latency', 'memory', 'quantization'})
+SUPPORTED_STAGES = frozenset({'latency', 'throughput', 'memory', 'quantization'})
 
 
 @dataclass(frozen=True)
@@ -36,11 +36,7 @@ def _percentage_fraction(value, name):
 
 
 def validate_stage_options(stages, k, min_improvement_pct=0.0):
-    """Validate percent inputs; retain stage order and deliberate repetitions.
-
-    Throughput remains a standalone objective until an inherited throughput
-    floor is supported. It cannot be used in this staged contract.
-    """
+    """Validate percent inputs; retain stage order and deliberate repetitions."""
     if not isinstance(stages, list) or not stages:
         raise ValueError('stages must be a nonempty list')
     canonical = []
@@ -62,15 +58,27 @@ def inherited_constraints(original: Constraints, checkpoints: list[dict], k=0.0)
     value is not a previously derived ceiling: allowances must never compound.
     Memory and quantization stages freeze positive integer sampled_peak_memory_mib.
     Their ceilings are rounded down using exact decimal percentage arithmetic.
+    Throughput stages freeze output_tokens_per_second and impose a lower bound.
     Caller checkpoints must use canonical names. Quality is never relaxed.
     """
     regression = _percentage_fraction(k, 'k')
     memory_multiplier = 1 + Fraction(str(k)) / 100
     ceiling = original.p95_latency_ms
     memory_ceiling = original.max_memory_mib
+    throughput_floor = original.min_output_tokens_per_second
     for checkpoint in checkpoints:
         if checkpoint.get('status') != 'completed':
             continue
+        if checkpoint.get('stage') == 'throughput':
+            measured_throughput = _finite_number(checkpoint.get('output_tokens_per_second'),
+                                                  'checkpoint output_tokens_per_second')
+            if measured_throughput <= 0:
+                raise ValueError('Completed throughput stages require positive measured output_tokens_per_second')
+            stage_floor = measured_throughput * (1 - regression)
+            if stage_floor <= 0:
+                raise ValueError('Inherited throughput floor must be positive')
+            throughput_floor = (stage_floor if throughput_floor is None
+                                else max(throughput_floor, stage_floor))
         if checkpoint.get('stage') in ('memory', 'quantization'):
             measured_memory = checkpoint.get('sampled_peak_memory_mib')
             if type(measured_memory) is not int or measured_memory <= 0:
@@ -88,4 +96,5 @@ def inherited_constraints(original: Constraints, checkpoints: list[dict], k=0.0)
             raise ValueError('Inherited latency ceiling must be finite')
         ceiling = stage_ceiling if ceiling is None else min(ceiling, stage_ceiling)
     return Constraints(**{**original.model_dump(), 'p95_latency_ms': ceiling,
-                          'max_memory_mib': memory_ceiling})
+                          'max_memory_mib': memory_ceiling,
+                          'min_output_tokens_per_second': throughput_floor})
