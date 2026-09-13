@@ -2,7 +2,7 @@
 
 `easy_cases.json` contains eight newly authored sanity-check questions: addition, comparison, list length, indexing, assignment, copying a field, filtering two records, and uppercase conversion. All have exact, independently checked answers. No model-generated code executes.
 
-These replace advanced reasoning and subtle Python behavior for the next MVP workload design. They are not a harder-model benchmark and do not establish general coding ability. They have not been run against either GPU configuration. Their 64-token limit matches the product default; the existing 24-case collector deliberately rejects that limit, so this file cannot silently replace the frozen pilot.
+These replace advanced reasoning and subtle Python behavior for the MVP workload design. They are not a harder-model benchmark and do not establish general coding ability. All eight ran in the live agent-guided BF16/FP8 KV comparison in evidence/mvp-agent-v1. That run applied token agreement, not an exact-answer task gate. Their 64-token limit matches the product default; the existing 24-case collector deliberately rejects that limit, so this file cannot silently replace the frozen pilot.
 
 Keep the original 24 questions, answer keys, grader, and measured results unchanged. Do not drop an easy case after observing a wrong answer. The answer-key validation is a local test, not a new model experiment.
 

@@ -4,15 +4,15 @@ Sera measures a model configuration, rejects quality failures, and returns a liv
 
 ## Current implementation
 
-The first fixed-candidate path is implemented. It supports one pinned Qwen3-0.6B model on Linux with vLLM 0.26.0 and an NVIDIA GPU. BF16 and FP8 KV ran on the supplied RTX PRO 6000. The packaged runner passed one live lifecycle check; the full optimization path still needs live acceptance.
+The single-model path has completed a live agent-guided quick check on the supplied RTX PRO 6000: baseline → agent proposal → FP8 KV candidate → quality rejection → returned baseline runner → saved report and Weave trace. It supports one pinned Qwen3-0.6B model on Linux with vLLM 0.26.0. See [the result and limits](evidence/mvp-agent-v1/README.md).
 
-The latest runner check returned `2` for `2 + 3`. Its runtime worked, but its answer was wrong. See [the saved evidence](evidence/sera-runner-v1/README.md). Do not treat runtime success as model correctness.
+The returned baseline runner answered `1` for `1 + 1`. Its runtime worked, but its answer was wrong. Do not treat runtime success or token agreement as model correctness.
 
-Agent-controlled selection is implemented behind the provider check, but has not passed live acceptance. Weave traces, task-correctness acceptance, joint placement, and the search benchmark are not implemented. A fixed candidate is not an agent recommendation.
+The live check used eight easy prompts and 24 measured requests per configuration, not the full 32-prompt/96-request acceptance workload. The agent recommended the baseline after its candidate failed. No optimization win or search advantage is established. Task-correctness acceptance, joint placement, and the search benchmark remain unfinished. Weave tracing ran through the experiment wrapper, not automatic package instrumentation.
 
 The W&B client, typed proposal/ranking/final-selection schemas, and bounded provider check are implemented. The client reads `WANDB_API_KEY` from the process environment; it never saves the key or request headers. Agent-controlled GPU execution stays disabled until the provider check passes.
 
-The first provider check failed (19/30 valid first responses; 22/30 after retries). Its records are preserved. The wire schema now expresses action/cost consistency and limits ranking to the one-candidate budget; this revision needs a fresh provider check.
+The first provider check failed (19/30 valid first responses; 22/30 after retries). Its records are preserved. After expressing action/cost consistency in the wire schema and bounding ranking to one candidate, the second check passed 30/30 on the first response with no retries. This establishes schema compatibility, not recommendation quality.
 
 ## Install
 
@@ -81,7 +81,7 @@ Sera switches only when the candidate has no generation errors, token agreement 
 
 Token agreement checks preserved behavior, **not correct answers**. No performance win, task-quality result, or agent-selection result is established merely by running this code.
 
-See [plan.md](plan.md) for delivery status and [spec.md](spec.md) for the full target. W&B agent wiring will use its [structured-output API](https://docs.wandb.ai/inference/response-settings/structured-output); provider validation is still pending.
+See [plan.md](plan.md) for delivery status and [spec.md](spec.md) for the full target. The W&B agent uses its [structured-output API](https://docs.wandb.ai/inference/response-settings/structured-output).
 
 ## Provider compatibility check
 
@@ -103,3 +103,5 @@ After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `
 ## Cache-pressure pilot
 
 `sera.pressure_pilot.run_pressure_pilot` runs the approved BF16-only profile: GPU memory fraction 0.025, eight concurrent 2,048-token inputs, context limit 4,096, and at most eight sequences. It uses synthetic padding, two warm-ups, and three waves. The predeclared scenario criterion is sampled KV use at least 80% plus at least one measured preemption, with zero request errors and successful cleanup. Otherwise it reports `not-established`. This pilot is separate from answer quality and candidate performance; there is no FP8 trial or automatic tuning.
+
+The approved pilot reached 93.66% sampled KV use, zero preemptions, and zero request errors. Cleanup passed. The full scenario is **not established**. The constrained server budget represents a smaller card; the physical GPU remains a 96 GB card. See [pilot evidence](evidence/pressure-v1/README.md).
