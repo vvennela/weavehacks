@@ -160,6 +160,29 @@ def test_invalid_runtime_response_is_saved_before_runtime_validation_fails(monke
     assert report['requests'][0]['failure_kind'] == 'generation'
 
 
+def test_empty_generated_tokens_cannot_pass_even_with_correct_json(monkeypatch, tmp_path):
+    pilot = pilot_module()
+    fake_runtime(monkeypatch)
+    original_request = SeraModel._request
+
+    def empty_tokens(self, route, payload=None, timeout=90):
+        body = original_request(self, route, payload, timeout)
+        if route == '/v1/chat/completions':
+            body['choices'][0]['token_ids'] = []
+        return body
+
+    monkeypatch.setattr(SeraModel, '_request', empty_tokens)
+    report = pilot.run_pilot(model_id=MODEL_ID, output_dir=tmp_path / 'pilot')
+    first = report['requests'][0]
+    assert report['status'] == 'fail'
+    assert first['response']['text'] == '{"answer": 5}'
+    assert first['response']['token_ids'] == []
+    assert first['grade']['passed'] is True
+    assert first['task_pass'] is False
+    assert first['failure_kind'] == 'generation'
+    assert first['error_type'] == 'EmptyGeneratedTokens'
+
+
 def test_token_limit_finish_cannot_pass_even_when_raw_json_is_correct(monkeypatch, tmp_path):
     pilot = pilot_module()
     fake_runtime(monkeypatch, finish_reason='length')

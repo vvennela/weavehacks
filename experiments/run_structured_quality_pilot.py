@@ -77,7 +77,9 @@ def collect_case(model, case):
         response = model._generate_prepared(payload, tokens)
         row['response'] = response.to_dict()
         row['grade'] = grade_case(case, response.text)
-        if response.finish_reason != 'stop':
+        if not response.token_ids:
+            row['error_type'] = 'EmptyGeneratedTokens'
+        elif response.finish_reason != 'stop':
             row['error_type'] = 'IncompleteGeneration'
         else:
             row['task_pass'] = row['grade']['passed']
