@@ -19,6 +19,8 @@ import time
 import urllib.error
 
 from benchmarks.grade import SYSTEM_PROMPT, dataset_hash, grade_case, load_cases
+from experiments.requested_answer_types import (PROFILE_VERSION as REQUESTED_TYPES_VERSION,
+                                                response_format_for_prompt)
 from sera.config import GLM_MODEL_ID, GLM_MODEL_REVISION, MODEL_ID, MODEL_REVISION, RuntimeConfig
 from sera.runtime import GENERATION, SeraModel
 from sera.storage import content_hash, save_json
@@ -66,7 +68,7 @@ class RecordingSeraModel(SeraModel):
             exchange['latency_ms'] = (time.perf_counter() - started) * 1000
 
 
-def collect_case(model, case):
+def collect_case(model, case, *, decoding_format=None):
     prompt = [{'role': 'system', 'content': SYSTEM_PROMPT},
               {'role': 'user', 'content': case['prompt']}]
     row = {'case_id': case['id'], 'prompt': prompt, 'prompt_hash': content_hash(prompt),
@@ -74,7 +76,7 @@ def collect_case(model, case):
     previous_exchanges = len(model.exchanges)
     try:
         payload, tokens = model.prepare(prompt)
-        payload['response_format'] = response_format()
+        payload['response_format'] = decoding_format if decoding_format is not None else response_format()
         row.update(prompt_token_ids=tokens, prompt_token_hash=content_hash(tokens))
         response = model._generate_prepared(payload, tokens)
         row['response'] = response.to_dict()
@@ -94,13 +96,15 @@ def collect_case(model, case):
     return row
 
 
-def run_pilot(*, model_id, output_dir, quantization=None):
+def run_pilot(*, model_id, output_dir, quantization=None, requested_types=False):
     if model_id not in PINNED_MODELS:
         raise ValueError('The pilot requires one of the two specified model IDs')
     config = RuntimeConfig(quantization=quantization)
     cases = load_cases(Path(__file__).resolve().parents[1] / 'benchmarks/easy_cases.json')
     if dataset_hash(cases) != DATASET_HASH:
         raise ValueError('The original eight-question dataset changed; create a new approved profile')
+    formats = [response_format_for_prompt(case['prompt']) if requested_types else response_format()
+               for case in cases]
     folder = Path(output_dir).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     profile = {'profile_version': PROFILE_VERSION, 'dataset_hash': DATASET_HASH,
@@ -108,6 +112,10 @@ def run_pilot(*, model_id, output_dir, quantization=None):
                'generation': GENERATION, 'enable_thinking': False,
                'configuration': config.model_dump(), 'quality_floor': QUALITY_FLOOR,
                'concurrency': 1, 'passes': 1, 'warmup_requests': 0}
+    if requested_types:
+        profile.update(profile_version=REQUESTED_TYPES_VERSION,
+                       response_format=None, response_formats=formats,
+                       schema_source='Task prompt output-type request only; no answer values or array lengths')
     report = {**profile, 'profile_hash': content_hash(profile),
               'response_schema_hash': content_hash(response_format()['json_schema']['schema']),
               'created_at': datetime.now(timezone.utc).isoformat(), 'status': 'running',
@@ -117,14 +125,16 @@ def run_pilot(*, model_id, output_dir, quantization=None):
                         'no retries or warmup. Request latency includes possible first-use grammar '
                         'compilation, but excludes model startup and tokenization. '
                         'No broad quality, speedup, or joint-placement claim.'}
+    if requested_types:
+        report['response_schema_hash'] = content_hash([value['json_schema']['schema'] for value in formats])
     path = folder / 'result.json'
     save_json(path, report)
     model = RecordingSeraModel(artifact_dir=folder / 'runtime', configuration=config,
                                model_id=model_id, revision=PINNED_MODELS[model_id])
     try:
         model.start()
-        for case in cases:
-            report['requests'].append(collect_case(model, case))
+        for case, decoding_format in zip(cases, formats):
+            report['requests'].append(collect_case(model, case, decoding_format=decoding_format))
             save_json(path, report)
     except Exception as error:
         report['error_type'] = type(error).__name__
@@ -150,8 +160,11 @@ def main(argv=None):
     parser.add_argument('--model-id', required=True, choices=PINNED_MODELS)
     parser.add_argument('--output-dir', required=True)
     parser.add_argument('--quantization', choices=['fp8_per_tensor'])
+    parser.add_argument('--requested-types', action='store_true',
+                        help='One new profile: constrain only the output type requested by each task')
     args = parser.parse_args(argv)
-    report = run_pilot(model_id=args.model_id, output_dir=args.output_dir, quantization=args.quantization)
+    report = run_pilot(model_id=args.model_id, output_dir=args.output_dir,
+                       quantization=args.quantization, requested_types=args.requested_types)
     print(f"{report['status']}: {report['task_quality']['correct']}/8 strict tasks")
     return 0 if report['status'] == 'pass' else 1
 
