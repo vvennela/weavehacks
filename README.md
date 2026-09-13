@@ -4,6 +4,48 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The [complete Astra loop](evidence/live-astra-expanded-v1/README.md) measured a 19.55% latency improvement, tested a combination, stopped under the progress rule, and returned a working runner.
 
+## Quick test: does the loop work?
+
+From the repository root, with Python 3.11+ and `uv` installed:
+
+```sh
+uv run --frozen --extra dev pytest -q \
+  tests/test_investigation_rehearsal.py \
+  tests/test_swarm_pipeline.py \
+  tests/test_swarm.py \
+  tests/test_expanding_search.py \
+  tests/test_investigation_stop_reasons.py
+```
+
+Success means all tests pass and the command exits with code `0`. These checks run
+the controller with scripted agents and model results: specialist investigation,
+shared findings, arbiter selection, rejection of wrong answers, feedback into the
+next round, candidate expansion, stopping, and returned-runner cleanup.
+**No GPU or API key is needed.** This checks loop behavior, not real model quality,
+agent reasoning, GPU performance, or the live Weave connection. The first run can
+download Python dependencies.
+
+To also run the offline rehearsal script and save a readable report:
+
+```sh
+sera_check_dir=$(mktemp -d "${TMPDIR:-/tmp}/sera-loop-check.XXXXXX")
+uv run --frozen python -m experiments.rehearse_investigation \
+  --output-dir "$sera_check_dir/run"
+printf '\nReports: %s/run\n' "$sera_check_dir"
+```
+
+Open `report.md` and `result.json` in the printed output directory. The scripted
+first candidate is fast but gives a wrong answer, so it is rejected. The second
+round uses that failure, selects a passing candidate, checks its returned runner,
+and closes it. This report covers two scripted specialists; the tests above also
+check the three-investigator swarm. The reports label all results **synthetic**.
+The rehearsal block creates a fresh directory, so it is safe to repeat.
+
+For a real GPU and hosted-agent run, use the
+[live loop commands below](#repeat-the-rehearsal-let-sera-choose-the-settings).
+Those require the Molab GPU, model files, credentials, and a connected controller;
+they are not a quick local check.
+
 ## Two implementations in this repository
 
 This repository holds two independent implementations of the same product idea. They
