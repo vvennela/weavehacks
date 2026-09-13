@@ -109,6 +109,54 @@ def test_pair_requires_successful_help_then_uses_only_sentinel(monkeypatch):
     assert calls[0][1]['timeout'] == 60
 
 
+@pytest.mark.parametrize('failure', ['exit', 'timeout'])
+def test_read_only_poll_recovers_from_one_connection_failure(monkeypatch, failure):
+    calls = []
+    def run(command, **kwargs):
+        calls.append(kwargs['input'])
+        if len(calls) == 1:
+            if failure == 'timeout':
+                raise subprocess.TimeoutExpired('private connection', 60)
+            return subprocess.CompletedProcess(command, 1, '', 'private connection detail')
+        return subprocess.CompletedProcess(command, 0, 'SERA_RELAY_DATA []\n', '')
+    monkeypatch.setattr(controller, 'run_process', run)
+    monkeypatch.setattr(controller.time, 'sleep', lambda _: None)
+    pair = controller.MarimoRelay('https://example.test/', '/pair.sh', '/remote/relay')
+    pair.connected = True
+    assert pair.pending(3) == []
+    assert len(calls) == 2
+    assert calls[0] == calls[1]
+
+
+def test_read_connection_retry_is_bounded_and_redacts_details(monkeypatch):
+    calls = []
+    def run(command, **kwargs):
+        calls.append(command)
+        return subprocess.CompletedProcess(command, 1, '', 'PRIVATE_TOKEN')
+    monkeypatch.setattr(controller, 'run_process', run)
+    monkeypatch.setattr(controller.time, 'sleep', lambda _: None)
+    pair = controller.MarimoRelay('https://example.test/', '/pair.sh', '/remote/relay')
+    with pytest.raises(RuntimeError, match='marimo command failed') as error:
+        pair.connect()
+    assert len(calls) == 3
+    assert 'PRIVATE_TOKEN' not in str(error.value)
+    assert not pair.connected
+
+
+def test_ambiguous_response_publication_is_not_blindly_retried(monkeypatch):
+    calls = []
+    def run(command, **kwargs):
+        calls.append(kwargs['input'])
+        return subprocess.CompletedProcess(command, 1, '', '')
+    monkeypatch.setattr(controller, 'run_process', run)
+    monkeypatch.setattr(controller.time, 'sleep', lambda _: None)
+    pair = controller.MarimoRelay('https://example.test/', '/pair.sh', '/remote/relay')
+    pair.connected = True
+    with pytest.raises(RuntimeError):
+        pair.publish('a' * 32, error='timeout')
+    assert len(calls) == 1
+
+
 def test_failed_help_stops_before_polling(monkeypatch):
     monkeypatch.setattr(controller, 'run_process', lambda *a, **k:
                         subprocess.CompletedProcess([], 1, '', 'secret detail'))

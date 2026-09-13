@@ -102,23 +102,31 @@ class MarimoRelay:
         self.relay_dir = str(relay_dir)
         self.connected = False
 
-    def _execute(self, code):
-        result = run_process(self.command, input=code, timeout=60)
-        if result.returncode:
-            # Never include command, stdout, stderr, or token in public errors.
-            raise RuntimeError('marimo command failed')
-        return result.stdout
+    def _execute(self, code, *, retry_read=False):
+        attempts = 3 if retry_read else 1
+        for attempt in range(attempts):
+            try:
+                result = run_process(self.command, input=code, timeout=60)
+            except subprocess.TimeoutExpired:
+                result = None
+            if result is not None and result.returncode == 0:
+                return result.stdout
+            if attempt + 1 < attempts:
+                print('Read-only relay connection failed; retrying.', flush=True)
+                time.sleep(attempt + 1)
+        # Never include command, stdout, stderr, or token in public errors.
+        raise RuntimeError('marimo command failed')
 
     def connect(self):
-        self._execute('import marimo._code_mode as cm; help(cm)')
+        self._execute('import marimo._code_mode as cm; help(cm)', retry_read=True)
         self.connected = True
 
-    def _call(self, expression):
+    def _call(self, expression, *, read_only=False):
         if not self.connected:
             raise RuntimeError('marimo relay not connected')
         code = ('import json\nfrom sera.relay import pending_requests, publish_response\n'
                 f'print({SENTINEL!r} + json.dumps({expression}))')
-        output = self._execute(code)
+        output = self._execute(code, retry_read=read_only)
         records = [line[len(SENTINEL):] for line in output.splitlines()
                    if line.startswith(SENTINEL)]
         if len(records) != 1:
@@ -126,7 +134,7 @@ class MarimoRelay:
         return json.loads(records[0])
 
     def pending(self, limit=3):
-        rows = self._call(f'pending_requests({self.relay_dir!r}, limit={limit!r})')
+        rows = self._call(f'pending_requests({self.relay_dir!r}, limit={limit!r})', read_only=True)
         if not isinstance(rows, list) or len(rows) > limit:
             raise ValueError('invalid pending request batch')
         return rows
