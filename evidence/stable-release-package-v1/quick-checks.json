@@ -1,0 +1,34 @@
+{
+  "schema_version": "sera-stable-release-quick-checks-v1",
+  "source_sha": "f61e6ae28e252c742d1b1d27d6d99ba5cf96a7b9",
+  "checkout_sha": "2bbc3013f151e20efcad2b73b58fbf56ddc42fb6",
+  "source_tree_equal": true,
+  "status": "passed",
+  "quick_tests": {
+    "command": "uv run --frozen --extra dev pytest -q tests/test_investigation_rehearsal.py tests/test_swarm_pipeline.py tests/test_swarm.py tests/test_expanding_search.py tests/test_investigation_stop_reasons.py",
+    "outcome": "45 passed in 2.15s",
+    "environment": "Fresh worktree development environment, not the clean wheel environments"
+  },
+  "synthetic_rehearsal": {
+    "command": "uv run --frozen python -m experiments.rehearse_investigation --output-dir /tmp/sera-stable-offline-elAYGU/run",
+    "exit_code": 0,
+    "rounds": 2,
+    "candidate_trials": 2,
+    "first_trial_quality_passed": false,
+    "second_trial_quality_passed": true,
+    "selected_trial": "trial-2",
+    "fresh_runner_probe_passed": true,
+    "returned_runner_closed": true,
+    "stop_reason": "budget-exhausted",
+    "result_sha256": "c2c2ec8131a3b4d2b54b506689873d128ae590474a7a4d2638de6cef01a3bae6",
+    "report_sha256": "584d5e3375954810497f13c3965e85a3a6833555a837f33e35d631ebbd6ce078"
+  },
+  "gpu_calls": 0,
+  "provider_calls": 0,
+  "limits": [
+    "The rehearsal uses scripted agents, outputs, timing, and memory.",
+    "Two synthetic specialists are covered by the script; the separate quick tests cover the three-investigator swarm.",
+    "The bounded synthetic stop is not a change to the normal uncapped plateau rule.",
+    "These results establish controller behavior, not real inference quality, performance, or search superiority."
+  ]
+}
