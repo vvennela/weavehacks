@@ -1,0 +1,134 @@
+{
+  "version": "sera-failure-replay-offline-audit-v1",
+  "scope": "Saved result and completed Weave export only; no network, provider, or GPU calls.",
+  "source_code": "a62d383",
+  "comparison_code": "9d3c6e7",
+  "artifact_sha256": {
+    "result.json": "e6399ef9fff09382b80384cf82e7afaf23f103dd8613f09cd0456d25c8e19345",
+    "weave-calls.json": "3743c0c113db48497134392b6f32cb243c964451b87216e531ad83769fbc9ae6"
+  },
+  "mechanical_passed": true,
+  "data_integrity_passed": true,
+  "factual_reasoning_passed": false,
+  "gpu_trials_executed": 0,
+  "verification_method": "Read-only Python comparisons against git-show pinned helper source, saved JSON, original live-swarm-investigation-v1 files, and completed Weave calls. Factual review examines response content, not hidden reasoning.",
+  "counts": {
+    "saved_agent_requests": 25,
+    "provider_attempts": 27,
+    "successful_schema_valid_attempts": 25,
+    "preserved_length_limited_failed_attempts": 2,
+    "exact_pinned_prompt_recomputations": 25,
+    "exact_comparison_prompt_recomputations": 25,
+    "matching_original_evidence_hashes": 25,
+    "matching_prompt_hashes": 25,
+    "matching_request_schema_hashes": 25,
+    "matching_transmitted_user_prompt_json": 25,
+    "matching_sdk_messages": 27,
+    "matching_sdk_model": 27,
+    "matching_sdk_response_schema": 27,
+    "matching_sdk_parent_full_evidence": 27,
+    "matching_sdk_response_content": 27,
+    "matching_sdk_finish_reason": 27,
+    "matching_sdk_choices_after_null_omission": 27,
+    "matching_parsed_response_after_string_strip": 25,
+    "copied_source_requests": 280,
+    "copied_source_metrics": 2,
+    "matching_copied_payloads": 282,
+    "matching_copied_output_hashes": 282,
+    "matching_copied_source_trace_ids": 282,
+    "matching_copied_source_file_hash_maps": 282,
+    "matching_copied_call_input_output": 282,
+    "matching_original_source_file_hashes": 3,
+    "unique_refinement_provider_ids": 6,
+    "unique_refinement_message_hashes": 6,
+    "unique_refinement_response_content_hashes": 6,
+    "isolated_investigator_histories": 6,
+    "entries_per_isolated_history": 4,
+    "legal_round_one_refinement_trials": 3,
+    "legal_round_two_refinement_abstentions": 3,
+    "successful_read_operations": 7,
+    "rejected_invalid_read_choices": 5
+  },
+  "normalization_notes": [
+    "The Weave export omits null fields present in raw SDK model dumps. All 27 choices match after removing null dictionary fields; content and finish_reason match without normalization.",
+    "One parsed reason strips a trailing space through existing validation. All 25 parsed responses match raw JSON after top-level string stripping.",
+    "No copied source payload fields were removed or changed for comparison. Only replay_source was removed from the replay payload, as declared by its provenance."
+  ],
+  "independence": {
+    "parent_history_contains_each_isolated_entry": true,
+    "each_isolated_history_has_only_its_investigator_id": true,
+    "shared_board_hash_equal_for_all_three_refinements_per_round": true,
+    "round_one_shared_board_sha256": "77a628219356562367ee00b87ff4d7ab6ef11f6927fffdaa90f2f154bb0835d2",
+    "round_two_shared_board_sha256": "1179ed640a0fc31b70271d13987c202ea81705c09f5c4ec54d41fe3987e758ff",
+    "recorded_three_worker_overlap_seconds": {
+      "round_one_initial": 9.401020053999673,
+      "round_one_refine": 4.009708520999993,
+      "round_two_initial": 5.7395549430002575,
+      "round_two_refine": 2.2166220319995773
+    },
+    "limit": "Independent calls and histories do not prove independent or correct reasoning; refinements intentionally share peer findings."
+  },
+  "manual_factual_findings": [
+    {
+      "agent_call_index": 3,
+      "round": 1,
+      "investigator_id": "scheduling",
+      "action": "trial",
+      "response_excerpt": "This failure is unrelated to scheduling or batching",
+      "finding": "Unsupported causal exclusion. Its prompt explicitly says the root cause is not established. Observed CUTLASS startup failure does not rule scheduling or batching in or out."
+    },
+    {
+      "agent_call_index": 7,
+      "round": 1,
+      "investigator_id": "memory_context",
+      "action": "trial",
+      "response_excerpt": "does not indicate a memory or scheduling issue",
+      "finding": "Unsupported causal exclusion. The saved diagnosis says memory-pressure and scheduling causes are not established."
+    },
+    {
+      "agent_call_index": 11,
+      "round": 1,
+      "investigator_id": "output_quality",
+      "action": "trial",
+      "response_excerpt": "target ≤ 735.3 ms",
+      "finding": "Incorrect numerical target, also present in both other round-one refinements. Five percent below baseline 774.183014999835 ms is 735.4738642498432 ms. The proposed setting itself is legal."
+    },
+    {
+      "agent_call_index": 16,
+      "round": 2,
+      "investigator_id": "scheduling",
+      "action": "keep-baseline",
+      "response_excerpt": "no evidence of a performance or memory benefit from any tested change",
+      "finding": "Overstatement. Trial-2 has a measured 126 MiB lower sampled peak and a 0.054228% latency reduction; neither establishes the required 5% latency gain or a causal memory benefit. Its future target 735.73 ms is also incorrect. Keeping baseline is legal and consistent with the objective gate."
+    },
+    {
+      "agent_call_index": 20,
+      "round": 2,
+      "investigator_id": "memory_context",
+      "action": "keep-baseline",
+      "response_excerpt": "If a future configuration were to achieve a p95 latency greater than 774.183 ms or a sampled peak memory greater than 88 687 MiB, the keep‑baseline decision would be refuted.",
+      "finding": "Reversed decision test: a worse alternative does not refute keeping baseline. It also calls trial-2 the only trial performed although trial-1 was attempted and failed at startup."
+    },
+    {
+      "agent_call_index": 24,
+      "round": 2,
+      "investigator_id": "output_quality",
+      "action": "keep-baseline",
+      "response_excerpt": "did not change memory usage",
+      "finding": "Contradicts supplied metrics: baseline sampled_peak_memory_mib=88687 and trial_2_sampled_peak_memory_mib=88561, a 126 MiB difference. Both values survive compaction. Its claim that increased alternative memory refutes baseline is also reversed."
+    }
+  ],
+  "read_failures": {
+    "round_one": {
+      "scheduling": "trial_diagnosis is not a legal query ID",
+      "memory_context": "trial_diagnosis is not a legal query ID",
+      "output_quality": "trial_diagnosis is not a legal query ID"
+    },
+    "round_two": {
+      "scheduling": "trial_diagnosis is not a legal query ID",
+      "output_quality": "A source call ID was returned instead of a legal query ID"
+    },
+    "interpretation": "All six investigator passes still completed at least one real read. Mechanical success does not mean all requested inspections were valid."
+  },
+  "conclusion": "Transport, copied-source provenance, prompt projection, independent histories, and bounded legal actions pass. Factual reasoning fails. The current missing-quality fix leaves every v3 prompt unchanged. Preserve this run as a failed reasoning result, not proof of reliable autonomous diagnosis."
+}
