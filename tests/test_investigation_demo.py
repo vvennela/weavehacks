@@ -128,3 +128,33 @@ def test_unreadable_preferred_record_does_not_claim_old_result_is_the_new_run(tm
     view = load(tmp_path)
     assert 'could not be read' in view['banner']
     assert view['rows'] == []
+
+
+def test_swarm_view_links_only_the_selected_namespaced_proposal(tmp_path):
+    report = saved_report()
+    report['swarm_enabled'] = True
+    proposal = {'proposal_id': 'same', 'agent_role': 'batching', 'action': 'trial',
+                'changed_lever': 'max_num_batched_tokens', 'proposed_value': 2048}
+    report['search']['rounds'] = [dict(round=1, trial_ids=['trial-1'],
+        specialists=[dict(investigator_id=name, role='batching', proposal=proposal,
+                          initial_proposal=proposal, arbiter_proposal_id=f'{name}:same',
+                          inspections=[dict(query_id='latency_outliers', status='complete',
+                                            result={'records': [{'call_id': 'source-call'}]})])
+                     for name in ['scheduling', 'memory_context']],
+        arbiter={'ranked_proposal_ids': ['scheduling:same']})]
+    report['search_trials'] = [dict(trial_id='trial-1', proposal=proposal,
+        arbiter_proposal_id='scheduling:same', investigator_id='scheduling',
+        task_quality={'passed': True}, reduced={'p95_latency_ms': 90},
+        review={'prediction_outcome': 'refuted'})]
+    write_record(tmp_path, 'live-team-investigation-v1', saved_report())
+    write_record(tmp_path, 'live-swarm-investigation-v1', report)
+    view = load(tmp_path)
+    assert view['source'] == 'evidence/live-swarm-investigation-v1/result.json'
+    selected, other = view['rows']
+    assert selected['Specialist'] == 'scheduling'
+    assert selected['Control role'] == 'batching'
+    assert 'quality passed' in selected['Measured gates']
+    assert other['Measured gates'] == 'not run'
+    assert 'latency_outliers' in selected['Inspections']
+    assert 'source-call' in selected['Trace calls']
+    assert 'Investigators recorded' in view['scope']

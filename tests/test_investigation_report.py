@@ -1,6 +1,42 @@
 from sera.investigation_report import render_investigation
 
 
+def test_swarm_report_shows_inspections_board_and_observed_overlap():
+    checks = []
+    for index, name in enumerate(['scheduling', 'memory_context', 'output_quality']):
+        checks.append(dict(investigator_id=name, role='batching', status='accepted',
+            phase_timings={'initial': {'started_monotonic': index, 'ended_monotonic': 10},
+                           'refine': {'started_monotonic': 11 + index, 'ended_monotonic': 20}},
+            inspections=[dict(query_id='latency_outliers', status='complete',
+                              result={'source': 'weave', 'records': [{'call_id': f'call-{index}'}]})],
+            initial_proposal={'proposal_id': 'first', 'changed_lever': 'max_num_batched_tokens',
+                              'proposed_value': 2048},
+            proposal={'proposal_id': 'revised', 'changed_lever': 'max_model_len', 'proposed_value': 256},
+            evidence={'history': []}))
+    report = {'swarm_enabled': True, 'search': {'rounds': [dict(round=1,
+        swarm={'shared_findings_hash': 'board-hash'}, shared_findings=[{}, {}, {}],
+        specialists=checks, trial_ids=[])]}}
+    text = render_investigation(report)
+    assert 'Swarm investigators: scheduling, memory_context, output_quality' in text
+    assert 'Initial investigation overlap: recorded' in text
+    assert 'Peer-review overlap: recorded' in text
+    assert 'Shared findings board: board-hash; entries=3' in text
+    assert 'latency_outliers: complete; source=weave; calls=call-0' in text
+    assert 'Initial proposal: max_num_batched_tokens=2048' in text
+    assert 'Investigator scheduling' in text
+    assert 'batching-only, not a full specialist swarm' not in text
+
+
+def test_swarm_report_does_not_infer_parallel_calls_from_labels():
+    report = {'swarm_enabled': True, 'search': {'rounds': [dict(round=1, swarm={},
+        specialists=[dict(investigator_id='scheduling', role='batching', status='rejected',
+                         inspections=[dict(query_id='quality_outputs', status='failed', error='TimeoutError')])])]}}
+    text = render_investigation(report)
+    assert 'Initial investigation overlap: not established' in text
+    assert 'quality_outputs: failed' in text
+    assert 'TimeoutError' in text
+
+
 def test_report_shows_rejected_and_abstained_proposals_without_inventing_history():
     report = {
         'status': 'ready', 'decision': {'selected': 'baseline'},

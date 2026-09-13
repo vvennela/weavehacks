@@ -12,6 +12,44 @@ def _gate_label(value):
     return 'passed' if value is True else 'failed' if value is False else MISSING
 
 
+def _phase_overlap(checks, phase):
+    intervals = [(check.get('phase_timings') or {}).get(phase, {}) for check in checks]
+    if len(intervals) < 2 or any(type(item.get(key)) not in (int, float)
+                               for item in intervals for key in ('started_monotonic', 'ended_monotonic')):
+        return 'not established'
+    overlap = max(item['started_monotonic'] for item in intervals) < min(
+        item['ended_monotonic'] for item in intervals)
+    return 'recorded' if overlap else 'not established'
+
+
+def _swarm_lines(record):
+    checks = record.get('specialists', [])
+    names = [check['investigator_id'] for check in checks if check.get('investigator_id')]
+    lines = [f"Swarm investigators: {', '.join(names) or MISSING}.",
+             f"Initial investigation overlap: {_phase_overlap(checks, 'initial')}.",
+             f"Peer-review overlap: {_phase_overlap(checks, 'refine')}.",
+             f"Shared findings board: {(record.get('swarm') or {}).get('shared_findings_hash', MISSING)}; "
+             f"entries={len(record.get('shared_findings', []))}.",
+             'Investigator roles are analysis perspectives, not additional hardware capabilities. '
+             'GPU trials remain sequential.', '']
+    for check in checks:
+        lines.append(f"Investigator {check.get('investigator_id', MISSING)}: {check.get('status', MISSING)}.")
+        for inspection in check.get('inspections', []):
+            result = inspection.get('result') or {}
+            ids = [str(item['call_id']) for item in result.get('records', []) if item.get('call_id')]
+            lines.append(f"Inspection {inspection.get('query_id', MISSING)}: {inspection.get('status', MISSING)}; "
+                         f"source={result.get('source', MISSING)}; calls={', '.join(ids) or MISSING}.")
+            if inspection.get('error'):
+                lines.append(f"Inspection error: {inspection['error']}.")
+        initial = check.get('initial_proposal') or {}
+        if initial:
+            change = ('keep-baseline' if initial.get('action') == 'keep-baseline' else
+                      f"{initial.get('changed_lever', MISSING)}={initial.get('proposed_value', MISSING)}")
+            lines.append(f"Initial proposal: {change}. {initial.get('reason', '')}")
+        lines.append('')
+    return lines
+
+
 def _specialist_scope(rounds, deployment):
     roles = {check.get('role') for record in rounds for check in record.get('specialists', [])
              if check.get('role') and check.get('status') != 'inactive'}
@@ -58,8 +96,8 @@ def _deployment_lines(deployment, search):
         f"{review.get('reason', MISSING)}",
         f"Deployment trials included in budget: {_value(search.get('initial_trials_used'))}.",
         'No BF16 speedup comparison is available: the BF16 baseline was not measured.',
-        'The measured deployment becomes the reference for later batching trials. '
-        'Specialists act in separate stages; this does not show competing proposals in one round.', ''])
+        'The measured deployment becomes the reference for later investigation. '
+        'Deployment advice is a separate stage; see the round records for proposal competition.', ''])
     return lines
 
 
@@ -138,12 +176,16 @@ def render_investigation(report):
                       'No LM or GPU calls ran. This is not measured model performance.', ''])
     lines.extend(['Agents propose experiments. Deterministic checks decide which results are eligible.',
                   'Trial order and access to history do not prove a causal search advantage.',
-                  _specialist_scope(search.get('rounds', []), deployment), ''])
+                  ('Independent investigators inspect traces and exchange findings before arbitration.'
+                   if report.get('swarm_enabled') else
+                   _specialist_scope(search.get('rounds', []), deployment)), ''])
     lines.extend(_deployment_lines(deployment, search))
     rendered = set()
     previous = None
     for record in search.get('rounds', []):
         lines.extend([f"### Round {record.get('round', MISSING)}", ''])
+        if report.get('swarm_enabled'):
+            lines.extend(_swarm_lines(record))
         for role in record.get('specialist_participation', []):
             lines.append(f"Participation {role.get('role', MISSING)}: {role.get('status', MISSING)}; "
                          f"legal candidates={_value(role.get('legal_candidate_count'))}; "

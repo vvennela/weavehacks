@@ -45,6 +45,16 @@ def _change(proposal):
     return f"{names.get(lever, lever)} → {proposal.get('proposed_value', MISSING)}"
 
 
+def _matches_trial(trial, specialist):
+    if specialist.get('investigator_id'):
+        identity = specialist.get('arbiter_proposal_id')
+        return bool(identity) and trial.get('arbiter_proposal_id') == identity
+    proposal = specialist.get('proposal') or {}
+    measured = trial.get('proposal') or {}
+    return (measured.get('proposal_id') == proposal.get('proposal_id')
+            and measured.get('agent_role') == specialist.get('role'))
+
+
 def _rows(report):
     rows = []
     deployment = report.get('deployment') or {}
@@ -60,22 +70,32 @@ def _rows(report):
         for specialist in record.get('specialists', []):
             proposal = specialist.get('proposal') or {}
             matching = [trials[trial_id] for trial_id in record.get('trial_ids', []) if trial_id in trials
-                        and (trials[trial_id].get('proposal') or {}).get('proposal_id') == proposal.get('proposal_id')
-                        and (trials[trial_id].get('proposal') or {}).get('agent_role') == specialist.get('role')]
+                        and _matches_trial(trials[trial_id], specialist)]
             trial = matching[0] if matching else None
             review = (trial or {}).get('review') or {}
             rows.append({'Stage': f"Round {record.get('round', MISSING)}",
-                         'Specialist': specialist.get('role', MISSING), 'Proposed change': _change(proposal),
+                         'Specialist': specialist.get('investigator_id') or specialist.get('role', MISSING),
+                         'Proposed change': _change(proposal),
                          'Arbiter': _arbiter(record.get('arbiter')),
                          'Measured gates': _measurements(trial),
                          'Prediction review': review.get('prediction_outcome', MISSING)})
+            if specialist.get('investigator_id'):
+                inspections = specialist.get('inspections', [])
+                rows[-1].update({'Control role': specialist.get('role', MISSING),
+                    'Initial proposal': _change(specialist.get('initial_proposal')),
+                    'Inspections': ', '.join(f"{item.get('query_id', MISSING)} ({item.get('status', MISSING)})"
+                                             for item in inspections) or MISSING,
+                    'Trace calls': ', '.join(str(row['call_id']) for item in inspections
+                                            for row in (item.get('result') or {}).get('records', [])
+                                            if row.get('call_id')) or MISSING})
     return rows
 
 
 def load_investigation_demo(root):
     """Prefer the named team record only when present; never load a synthetic fallback."""
     root = Path(root)
-    sources = ['evidence/live-team-investigation-v1/result.json', 'evidence/live-investigation-v1/result.json']
+    sources = ['evidence/live-swarm-investigation-v1/result.json',
+               'evidence/live-team-investigation-v1/result.json', 'evidence/live-investigation-v1/result.json']
     source = next((name for name in sources if (root / name).is_file()), None)
     view = {'source': source, 'rows': [], 'banner': 'No saved live investigation is available yet.',
             'scope': '', 'runner': MISSING, 'limits': '', 'trace_url': None, 'budget': MISSING}
@@ -101,6 +121,10 @@ def load_investigation_demo(root):
              'Quantization and batching act in separate stages, not competing proposals in one round.'
              if report.get('deployment') and roles == {'batching', 'quantization'} else
              f"Saved specialist roles: {', '.join(sorted(roles)) or MISSING}.")
+    if report.get('swarm_enabled'):
+        scope = (f"Investigators recorded: {', '.join(sorted(roles)) or MISSING}. "
+                 'Read the initial findings, peer-reviewed proposals, and measured outcome separately. '
+                 'Investigator roles do not enable multi-GPU parallelism; GPU trials remain sequential.')
     decision = report.get('decision') or {}
     selected = decision.get('selected')
     config = report.get('baseline_configuration') if selected == 'baseline' else next(
