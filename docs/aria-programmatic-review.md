@@ -1,5 +1,28 @@
 # ARIA programmatic access review
 
+## Post-completion-checkpoint recheck
+
+Rechecked the official documentation on 2026-09-13 after writing `completion.md`.
+No ARIA or W&B connector is exposed in this session's tool inventory. No account
+settings, conversations, automations, or remote jobs were created.
+
+The documented automation can react to a **Weave metric crossing a threshold**
+as well as run/artifact events. That supports an optional event-triggered review
+after Sera records a result; it is not proof of an integrated feedback loop.
+Execution history exposes a conversation identifier, not a completed typed answer.
+[ARIA event and conversation documentation](https://docs.wandb.ai/models/automations/create-automations/aria).
+
+The Python SDK still cannot create or parse ARIA automations. Setup remains in
+the W&B UI, and account availability is unverified here.
+[Current SDK limitation](https://docs.wandb.ai/models/automations/api).
+
+The next optional proof remains one read-only review of a completed Sera result,
+with its exact prompt, answer, citations, and elapsed time saved. Do not enable
+automatic GPU execution from that review. The current joint-run blocker is
+Molab's per-service memory accounting; adding ARIA does not resolve it.
+
+## Earlier detailed review
+
 Checked 2026-09-13 at Sera revision `71de837`. Research only: no ARIA
 conversation, automation, remote job, or account setting was created or changed.
 

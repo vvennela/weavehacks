@@ -2,6 +2,9 @@
 
 Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
 
+See [completion.md](completion.md) for the current verified status, remaining work,
+and local/cloud setup. The rehearsal sections below preserve historical results.
+
 The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. The [complete Astra loop](evidence/live-astra-expanded-v1/README.md) measured a 19.55% latency improvement, tested a combination, stopped under the progress rule, and returned a working runner.
 
 ## Quick test: does the loop work?

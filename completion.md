@@ -18,6 +18,10 @@ cleanly. The [Luna repeat](evidence/live-luna-expanded-v2/README.md) also comple
 with an 18.73% gain on that workload; it required one controller reconnection.
 Neither result proves general reasoning reliability or globally optimal settings.
 
+The combined source suite passes **1,334 tests**, with one optional marimo skip
+(`uv run --frozen --extra dev pytest -q`, 46.89 s). The final ownership-diagnostic
+change also passes the 50-test focused placement suite.
+
 The [README quick check](README.md#quick-test-does-the-loop-work) passes 45 offline
 checks and includes a repeatable script that saves a synthetic loop report. It
 requires no GPU or API key and makes no real inference-performance claim.
@@ -37,7 +41,11 @@ Evidence: [benchmark and pressure audit](evidence/final-benchmark-audit-v1/READM
 [live grid comparison](evidence/live-grid-comparison-v1/README.md),
 [capacity calibration](evidence/capacity-calibration-v1/README.md),
 [SQLite recovery](docs/optimizer-recovery.md),
-[clean package checks](evidence/final-package-release-v1/README.md).
+[latest clean package checks](evidence/final-package-release-v2/README.md).
+
+The final tested wheel is built from source `9fb0851`; SHA-256:
+`27d3abc04afe55423538f93aa41104e6085ffe1b49cdd7a86534daed1b4f348f`.
+Both clean installations and all 66 packaged source-file comparisons pass.
 
 ## Immediate decision: joint GPU accounting
 
@@ -90,6 +98,6 @@ the local controller to remain connected to Molab.
 - The sampled memory limits do not guarantee that very short peaks were captured.
 - Startup/download time is separate from measured request latency.
 - The partner's demo and website files were not changed in this work.
-- ARIA remains optional. The [existing access review](docs/aria-programmatic-review.md)
+- ARIA remains optional. The [updated access review](docs/aria-programmatic-review.md)
   documents a UI-configured event trigger, not a verified typed request/response
   integration. It cannot replace the working Sera loop or bypass its validator.
