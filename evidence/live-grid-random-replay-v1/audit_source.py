@@ -37,12 +37,21 @@ def audit():
                    'revision': REVISIONS['live_driver_checkout'],
                    'sha256': hashlib.sha256(git('show',
                        f"{REVISIONS['live_driver_checkout']}:benchmarks/live_comparison.py")).hexdigest()},
+        'post_run_installed_package_check': {
+            'source': 'Parent controller remote inspection after the live run; not rerun by this git audit',
+            'wheel_path': '/marimo/sera-releases/0.2.0-d8c7304/sera_inference-0.2.0-py3-none-any.whl',
+            'wheel_sha256': '1617374eb978c15f67c85fa0464af2d288474af1721c2a9be240500a80982e6a',
+            'installed_python_files_compared': 27,
+            'different_files': [],
+            'scope': 'All 27 installed sera Python modules matched the saved wheel after the run.',
+        },
         'scope': 'Retrospective comparison of immutable git source, not a launch-time import-path record.',
         'limitations': [
             'The live launch did not record Python module __file__ paths.',
             'Later inspection found PYTHONSAFEPATH=1 and site-packages before the checkout.',
             'The likely installed-library import path is an inference, not a recorded launch fact.',
-            'This audit compares git source trees; it does not attest wheel bytes or the running process.',
+            'This script compares git source trees; the separate installed-wheel check is reported post-run evidence.',
+            'Neither check records module paths or bytes inside the historical running process.',
         ],
     }
 

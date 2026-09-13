@@ -68,5 +68,11 @@ every file hash and the driver's hash. Reproduce with:
 PYTHONPATH=. python evidence/live-grid-random-replay-v1/audit_source.py
 ```
 
-This retrospective git audit does not attest the wheel or running-process bytes.
-No original source artifact was edited and no GPU result was rerun.
+The parent controller also compared all 27 installed Sera Python files against
+the saved `sera_inference-0.2.0-py3-none-any.whl` after the run. All matched. The
+wheel SHA256 is
+`1617374eb978c15f67c85fa0464af2d288474af1721c2a9be240500a80982e6a`.
+This separate post-run check is recorded in the audit as reported evidence; the
+git script does not repeat a remote wheel check. Neither check records import
+paths inside the historical running process. No original source artifact was
+edited and no GPU result was rerun.
