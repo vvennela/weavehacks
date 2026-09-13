@@ -10,6 +10,8 @@ The latest runner check returned `2` for `2 + 3`. Its runtime worked, but its an
 
 Agent selection, Weave traces, task-correctness acceptance, joint placement, and the search benchmark are not implemented. A fixed candidate is not an agent recommendation.
 
+The W&B client, typed proposal/ranking/final-selection schemas, and bounded provider check are implemented. The client reads `WANDB_API_KEY` from the process environment; it never saves the key or request headers. Agent-controlled GPU execution stays disabled until the provider check passes.
+
 ## Install
 
 Use the existing GPU environment with its working vLLM and CUDA packages. Installing Sera does not install or change the GPU stack.
@@ -78,3 +80,18 @@ Sera switches only when the candidate has no generation errors, token agreement 
 Token agreement checks preserved behavior, **not correct answers**. No performance win, task-quality result, or agent-selection result is established merely by running this code.
 
 See [plan.md](plan.md) for delivery status and [spec.md](spec.md) for the full target. W&B agent wiring will use its [structured-output API](https://docs.wandb.ai/inference/response-settings/structured-output); provider validation is still pending.
+
+## Provider compatibility check
+
+Install the `agent` extra. With `WANDB_API_KEY` already supplied through the environment:
+
+```python
+from sera.provider_check import check_provider
+
+provider_report = check_provider(
+    project="vvennela-n-a/wandb_agent_default_project",
+    output_dir="sera-runs/provider-check",
+)
+```
+
+This makes 30 requests using the actual three schemas and synthetic evidence. Each failed response permits one retry. It requires 29 first-pass valid responses and all 30 valid within the retry limit. All attempts, truncation, errors, timings, and separate evidence-reference checks are saved. A pass establishes schema compatibility, not useful search or model correctness. Credential/access errors stop the check early.
