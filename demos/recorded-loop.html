@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sera · Recorded optimization loop</title>
+<style>
+:root{color-scheme:dark;--bg:#101713;--panel:#19221c;--line:#344638;--ink:#edf5e9;--muted:#afc0af;--green:#befa88;--orange:#f6ba74}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:28px 34px}header{display:flex;justify-content:space-between;gap:20px;align-items:start}.brand{font-size:26px;font-weight:750;letter-spacing:-1px}.brand span{color:var(--green)}.tag{display:inline-block;border:1px solid #738565;border-radius:5px;padding:4px 9px;font:11px ui-monospace,monospace;letter-spacing:1px;color:var(--green)}h1{font-size:clamp(24px,3.3vw,42px);line-height:1.12;letter-spacing:-1.3px;margin:23px 0 10px}p{margin:8px 0}.muted,.note{color:var(--muted)}.note{font-size:12px}.subtitle{max-width:920px;color:var(--muted)}.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:24px 0 10px}button,select{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;border-radius:7px;padding:8px 14px;cursor:pointer}button:hover,select:hover{border-color:var(--green)}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--orange);outline-offset:3px}#play{background:var(--green);color:#182110;min-width:104px;font-weight:700}#scrub{flex:1;min-width:160px;accent-color:var(--green)}#clock{font:13px ui-monospace,monospace}.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin:24px 0}.step{border:1px solid var(--line);padding:12px 8px;border-radius:8px;color:var(--muted);font-size:12px}.step b{display:block;font:11px ui-monospace,monospace;margin-bottom:6px}.step.active{background:var(--green);border-color:var(--green);color:#15200e}.step.done{border-color:#728a61}.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px}.stage-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}h2{font-size:20px;margin:0;letter-spacing:-.4px}.round{font:12px ui-monospace,monospace;color:var(--green)}.agents{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.agent{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-height:245px;transition:border-color .2s,background .2s}.agent.active{border-color:var(--green);background:#233322}.agent.selected{box-shadow:inset 0 4px var(--green)}.agent h3{margin:0 0 3px;font-size:18px}.role{font-size:12px;color:var(--muted);margin-bottom:19px}.label{font:10px ui-monospace,monospace;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:14px 0 5px}.proposal{font-size:14px;font-weight:650}.feedback{font-size:12px;color:#d1dfca}.changed{color:var(--green)}.detail{border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;padding:16px 18px;margin-top:14px;min-height:128px;font-size:14px}.detail strong{color:var(--green)}aside{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}aside h2{font-size:16px}.best{font-size:36px;letter-spacing:-1.5px;margin:14px 0 0}.best small{font-size:14px;letter-spacing:0;color:var(--muted)}#gain{color:var(--green);font-size:13px}svg{display:block;width:100%;height:auto;margin-top:18px}.legend{font-size:11px;color:var(--muted);margin-top:12px}.footer{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:1px solid var(--line);margin-top:23px;padding-top:15px;font-size:12px;color:var(--muted)}a{color:var(--green)}.links{margin-top:8px}.hidden{visibility:hidden}@media(max-width:900px){.layout{grid-template-columns:1fr}.agent{min-height:220px}aside{display:grid;grid-template-columns:1fr 1fr;gap:8px}aside svg{grid-column:2;grid-row:1/5}.flow{grid-template-columns:repeat(4,1fr)}}@media(max-width:570px){main{padding:20px 16px}.agents{grid-template-columns:1fr}.agent{min-height:0}.footer{grid-template-columns:1fr}.flow{grid-template-columns:repeat(4,1fr)}header{align-items:center}.tag{font-size:9px}aside{display:block}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body><main>
+<header><div class="brand">sera<span>↗</span></div><span class="tag">RECORDED REPLAY · 13 SEP 2026</span></header>
+<h1>Three agents. One experiment. Learn and repeat.</h1>
+<p class="subtitle">Replay a completed Qwen2.5 72B optimization run. Agents propose and review; the arbiter selects one GPU experiment per round. Measurements shape the next round.</p>
+<div class="controls"><button id="play" type="button">▶ Play</button><button id="restart" type="button">Restart</button><label for="speed">Speed</label><select id="speed"><option value="1">1×</option><option value="4">4×</option><option value="8" selected>8×</option><option value="16">16×</option></select><input id="scrub" type="range" min="0" max="838.1639053689978" step="0.1" value="0" aria-label="Replay position in schematic run seconds"><output id="clock"></output></div>
+<p class="note">Schematic pacing: the measured full run took 838.164 seconds (about 1:45 at 8×). Phase boundaries below are illustrative, not measured GPU spans. All proposals and results come from the completed run. Press Play to begin.</p>
+<nav class="flow" id="flow" aria-label="Optimization loop"></nav>
+<div class="layout"><section aria-label="Current replay step"><div class="stage-head"><h2 id="headline" aria-live="polite"></h2><span class="round" id="round"></span></div><div class="agents" id="agents"></div><div class="detail" id="detail" aria-live="polite"></div></section><aside><h2>Best measured latency</h2><div class="best" id="best"></div><div id="gain"></div><svg id="chart" viewBox="0 0 270 200" role="img" aria-label="Measured latency by configuration; lower is better"></svg><p class="legend">Worst p95 across loads 1, 2, 4, 8. Each configuration: 96 timed requests and 8/8 strict-JSON quality checks passed.</p></aside></div>
+<footer class="footer"><div><strong>Recorded setup</strong><br>Qwen/Qwen2.5-72B-Instruct · FP8 weights · BF16 KV cache<br>1 × RTX PRO 6000 Blackwell · investigators: gpt-6-astra<div class="links"><a href="https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09c11-ca49-7d43-94cf-e56c54f98ac4" target="_blank" rel="noopener">Source trace ↗</a> · <a href="../evidence/openai-example-v2/audit-summary.json">Audit JSON</a> · <a href="../evidence/openai-example-v2/replay-timings.json">Proposal history</a></div></div><div><strong>Scope of the result</strong><br>Eight easy tasks, warmed repeated prompts. This does not establish cold-cache performance, broad model quality, or a global optimum. Peer feedback below is paraphrased from recorded reasoning. This page runs offline; it makes no model or GPU calls.</div></footer>
+</main><script>
+'use strict';
+const totalSeconds = 838.1639053689978;
+const measurements = [
+  {name:'Baseline', value:771.0464070005401},
+  {name:'Prefix cache', value:624.7854280009051},
+  {name:'Graphs only', value:764.0717579997727},
+  {name:'Cache + graphs', value:618.5879460026626}
+];
+const rounds = [
+  {selected:0, experiment:'Enable prefix caching on baseline', agents:[
+    {initial:'Enable prefix caching', final:'Enable prefix caching', feedback:'Repeated warmed prompts support a reuse test. Memory pressure is not established; defer the graph idea.'},
+    {initial:'GPU memory allocation → 85%', final:'Enable prefix caching', feedback:'Accept A’s reuse hypothesis. Withdraw the allocation change: zero preemptions and no observed memory constraint.'},
+    {initial:'Enable graph execution', final:'Enable graph execution', feedback:'Prefix reuse is plausible. Keep the graph hypothesis for a test; launch overhead is not proven.'}
+  ], decision:'Select Agent A. Agent B now proposes the same cache change; one trial tests it. Defer Agent C’s graph proposal.', result:'624.785 ms · <strong>18.969% lower latency than baseline.</strong> Quality: 8/8. The gain clears the 5% progress threshold. Feed the measured cache result into round 2.'},
+  {selected:0, experiment:'Enable graph execution on baseline (no prefix cache)', agents:[
+    {initial:'Disable chunked prefill', final:'Enable graph execution', feedback:'Accept the peers’ graph test. Small queue time gives little support for a scheduling bottleneck.'},
+    {initial:'Enable graph execution', final:'Enable graph execution', feedback:'Test execution strategy with a single change. Graph compatibility and memory use still need measurement.'},
+    {initial:'Enable graph execution', final:'Enable graph execution', feedback:'Accept the graph experiment, without claiming its mechanism is proven. Test on baseline to isolate the change.'}
+  ], decision:'Select Agent A’s graph-only proposal. All three final proposals describe the same experiment, so they do not need separate GPU trials.', result:'764.072 ms · <strong>Misses the latency target.</strong> Only 0.905% below baseline; slower than the cache result. Quality: 8/8, no generation errors. First round without qualifying progress → run one confirmation round.'},
+  {selected:1, experiment:'Enable graph execution on trial-1 (retain prefix caching)', agents:[
+    {initial:'Disable chunked prefill', final:'Disable chunked prefill', feedback:'Keep a distinct scheduling test. Graphs alone gave little gain; a cache interaction remains unmeasured.'},
+    {initial:'GPU memory allocation → 85%', final:'Combine prefix caching + graphs', feedback:'Accept C’s interaction test on the best parent. Withdraw allocation reduction: no measured memory constraint.'},
+    {initial:'Combine prefix caching + graphs', final:'Combine prefix caching + graphs', feedback:'Keep the measured cache advantage and test the graph interaction. Graph-only results temper the prediction.'}
+  ], decision:'Select Agent B. Agent C proposes the same combination. Retain trial-1 prefix caching and change only graph execution; measure the interaction.', result:'618.588 ms · <strong>19.773% lower latency than baseline.</strong> Quality: 8/8. This is the best measured result, but only 0.992% better than the prior best: below the 5% progress threshold. Confirmation completes the plateau stop.'}
+];
+const steps = ['Inspect','Propose','Peer review','Arbiter','GPU trial','Measure','Stop / return'];
+const stages = [
+  {at:0, phase:'setup', round:-1, step:0, title:'Check provider and measure baseline'},
+  ...rounds.flatMap((round,index) => {
+    const start = 170 + index * 180;
+    return [
+      {at:start, phase:'inspect', step:0, title:'Read evidence together'},
+      {at:start+16, phase:'propose', step:1, title:'Three independent proposals'},
+      {at:start+43, phase:'review', step:2, title:'Review peers and revise'},
+      {at:start+65, phase:'arbiter', step:3, title:'Arbiter selects one experiment'},
+      {at:start+82, phase:'gpu', step:4, title:'Run the selected GPU experiment'},
+      {at:start+149, phase:'result', step:5, title:'Measure, compare, feed back'}
+    ].map(stage => ({...stage, round:index}));
+  }),
+  {at:710, phase:'stop', round:2, step:6, title:'Plateau + one confirmation → stop'},
+  {at:785, phase:'cleanup', round:2, step:6, title:'Return best configuration; verify runner'},
+  {at:totalSeconds, phase:'complete', round:2, step:6, title:'Runner verified. GPU cleanup complete.'}
+];
+let elapsed = 0;
+let speed = 8;
+let playing = false;
+let lastFrame = performance.now();
+let lastStage = -1;
+const element = id => document.getElementById(id);
+function formatTime(seconds) { return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2,'0')}`; }
+function seek(seconds) {
+  elapsed = Math.max(0, Math.min(totalSeconds, seconds));
+  if (elapsed >= totalSeconds) playing = false;
+  render();
+}
+function render() {
+  element('play').textContent = playing ? 'Ⅱ Pause' : '▶ Play';
+  element('scrub').value = elapsed;
+  element('clock').textContent = `${formatTime(elapsed)} / ${formatTime(totalSeconds)}`;
+  const stageIndex = stages.findLastIndex(stage => stage.at <= elapsed);
+  if (stageIndex === lastStage) return;
+  lastStage = stageIndex;
+  const stage = stages[stageIndex];
+  const round = rounds[Math.max(stage.round,0)];
+  const afterReview = ['review','arbiter','gpu','result','stop','cleanup','complete'].includes(stage.phase);
+  const showProposal = !['setup','inspect'].includes(stage.phase);
+  const hasSelection = ['arbiter','gpu','result','stop','cleanup','complete'].includes(stage.phase);
+  element('headline').textContent = stage.title;
+  element('round').textContent = stage.round < 0 ? 'SETUP' : `ROUND ${stage.round + 1} / 3${stage.round === 2 ? ' · CONFIRMATION' : ''}`;
+  element('flow').innerHTML = steps.map((name,index) => `<div class="step ${index===stage.step?'active':index<stage.step?'done':''}" ${index===stage.step?'aria-current="step"':''}><b>0${index+1}</b>${name}</div>`).join('');
+  element('agents').innerHTML = round.agents.map((agent,index) => {
+    const selected = hasSelection && index === round.selected;
+    const active = ['inspect','propose','review'].includes(stage.phase) || selected;
+    const changed = agent.initial !== agent.final;
+    return `<article class="agent ${active?'active':''} ${selected?'selected':''}"><h3>Agent ${'ABC'[index]}</h3><div class="role">${['Scheduling','Memory & context','Output quality'][index]}</div><div class="label">${showProposal?'Initial proposal':'Shared evidence'}</div><div class="proposal">${showProposal?agent.initial:stage.round<0?'Waiting for baseline':'Prior trial metrics + latency outliers'}</div>${afterReview?`<div class="label">${changed?'↳ Revised after peer review':'After peer review'}</div><div class="proposal ${changed?'changed':''}">${agent.final}</div><p class="feedback">${agent.feedback}</p>`:''}${selected?'<div class="label changed">Selected for one GPU trial</div>':''}</article>`;
+  }).join('');
+  let detail;
+  if (stage.phase === 'setup') detail = '<strong>Before the search</strong><p>Provider checks passed 34/34 requests. Measure the unchanged model: FP8 weights, BF16 KV cache, eager execution, prefix caching off. Baseline: 771.046 ms, 8/8 quality checks. The baseline appears on the chart when the first round begins.</p>';
+  else if (stage.phase === 'inspect') detail = `<strong>Same evidence, three views</strong><p>All three investigators read load metrics and latency outliers in parallel. ${stage.round===0?'The baseline is valid; latency rises with load, but the cause is unknown.':stage.round===1?'Prefix caching improved latency. The next proposals can use that measured result.':'Graphs alone missed the target. The cache result remains the best measured parent.'}</p>`;
+  else if (stage.phase === 'propose') detail = '<strong>Parallel proposals are hypotheses</strong><p>Each agent suggests a configuration change and its expected effect. None of these proposals is a GPU result. The agents next see peer proposals and decide what to keep or revise.</p>';
+  else if (stage.phase === 'review') detail = '<strong>Peer feedback changes the next decision</strong><p>The cards show recorded initial and final recommendations. Green text marks a changed recommendation. Feedback is a short paraphrase of each agent’s recorded peer review.</p>';
+  else if (stage.phase === 'arbiter') detail = `<strong>${round.experiment}</strong><p>${round.decision}</p>`;
+  else if (stage.phase === 'gpu') detail = `<strong>One actual experiment: trial-${stage.round+1}</strong><p>${round.experiment}. The GPU runner loads this configuration, warms the workload, checks quality, and measures the fixed loads. Agents do not run separate GPU trials. The result is revealed next.</p>`;
+  else if (stage.phase === 'result') detail = `<strong>Recorded trial-${stage.round+1} outcome</strong><p>${round.result}</p>`;
+  else if (stage.phase === 'stop') detail = '<strong>Stop: objective-plateau-confirmed</strong><p>Round 2 made no qualifying progress. Round 3 was the additional confirmation round, and its 0.992% gain over the prior best stayed below 5%. Return the best quality-valid result: cache + graphs. This stopping rule does not prove a global optimum.</p>';
+  else detail = '<strong>Completed run: cache + graphs selected</strong><p>771.046 → 618.588 ms (19.773% lower latency). The returned runner passed a fresh probe: {"answer": 5}. Cleanup passed; the post-cleanup GPU reading was 0 MiB used. Full invocation, including provider checks: 838.164 seconds.</p>';
+  element('detail').innerHTML = detail;
+  const revealed = stage.round < 0 ? 0 : ['result','stop','cleanup','complete'].includes(stage.phase) ? stage.round+2 : stage.round+1;
+  const best = revealed ? Math.min(...measurements.slice(0,revealed).map(item=>item.value)) : null;
+  element('best').innerHTML = best === null ? '— <small>ms</small>' : `${best.toFixed(3)} <small>ms</small>`;
+  element('gain').textContent = best === null ? 'Awaiting baseline' : `${((1-best/measurements[0].value)*100).toFixed(3)}% below baseline`;
+  element('chart').innerHTML = measurements.map((item,index)=>`<g opacity="${index<revealed?1:0.25}"><text x="0" y="${index*48+12}" fill="#c4d2be" font-size="11">${item.name}</text><rect x="0" y="${index*48+20}" width="${index<revealed?item.value/800*204:8}" height="12" rx="3" fill="${item.value===best?'#befa88':'#71866b'}"/><text x="265" y="${index*48+30}" text-anchor="end" fill="#edf5e9" font-size="11">${index<revealed?item.value.toFixed(1):'—'}</text></g>`).join('');
+}
+element('play').addEventListener('click', () => { if(elapsed>=totalSeconds) seek(0); playing=!playing; lastFrame=performance.now(); render(); });
+element('restart').addEventListener('click', () => { playing=false; seek(0); });
+element('speed').addEventListener('change', event => { speed=Number(event.target.value); });
+element('scrub').addEventListener('input', event => { seek(Number(event.target.value)); lastFrame=performance.now(); });
+function tick(now) { if(playing) seek(elapsed+(now-lastFrame)/1000*speed); lastFrame=now; requestAnimationFrame(tick); }
+render();
+requestAnimationFrame(tick);
+</script></body></html>
