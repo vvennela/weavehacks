@@ -170,7 +170,7 @@ class PlacementResult:
                  f"Physical bytes: {self.report['plan']['physical_gpu_bytes']}",
                  f"Declared bytes: {self.report['plan']['declared_budget_bytes']}",
                  'Memory peaks are sampled, not continuous allocation enforcement.',
-                 'This is one explicit placement plan, not an agent-selected or globally optimal placement.',
+                 'This executor tests one explicit plan; see the search report for agent selection. No global-optimality claim.',
                  'No quantization-enabled placement claim without an unchanged-budget unquantized comparison.']
         if self.report.get('weave_url'):
             lines.extend(['', f"Weave trace: {self.report['weave_url']}",

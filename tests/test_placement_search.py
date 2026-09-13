@@ -209,3 +209,38 @@ def test_changed_quality_contract_cannot_enter_candidate_universe(search_inputs)
     with pytest.raises(ValueError, match='requirements'):
         search.optimize_placement(**args)
     assert not args['agent'].history
+
+
+def test_estimated_infeasible_bf16_plan_is_visible_to_agent_but_not_executable(search_inputs, monkeypatch):
+    search, args = search_inputs
+    baseline = args['plans'][0]
+    quantized_data = baseline.model_dump()
+    quantized_data['services'][1]['configuration']['quantization'] = 'fp8_per_tensor'
+    quantized = validate_placement_plan(quantized_data)
+    # Use the real isolated-only executor for a valid synthetic quantized reference.
+    from sera.placement import measure_placement_references
+    reference_folder = Path(args['output_dir']).parent/'quantized-reference'
+    estimates = args['memory_estimates'][baseline.plan_hash]
+    measure_placement_references(plan=quantized, workloads=args['workloads'], memory_estimates=estimates,
+                                 output_dir=reference_folder)
+    huge = {model:value for model,value in estimates.items()}
+    huge[GLM_MODEL_ID] = huge[GLM_MODEL_ID].model_copy(update={'weights_bytes':600*1024**2})
+    args.update(plans=[baseline, quantized],
+        memory_estimates={baseline.plan_hash:huge, quantized.plan_hash:estimates},
+        isolated_references={baseline.plan_hash:None, quantized.plan_hash:reference_folder/'result.json'})
+    starts, _ = execution_stub(search, monkeypatch, [100.])
+    result = search.optimize_placement(**args)
+    evidence = args['agent'].history[0]['evidence']
+    assert evidence['legal_proposal_ids'] == [quantized.plan_hash]
+    rejected = evidence['rejected_plans'][0]
+    assert rejected['plan_id'] == baseline.plan_hash
+    assert rejected['reason'] == 'estimated-memory-does-not-fit'
+    assert rejected['measurement_status'] == 'not-measured'
+    assert rejected['fit_check'][GLM_MODEL_ID]['required_bytes'] > rejected['fit_check'][GLM_MODEL_ID]['allocation_bytes']
+    assert starts == [quantized.plan_hash]
+    proof = result.report['capacity_evidence']
+    assert proof['established'] is True
+    assert proof['unquantized_failure_basis'] == 'deterministic-estimate-not-measured'
+    assert proof['measured_memory_savings_bytes'] is None
+    assert result.report['quantization_enabled_placement'] is True
+    result.close()

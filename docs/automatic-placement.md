@@ -33,6 +33,21 @@ does not reproduce a smaller card's speed or bandwidth. A passing pair alone doe
 not prove quantization enabled placement; the unchanged-budget unquantized
 comparison is still required for that claim.
 
+Keep a rejected BF16 counterfactual in the menu when it is useful evidence.
+The validator exposes its per-model weight/KV/workspace/process/fragmentation
+arithmetic to the arbiter, marked `not-measured`, but never makes that plan
+executable. A deterministically rejected plan can have a `null` isolated-reference
+path. A plan that fits its estimate still requires a passing measured reference.
+
+After a successful return, the capacity checker can identify an otherwise-matching
+BF16 counterfactual. The workload, revisions, hard allocations, server fractions,
+other settings, and constraints must match; only weight quantization can differ.
+The resulting claim is explicitly limited to **a measured passing quantized pair
+versus an estimated BF16 fit rejection**. It is not a measured BF16 OOM or a
+measured memory-saving percentage. `measured_memory_savings_bytes` stays unavailable.
+Allocation-search winners require their own matching BF16 counterfactual; changing
+allocations or batch settings cannot be described as a quantization-only comparison.
+
 ## Objectives and stopping
 
 - Default latency objective: lowest worst-service p95, then lower device memory.
@@ -125,6 +140,8 @@ The manifest's schema is `sera-placement-rehearsal-v1`. It contains:
 - `concurrency`: the approved fixed load levels, such as `[1, 2, 4, 8]`.
 - `isolated_references`: plan-hash to saved reference `result.json` path, required
   for `search`. The reference stage emits an index of these paths.
+  A deterministic memory-fit rejection uses `null`; it is evidence, not a live
+  candidate. Failed measured references remain saved and are rejected by search.
 - `provider_check`: existing matching provider certificate path for `search`.
 - `weave_project`: optional explicit trace project matching the agent project.
 - `response_formats` and `response_format_version`: optional explicit decoding

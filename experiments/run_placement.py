@@ -61,7 +61,8 @@ def load_manifest(path):
     def resolve(value):
         candidate = Path(value)
         return candidate if candidate.is_absolute() else path.parent/candidate
-    references = {plan_id:resolve(value) for plan_id,value in manifest.get('isolated_references', {}).items()}
+    references = {plan_id:resolve(value) if value is not None else None
+                  for plan_id,value in manifest.get('isolated_references', {}).items()}
     certificate = resolve(manifest['provider_check']) if manifest.get('provider_check') else None
     return dict(manifest=manifest, plans=plans, workloads=profiles, memory_estimates=estimates,
                 isolated_references=references, provider_check=certificate,
@@ -72,19 +73,22 @@ def run_references(loaded, output_dir):
     folder = Path(output_dir).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     record = dict(schema_version='sera-placement-reference-index-v1', dataset_hash=DATASET_HASH,
-                  manifest=loaded['manifest'], references={}, status='running')
+                  manifest=loaded['manifest'], references={}, passing_references=0, rejected=[], status='running')
     save_json(folder/'result.json', record)
     for plan in loaded['plans']:
         result = measure_placement_references(plan=plan, workloads=loaded['workloads'],
             memory_estimates=loaded['memory_estimates'][plan.plan_hash],
             output_dir=folder/plan.plan_hash, weave_project=loaded['weave_project'])
         if result.report['status'] != 'references-ready':
-            record.update(status='blocked', failed_plan_id=plan.plan_hash, reason=result.report['decision'])
+            record['rejected'].append(dict(plan_id=plan.plan_hash, decision=result.report['decision']))
+            record['references'][plan.plan_hash] = (None if result.report['decision']['reason'] == 'estimated-memory-does-not-fit'
+                                                   else str(result.output_dir/'result.json'))
             save_json(folder/'result.json', record)
-            return record
+            continue
         record['references'][plan.plan_hash] = str(result.output_dir/'result.json')
+        record['passing_references'] += 1
         save_json(folder/'result.json', record)
-    record['status'] = 'references-ready'
+    record['status'] = 'references-ready' if record['passing_references'] else 'blocked'
     save_json(folder/'result.json', record)
     return record
 
@@ -132,7 +136,7 @@ def main(argv=None):
         parser.error('--output-dir is required for GPU execution')
     if args.phase == 'references':
         record = run_references(loaded, args.output_dir)
-        print(json.dumps(dict(status=record['status'], passing_references=len(record['references']))))
+        print(json.dumps(dict(status=record['status'], passing_references=record['passing_references'])))
         return 0 if record['status'] == 'references-ready' else 1
     record = run_search(loaded, args.output_dir, objective=Objective(priority=args.objective),
                         budget=Budget(max_candidate_trials=args.max_candidate_trials))

@@ -78,7 +78,9 @@ class PlacementSearchResult:
             'Quality and latency limits remain mandatory for both models.',
             'Latency objective is the worst service p95. Memory is sampled device peak.',
             'Throughput is both services\' output tokens divided by the sum of shared load-window durations.',
-            'No global-optimality or quantization-enabled-placement claim.',
+            ('Capacity evidence: measured quantized placement versus an estimated BF16 fit rejection.'
+             if self.report.get('quantization_enabled_placement') else 'Quantization-enabled placement is not established.'),
+            'No measured memory-savings claim without a measured matching BF16 pair; no global-optimality claim.',
             'Provider certificate proves existing schema formatting, not placement reasoning quality.']
         if self.report.get('weave_url'):
             lines.append(f"Weave: {self.report['weave_url']}")
@@ -189,8 +191,14 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
     (folder/'references').mkdir()
     for plan_id, plan in by_id.items():
         try:
-            if any(estimates[plan_id][service.model_id].total_bytes > service.allocation_bytes for service in plan.services):
-                raise ValueError('Estimated memory exceeds a service allocation')
+            fit = {service.model_id:dict(required_bytes=estimates[plan_id][service.model_id].total_bytes,
+                allocation_bytes=service.allocation_bytes, components=estimates[plan_id][service.model_id].model_dump(),
+                fits=estimates[plan_id][service.model_id].total_bytes <= service.allocation_bytes) for service in plan.services}
+            if not all(row['fits'] for row in fit.values()):
+                report['rejected'].append(dict(plan_id=plan_id, plan=plan.model_dump(),
+                    reason='estimated-memory-does-not-fit', fit_check=fit,
+                    measurement_status='not-measured', estimate_source='caller-supplied-component-estimates'))
+                continue
             bound = bind_placement_reference(isolated_references[plan_id], plan, profiles)
             raw = Path(isolated_references[plan_id]).read_bytes()
             if hashlib.sha256(raw).hexdigest() != bound['provenance']['sha256']:
@@ -222,6 +230,7 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
                 break
             evidence = dict(placement=True, legal_proposal_ids=remaining[:],
                 proposals=[eligible[key] for key in remaining], objective=objective.model_dump(),
+                rejected_plans=deepcopy(report['rejected']),
                 remaining_trials=None if budget.max_candidate_trials is None else budget.max_candidate_trials-len(report['trials']),
                 incumbent_plan_id=best_id, incumbent_objectives=best_values,
                 confirmation_round=report['no_progress_rounds'] == 1, history=deepcopy(history),
@@ -233,6 +242,8 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
                     'Act as the placement frontier reader and arbiter. Select at most one legal_proposal_ids entry, '
                     'or abstain with an empty list when another trial is not useful for the supplied objective. '
                     'Every proposed plan has measured passing isolated evidence, not passing joint evidence. '
+                    'rejected_plans includes deterministic fit failures, not measured performance. '
+                    'Explain whether weight quantization is needed under those specific allocations, but never select a rejected plan. '
                     'Use recorded quality, memory, latency and failed joint outcomes; state expected contention '
                     'as a hypothesis, not an observed cause. Do not invent plans, allocations, thresholds, '
                     'quality scores, or speedups. Honor confirmation_round and the remaining budget. '
@@ -306,6 +317,13 @@ def _optimize_placement(*, plans, workloads, memory_estimates, isolated_referenc
         if active is not None:
             active.close()
             active = None
+        if result.placement is not None:
+            from .placement_capacity import capacity_evidence
+            proof = capacity_evidence(by_id[best_id], report['rejected'], by_id, result.placement.report)
+            proof['workload_hash'] = report['workload_hash']
+            report.update(capacity_evidence=proof, quantization_enabled_placement=proof['established'])
+            result.placement.report.update(capacity_evidence=proof, quantization_enabled_placement=proof['established'])
+            result.placement._save()
         result._save()
         return result
     except BaseException as error:
