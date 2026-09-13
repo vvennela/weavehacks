@@ -123,3 +123,124 @@ def test_cli_selects_compatible_route_without_key_argument(monkeypatch, tmp_path
         'https://gateway.example/v1', '--model', 'chosen', '--project', 'test/project',
         '--output-dir', str(tmp_path/'check')]) == 0
     assert isinstance(seen['agent'], OpenAICompatibleAgent)
+
+
+def mock_http_transport(monkeypatch, handler):
+    """Exercise the installed SDK and HTTP client without opening a socket."""
+    httpx = pytest.importorskip('httpx')
+    pytest.importorskip('openai')
+    clients = []
+    requests = []
+
+    def handle(request):
+        requests.append(request)
+        return handler(request)
+
+    class MockClient(httpx.Client):
+        def __init__(self, **kwargs):
+            super().__init__(transport=httpx.MockTransport(handle), **kwargs)
+            clients.append(self)
+
+    monkeypatch.setattr(httpx, 'Client', MockClient)
+    return httpx, requests, clients
+
+
+def completion_body(case):
+    return {'id': 'mock-completion', 'object': 'chat.completion', 'created': 0,
+        'model': 'gateway-model', 'choices': [{'index': 0, 'finish_reason': 'stop',
+            'message': {'role': 'assistant', 'content': json.dumps(valid_response(case))}}]}
+
+
+def test_real_sdk_sends_only_instance_auth_and_bounded_strict_request(monkeypatch):
+    case = provider_cases()[0]
+    httpx, requests, clients = mock_http_transport(monkeypatch,
+        lambda request: httpx.Response(200, json=completion_body(case)))
+    monkeypatch.setenv('OPENAI_API_KEY', 'ambient-openai-secret')
+    monkeypatch.setenv('OPENAI_ORG_ID', 'ambient-organization')
+    monkeypatch.setenv('OPENAI_PROJECT_ID', 'ambient-project')
+    monkeypatch.setenv('WANDB_API_KEY', 'weave-only-secret')
+    for key in ['first-instance-secret', 'second-instance-secret']:
+        assert agent(api_key=key).request(case['role'], case['evidence'], 'Inspect') is not None
+    assert [request.headers['authorization'] for request in requests] == [
+        'Bearer first-instance-secret', 'Bearer second-instance-secret']
+    for request in requests:
+        assert str(request.url) == 'https://gateway.example/v1/chat/completions'
+        assert not request.headers.get('openai-project')
+        assert not request.headers.get('openai-organization')
+        assert 'ambient-' not in str(request.headers)
+        assert 'weave-only-secret' not in str(request.headers)
+        assert json.loads(request.content)['response_format']['json_schema']['strict'] is True
+        assert all(0 < value <= 90 for value in request.extensions['timeout'].values())
+    assert all(client.is_closed for client in clients)
+
+
+@pytest.mark.parametrize('destination', [
+    'https://elsewhere.example/stolen', 'https://gateway.example/uncertified-route'])
+def test_real_sdk_does_not_follow_redirects(monkeypatch, destination):
+    httpx, requests, clients = mock_http_transport(monkeypatch,
+        lambda request: httpx.Response(307, headers={'location': destination}))
+    current = agent()
+    assert current.request('arbiter', {'legal_proposal_ids': []}, 'Inspect') is None
+    assert len(requests) == 2  # Sera's single retry, never an SDK retry or redirect.
+    assert {str(request.url) for request in requests} == {
+        'https://gateway.example/v1/chat/completions'}
+    assert all(attempt['http_status'] == 307 for attempt in current.history[0]['attempts'])
+    assert all(client.is_closed for client in clients)
+
+
+@pytest.mark.parametrize('status, attempts', [(401, 1), (403, 1), (404, 1), (429, 2), (500, 2)])
+def test_real_sdk_http_errors_are_bounded_and_secret_free(monkeypatch, status, attempts):
+    httpx, requests, clients = mock_http_transport(monkeypatch,
+        lambda request: httpx.Response(status, json={'error': {
+            'message': 'test-private-key-a must not enter an audit'}}))
+    current = agent()
+    assert current.request('arbiter', {'legal_proposal_ids': []}, 'Inspect') is None
+    assert len(requests) == attempts
+    assert 'test-private-key-a' not in json.dumps(current.history)
+    assert all(row['error'] == f'Provider HTTP {status}'
+               for row in current.history[0]['attempts'])
+    assert all(client.is_closed for client in clients)
+
+
+def test_real_sdk_timeout_is_bounded_and_secret_free(monkeypatch):
+    def timeout(request):
+        raise httpx.ReadTimeout('test-private-key-a timeout', request=request)
+    httpx, requests, clients = mock_http_transport(monkeypatch, timeout)
+    current = agent()
+    assert current.request('arbiter', {'legal_proposal_ids': []}, 'Inspect') is None
+    assert len(requests) == 2
+    assert 'test-private-key-a' not in json.dumps(current.history)
+    assert all(row['error'] == 'APITimeoutError' for row in current.history[0]['attempts'])
+    assert all(client.is_closed for client in clients)
+
+
+@pytest.mark.parametrize('echoed_secret', ['test-private-key-a', 'weave-only-secret'])
+def test_real_sdk_success_does_not_record_echoed_credentials(monkeypatch, echoed_secret):
+    case = provider_cases()[0]
+    body = completion_body(case)
+    body['gateway_debug'] = echoed_secret
+    monkeypatch.setenv('WANDB_API_KEY', 'weave-only-secret')
+    httpx, requests, clients = mock_http_transport(monkeypatch,
+        lambda request: httpx.Response(200, json=body))
+    current = agent()
+    assert current.request(case['role'], case['evidence'], 'Inspect') is None
+    assert len(requests) == 2
+    assert echoed_secret not in json.dumps(current.history)
+    assert all(row['error'] == 'Provider response contains a credential'
+               for row in current.history[0]['attempts'])
+    assert all(client.is_closed for client in clients)
+
+
+@pytest.mark.parametrize('response_kind', ['html', 'json-array', 'json-string'])
+def test_real_sdk_malformed_success_fails_closed_without_secret_leak(monkeypatch, response_kind):
+    def response(request):
+        if response_kind == 'html':
+            return httpx.Response(200, text='<html>test-private-key-a</html>')
+        body = [] if response_kind == 'json-array' else 'test-private-key-a'
+        return httpx.Response(200, json=body)
+    httpx, requests, clients = mock_http_transport(monkeypatch, response)
+    current = agent()
+    assert current.request('arbiter', {'legal_proposal_ids': []}, 'Inspect') is None
+    assert len(requests) == 2
+    assert 'test-private-key-a' not in json.dumps(current.history)
+    assert all(client.is_closed for client in clients)

@@ -327,7 +327,12 @@ class OpenAICompatibleAgent(WandbAgent):
             with openai.OpenAI(base_url=self.base_url, api_key=self._api_key.get_secret_value(),
                                project='', organization='', timeout=90, max_retries=0,
                                http_client=httpx.Client(follow_redirects=False)) as client:
-                body = client.chat.completions.create(**payload).model_dump(mode='json')
+                response = client.chat.completions.create(**payload)
+                # The SDK can return text or a JSON scalar/list for a malformed HTTP 200.
+                # Reject that envelope without storing the untrusted body in the audit.
+                if not callable(getattr(response, 'model_dump', None)):
+                    raise ProviderTransportError('Provider returned an invalid completion envelope')
+                body = response.model_dump(mode='json')
             # A misconfigured gateway can echo credentials in a successful response.
             encoded = json.dumps(body, allow_nan=False)
             secrets = (self._api_key.get_secret_value(), os.environ.get('WANDB_API_KEY', ''))
