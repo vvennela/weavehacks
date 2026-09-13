@@ -1,29 +1,44 @@
-"""Generate notebooks/lab.py with the captured runs embedded.
+"""Generate notebooks/lab.py with Sera's source embedded.
 
-The notebook is generated rather than hand-maintained for one reason: it carries
-its run data inline so the WASM export is self-contained, and nobody should have
-to hand-edit 22KB of JSON inside a source file.
+The notebook runs the real optimization loop in the browser under Pyodide, so it
+carries the package itself rather than a recording of its output. Sera is pure
+Python over numpy and pyyaml, and the only module that touches subprocess or
+urllib is the vLLM runner, which is excluded here — nothing in the Phase 1 path
+imports it.
 
-    PYTHONPATH=src python scripts/build_lab_data.py      # capture -> lab_runs.json
-    PYTHONPATH=src python scripts/build_lab_notebook.py  # lab_runs.json -> lab.py
+    PYTHONPATH=src python scripts/build_lab_notebook.py
 """
-import json
+import base64
+import io
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "scripts" / "lab_notebook_template.py"
 
 
+def bundle() -> str:
+    """Sera's source plus the lab specs, as one base64 zip."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+        for path in sorted((ROOT / "src" / "sera").rglob("*.py")):
+            # The vLLM runner needs subprocess and urllib, neither of which a
+            # browser can offer. Nothing in the Phase 1 path imports it.
+            if "vllm" in path.name or "__pycache__" in str(path):
+                continue
+            z.write(path, path.relative_to(ROOT / "src").as_posix())
+        for path in sorted((ROOT / "specs").glob("lab_*.yaml")):
+            z.write(path, path.relative_to(ROOT).as_posix())
+    return base64.b64encode(buf.getvalue()).decode()
+
+
 def main() -> int:
-    data = json.loads((ROOT / "notebooks" / "lab_runs.json").read_text())
-    # separators keep the literal tight; the notebook is read in a browser, not a diff.
-    blob = json.dumps(data, separators=(",", ":"), allow_nan=False)
-    if '"""' in blob:
-        raise SystemExit("run data contains a triple quote and would break the literal")
-    source = TEMPLATE.read_text().replace("__LAB_DATA__", blob)
+    blob = bundle()
+    source = TEMPLATE.read_text().replace("__SERA_BUNDLE__", blob)
     target = ROOT / "notebooks" / "lab.py"
     target.write_text(source)
-    print(f"wrote {target.relative_to(ROOT)}  ({target.stat().st_size:,} bytes)")
+    print(f"wrote {target.relative_to(ROOT)}  ({target.stat().st_size:,} bytes, "
+          f"bundle {len(blob):,} chars)")
     return 0
 
 

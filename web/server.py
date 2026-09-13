@@ -158,6 +158,7 @@ class Handler(SimpleHTTPRequestHandler):
                   '/models': 'models.html', '/resources': 'resources.html',
                   '/notebook': 'lab-notebook.html'}
         legacy = {'/' + filename: route for route, filename in routes.items()}
+        routes.update({route: 'sera-lab-preview.html' for route in ('/lab/performance', '/lab/models', '/lab/trials')})
         legacy['/sera-design-preview.html'] = '/'
         if path in legacy:
             self.redirect(legacy[path])
@@ -184,7 +185,7 @@ class Handler(SimpleHTTPRequestHandler):
         if path == '/notebook-app' or path.startswith('/notebook-app/'):
             self.serve_notebook(path, head)
             return
-        if path in ('/lab', '/designs', '/notebook') and not self.user():
+        if (path in ('/lab', '/designs', '/notebook') or path.startswith('/lab/')) and not self.user():
             self.redirect('/sign-in')
             return
         if path in ('/sign-in', '/get-started') and self.user():
