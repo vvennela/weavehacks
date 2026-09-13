@@ -1,0 +1,33 @@
+# secrets — never commit
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# run artifacts
+runs/
+*.jsonl
+!tests/fixtures/*.jsonl
+.marimo/
+wandb/
+
+# model caches
+models/
+.cache/
+
+# os
+.DS_Store
+
+# macOS/iCloud conflict duplicates — never real files
+*[ ]2.*
+* 2.*
