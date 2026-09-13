@@ -197,7 +197,7 @@ The approved live comparison completed at concurrency 1, 2, 4, and 8. Both plans
 
 The delegated [search replay harness](benchmarks/SEARCH.md) implements a frozen universe, equal budgets, grid and seeded random controls, and bounded agent adapters. It now supports multi-round batching comparisons in local tests. It has not established a real benchmark win. Context-varying benchmark universes remain blocked by the workload contract, and the full no-telemetry ablation remains blocked by required metric citations. Wider schema support requires a new matching provider check. No benchmark prompts or thresholds were tuned to make the batching result look better.
 
-## Two-model status: blocked by task quality
+## Two-model status: quality and shared execution remain incomplete
 
 The specified Qwen0.6B + GLM-4-9B pair is not ready for verified placement. GLM loaded in BF16 and FP8, but passed 0/8 strict-format tasks. Qwen FP8 passed 1/8; it had both format errors and a wrong filtering answer. The earlier Qwen BF16 result was 2/8. We stopped before running them together. See [the preserved prerequisite results](evidence/placement-prerequisites-v1/README.md).
 
@@ -206,6 +206,8 @@ In plain English: the programs run, but these two smaller models do not yet meet
 A separate `experiments.run_structured_quality_pilot` command now tests native JSON decoding for one specified BF16 model at a time. It keeps the eight questions, exact answers, generation limits, and 99% floor. Its schema does not contain the answers. It saves raw responses and diagnostic request latency without repairing output. A passing pilot would establish only this new decoding profile; joint scheduling, a declared smaller-card budget, and a measured concurrent trial would still be needed.
 
 The [Qwen structured-output pilot completed at 7/8](evidence/qwen-structured-quality-v3/README.md): all answers were valid JSON, but filtering was still wrong. Median request latency was 112.60 ms, with a retained 59.21-second filtering outlier. Cleanup passed. This is a quality rejection, not a verified baseline or speedup. The [placement plan](docs/placement-plan.md) separates this quality gate from the remaining shared-runtime work and required budget/latency decisions.
+
+[GLM passed the same structured-output pilot at 8/8](evidence/glm-structured-quality-v1/README.md), including filtering. Median request latency was 141.05 ms, with a 1.36-second maximum on the first request. Cleanup passed. GLM now has a passing isolated BF16 quality profile; Qwen still does not. Neither pilot proves quantized quality, joint fit, or concurrent performance.
 
 The [saved-results audit](evidence/release-benchmark-audit/README.md) reproduced all 64 saved task grades and the four-load Qwen72B comparison. It found no complete frozen small-model search universe, so a measured grid/random comparison remains unavailable.
 

@@ -12,7 +12,7 @@ Two separate gaps remain:
 1. **Task quality:** no tested configuration of the pair passes the current eight-task, strict JSON contract at the fixed 0.99 quality floor. The original isolated results remain preserved: Qwen BF16 passed 2/8, Qwen FP8 weights passed 1/8, GLM BF16 passed 0/8, and GLM FP8 weights passed 0/8. These are task failures, not proof of broken quantization kernels. See [the original prerequisite record](../evidence/placement-prerequisites-v1/README.md).
 2. **Joint execution:** the current runtime requires an idle GPU. It rejects a second service once GPU use exceeds 128 MiB. Joint ownership, concurrent measurement, pair selection, and pair rollback are not implemented.
 
-A new native structured-output profile is being tested. Qwen completed at 7/8: all answers were valid JSON, but the filtering answer remained wrong. GLM's isolated pilot is running. A passing pair at the fixed 0.99 floor is not established. The new profile does not replace or regrade the original failures. See [Qwen's preserved result](../evidence/qwen-structured-quality-v3/README.md).
+A new native structured-output profile was tested. Qwen completed at 7/8: all answers were valid JSON, but the filtering answer remained wrong. GLM passed 8/8, including filtering. A passing pair at the fixed 0.99 floor is not established. The new profile does not replace or regrade the original failures. See [Qwen's result](../evidence/qwen-structured-quality-v3/README.md) and [GLM's result](../evidence/glm-structured-quality-v1/README.md).
 
 Even if both isolated quality pilots pass, phase two remains unfinished. They do not establish shared-GPU fit, latency, interference, or two usable returned runners.
 
