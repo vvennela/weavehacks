@@ -294,5 +294,7 @@ def test_leaked_memory_on_one_gpu_fails_cleanup(monkeypatch, tmp_path):
 
 
 def test_single_gpu_agent_contract_stays_unchanged():
+    from sera.config import CONTROL_ROLES, validate_control_value
+    assert 'tensor_parallel_size' not in CONTROL_ROLES
     with pytest.raises(ValueError):
-        RuntimeConfig(tensor_parallel_size=2)
+        validate_control_value('tensor_parallel_size', 2)

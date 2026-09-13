@@ -1,4 +1,4 @@
-"""Explicit single-host tensor-parallel runner; not the automatic search adapter."""
+"""Explicit single-host tensor-parallel runtime and fixed-hardware search adapter."""
 
 import importlib.metadata
 import os
@@ -10,7 +10,6 @@ import sys
 import threading
 import time
 import urllib.request
-from typing import Literal
 
 from .config import RuntimeConfig
 from .hardware import HardwareAssignment, ModelDescriptor, discover_gpus, load_model_config, preflight_hardware, validate_model_config
@@ -18,17 +17,11 @@ from .runtime import CleanupError, GENERATION, SERVED_MODEL, SeraModel, _child_e
 from .storage import content_hash
 
 
-class _AssignedRuntimeConfig(RuntimeConfig):
-    """Resolved runtime record, separate from the certified agent control schema."""
-
-    tensor_parallel_size: Literal[1, 2, 4, 8] = 1
-
-
 class PortableSeraModel(SeraModel):
     """Own one explicitly configured BF16 service on 1, 2, 4, or 8 GPUs.
 
     Readiness is runtime compatibility, not a quality or speedup certificate.
-    Automatic model selection and multi-GPU search are not implemented here.
+    Automatic hardware selection and new-model precision selection are not enabled.
     """
 
     def __init__(self, *, model, hardware, artifact_dir, configuration=None):
@@ -40,7 +33,9 @@ class PortableSeraModel(SeraModel):
             (configuration or RuntimeConfig()).model_dump())
         if self.configuration.quantization is not None or self.configuration.kv_cache_dtype != "auto":
             raise ValueError("Portable model experiments require BF16 weights and KV; FP8 is not certified")
-        self.configuration = _AssignedRuntimeConfig.model_validate(self.configuration.model_dump() |
+        if self.configuration.tensor_parallel_size not in {1, len(self._gpu_uuids)}:
+            raise ValueError("Configured tensor parallel size does not match the hardware assignment")
+        self.configuration = RuntimeConfig.model_validate(self.configuration.model_dump() |
             {"tensor_parallel_size": len(self._gpu_uuids)})
         self.model_id, self.revision = self.model.model_id, self.model.revision
         self.artifact_dir = Path(artifact_dir).resolve()
@@ -58,7 +53,7 @@ class PortableSeraModel(SeraModel):
             hardware_assignment=self.hardware.model_dump(), generation=GENERATION,
             enable_thinking=False, sampled_peak_memory_mib=None, telemetry_errors=0,
             validation_status="not-measured", adapter="explicit-single-host-v1",
-            limits=["BF16 dense Qwen2/Qwen3/Llama only", "No automatic search integration",
+            limits=["BF16 dense Qwen2/Qwen3/Llama only", "No automatic hardware or precision selection",
                     "No quality or performance claim from startup", "No multi-node or MIG support"])
 
     def _selected_snapshot(self):
@@ -227,3 +222,50 @@ class PortableSeraModel(SeraModel):
             if self.artifact_dir.exists():
                 self._save()
         return self.record
+
+
+class PortableRuntimeFactory:
+    """Keep one validated model and fixed GPU assignment for an entire search."""
+
+    def __init__(self, *, model, hardware):
+        self.model = ModelDescriptor.model_validate(model.model_dump() if isinstance(model, ModelDescriptor) else model)
+        self.hardware = HardwareAssignment.model_validate(
+            hardware.model_dump() if isinstance(hardware, HardwareAssignment) else hardware)
+        self._model_data = self.model.model_dump()
+        self._hardware_data = self.hardware.model_dump()
+
+    def validate_configuration(self, configuration):
+        if self.model.model_dump() != self._model_data or self.hardware.model_dump() != self._hardware_data:
+            raise ValueError("The model or hardware assignment changed during optimization")
+        config = RuntimeConfig.model_validate(configuration.model_dump())
+        if config.tensor_parallel_size != len(self.hardware.gpu_uuids):
+            raise ValueError("Search configuration must preserve the fixed tensor parallel assignment")
+        if config.quantization is not None or config.kv_cache_dtype != 'auto':
+            raise ValueError("Portable optimization supports BF16 weights and KV only")
+        return config
+
+    def baseline_configuration(self, supplied):
+        config = (RuntimeConfig(tensor_parallel_size=len(self.hardware.gpu_uuids))
+                  if supplied is None else RuntimeConfig.model_validate(supplied))
+        return self.validate_configuration(config)
+
+    def __call__(self, *, artifact_dir, configuration, model_id, revision):
+        config = self.validate_configuration(configuration)
+        if (model_id, revision) != (self.model.model_id, self.model.revision):
+            raise ValueError("Runtime model identity differs from the pinned search model")
+        return PortableSeraModel(model=self.model, hardware=self.hardware,
+                                 artifact_dir=artifact_dir, configuration=config)
+
+
+def optimize_on_hardware(*, model, hardware, prompts, mode='auto', **options):
+    """Use the existing measured search on an explicit model and fixed GPUs.
+
+    Default mode uses the configured three-investigator swarm. Model weights and
+    KV remain BF16; the agents cannot change the supplied GPU assignment.
+    A versioned task evaluator and explicit quality floor are required.
+    """
+    from .api import optimize
+
+    factory = PortableRuntimeFactory(model=model, hardware=hardware)
+    return optimize(models=[factory.model.model_id], prompts=prompts, mode=mode,
+                    _runtime_factory=factory, **options)

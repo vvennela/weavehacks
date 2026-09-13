@@ -31,7 +31,7 @@ def test_candidate_requires_a_name_reason_and_complete_config():
     {"gpu_memory_utilization": 0.0}, {"gpu_memory_utilization": 1.1},
     {"gpu_memory_utilization": float("nan")}, {"gpu_memory_utilization": float("inf")},
     {"dtype": "float16"}, {"quantization": "fp8"}, {"kv_cache_dtype": "int4"},
-    {"tensor_parallel_size": 2}, {"max_model_len": 4097},
+    {"tensor_parallel_size": 3}, {"max_model_len": 4097},
     {"enable_prefix_caching": "false"}, {"unknown_flag": 1},
     {"tensor_parallel_size": True}, {"enable_prefix_caching": 0},
     {"enable_chunked_prefill": 1}, {"enforce_eager": 1},

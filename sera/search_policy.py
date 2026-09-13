@@ -79,7 +79,10 @@ def propose_search_space(baseline, *, model_id, workload, explicit_space=None):
         report['rationale'].append('Explicit values, order, and candidate-hash subset preserved unchanged; '
                                    'parent/workload legality remains the existing validator\'s responsibility.')
         return report
-    if model_id not in {MODEL_ID, LARGE_MODEL_ID}:
+    runtime = baseline.get('runtime')
+    portable = (isinstance(runtime, dict) and runtime.get('adapter') == 'explicit-single-host-v1'
+                and bool(runtime.get('model_preflight')))
+    if model_id not in {MODEL_ID, LARGE_MODEL_ID} and not portable:
         raise ValueError('Policy supports only the current single-model Qwen optimizer models')
     workload = Workload.model_validate(workload)
     missing = report['missing_or_invalid']
@@ -216,7 +219,7 @@ def expand_search_space(baseline, trials, *, model_id, workload):
     # The investigator must decide whether their test is useful for this workload.
     for lever in ('enforce_eager', 'enable_prefix_caching', 'enable_chunked_prefill'):
         add(base_id, lever, not base_values[lever], reason='Test a supported execution strategy; compatibility and gain remain unmeasured.')
-    if model_id == MODEL_ID:
+    if model_id == MODEL_ID and baseline['runtime'].get('adapter') != 'explicit-single-host-v1':
         add(base_id, 'kv_cache_dtype', 'fp8', reason='Test the supported small-model cache format under the fixed task gate.')
     for candidate in seed['candidates']:
         lever, value = next(iter(candidate['changed'].items()))

@@ -51,7 +51,8 @@ def agent_evidence(baseline, objective=None, constraints=None, *, prompts=()):
                    sampled_peak_memory_mib=baseline["runtime"].get("sampled_peak_memory_mib"))
     metrics.update(load_snapshot_metrics(baseline))
     model_id = baseline["runtime"].get("model_id", MODEL_ID)
-    supported = SUPPORTED_CHANGES if model_id == MODEL_ID else {"max_num_batched_tokens": [2048]}
+    portable = baseline['runtime'].get('adapter') == 'explicit-single-host-v1'
+    supported = SUPPORTED_CHANGES if model_id == MODEL_ID and not portable else {"max_num_batched_tokens": [2048]}
     return {"trial_id": "baseline", "model_id": model_id,
             "revision": baseline["runtime"].get("revision", MODEL_REVISION),
             "objective": (objective or Objective()).model_dump(),
@@ -193,7 +194,7 @@ def render_summary(report, output_dir):
 def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, provider_check=None,
              objective=None, evaluation=None, evaluation_version=None, constraints=None,
              workload=None, baseline_configuration=None, budget=None, investigation_space=None,
-             automatic_space=False, swarm=False, trace_reader=None):
+             automatic_space=False, swarm=False, trace_reader=None, _runtime_factory=None):
     """One candidate, or an opt-in bounded agent investigation; no joint placement.
 
     Uses at most 32 supplied prompts, declared loads, up to 16 warm-ups, three
@@ -228,16 +229,26 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         if constraints is None:
             raise ValueError("Verified mode requires an explicit quality floor in Constraints")
         constraints = Constraints.model_validate(constraints)
-    if models not in ([MODEL_ID], [LARGE_MODEL_ID]):
+    if _runtime_factory is not None:
+        from .portable_runtime import PortableRuntimeFactory
+        if not isinstance(_runtime_factory, PortableRuntimeFactory):
+            raise ValueError('An explicit run requires a validated PortableRuntimeFactory')
+        if models != [_runtime_factory.model.model_id]:
+            raise ValueError('Model list differs from the explicit pinned model')
+        if evaluation is None:
+            raise ValueError('Explicit hardware optimization requires versioned task requirements')
+    elif models not in ([MODEL_ID], [LARGE_MODEL_ID]):
         raise ValueError("Supply one supported pinned Qwen model")
+    runtime_factory = _runtime_factory or SeraModel
     if not isinstance(prompts, list) or not 1 <= len(prompts) <= 32:
         raise ValueError("Supply 1 to 32 prompts; inputs are never silently dropped")
     for prompt in prompts:
         if not isinstance(prompt, (str, list)) or not prompt:
             raise ValueError("Each prompt must be nonempty text or chat messages")
     model_id = models[0]
-    revision = LARGE_MODEL_REVISION if model_id == LARGE_MODEL_ID else MODEL_REVISION
-    if model_id == LARGE_MODEL_ID and baseline_configuration is None:
+    revision = (_runtime_factory.model.revision if _runtime_factory is not None else
+                LARGE_MODEL_REVISION if model_id == LARGE_MODEL_ID else MODEL_REVISION)
+    if _runtime_factory is None and model_id == LARGE_MODEL_ID and baseline_configuration is None:
         from .fit import optimize_fit
         if candidate is not None:
             raise ValueError("The fit-first path selects its candidate from the validated memory plans")
@@ -252,8 +263,9 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                             constraints=constraints, agent=agent, provider_check=provider_check,
                             workload=workload, budget=budget, investigation_space=investigation_space,
                             automatic_space=automatic_space, swarm=swarm, trace_reader=trace_reader)
-    baseline_config = RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(baseline_configuration)
-    if baseline_configuration is not None:
+    baseline_config = (_runtime_factory.baseline_configuration(baseline_configuration) if _runtime_factory is not None else
+                       RuntimeConfig() if baseline_configuration is None else RuntimeConfig.model_validate(baseline_configuration))
+    if _runtime_factory is None and baseline_configuration is not None:
         if model_id != LARGE_MODEL_ID or baseline_config != RuntimeConfig(quantization="fp8_per_tensor"):
             raise ValueError("An explicit reference is supported only for the proven Qwen72B FP8 weight plan")
         if evaluation is None:
@@ -263,6 +275,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
     if investigation_space is not None:
         investigation_space = resolve_investigation_space(investigation_space, baseline=baseline_config,
                                                           model_id=model_id, workload=workload)
+        if _runtime_factory is not None and investigation_space['supported_changes'].get('kv_cache_dtype'):
+            raise ValueError('Portable optimization supports BF16 weights and KV only')
     provider_validation = None
     if agent is not None:
         from .provider_check import require_provider_check
@@ -271,12 +285,15 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         provider_validation = require_provider_check(provider_check, agent)
         history_start = len(agent.history)
     else:
+        batch_default = _runtime_factory is not None or model_id == LARGE_MODEL_ID
         candidate = validate_candidate(candidate if candidate is not None else Candidate(
-            name="batch-2048" if model_id == LARGE_MODEL_ID else "kv-fp8",
+            name="batch-2048" if batch_default else "kv-fp8",
             reason="Test one predeclared supported change against the reference",
             config=RuntimeConfig.model_validate(baseline_config.model_dump() | (
-                {"max_num_batched_tokens": 2048} if model_id == LARGE_MODEL_ID else {"kv_cache_dtype": "fp8"}))),
+                {"max_num_batched_tokens": 2048} if batch_default else {"kv_cache_dtype": "fp8"}))),
             baseline=baseline_config)
+        if _runtime_factory is not None:
+            _runtime_factory.validate_configuration(candidate.config)
         if model_id == LARGE_MODEL_ID and candidate.config.kv_cache_dtype != "auto":
             raise ValueError("Combined FP8 weights and FP8 KV are not enabled for Qwen72B")
     folder = Path(output_dir or Path("sera-runs") / uuid.uuid4().hex).resolve()
@@ -285,7 +302,8 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
               "created_at": datetime.now(timezone.utc).isoformat(),
               "mode": "agent-guided" if agent is not None else "fixed-candidate",
               "model_id": model_id, "model_revision": revision,
-              "baseline_name": "sera-fp8-weight-reference-v1" if model_id == LARGE_MODEL_ID else BASELINE_NAME,
+              "baseline_name": ('sera-explicit-bf16-reference-v1' if _runtime_factory is not None else
+                                "sera-fp8-weight-reference-v1" if model_id == LARGE_MODEL_ID else BASELINE_NAME),
               "baseline_configuration": baseline_config.model_dump(),
               "candidate": candidate.model_dump() if candidate else None,
               "prompts": prompts, "workload_hash": content_hash(prompts),
@@ -309,11 +327,17 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
                          "TTFT and queue percentiles unavailable",
                          "Quality is limited to the supplied evaluator and prompts" if evaluation else "no task-correctness claim"],
               "rejected": []}
+    if _runtime_factory is not None:
+        report['execution'] = dict(adapter='explicit-single-host-v1',
+            model_descriptor=_runtime_factory.model.model_dump(),
+            hardware_assignment=_runtime_factory.hardware.model_dump(),
+            tensor_parallel_selection='caller-fixed', memory_fit='requires-runtime-startup',
+            precision_support='BF16-only', live_validation_scope='this run only')
     result = SeraResult(models=[], report=report, output_dir=folder)
     active = None
     result._save()
     try:
-        active = SeraModel(artifact_dir=folder / "baseline", model_id=model_id,
+        active = runtime_factory(artifact_dir=folder / "baseline", model_id=model_id,
                            revision=revision, configuration=baseline_config)
         active.start()
         report["baseline"] = collect_trial(active, prompts, "baseline", baseline=True, workload=workload)
@@ -334,7 +358,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             return investigate(result=result, active=investigation_runner, agent=agent,
                 history_start=history_start, budget=budget, objective=objective, constraints=constraints,
                 evaluation=evaluation, evaluation_version=evaluation_version, workload=workload,
-                swarm=swarm, trace_reader=trace_reader)
+                swarm=swarm, trace_reader=trace_reader, runtime_factory=runtime_factory)
         if agent is not None and baseline["status"] == "collected" and can_compare:
             from .agent import validate_proposal
             evidence = agent_evidence(baseline, objective, constraints, prompts=prompts)
@@ -356,7 +380,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
         if baseline["status"] == "collected" and can_compare and candidate is not None:
             active.close()
             result._save()
-            active = SeraModel(artifact_dir=folder / "candidate", configuration=candidate.config,
+            active = runtime_factory(artifact_dir=folder / "candidate", configuration=candidate.config,
                                model_id=model_id, revision=revision)
             try:
                 active.start()
@@ -405,7 +429,7 @@ def optimize(*, models, prompts, output_dir=None, candidate=None, agent=None, pr
             return result
         if report["decision"]["selected"] == "baseline" and trial is not None:
             active.close()
-            active = SeraModel(artifact_dir=folder / "returned-baseline", configuration=baseline_config,
+            active = runtime_factory(artifact_dir=folder / "returned-baseline", configuration=baseline_config,
                                model_id=model_id, revision=revision)
             active.start()
         if baseline["status"] != "collected":

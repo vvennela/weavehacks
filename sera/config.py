@@ -65,7 +65,7 @@ class RuntimeConfig(BaseModel):
     dtype: Literal["bfloat16"] = "bfloat16"
     quantization: Literal["fp8_per_tensor"] | None = None
     kv_cache_dtype: Literal["auto", "fp8"] = "auto"
-    tensor_parallel_size: Literal[1] = 1
+    tensor_parallel_size: Literal[1, 2, 4, 8] = 1
     max_model_len: int = Field(default=4096, ge=65, le=4096)
     max_num_seqs: int = Field(default=8, ge=1, le=256)
     max_num_batched_tokens: int = Field(default=4096, ge=1, le=65536)

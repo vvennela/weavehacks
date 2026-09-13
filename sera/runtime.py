@@ -168,6 +168,8 @@ class SeraModel:
         self.placement_owner = placement_owner
         self.configuration = RuntimeConfig.model_validate(
             (configuration or RuntimeConfig()).model_dump())
+        if self.configuration.tensor_parallel_size != 1:
+            raise ValueError("Use PortableSeraModel with an explicit hardware assignment for tensor parallelism")
         self.artifact_dir = Path(artifact_dir).resolve()
         self.process = None
         self._log = None

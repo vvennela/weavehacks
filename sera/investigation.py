@@ -248,8 +248,9 @@ def choose_experiments(agent, evidence, legal, record, remaining):
 
 def investigate(*, result, active, agent, history_start, budget, objective, constraints,
                 evaluation, evaluation_version, workload, initial_trials_used=0,
-                swarm=False, trace_reader=None):
+                swarm=False, trace_reader=None, runtime_factory=None):
     from . import pipeline
+    runtime_factory = pipeline.SeraModel if runtime_factory is None else runtime_factory
 
     report, folder = result.report, result.output_dir
 
@@ -410,7 +411,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 save()
                 stage = 'constructor'
                 try:
-                    active = pipeline.SeraModel(artifact_dir=folder / trial_id, configuration=candidate.config,
+                    active = runtime_factory(artifact_dir=folder / trial_id, configuration=candidate.config,
                                                 model_id=report['model_id'], revision=report['model_revision'])
                     trial['runtime'] = active.record
                     stage = 'startup'
@@ -493,7 +494,7 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             if active_trial_id != selected_id:
                 close_active()
                 config = RuntimeConfig.model_validate(best['runtime']['configuration'])
-                active = pipeline.SeraModel(artifact_dir=folder / 'returned-best', configuration=config,
+                active = runtime_factory(artifact_dir=folder / 'returned-best', configuration=config,
                                             model_id=report['model_id'], revision=report['model_revision'])
                 active.start()
             active._require_ready()

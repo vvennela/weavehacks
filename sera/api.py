@@ -67,11 +67,18 @@ def optimize(*, models, prompts, mode='auto', **options):
         raise ValueError('Configured swarm requires swarm=True and no fixed candidate')
     if options.get('trace_reader') is not None and not callable(options['trace_reader']):
         raise ValueError('trace_reader must be callable')
-    if models not in ([MODEL_ID], [LARGE_MODEL_ID]):
+    factory = options.get('_runtime_factory')
+    if factory is not None:
+        from .portable_runtime import PortableRuntimeFactory
+        if not isinstance(factory, PortableRuntimeFactory) or models != [factory.model.model_id]:
+            raise ValueError('An explicit run requires its validated pinned runtime factory')
+        if options.get('evaluation') is None or options.get('constraints') is None:
+            raise ValueError('Explicit hardware optimization requires versioned task requirements')
+    elif models not in ([MODEL_ID], [LARGE_MODEL_ID]):
         raise ValueError('Supply one supported pinned Qwen model')
     if not isinstance(prompts, list) or not 1 <= len(prompts) <= 32:
         raise ValueError('Supply 1 to 32 prompts; inputs are never silently dropped')
-    if models == [LARGE_MODEL_ID] and (options.get('evaluation') is None or options.get('constraints') is None):
+    if factory is None and models == [LARGE_MODEL_ID] and (options.get('evaluation') is None or options.get('constraints') is None):
         raise ValueError('Fit-first loading requires a versioned task evaluator and explicit quality floor')
     arguments.setdefault('budget', Budget(max_candidate_trials=None))
     arguments.setdefault('workload', Workload(concurrency=[1, 2, 4, 8]))

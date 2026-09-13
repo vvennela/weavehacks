@@ -69,6 +69,8 @@ class PlacementPlan(_PlacementRecord):
         if 10 * allocated > 9 * self.declared_budget_bytes:
             raise ValueError('Service allocations must leave ten percent of the declared budget as reserve')
         for service in self.services:
+            if service.configuration.tensor_parallel_size != 1:
+                raise ValueError('Shared single-GPU placement requires tensor_parallel_size=1')
             fraction = service.allocation_bytes / self.physical_gpu_bytes
             if service.configuration.gpu_memory_utilization != fraction:
                 raise ValueError('Service memory fraction must equal allocated bytes / physical GPU bytes')
