@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"candidate\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The tested candidate passed quality and reduced p95 from 100 ms to 80 ms, a 20% reduction that exceeds the predicted 5%. This agrees with the deterministic selection. No read call IDs or saved evidence paths were supplied. The result supports retaining the candidate, but does not establish a placement or hardware cause for the gain.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12596,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 94,
+    "reasoning_output_tokens": 0
+  }
+}

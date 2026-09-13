@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"trial\",\n  \"proposal_id\": \"scheduling-refine-graph-execution\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": \"enforce_eager\",\n  \"proposed_value\": false,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"trial_2_p95_latency_ms\",\n    \"generation_errors\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\",\n    \"concurrency_8_cumulative_snapshot_preemptions\",\n    \"p99_reliable\"\n  ],\n  \"predicted_metric_change\": \"Hypothesis, not a measured gain: non-eager execution reduces p95_latency_ms by at least 5% versus baseline, to at most 731.9633919492845 ms, while preserving quality >=0.99 and generation_errors=0. Reference: call 01a09b0e-fa51-74b9-86c4-c713021cc983, paths reduced and task_quality/per_prompt. Beating trial_2_p95_latency_ms=625.3441509998083 from call 01a09b12-5113-7563-b9bf-84b638c36485 at reduced remains uncertain.\",\n  \"confidence\": 0.6,\n  \"expected_trial_cost\": 1,\n  \"falsification_condition\": \"The predicted baseline improvement is refuted if matched-workload p95_latency_ms exceeds 731.9633919492845 ms. Compare reduced against call 01a09b0e-fa51-74b9-86c4-c713021cc983; startup failure, generation_errors>0, or quality below 0.99 disqualifies the candidate using status and task_quality/per_prompt. Qualifying search progress separately requires at least 5% improvement over the incumbent recorded at reduced in call 01a09b12-5113-7563-b9bf-84b638c36485.\",\n  \"reason\": \"No observed failure is supplied: calls 01a09b0e-fa51-74b9-86c4-c713021cc983 and 01a09b12-5113-7563-b9bf-84b638c36485 report accepted, collected outcomes at status and decision, zero generation errors at reduced, and quality 1.0 at task_quality/per_prompt. Causes of latency remain unestablished. Independently reviewing the peers, I accept non-eager execution as a useful experiment but reject treating reduced execution overhead as established evidence. Negligible cumulative queueing and zero preemptions provide little support for raising sequence capacity beyond offered concurrency eight. Prepared prompts are only 85\u2013109 tokens, weakening the case that the 4096-token batch budget binds. These observations favor testing execution strategy; cumulative snapshots cannot prove its benefit. The listed baseline-parent candidate changes only enforce_eager and has no component trials. Trial-2's prefix-cache gain applies to warmed repeated prompts and cannot be inherited by this legal configuration. A baseline-relative gain alone would not establish progress over that incumbent.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 24403,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 698,
+    "reasoning_output_tokens": 22
+  }
+}

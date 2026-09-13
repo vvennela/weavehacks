@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aee-3e27-70f2-aa48-879e8e69776f"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested because placement was unsupported in the single-model milestone. No candidate latency or quality measurements exist to assess the predicted improvement. Retain baseline per the deterministic selection; the next proposal must use supported placement.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12598,"cached_input_tokens":8576,"cache_write_input_tokens":0,"output_tokens":71,"reasoning_output_tokens":0}}

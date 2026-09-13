@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09af0-07fc-78a1-9499-f7c9c3c55285"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"not-tested\",\"reason\":\"The candidate was not tested, so neither the predicted p95 reduction nor quality preservation was measured. Baseline is the only eligible trial and the deterministic selection. Placement is unsupported in this milestone; abstain from selecting a candidate until a supported proposal is tested.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12595,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":78,"reasoning_output_tokens":0}}

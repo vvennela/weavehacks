@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The deterministic selection is baseline, the only eligible trial. The budget was exhausted and the candidate was not tested, so neither the predicted 5% p95 reduction nor preserved quality was measured. Abstain from a new proposal under the exhausted budget; no causal diagnosis is supported."}

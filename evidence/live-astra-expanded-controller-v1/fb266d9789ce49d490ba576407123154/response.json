@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"trial\",\n  \"proposal_id\": \"scheduling-prefix-reuse-01\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": \"enable_prefix_caching\",\n  \"proposed_value\": true,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"generation_errors\",\n    \"successful_requests\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\",\n    \"concurrency_8_cumulative_snapshot_mean_ttft_ms\",\n    \"concurrency_8_cumulative_snapshot_preemptions\"\n  ],\n  \"predicted_metric_change\": \"Hypothesis: prefix reuse reduces repeated prefill work under the declared per-load warmup, lowering worst-per-load p95_latency_ms by at least 5%, from 770.4877809992468 to at most 731.9633919492844 ms. The reference is read call 01a09b0e-fa43-74de-aea6-433da8a3162a, reduced.p95_latency_ms at concurrency 8. This is an unmeasured prediction limited to repeated prompts after warmup, not cold-cache traffic.\",\n  \"confidence\": 0.62,\n  \"expected_trial_cost\": 1,\n  \"falsification_condition\": \"The predicted objective gain is refuted if the same workload produces worst-per-load p95_latency_ms above 731.9633919492844 ms, compared with read call 01a09b0e-fa43-74de-aea6-433da8a3162a at reduced.p95_latency_ms. Any generation_errors or quality below 0.99 makes the trial unacceptable; compare read call 01a09b0e-fa51-74b9-86c4-c713021cc983 at reduced and task_quality/per_prompt. Startup failure would establish incompatibility for this trial, not a measured latency regression.\",\n  \"reason\": \"No observed failure is supplied: read call 01a09b0e-fa51-74b9-86c4-c713021cc983 records an accepted, collected result at status and decision, zero generation_errors at reduced, and quality 1.0 at task_quality/per_prompt. A causal performance bottleneck remains unknown. Read call 01a09b0e-fa43-74de-aea6-433da8a3162a at reduced.p95_latency_ms shows latency rising from 572.3665739997159 ms at concurrency 1 to 770.4877809992468 ms at concurrency 8. Supplied cumulative snapshots show negligible queueing and zero preemptions, although they include prior activity and do not establish causality. These observations give little support for increasing sequence capacity. The declared repeated-prompts-after-per-load-warmup workload directly supports testing the supplied available-for-trial prefix-reuse technique. Enable prefix caching using legal candidate 595475b749e9dfdbc1d4cc01b76932727ea803d2dabee4e0b85df20fdfd70544, parent baseline, with no component trials. Compatibility, gain, and preserved quality require measurement.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 20606,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 737,
+    "reasoning_output_tokens": 46
+  }
+}

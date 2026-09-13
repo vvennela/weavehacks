@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\n  \"action\": \"trial\",\n  \"proposal_id\": \"scheduling-eager-false-01\",\n  \"agent_role\": \"batching\",\n  \"parent_trial_id\": \"baseline\",\n  \"model_id\": \"Qwen/Qwen2.5-72B-Instruct\",\n  \"changed_lever\": \"enforce_eager\",\n  \"proposed_value\": false,\n  \"evidence_used\": [\n    \"p95_latency_ms\",\n    \"generation_errors\",\n    \"concurrency_8_cumulative_snapshot_mean_queue_ms\",\n    \"concurrency_8_cumulative_snapshot_preemptions\",\n    \"trial_2_p95_latency_ms\",\n    \"trial_2_generation_errors\"\n  ],\n  \"predicted_metric_change\": \"Hypothesis: allowing graph execution will reduce p95_latency_ms by at least 5% versus baseline's 770.4877809992468 ms, recorded by call 01a09b0e-fa51-74b9-86c4-c713021cc983 at reduced. This gain is unmeasured; exceeding the current best trial_2_p95_latency_ms of 625.3441509998083 ms in call 01a09b12-5113-7563-b9bf-84b638c36485 at reduced is less certain.\",\n  \"confidence\": 0.55,\n  \"expected_trial_cost\": 1,\n  \"falsification_condition\": \"Refute the predicted gain if measured p95_latency_ms exceeds 95% of the baseline reference in call 01a09b0e-fa51-74b9-86c4-c713021cc983 at reduced. Startup or generation failures, or quality below 0.99, invalidate the candidate; inspect status, reduced, and task_quality/per_prompt, matching the evidence paths in that call. Separately, round progress requires at least 5% improvement over the incumbent recorded in call 01a09b12-5113-7563-b9bf-84b638c36485 at reduced.\",\n  \"reason\": \"No observed failure is supplied: calls 01a09b0e-fa51-74b9-86c4-c713021cc983 and 01a09b12-5113-7563-b9bf-84b638c36485 report accepted outcomes at status and decision, zero generation_errors at reduced, and quality 1.0 at task_quality/per_prompt. Causes of latency remain unestablished. Baseline cumulative queue time at concurrency 8 is only 0.007548437494619975 ms with zero preemptions; these snapshots do not establish a bottleneck. Prepared prompts span 85\u2013109 tokens at input_token_ids, so eight maximum-length prompts fit even a 1024-token budget, weakening the case for batch-budget changes; sequence capacity already matches offered concurrency. The legal untested enforce_eager=false candidate tests whether execution overhead contributes to latency. Its parent is baseline with no component trials; the measured prefix-caching improvement does not authorize a combination absent from candidate_options. No peer claims were supplied.\"\n}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 23193,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 712,
+    "reasoning_output_tokens": 61
+  }
+}

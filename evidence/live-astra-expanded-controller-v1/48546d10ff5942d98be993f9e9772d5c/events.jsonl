@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09af0-90c3-7da0-a28e-9a0ac40a8451"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"baseline\",\"prediction_outcome\":\"refuted\",\"reason\":\"The candidate's p95 was 20% lower (80 ms versus 100 ms), but it failed quality, refuting the combined prediction. The deterministic selection retains baseline, the only eligible trial. No causal diagnosis or read IDs or saved evidence paths were supplied. The next proposal must address quality preservation; these results do not establish a hardware or placement cause.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12602,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":99,"reasoning_output_tokens":0}}

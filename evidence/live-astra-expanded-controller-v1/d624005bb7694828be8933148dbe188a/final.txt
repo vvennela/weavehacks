@@ -1,0 +1,1 @@
+{"selected_trial_id":"baseline","prediction_outcome":"not-tested","reason":"The candidate was not tested, so neither the predicted p95 reduction nor quality preservation was measured. Baseline is the only eligible trial and the deterministic selection. Placement is unsupported in this milestone; abstain from selecting a candidate until a supported proposal is tested."}

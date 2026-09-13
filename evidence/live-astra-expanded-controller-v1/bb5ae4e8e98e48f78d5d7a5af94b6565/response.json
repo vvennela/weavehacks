@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"selected_trial_id\":\"trial-4\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The measured p95 of 619.850538 ms is below trial-2's 625.344151 ms (read 01a09b12-5113-7563-b9bf-84b638c36485, reduced), confirming the directional prediction with quality 1.0 and zero generation errors (status, task_quality/per_prompt). It misses the proposed 594.077 ms threshold for 5% progress over trial-2. The deterministic decision nevertheless selects trial-4 for its 19.55% improvement over the supplied baseline. The causal mechanism remains unestablished. Preserve workload and quality constraints; do not retry this configuration, and require evidence for another proposal or abstain.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17931,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 171,
+    "reasoning_output_tokens": 0
+  }
+}

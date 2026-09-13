@@ -1,0 +1,7 @@
+{
+  "source_revision": "5b872a546bd09f65f1de28e21995a06f60ec17eb",
+  "reason": "The initial controller exited on a relay connection error after completing all provider cases. No Astra GPU run had started.",
+  "change": "Retry read-only connection operations up to three times. Response publication is not blindly replayed.",
+  "command": "Same command and output directory as controller-launch.json.",
+  "gpu_source_revision": "c7c8ae1b6bcca5d0ed73640ecc12fd0dfbe98d7c"
+}

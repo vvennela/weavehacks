@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b0f-25b8-7c81-a4dc-2307ef808c7b"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No failure is observed: baseline successful_requests=96, generation_errors=0, and measured quality.mean=1.0 passed the floor. Baseline p95_latency_ms=770.4877809992468 leaves its load-specific contributors unknown. Inspect load_metrics to compare latency across concurrency levels and guide scheduling investigation. Cumulative queue/TTFT snapshots do not establish a bottleneck or causal gain; no source call IDs or peer claims were supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":16657,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":114,"reasoning_output_tokens":0}}

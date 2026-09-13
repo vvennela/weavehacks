@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b17-fbc0-7823-8994-005f8ee7e3e2"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"Trial-3 failed the latency objective: p95_latency_ms was 764.9130589998094 versus baseline 770.4877809992468; diagnosis.observed.objective.improvement_fraction was 0.007235315259909054, below 0.05. Quality mean remained 1.0 with zero generation_errors. The underlying cause is not established. Inspect load_metrics to review the persisted failure diagnosis and per-load latency evidence before recommending another setting. No source call IDs or peer claims were supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":18953,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":161,"reasoning_output_tokens":30}}

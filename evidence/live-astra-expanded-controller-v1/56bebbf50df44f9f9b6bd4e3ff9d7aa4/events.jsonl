@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b17-fbc0-7580-bdb5-66ed510dd91b"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"Trial-3's persisted diagnosis records objective-not-improved: p95_latency_ms was 764.9130589998094 versus baseline 770.4877809992468, with improvement_fraction 0.007235315259909054 below the required 0.05. Quality passed with mean 1.0 and generation_errors was 0; the performance cause remains unestablished. Choose load_metrics to inspect the failed trial's persisted diagnosis and per-load latency evidence for scheduling decisions. Cumulative queue/TTFT snapshots do not establish causality. No source call IDs or peer claims were supplied.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":18980,"cached_input_tokens":8448,"cache_write_input_tokens":0,"output_tokens":146,"reasoning_output_tokens":0}}

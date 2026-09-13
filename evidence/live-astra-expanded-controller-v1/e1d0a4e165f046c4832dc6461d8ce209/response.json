@@ -1,0 +1,19 @@
+{
+  "model": "gpt-6-astra",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"scheduling:scheduling-refine-prefix-cache-01\"],\"reason\":\"No failure is observed: source 01a09b0e-fa51-74b9-86c4-c713021cc983 reports status=collected, generation_errors=0, and quality.mean=1.0. Source 01a09b0e-fa43-74de-aea6-433da8a3162a reports concurrency-8 reduced.p95_latency_ms=770.4877809992468; its cause is not established. Accept scheduling\u2019s prefix-caching proposal as a testable hypothesis because this workload explicitly repeats prompts after per-load warmup. Accept the graph proposals as plausible experiments, but prioritize caching for its direct connection to the declared workload, not peer consensus or proven superiority. Use the single round slot to test enable_prefix_caching=true with other settings fixed. Cache effectiveness and latency gain remain unmeasured. After execution, deterministic gates must verify quality at least 0.99 and worst-per-load p95 latency at most 731.9633919492844 ms for the required 5% improvement. This selects an experiment, not deployment approval.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 19630,
+    "cached_input_tokens": 8448,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 298,
+    "reasoning_output_tokens": 42
+  }
+}

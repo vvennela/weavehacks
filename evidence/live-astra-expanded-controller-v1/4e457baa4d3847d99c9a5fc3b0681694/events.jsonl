@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aef-92b0-7c10-9a86-6064b7afedd3"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"candidate\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The tested candidate passed quality and reduced p95 from 100 ms to 80 ms, a 20% reduction that exceeds the predicted 5%. This agrees with the deterministic selection. No read call IDs or saved evidence paths were supplied. The result supports retaining the candidate, but does not establish a placement or hardware cause for the gain.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12596,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":94,"reasoning_output_tokens":0}}
