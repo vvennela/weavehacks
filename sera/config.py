@@ -70,9 +70,9 @@ class RuntimeConfig(BaseModel):
     max_num_seqs: int = Field(default=8, ge=1, le=256)
     max_num_batched_tokens: int = Field(default=4096, ge=1, le=65536)
     gpu_memory_utilization: float = Field(default=0.9, gt=0, le=0.9)
-    enable_prefix_caching: Literal[False] = False
-    enable_chunked_prefill: Literal[True] = True
-    enforce_eager: Literal[True] = True
+    enable_prefix_caching: bool = False
+    enable_chunked_prefill: bool = True
+    enforce_eager: bool = True
 
     @field_validator("tensor_parallel_size", mode="before")
     @classmethod
@@ -92,6 +92,8 @@ class RuntimeConfig(BaseModel):
     def validate_batch(self):
         if self.max_num_batched_tokens < self.max_num_seqs:
             raise ValueError("Batch token limit must cover at least one token per sequence")
+        if not self.enable_chunked_prefill and self.max_num_batched_tokens < self.max_model_len:
+            raise ValueError("Without chunked prefill, the batch token limit must cover the context limit")
         return self
 
     @property
@@ -115,6 +117,8 @@ SUPPORTED_CHANGES = {"kv_cache_dtype": ["fp8"], "max_num_batched_tokens": [2048]
 CONTROL_ROLES = {
     "kv_cache_dtype": "quantization", "max_num_batched_tokens": "batching",
     "max_num_seqs": "batching", "max_model_len": "batching",
+    "enable_prefix_caching": "batching", "enable_chunked_prefill": "batching",
+    "enforce_eager": "batching", "gpu_memory_utilization": "quantization",
 }
 CONTROL_VALUE_ADAPTERS = {
     lever: TypeAdapter(RuntimeConfig.model_fields[lever].rebuild_annotation(),
@@ -185,7 +189,7 @@ class InvestigationSpace(BaseModel):
     """Explicit, bounded experiment values; not permission to skip runtime checks."""
 
     model_config = ConfigDict(strict=True, frozen=True, extra="forbid")
-    supported_changes: dict[str, list[int | Literal['fp8']]]
+    supported_changes: dict[str, list[int | float | bool | Literal['fp8']]]
     candidate_hashes: list[str] | None = None
 
     @field_validator('supported_changes')

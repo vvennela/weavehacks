@@ -8,6 +8,7 @@ import time
 from .agent import ArbiterDecision, Proposal, validate_proposal
 from .storage import content_hash
 from .tracing import InspectionReadError
+from .techniques import EXPERTISE, techniques_for, specialist_shortlist
 
 
 INVESTIGATORS = ('scheduling', 'memory_context', 'output_quality')
@@ -30,6 +31,11 @@ def _proposal(agent, evidence, check, key):
         raise ValueError('A previous failed experiment requires a successful trace inspection before proposing')
     response = agent.request('proposal', deepcopy(evidence),
         'Investigate as investigator_id, which is an analysis focus, not a hardware role. '
+        'Use your expertise and sourced techniques to form a testable hypothesis. '
+        'Only available-for-trial controls can execute; blocked or adapter-required techniques '
+        'are not runnable options. candidate_options lists complete legal configurations. '
+        'A combination names its actual parent_trial_id and measured component_trial_ids. '
+        'Do not demand a proven gain before proposing a useful experiment. '
         'Use the saved measurements, read-only inspections, and any shared findings. '
         'Propose one legal untested setting or keep-baseline. Set agent_role to the control role '
         'for that setting, not investigator_id. Cite exact available metric names. '
@@ -147,6 +153,26 @@ def _parallel(function, children, evidences, checks, *args):
         return [future.result() for future in futures]
 
 
+def _specialist_evidence(common, investigator, *, peer_hashes=()):
+    supplied = deepcopy(common)
+    if common.get('candidate_options') is not None:
+        available = set(common['frozen_candidate_hashes'])
+        options = specialist_shortlist(investigator,
+            [item for item in common['candidate_options'] if item['config_hash'] in available],
+            peer_hashes=peer_hashes)
+        changes = {}
+        for option in options:
+            lever, value = next(iter(option['changed'].items()))
+            if value not in changes.setdefault(lever, []):
+                changes[lever].append(value)
+        supplied.update(candidate_options=options, supported_changes=changes,
+            frozen_candidate_hashes=[item['config_hash'] for item in options],
+            shortlist_limit=8, shortlist_count=len(options))
+    supplied.update(investigator_id=investigator, expertise=EXPERTISE[investigator],
+                    techniques=techniques_for(investigator, supplied['supported_changes']))
+    return supplied
+
+
 def choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_reader):
     """Return the existing (proposal, candidate, selection reason) contract."""
     details = record['swarm'] = dict(enabled=True, investigators=[])
@@ -170,7 +196,7 @@ def choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_re
     common = deepcopy(evidence) | dict(supported_changes=changes,
         frozen_candidate_hashes=[entry[3].config.config_hash for entry in legal],
         remaining_trials=evidence['remaining_trials'], failure_inspection_required=bool(evidence.get('failure_diagnoses')))
-    evidences = [deepcopy(common) | {'investigator_id': name} for name in INVESTIGATORS]
+    evidences = [_specialist_evidence(common, name) for name in INVESTIGATORS]
     checks = [dict(investigator_id=name, role=None, status='rejected', inspections=[], phase_timings={})
               for name in INVESTIGATORS]
     record['specialists'].extend(checks)
@@ -188,7 +214,13 @@ def choose_swarm_experiments(agent, evidence, legal, record, remaining, trace_re
             for check in checks]
         record['shared_findings'] = deepcopy(board)
         board_hash = details['shared_findings_hash'] = content_hash(board)
-        responses = _parallel(_refine, children, evidences, checks, board, board_hash)
+        peer_hashes = []
+        for check, supplied in zip(checks, evidences):
+            if check.get('initial_status') == 'accepted':
+                candidate = validate_proposal(Proposal.model_validate(check['initial_proposal']), supplied)
+                peer_hashes.append(candidate.config.config_hash)
+        refined_evidences = [_specialist_evidence(common, name, peer_hashes=peer_hashes) for name in INVESTIGATORS]
+        responses = _parallel(_refine, children, refined_evidences, checks, board, board_hash)
     finally:
         # Do not mutate the parent history while children are executing.
         for name, child, check in zip(INVESTIGATORS, children, checks):

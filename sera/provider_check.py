@@ -1,4 +1,4 @@
-"""The spec's bounded 30-response provider compatibility experiment."""
+"""Provider compatibility: original 30 cases plus the four new control types."""
 
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -11,7 +11,7 @@ from .storage import content_hash, save_json
 
 
 def provider_cases():
-    """Freeze ten evidence conditions for each of the three actual schemas."""
+    """Freeze 30 original conditions plus four new-control proposal cases."""
     cases = []
     conditions = ["active-cache", "active-batching", "active-sequences", "active-context", "actual-parent",
                   "budget-exhausted", "missing-metric", "ranking", "inactive", "quality-failure"]
@@ -64,6 +64,11 @@ def provider_cases():
                     "proposal_prediction": "At least 5% lower p95 while preserving quality",
                     "placement": "not-supported-in-single-model-milestone"}
         cases.append({"id": f"frontier-{condition}", "role": "frontier", "evidence": frontier})
+    for lever, value in [('enable_prefix_caching', True), ('enable_chunked_prefill', False),
+                         ('enforce_eager', False), ('gpu_memory_utilization', .85)]:
+        evidence = deepcopy(cases[0]['evidence'])
+        evidence.update(condition=f'active-{lever}', supported_changes={lever: [value]})
+        cases.append(dict(id=f'proposal-active-{lever}', role='proposal', evidence=evidence))
     return cases
 
 
@@ -120,7 +125,7 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None):
                     context["error"] = str(error)
             record["context_checks"].append(context)
             save_json(path, record)
-            print(f"Provider check {len(agent.history)}/30: {case['id']}; valid={parsed is not None}", flush=True)
+            print(f"Provider check {len(agent.history)}/{len(cases)}: {case['id']}; valid={parsed is not None}", flush=True)
             last = agent.history[-1]["attempts"][-1]
             if last.get("http_status") in {401, 403, 404}:
                 record["stop_reason"] = last["error"]
@@ -128,11 +133,11 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None):
     finally:
         first = sum(entry["attempts"][0]["schema_valid"] for entry in agent.history)
         valid = sum(any(attempt["schema_valid"] for attempt in entry["attempts"]) for entry in agent.history)
-        complete = len(agent.history) == 30
+        complete = len(agent.history) == len(cases)
         record.update(first_pass_valid=first, valid_with_one_retry=valid,
                       completed_requests=len(agent.history),
                       retries=sum(len(entry["attempts"]) - 1 for entry in agent.history),
-                      passed=complete and first >= 29 and valid == 30
+                      passed=complete and first >= len(cases) - 1 and valid == len(cases)
                              and all(check["passed"] for check in record["context_checks"]),
                       status="complete" if complete else "incomplete")
         save_json(path, record)
@@ -152,8 +157,9 @@ def require_provider_check(path, agent):
             or record.get("cases_hash") != content_hash(provider_cases())):
         raise ValueError("Provider check does not match this model, project, and schemas")
     requests = record.get("requests", [])
-    if len(requests) != 30:
-        raise ValueError("A complete 30-request provider check is required")
+    total = len(provider_cases())
+    if len(requests) != total:
+        raise ValueError(f"A complete {total}-request provider check is required")
     first = 0
     for case, entry in zip(provider_cases(), requests):
         if entry.get("provider", "wandb") != provider:
@@ -185,11 +191,11 @@ def require_provider_check(path, agent):
         first += valid[0]
         if not any(valid):
             raise ValueError("Provider check contains a request that failed both attempts")
-    if first < 29:
-        raise ValueError("Provider check needs at least 29 first-pass valid responses")
+    if first < total - 1:
+        raise ValueError(f"Provider check needs at least {total - 1} first-pass valid responses")
     return {"path": str(Path(path).resolve()), "schema_hash": schema_hash(),
             "model": agent.model, "provider": provider,
-            "first_pass_valid": first, "valid_with_one_retry": 30}
+            "first_pass_valid": first, "valid_with_one_retry": total}
 
 
 def main(argv=None):

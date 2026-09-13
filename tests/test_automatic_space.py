@@ -58,9 +58,10 @@ def test_policy_uses_collected_baseline_and_resolves_before_first_agent_call(tmp
         scope = result.report['investigation_space']
         assert scope['space_hash']
         assert scope['candidate_hashes'] == audit['space']['candidate_hashes']
-        assert 'kv_cache_dtype' not in scope['supported_changes']
+        assert scope['supported_changes']['kv_cache_dtype'] == ['fp8']
         evidence = next(e for role, e in seen if role == 'proposal')
-        assert evidence['supported_changes'] == scope['supported_changes']
+        assert all(values == scope['supported_changes'][lever]
+                   for lever, values in evidence['supported_changes'].items())
         assert result.report['search_trials'][0]['config_hash'] in scope['candidate_hashes']
     saved = json.loads((tmp_path/'run/result.json').read_text())
     assert saved['candidate_policy'] == audit
@@ -140,9 +141,14 @@ def test_omitted_flag_keeps_defaults_and_does_not_call_policy(tmp_path, monkeypa
 def test_generated_space_still_uses_runtime_validator_before_agent_calls(tmp_path, monkeypatch):
     from test_investigation import install_fakes, run
     runners, calls, agent = install_fakes(monkeypatch)
-    bad_policy = {'status': 'generated', 'space': {'supported_changes': {'max_model_len': [4096]}},
-                  'rationale': ['invalid no-op fixture']}
-    monkeypatch.setattr(search_policy, 'propose_search_space', lambda *a, **k: bad_policy)
+    config = sera.RuntimeConfig()
+    bad_policy = {'status': 'generated',
+        'space': {'supported_changes': {'max_model_len': [4096]}, 'candidate_hashes': [config.config_hash]},
+        'rationale': ['invalid no-op fixture'],
+        'candidate_parents': {'baseline': {'configuration': config.model_dump()}},
+        'candidates': [{'parent_trial_id': 'baseline', 'configuration': config.model_dump(),
+                        'config_hash': config.config_hash, 'reason': 'Invalid no-op'}]}
+    monkeypatch.setattr(search_policy, 'expand_search_space', lambda *a, **k: bad_policy)
     with pytest.raises(ValueError, match='exactly one'):
         run(tmp_path, agent, automatic_space=True)
     assert not calls

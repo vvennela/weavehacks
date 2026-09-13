@@ -34,6 +34,23 @@ def remaining_candidates(evidence, baseline_config, seen, workload, baseline):
     legal = []
     considered = set(seen)
     frozen_hashes = evidence.get('frozen_candidate_hashes')
+    if evidence.get('candidate_options') is not None:
+        required = max(map(len, baseline.get('input_token_ids', [[]]))) + GENERATION['max_tokens']
+        for option in evidence['candidate_options']:
+            config = RuntimeConfig.model_validate(option['configuration'])
+            if config.config_hash in considered:
+                continue
+            if frozen_hashes is not None and config.config_hash not in frozen_hashes:
+                continue
+            parent = evidence['candidate_parents'][option['parent_trial_id']]['configuration']
+            candidate = validate_candidate(Candidate(name=config.config_hash, reason=option['reason'], config=config),
+                baseline=parent, supported_changes=evidence['supported_changes'], frozen_candidate_hashes=frozen_hashes)
+            if config.max_model_len < required or config.max_num_seqs < max(workload.concurrency):
+                continue
+            lever, value = next(iter(option['changed'].items()))
+            considered.add(config.config_hash)
+            legal.append((CONTROL_ROLES[lever], lever, value, candidate))
+        return legal
     for lever, values in evidence['supported_changes'].items():
         for value in values:
             config = RuntimeConfig.model_validate(baseline_config.model_dump() | {lever: value})
@@ -267,26 +284,9 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                       limits=['single model', 'already-active single-setting controls',
                               'no combination trials', 'no live search-advantage claim'])
         if report.get('automatic_space'):
-            from .config import resolve_investigation_space
-            from .search_policy import propose_search_space
-            from .storage import content_hash
-
-            if baseline.get('status') == 'collected':
-                policy = propose_search_space(baseline, model_id=report['model_id'], workload=workload)
-            else:
-                policy = dict(status='not-generated', space=None,
-                              reason='Baseline measurement did not complete')
-            report['candidate_policy'] = policy
-            if policy['space'] is not None:
-                report['investigation_space'] = resolve_investigation_space(policy['space'],
-                    baseline=baseline_config, model_id=report['model_id'], workload=workload)
-            else:
-                # InvestigationSpace requires at least one value. An explicit empty
-                # resolved pool means stop, never fall back to the legacy defaults.
-                empty = dict(supported_changes={}, candidate_hashes=[])
-                report['investigation_space'] = empty | {'space_hash': content_hash(empty)}
-            report['limits'][1] = 'evidence-generated single-setting controls'
-            save()
+            report['candidate_ledger'] = {}
+            report['limits'][1:3] = ['Evidence-generated settings refreshed each round.',
+                                     'Pairwise combinations require independently quality-passing components.']
         initial = pipeline.agent_evidence(baseline, objective, constraints, prompts=report['prompts'])
         if report.get('deployment'):
             initial['deployment_context'] = deployment_context(report['deployment'])
@@ -295,6 +295,38 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             initial['supported_changes'] = deepcopy(space['supported_changes'])
             if space.get('candidate_hashes') is not None:
                 initial['frozen_candidate_hashes'] = list(space['candidate_hashes'])
+
+        def refresh_candidates():
+            from .search_policy import expand_search_space
+            from .storage import content_hash
+            policy = expand_search_space(baseline, report['search_trials'],
+                                          model_id=report['model_id'], workload=workload)
+            report['candidate_policy'] = policy
+            space = policy['space'] or dict(supported_changes={}, candidate_hashes=[])
+            from .techniques import technique_catalog
+            report['technique_catalog'] = technique_catalog(space['supported_changes'])
+            report['investigation_space'] = deepcopy(space) | {'space_hash': content_hash(space)}
+            initial.update(supported_changes=deepcopy(space['supported_changes']),
+                frozen_candidate_hashes=list(space['candidate_hashes']),
+                candidate_options=deepcopy(policy['candidates']),
+                candidate_parents=deepcopy(policy['candidate_parents']))
+            for option in policy['candidates']:
+                config = RuntimeConfig.model_validate(option['configuration'])
+                validate_candidate(Candidate(name=option['config_hash'], reason=option['reason'], config=config),
+                    baseline=policy['candidate_parents'][option['parent_trial_id']]['configuration'],
+                    supported_changes=space['supported_changes'], frozen_candidate_hashes=space['candidate_hashes'])
+                if config.config_hash != option['config_hash']:
+                    raise ValueError('Generated configuration hash mismatch')
+                report['candidate_ledger'].setdefault(option['config_hash'], deepcopy(option) |
+                    dict(status='untried', first_seen_round=len(search['rounds']) + 1))
+            save()
+
+        if report.get('automatic_space'):
+            if baseline['status'] == 'collected':
+                refresh_candidates()
+            else:
+                report['candidate_policy'] = dict(status='not-generated', space=None,
+                                                  reason='Baseline measurement did not complete')
         seen = {baseline_config.config_hash}
         best = baseline if select_candidate(baseline, None, objective=objective, constraints=constraints)['selected'] else None
         if until_plateau:
@@ -315,11 +347,15 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
             if not remaining:
                 search['stop_reason'] = 'budget-exhausted'
                 break
+            if report.get('automatic_space') and report['search_trials']:
+                refresh_candidates()
             legal = remaining_candidates(initial, baseline_config, seen, workload, baseline)
             if not legal:
                 search['stop_reason'] = 'no-legal-untested-candidate'
                 break
             record = dict(round=len(search['rounds']) + 1, specialists=[], trial_ids=[])
+            if report.get('automatic_space'):
+                record['candidate_policy'] = deepcopy(report['candidate_policy'])
             if until_plateau:
                 record['confirmation_round'] = search['plateau']['confirmation_round_pending']
             evidence = round_evidence(initial, search, report['search_trials'], remaining,
@@ -358,6 +394,13 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                                           model_id=report['model_id'], revision=report['model_revision']),
                              config_hash=candidate.config.config_hash, proposal=proposal.model_dump(),
                              selection_reason=selection_reason)
+                if report.get('automatic_space'):
+                    option = next(item for item in initial['candidate_options']
+                                  if item['config_hash'] == candidate.config.config_hash
+                                  and item['parent_trial_id'] == proposal.parent_trial_id)
+                    trial['component_trial_ids'] = list(option['component_trial_ids'])
+                    trial['parent_trial_id'] = option['parent_trial_id']
+                    report['candidate_ledger'][trial['config_hash']].update(status='starting', trial_id=trial_id)
                 if swarm:
                     scoped_id = record['arbiter']['ranked_proposal_ids'][0]
                     selected = record['arbiter_evidence']['proposal_id_map'][scoped_id]
@@ -385,6 +428,10 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
                 decision = select_candidate(baseline, trial, objective=objective, constraints=constraints)
                 trial['decision'] = decision
                 trial['diagnosis'] = trial_diagnosis(baseline, trial, decision)
+                if report.get('automatic_space'):
+                    report['candidate_ledger'][trial['config_hash']].update(status=trial['status'],
+                        task_quality_passed=trial.get('task_quality', {}).get('passed'),
+                        selection=decision['selected'])
                 save()
                 export_trial_diagnosis(trial)
                 save()

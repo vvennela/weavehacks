@@ -75,6 +75,7 @@ def export_trial_events(record, prompts):
             'generation_errors': record.get('generation_errors'),
             'quality_requests': len(record['quality']), 'self_check_requests': len(record['self_check']),
             'timing_scope': export['timing_scope'],
+            'cache_evaluation': record['workload'].get('cache_evaluation'),
         })
         export['emitted_events'] += 1
         export['status'] = 'complete'
@@ -94,6 +95,11 @@ def collect_trial(model, prompts, trial_id, *, baseline=False, workload=None):
               "config_hash": model.configuration.config_hash, "requests": [],
               "warmup": [], "quality": [], "self_check": [], "metrics": {}, "loads": [],
               "workload": {**workload.model_dump(), "quality_concurrency": 1,
+                           "cache_evaluation": {
+                               "prefix_caching_enabled": model.configuration.enable_prefix_caching,
+                               "measured_scope": "repeated-prompts-after-per-load-warmup",
+                               "cold_cache_measurement": False,
+                               "warmup_prompts_per_load": min(len(prompts), 16)},
                            "latency_reduction": "worst-per-load-percentile",
                            "throughput_reduction": "total-tokens-over-total-measured-window-seconds"}}
 

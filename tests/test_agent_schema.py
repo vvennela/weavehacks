@@ -72,7 +72,7 @@ def test_frontier_reader_cannot_add_an_approval_field():
 def test_wire_schema_expresses_action_cost_and_value_constraints():
     schema = Proposal.model_json_schema()
     branches = schema["anyOf"]
-    assert len(branches) == 5
+    assert len(branches) == 9
     assert branches[0]["properties"]["expected_trial_cost"] == {"const": 0}
     assert all(branch["properties"]["expected_trial_cost"] == {"const": 1} for branch in branches[1:])
     assert ArbiterDecision.model_json_schema()["properties"]["ranked_proposal_ids"]["maxItems"] == 1

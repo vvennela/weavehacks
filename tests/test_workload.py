@@ -31,7 +31,8 @@ def test_sweep_uses_worst_load_latency_without_pooling_percentiles():
     assert reduced['p99_reliable'] is False
 
 
-def test_sweep_runs_concurrent_requests_but_quality_stays_serial(tmp_path):
+@pytest.mark.parametrize('prefix_caching', [False, True])
+def test_sweep_runs_concurrent_requests_but_quality_stays_serial(tmp_path, prefix_caching):
     class Response:
         def to_dict(self):
             return {'text': 'ok', 'token_ids': [1], 'prompt_token_ids': [2],
@@ -40,7 +41,7 @@ def test_sweep_runs_concurrent_requests_but_quality_stays_serial(tmp_path):
 
     class Model:
         artifact_dir = tmp_path
-        configuration = RuntimeConfig()
+        configuration = RuntimeConfig(enable_prefix_caching=prefix_caching)
         record = {}
 
         def __init__(self):
@@ -73,6 +74,12 @@ def test_sweep_runs_concurrent_requests_but_quality_stays_serial(tmp_path):
     assert len(result['quality']) == len(result['self_check']) == 2
     assert result['reduced']['request_count'] == 12
     assert result['workload']['quality_concurrency'] == 1
+    assert result['workload']['cache_evaluation'] == {
+        'prefix_caching_enabled': prefix_caching,
+        'measured_scope': 'repeated-prompts-after-per-load-warmup',
+        'cold_cache_measurement': False,
+        'warmup_prompts_per_load': 2,
+    }
 
 
 def test_sweep_rejects_load_above_service_sequence_limit_before_generation(tmp_path):

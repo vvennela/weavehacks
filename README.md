@@ -2,6 +2,8 @@
 
 Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
 
+The [candidate catalog and expanding search](docs/candidate-catalog.md) describes the implemented round-by-round generator, eight typed controls, and 20 sourced technique families. Each specialist gets up to eight legal options; this is not a trial cap. Techniques requiring unsupported hardware or missing adapters cannot be proposed. Expanded Luna/Astra live validation is pending; earlier evidence below used the old menu.
+
 ## Demo rehearsal: plain-English guide
 
 ### Latest swarm recording
@@ -211,7 +213,7 @@ provider_report = check_provider(
 )
 ```
 
-This makes 30 requests using the actual three schemas and synthetic evidence. Each failed response permits one retry. It requires 29 first-pass valid responses, all 30 valid within the retry limit, and all evidence-reference checks passing. Proposal fixtures require trial or keep-baseline shapes so a model cannot pass by avoiding the new controls. All attempts, truncation, errors, and timings are saved. A pass establishes schema compatibility, not useful search or model correctness. Credential/access errors stop the check early.
+This makes 34 requests using the actual three schemas and synthetic evidence. Each failed response permits one retry. It requires 33 first-pass valid responses, all 34 valid within the retry limit, and all evidence-reference checks passing. Proposal fixtures require trial or keep-baseline shapes so a model cannot pass by avoiding the new controls. All attempts, truncation, errors, and timings are saved. A pass establishes schema compatibility, not useful search or model correctness. Credential/access errors stop the check early. Earlier 30-case certificates do not certify the expanded schema.
 
 After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `provider_check=".../result.json"` to `optimize`. Sera gives the agent the measured baseline, validates one proposal, measures it if legal, applies the unchanged gate, and returns the outcome for a final recommendation. A keep-baseline or invalid proposal consumes no candidate GPU trial. The final agent response cannot change the deterministic selection.
 

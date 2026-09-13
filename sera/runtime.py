@@ -239,7 +239,9 @@ class SeraModel:
                        "--max-num-seqs", str(config.max_num_seqs),
                        "--max-num-batched-tokens", str(config.max_num_batched_tokens),
                        "--gpu-memory-utilization", str(config.gpu_memory_utilization),
-                       "--no-enable-prefix-caching", "--enable-chunked-prefill", "--enforce-eager",
+                       "--enable-prefix-caching" if config.enable_prefix_caching else "--no-enable-prefix-caching",
+                       "--enable-chunked-prefill" if config.enable_chunked_prefill else "--no-enable-chunked-prefill",
+                       "--enforce-eager" if config.enforce_eager else "--no-enforce-eager",
                        "--generation-config", "vllm", "--seed", "0", "--cpu-offload-gb", "0",
                        "--enable-tokenizer-info-endpoint", "--shutdown-timeout", "15"]
             if config.quantization is not None:

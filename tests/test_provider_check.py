@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from sera.agent import AGENT_MODEL, schema_hash
-from sera.config import MODEL_ID
+from sera.config import MODEL_ID, CONTROL_ROLES
 from sera.provider_check import provider_cases, require_provider_check
 from sera.storage import content_hash
 
@@ -18,7 +18,7 @@ def valid_response(case):
         active = evidence['supported_changes'] and evidence['remaining_trials'] > 0
         lever, values = next(iter(evidence['supported_changes'].items())) if active else (None, [None])
         return dict(action='trial' if active else 'keep-baseline', proposal_id='p1',
-                    agent_role='quantization' if lever == 'kv_cache_dtype' else 'batching',
+                    agent_role=CONTROL_ROLES.get(lever, 'batching'),
                     parent_trial_id=evidence['trial_id'], model_id=MODEL_ID,
                     changed_lever=lever, proposed_value=values[0], evidence_used=['p95_latency_ms'],
                     predicted_metric_change='Lower latency', confidence=0.5,
@@ -50,21 +50,24 @@ def verify(tmp_path, record):
     return require_provider_check(path, SimpleNamespace(model=AGENT_MODEL, project='test/project'))
 
 
-def test_thirty_cases_cover_each_control_and_nondefault_parent():
+def test_cases_cover_each_control_and_nondefault_parent():
     cases = provider_cases()
-    assert len(cases) == 30
+    assert len(cases) == 34
     assert {role: sum(case['role'] == role for case in cases)
-            for role in ('proposal', 'arbiter', 'frontier')} == dict(proposal=10, arbiter=10, frontier=10)
+            for role in ('proposal', 'arbiter', 'frontier')} == dict(proposal=14, arbiter=10, frontier=10)
     proposals = [case['evidence'] for case in cases if case['role'] == 'proposal']
     assert any(e['supported_changes'] == {'max_num_seqs': [4]} for e in proposals)
     assert any(e['supported_changes'] == {'max_model_len': [2048]} for e in proposals)
     assert any(e.get('configuration', {}).get('max_num_batched_tokens') == 2048
                and e['supported_changes'] == {'max_num_batched_tokens': [4096]} for e in proposals)
+    for lever, value in [('enable_prefix_caching', True), ('enable_chunked_prefill', False),
+                         ('enforce_eager', False), ('gpu_memory_utilization', .85)]:
+        assert any(e['supported_changes'] == {lever: [value]} for e in proposals)
 
 
 def test_current_certificate_passes_and_stale_schema_fails(tmp_path):
     record = certificate()
-    assert verify(tmp_path, record)['valid_with_one_retry'] == 30
+    assert verify(tmp_path, record)['valid_with_one_retry'] == 34
     record['schema_hash'] = 'old-schema'
     with pytest.raises(ValueError, match='schemas'):
         verify(tmp_path, record)
@@ -226,9 +229,9 @@ def test_certificate_retries_invalid_metric_but_does_not_count_it_as_first_valid
     message['content'] = json.dumps(response)
     failed['schema_valid'] = True  # Recompute; never trust this flag.
     entry['attempts'].insert(0, failed)
-    assert verify(tmp_path, record)['first_pass_valid'] == 29
+    assert verify(tmp_path, record)['first_pass_valid'] == 33
     record['requests'][3]['attempts'].insert(0, deepcopy(failed))
-    with pytest.raises(ValueError, match='29 first-pass'):
+    with pytest.raises(ValueError, match='33 first-pass'):
         verify(tmp_path, record)
 
 
@@ -276,6 +279,6 @@ def test_format_check_accepts_explicit_agent_and_preserves_all_thirty_cases(tmp_
     agent = Agent()
     record = check_provider(project=agent.project, model=agent.model,
                             output_dir=tmp_path / 'check', agent=agent)
-    assert record['passed'] and record['completed_requests'] == 30
+    assert record['passed'] and record['completed_requests'] == 34
     assert record['provider'] == 'codex-relay'
-    assert require_provider_check(tmp_path / 'check/result.json', agent)['first_pass_valid'] == 30
+    assert require_provider_check(tmp_path / 'check/result.json', agent)['first_pass_valid'] == 34

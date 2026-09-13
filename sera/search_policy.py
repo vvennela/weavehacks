@@ -8,7 +8,7 @@ from copy import deepcopy
 import math
 
 from .config import (InvestigationSpace, LARGE_MODEL_ID, MODEL_ID, RuntimeConfig,
-                     Workload, resolve_investigation_space)
+                     Workload, resolve_investigation_space, CONTROL_ROLES)
 from .runtime import GENERATION
 from .storage import content_hash
 
@@ -120,7 +120,11 @@ def propose_search_space(baseline, *, model_id, workload, explicit_space=None):
     def suggest(lever, value, reason):
         if value == getattr(config, lever):
             return
-        candidate = RuntimeConfig.model_validate(config.model_dump() | {lever: value})
+        try:
+            candidate = RuntimeConfig.model_validate(config.model_dump() | {lever: value})
+        except ValueError:
+            missing.append(f'{lever}: suggested value conflicts with coupled runtime bounds.')
+            return
         changes.setdefault(lever, []).append(value)
         report['candidates'].append(dict(changed={lever: value}, configuration=candidate.model_dump(),
                                          config_hash=candidate.config_hash, reason=reason))
@@ -157,4 +161,111 @@ def propose_search_space(baseline, *, model_id, workload, explicit_space=None):
         resolved = resolve_investigation_space(space, baseline=config, model_id=model_id, workload=workload)
         report.update(status='generated', space=dict(supported_changes=changes,
                                                      candidate_hashes=resolved['candidate_hashes']))
+    return report
+
+
+def expand_search_space(baseline, trials, *, model_id, workload):
+    """Generate the next normal-mode pool from actual outcomes, never a frozen benchmark.
+
+    Single-control experiments retain the original reference as parent. A pairwise
+    combination is allowed only when both constituent changes passed task quality
+    in separate measured trials. Every full configuration is deduplicated.
+    """
+    seed = propose_search_space(baseline, model_id=model_id, workload=workload)
+    report = dict(policy_version='sera-expanding-space-v1', status='no-candidate', space=None,
+                  candidates=[], candidate_parents={}, rejected=[], rationale=[],
+                  history_trial_ids=[trial['trial_id'] for trial in trials],
+                  evidence=deepcopy(seed['evidence']), missing_or_invalid=seed['missing_or_invalid'],
+                  limits=['Generated settings are experiments, not certified gains.',
+                          'Original workload and quality requirements remain fixed.',
+                          'Only independently quality-passing single changes can be combined.'])
+    if 'required_context_tokens' not in seed['evidence'] or any(
+            'exceeds the baseline' in message for message in seed['missing_or_invalid']):
+        return report
+    workload = Workload.model_validate(workload)
+    base = RuntimeConfig.model_validate(baseline['runtime']['configuration'])
+    base_values = base.model_dump()
+    required = seed['evidence']['required_context_tokens']
+    concurrency = max(workload.concurrency)
+    base_id = baseline['trial_id']
+    seen = {base.config_hash, *(trial['config_hash'] for trial in trials)}
+    candidates = {}
+    parents = {base_id: dict(configuration=base_values, component_trial_ids=[])}
+
+    def add(parent_id, lever, value, *, components=(), reason):
+        parent = parents[parent_id]['configuration']
+        if type(parent[lever]) is type(value) and parent[lever] == value:
+            return
+        try:
+            config = RuntimeConfig.model_validate(parent | {lever: value})
+            if config.max_model_len < required or config.max_num_seqs < concurrency:
+                return
+            if model_id == LARGE_MODEL_ID and config.kv_cache_dtype != 'auto':
+                return
+        except ValueError:
+            report['rejected'].append(dict(parent_trial_id=parent_id, changed={lever: value},
+                                           reason='Runtime bounds or coupled settings are invalid.'))
+            return
+        if config.config_hash in seen or config.config_hash in candidates:
+            return
+        candidates[config.config_hash] = dict(config_hash=config.config_hash,
+            configuration=config.model_dump(), parent_trial_id=parent_id,
+            component_trial_ids=list(components), changed={lever: value}, reason=reason)
+
+    # Execution alternatives are not hidden behind a claim of measured pressure.
+    # The investigator must decide whether their test is useful for this workload.
+    for lever in ('enforce_eager', 'enable_prefix_caching', 'enable_chunked_prefill'):
+        add(base_id, lever, not base_values[lever], reason='Test a supported execution strategy; compatibility and gain remain unmeasured.')
+    if model_id == MODEL_ID:
+        add(base_id, 'kv_cache_dtype', 'fp8', reason='Test the supported small-model cache format under the fixed task gate.')
+    for candidate in seed['candidates']:
+        lever, value = next(iter(candidate['changed'].items()))
+        add(base_id, lever, value, reason=candidate['reason'])
+
+    # Outcomes add neighbors, including after a no-gain result. They never reset
+    # the objective plateau counter merely by creating more choices.
+    anchors = [baseline, *[trial for trial in trials if trial.get('status') == 'collected']]
+    for trial in anchors:
+        values = trial['runtime']['configuration']
+        for lever in ('max_num_batched_tokens', 'max_num_seqs', 'max_model_len'):
+            center = values[lever]
+            neighbors = {center // 2, center * 2}
+            if lever == 'max_num_batched_tokens':
+                neighbors.add(max(base.max_num_seqs, center // 4))
+            for value in sorted(neighbors):
+                add(base_id, lever, value, reason=f'Explore a neighboring {lever} value around measured trial {trial["trial_id"]}.')
+        fraction = values['gpu_memory_utilization']
+        for value in (round(fraction - .05, 4), round(fraction + .05, 4)):
+            # Do not generate an arbitrary tiny memory budget for a fit-first model.
+            if value >= .5:
+                add(base_id, 'gpu_memory_utilization', value,
+                    reason=f'Test allocation headroom around measured trial {trial["trial_id"]}; fit remains subject to startup validation.')
+
+    passing = []
+    for trial in trials:
+        if trial.get('status') != 'collected' or trial.get('task_quality', {}).get('passed') is not True:
+            continue
+        values = trial['runtime']['configuration']
+        changed = {key: value for key, value in values.items() if value != base_values[key]}
+        if len(changed) == 1 and next(iter(changed)) in CONTROL_ROLES:
+            passing.append((trial, changed))
+    for index, (left, left_change) in enumerate(passing):
+        for right, right_change in passing[index + 1:]:
+            if set(left_change) == set(right_change):
+                continue
+            parents[left['trial_id']] = dict(configuration=deepcopy(left['runtime']['configuration']),
+                                             component_trial_ids=[left['trial_id']])
+            lever, value = next(iter(right_change.items()))
+            add(left['trial_id'], lever, value, components=[left['trial_id'], right['trial_id']],
+                reason='Combine two independently measured, quality-passing changes; the combination must pass again.')
+    changes = {}
+    for candidate in candidates.values():
+        lever, value = next(iter(candidate['changed'].items()))
+        if value not in changes.setdefault(lever, []):
+            changes[lever].append(value)
+    report.update(candidates=list(candidates.values()), candidate_parents=parents)
+    report['rationale'] = list(dict.fromkeys(candidate['reason'] for candidate in candidates.values()))
+    if candidates:
+        report.update(status='generated', space=dict(supported_changes=changes,
+                      candidate_hashes=sorted(candidates)))
     return report

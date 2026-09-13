@@ -177,7 +177,9 @@ def build_investigation_prompt(evidence):
         'configuration', 'objective', 'constraints', 'remaining_trials', 'supported_changes',
         'frozen_candidate_hashes', 'legal_proposal_ids', 'required_inspection', 'failure_inspection_required',
         'degraded', 'inspection_status', 'quality_mode', 'decision_scope',
-        'search_policy', 'total_trial_cap', 'round_trial_capacity', 'plateau'))
+        'search_policy', 'total_trial_cap', 'round_trial_capacity', 'plateau',
+        'candidate_options', 'candidate_parents', 'techniques', 'expertise',
+        'shortlist_limit', 'shortlist_count'))
     result['metrics'] = {key: deepcopy(value) for key, value in evidence.get('metrics', {}).items() if value is not None}
     summaries, records, sources = projection.inspections(evidence)
     diagnosed = {row['trial_id']: row['source_call_id'] for row in records if row['record_type'] == 'trial_diagnosis'}

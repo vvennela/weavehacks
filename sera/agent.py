@@ -29,7 +29,7 @@ class Proposal(StrictRecord):
                         "agent_role": {"const": "quantization"}, "changed_lever": {"const": "kv_cache_dtype"},
                         "proposed_value": {"const": "fp8"}}},
         *[{"properties": {"action": {"const": "trial"}, "expected_trial_cost": {"const": 1},
-                          "agent_role": {"const": "batching"}, "changed_lever": {"const": lever},
+                          "agent_role": {"const": CONTROL_ROLES[lever]}, "changed_lever": {"const": lever},
                           "proposed_value": adapter.json_schema()}}
           for lever, adapter in CONTROL_VALUE_ADAPTERS.items()],
     ]})
@@ -38,8 +38,10 @@ class Proposal(StrictRecord):
     agent_role: Literal["quantization", "batching"]
     parent_trial_id: str = Field(min_length=1)
     model_id: str = Field(min_length=1)
-    changed_lever: Literal["kv_cache_dtype", "max_num_batched_tokens", "max_num_seqs", "max_model_len"] | None
-    proposed_value: Literal["fp8"] | int | None
+    changed_lever: Literal["kv_cache_dtype", "max_num_batched_tokens", "max_num_seqs", "max_model_len",
+                           "enable_prefix_caching", "enable_chunked_prefill", "enforce_eager",
+                           "gpu_memory_utilization"] | None
+    proposed_value: Literal["fp8"] | int | float | bool | None
     evidence_used: list[str] = Field(min_length=1)
     predicted_metric_change: str = Field(min_length=1)
     confidence: float = Field(ge=0, le=1)
@@ -120,7 +122,9 @@ def parse_response(role, content, evidence):
 
 
 def validate_proposal(proposal, evidence):
-    if proposal.parent_trial_id != evidence["trial_id"] or proposal.model_id != evidence["model_id"]:
+    parents = evidence.get('candidate_parents', {})
+    if ((proposal.parent_trial_id != evidence["trial_id"] and proposal.parent_trial_id not in parents)
+            or proposal.model_id != evidence["model_id"]):
         raise ValueError("Proposal does not reference the supplied baseline and model")
     if any(key not in evidence["metrics"] or evidence["metrics"][key] is None
            for key in proposal.evidence_used):
@@ -134,8 +138,15 @@ def validate_proposal(proposal, evidence):
         remaining = evidence['round_trial_capacity']
     if remaining < proposal.expected_trial_cost:
         raise ValueError("Proposal exceeds the remaining trial budget")
-    baseline = evidence.get("configuration")
+    baseline = (parents[proposal.parent_trial_id]['configuration']
+                if proposal.parent_trial_id in parents else evidence.get("configuration"))
     candidate = proposal.to_candidate(baseline)
+    if evidence.get('candidate_options') is not None:
+        matches = [item for item in evidence['candidate_options']
+                   if item['config_hash'] == candidate.config.config_hash
+                   and item['parent_trial_id'] == proposal.parent_trial_id]
+        if not matches:
+            raise ValueError('Proposal does not name a generated candidate and its measured parent')
     return validate_candidate(candidate, baseline=baseline,
                               supported_changes=evidence["supported_changes"],
                               frozen_candidate_hashes=evidence.get("frozen_candidate_hashes"))
