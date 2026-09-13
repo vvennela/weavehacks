@@ -29,7 +29,7 @@ def _(Path, mo):
     ]
     if _view['rows']:
         _content.append(mo.ui.table(_view['rows'], selection=None, pagination=False,
-                                    label='Saved investigation — proposals are not approvals'))
+                                    label='Recorded investigation — measured gates and agent explanations are separate'))
     _content.append(mo.md(_view['runner'] + '\n\nCandidate trials used: ' + _view['budget']
                          + '. p95 is the time covering 95% of measured requests.\n\n' + _view['limits']))
     if _view['source']:

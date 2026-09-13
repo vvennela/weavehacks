@@ -78,6 +78,7 @@ def _rows(report):
             rows.append({'Stage': f"Round {record.get('round', MISSING)}",
                          'Specialist': specialist.get('investigator_id') or specialist.get('role', MISSING),
                          'Proposed change': _change(proposal),
+                         'Agent explanation': proposal.get('reason') or MISSING,
                          'Arbiter': _arbiter(record.get('arbiter')),
                          'Measured gates': _measurements(trial),
                          'Prediction review': review.get('prediction_outcome', MISSING)})
@@ -96,9 +97,9 @@ def _rows(report):
 
 
 def load_investigation_demo(root):
-    """Prefer the named team record only when present; never load a synthetic fallback."""
+    """Prefer the core-loop record when present; never load a synthetic fallback."""
     root = Path(root)
-    sources = ['evidence/live-swarm-investigation-v1/result.json',
+    sources = ['evidence/live-core-loop-v1/result.json', 'evidence/live-swarm-investigation-v1/result.json',
                'evidence/live-team-investigation-v1/result.json', 'evidence/live-investigation-v1/result.json']
     source = next((name for name in sources if (root / name).is_file()), None)
     view = {'source': source, 'rows': [], 'banner': 'No saved live investigation is available yet.',
@@ -141,7 +142,8 @@ def load_investigation_demo(root):
     runner += f" · fresh request {_gate(report.get('post_return_task_passed'))}"
     runner += ' · closed after the recorded run' if report.get('returned_runner_closed') is True else ' · closure not recorded'
     search = report.get('search') or {}
-    limits = 'Access to earlier measurements does not prove a search advantage. No best-plan or speedup claim.'
+    limits = ('Agent explanations are claims, not measured facts. '
+              'Access to earlier measurements does not prove a search advantage. No best-plan or speedup claim.')
     if report.get('deployment'):
         limits += ' The BF16 fit rejection is an estimate, not a measured BF16 comparison.'
     return view | {'rows': rows, 'banner': banner, 'scope': scope, 'runner': runner, 'limits': limits,

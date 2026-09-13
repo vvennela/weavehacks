@@ -64,8 +64,10 @@ def test_real_team_record_is_the_fallback_with_honest_staged_roles(tmp_path):
     assert 'closed after the recorded run' in view['runner']
 
 
-def test_current_swarm_view_does_not_call_a_failed_start_a_quality_failure():
-    view = load(ROOT)
+def test_current_swarm_view_does_not_call_a_failed_start_a_quality_failure(tmp_path):
+    report = json.loads((ROOT / 'evidence/live-swarm-investigation-v1/result.json').read_text())
+    write_record(tmp_path, 'live-swarm-investigation-v1', report)
+    view = load(tmp_path)
     assert view['source'] == 'evidence/live-swarm-investigation-v1/result.json'
     assert view['budget'] == '2/2'
     assert len(view['rows']) == 6
@@ -173,3 +175,38 @@ def test_swarm_view_links_only_the_selected_namespaced_proposal(tmp_path):
     assert 'latency_outliers' in selected['Inspections']
     assert 'source-call' in selected['Trace calls']
     assert 'Investigators recorded' in view['scope']
+
+
+def test_core_loop_record_takes_priority_and_keeps_explanation_separate(tmp_path):
+    write_record(tmp_path, 'live-swarm-investigation-v1', saved_report())
+    report = saved_report()
+    report['search']['rounds'][0]['specialists'][0]['proposal']['reason'] = 'I predict lower latency.'
+    write_record(tmp_path, 'live-core-loop-v1', report)
+    view = load(tmp_path)
+    assert view['source'] == 'evidence/live-core-loop-v1/result.json'
+    assert 'does not run live inference' in view['banner']
+    assert view['rows'][0]['Agent explanation'] == 'I predict lower latency.'
+    assert 'I predict' not in view['rows'][0]['Measured gates']
+    assert 'explanations are claims, not measured facts' in view['limits']
+
+
+def test_partial_core_loop_cannot_borrow_old_success_or_infer_probe(tmp_path):
+    write_record(tmp_path, 'live-swarm-investigation-v1', saved_report())
+    write_record(tmp_path, 'live-core-loop-v1', {
+        'status': 'running', 'decision': {'selected': 'baseline'}, 'search': {'rounds': []}})
+    view = load(tmp_path)
+    assert view['source'] == 'evidence/live-core-loop-v1/result.json'
+    assert 'not a completed result' in view['banner']
+    assert 'fresh request not recorded' in view['runner']
+    assert 'closure not recorded' in view['runner']
+    assert 'accepted' not in view['banner']
+
+
+def test_unreadable_core_loop_does_not_fall_back_to_old_success(tmp_path):
+    write_record(tmp_path, 'live-swarm-investigation-v1', saved_report())
+    write_record(tmp_path, 'live-core-loop-v1', {})
+    (tmp_path / 'evidence/live-core-loop-v1/result.json').write_text('{')
+    view = load(tmp_path)
+    assert view['source'] == 'evidence/live-core-loop-v1/result.json'
+    assert 'could not be read' in view['banner']
+    assert view['rows'] == []
