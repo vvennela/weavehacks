@@ -1,0 +1,8 @@
+name = "sera-molab"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# No secrets and no bindings on purpose: the molab sandbox does not enforce
+# authentication, so this Worker is a pure passthrough. UPSTREAM is a constant
+# in src/index.js because a molab sandbox URL changes whenever the GPU is
+# re-attached, and redeploying the Worker is the same one command either way.
