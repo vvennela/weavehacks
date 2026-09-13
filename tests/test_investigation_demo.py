@@ -45,8 +45,10 @@ def test_existing_real_run_is_prominent_but_labeled_batching_only(tmp_path):
     assert 'does not prove a search advantage' in view['limits']
 
 
-def test_current_real_team_record_is_the_default_with_honest_staged_roles():
-    view = load(ROOT)
+def test_real_team_record_is_the_fallback_with_honest_staged_roles(tmp_path):
+    team = json.loads((ROOT / 'evidence/live-team-investigation-v1/result.json').read_text())
+    write_record(tmp_path, 'live-team-investigation-v1', team)
+    view = load(tmp_path)
     assert view['source'] == 'evidence/live-team-investigation-v1/result.json'
     assert 'status: closed' in view['banner']
     assert view['budget'] == '2/3'

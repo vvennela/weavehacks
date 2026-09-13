@@ -188,6 +188,18 @@ After a matching check passes, supply `agent=sera.WandbAgent(project=...)` and `
 
 ## Bounded agent investigation
 
+### Investigative swarm mode
+
+`--swarm` enables three independent investigators: scheduling, memory/context, and output quality. They choose read-only inspections of persisted Weave records, work concurrently, then read the same shared findings board and refine their proposals. An arbiter can select at most one GPU experiment per round. GPU trials stay sequential.
+
+Use `--swarm --auto-space --budget 2` with the live command below. Weave is required; `--swarm --no-weave` is rejected. The Python interface is `optimize(..., swarm=True, trace_reader=reader)` with a forkable agent and a budget. The command supplies the traced reader automatically. Ordinary calls keep the existing staged loop.
+
+Each inspection records its source call IDs and output hashes. Missing or incomplete remote evidence is marked as a failed inspection; it is not replaced by local outputs. Model answers and peer findings are data, not instructions. These analysis roles do not add multi-GPU controls or enable unverified precision settings.
+
+The live swarm rehearsal is still being checked. The earlier team recording below proves the staged loop, not this concurrent mode.
+
+### Existing staged loop
+
 The production controller accepts `budget=sera.Budget(max_candidate_trials=2)` with an agent and a matching passed provider record. Omitting `budget` preserves the one-candidate path. It completed a [real two-round investigation](evidence/live-investigation-v1/README.md): one measured batch-token candidate, prediction review, later arbitration using that history, reference restoration, a new request, and cleanup.
 
 Each round gives the active quantization and batching specialists the baseline measurements and a short history of previous trials. An arbiter selects an experiment. Sera validates it, measures it with the existing runner, applies the unchanged quality and performance gates, and asks the agent to review its prediction. The next round receives the result, including failures. The current implementation also supplies bounded examples of actual inputs and outputs, prioritizing task failures and slow requests. Complete raw records remain saved; examples are selected evidence, not representative averages or instructions from model output. The team rehearsal verified this richer evidence in the actual provider calls and matching Weave records.
