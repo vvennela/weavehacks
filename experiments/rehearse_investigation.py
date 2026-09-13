@@ -78,27 +78,33 @@ class SyntheticAgent:
 
     def request(self, role, evidence, instruction):
         if role == 'arbiter':
+            proposals = evidence['proposals']
+            history = evidence.get('history', [])
+            after_failure = bool(history and not history[0]['trial']['task_quality']['passed']
+                                 and history[0]['review']['prediction_outcome'] == 'refuted')
+            selected_role = 'batching' if after_failure else 'quantization'
+            selected = next(proposal for proposal in proposals if proposal['agent_role'] == selected_role)
             return self._record(role, evidence, ArbiterDecision(
-                ranked_proposal_ids=evidence['legal_proposal_ids'][:1],
-                reason='Choose the only active proposal in this scripted rehearsal'))
+                ranked_proposal_ids=[selected['proposal_id']],
+                reason=('The saved cache trial failed quality and its prediction was refuted; choose batching'
+                        if after_failure else
+                        'Two specialist proposals competed; test cache precision first in this scripted policy')))
         history = evidence.get('history', [])
         after_failure = bool(history and not history[0]['trial']['task_quality']['passed']
                              and history[0]['review']['prediction_outcome'] == 'refuted')
         specialist = evidence['specialist_role']
-        abstain = specialist == 'batching' and not after_failure
         lever, values = next(iter(evidence['supported_changes'].items()))
         reason = ('The earlier cache trial was fast but failed quality; test batching with baseline precision'
-                  if after_failure else 'Wait for the cache experiment' if abstain else
-                  'Test the declared cache-precision experiment')
+                  if after_failure else 'Test batching as a latency hypothesis while keeping baseline precision'
+                  if specialist == 'batching' else 'Test the declared cache-precision experiment')
         return self._record(role, evidence, Proposal(
-            action='keep-baseline' if abstain else 'trial',
+            action='trial',
             proposal_id=f'{specialist}-{len(history) + 1}', agent_role=specialist,
             parent_trial_id=evidence['trial_id'], model_id=evidence['model_id'],
-            changed_lever=None if abstain else lever, proposed_value=None if abstain else values[0],
+            changed_lever=lever, proposed_value=values[0],
             evidence_used=['trial_1_p95_latency_ms'] if after_failure else ['p95_latency_ms'],
-            predicted_metric_change=('No change until the cache result is available' if abstain else
-                                     'Reduce p95 by at least 5% while preserving task correctness'),
-            confidence=.5, expected_trial_cost=0 if abstain else 1,
+            predicted_metric_change='Reduce p95 by at least 5% while preserving task correctness',
+            confidence=.5, expected_trial_cost=1,
             falsification_condition='Quality fails or p95 improves by less than 5%', reason=reason))
 
     def review(self, evidence):

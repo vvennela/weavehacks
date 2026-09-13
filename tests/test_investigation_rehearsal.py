@@ -19,6 +19,12 @@ def test_offline_rehearsal_saves_feedback_gates_fresh_runner_and_cleanup(tmp_pat
     assert report['provenance']['provider_calls'] == 0
     assert report['decision']['selected'] == 'trial-2'
     first, second = report['search_trials']
+    initial = report['search']['rounds'][0]
+    assert {row['role'] for row in initial['specialists'] if row['status'] == 'accepted'} == {
+        'quantization', 'batching'}
+    assert len(initial['arbiter_evidence']['legal_proposal_ids']) == 2
+    assert first['proposal']['agent_role'] == 'quantization'
+    assert second['proposal']['agent_role'] == 'batching'
     assert not first['task_quality']['passed']
     assert first['reduced']['p95_latency_ms'] < second['reduced']['p95_latency_ms']
     assert second['task_quality']['passed']
@@ -31,6 +37,8 @@ def test_offline_rehearsal_saves_feedback_gates_fresh_runner_and_cleanup(tmp_pat
     assert saved == report
     text = (tmp_path / 'rehearsal/investigation.md').read_text()
     assert 'SYNTHETIC' in text
+    assert 'quantization and batching' in text
+    assert 'Two specialist proposals competed' in text
     assert 'Quality gate: failed' in text
     assert 'Quality gate: passed' in text
     assert 'History supplied: trial-1' in text
