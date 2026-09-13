@@ -2,34 +2,30 @@
 
 ## Mission
 
-Make Sera understandable and useful to a developer with no inference-engineering knowledge.
+Make Sera useful to a developer who has no inference-engineering knowledge.
 
-Barrat owns the public experience:
+Barrat owns:
 
-- Product language
-- Public API design
+- Public API shape and product language
+- Demo prompts and expected story
 - Marimo notebook
-- Progress and error presentation
-- Results and comparison views
+- Progress, failure, and result views
 - Weave trace presentation
-- Demo and submission material
+- Benchmark charts
+- Quick start, demo, and submission
 
-Barrat does not own vLLM control, measurements, search logic, validation, or persistence.
+Barrat does not own runtime control, measurements, search logic, validation, or persistence.
 
-## Working agreement
+## Work rules
 
-- Work against the shared SeraResult fixture before the backend is complete.
-- Do not read backend internals from the notebook.
-- Treat the Sera public API and result schema as the integration boundary.
-- Mark each task TODO, DOING, BLOCKED, or DONE.
-- Record blockers under the task that owns them.
-- Integrate after each working vertical slice. Do not wait for all backend work.
+- Build the notebook against a fixed SeraResult fixture first.
+- Use only Sera's public API.
+- Keep setup, live execution, and prepared demo data separate.
+- Mark tasks TODO, DOING, BLOCKED, or DONE.
+- Record the exact dependency when work is blocked.
+- Integrate at each shared checkpoint.
 
-## Task order
-
-Complete P0 tasks first. They unblock the backend and the first integrated demo.
-
-## B1 — Public experience contract
+## B1 — Product contract and demo inputs
 
 Priority: P0
 
@@ -37,36 +33,32 @@ Status: TODO
 
 Todo:
 
-- Define the minimum Sera call for one model and two models.
+- Finalize the one-model and two-model API examples.
 - Define quick mode and verified mode in user language.
-- Define the visible stages of an optimization run.
-- Define what the user sees when Sera finds an improvement.
-- Define what the user sees when no safe improvement exists.
-- Define the names and order of result sections.
-- Give Vishnu a fixed example of the final SeraResult data.
+- Define the visible run stages and final outcomes.
+- Choose and version the prompt corpus.
+- Define the quality-check intent.
+- Define the expected demo story without hard-coding trial results.
+- Define the benchmark candidate universe with Vishnu.
+- Give Vishnu golden examples of progress events and SeraResult.
 
 Result:
 
-- One approved API example
-- One approved SeraResult fixture
-- User-facing names for states, metrics, failures, and recommendations
+- Approved public API example
+- Versioned prompt corpus
+- Golden progress and result examples
+- Written demo scenario
 
 Win condition:
 
-A developer can read the example, name models, provide prompts, run Sera, and understand the returned result without learning vLLM settings.
+A developer can understand the input, run, and output without knowing vLLM settings. Vishnu can implement every public object without guessing.
 
 Depends on:
 
 - product.md
 - spec.md
 
-Blocks:
-
-- Vishnu V2
-- Barrat B2
-- Barrat B4
-
-## B2 — Marimo notebook shell
+## B2 — Fixture-driven Marimo notebook
 
 Priority: P0
 
@@ -74,34 +66,28 @@ Status: TODO
 
 Todo:
 
-- Create the demonstration notebook as a normal Marimo Python file.
-- Add model and prompt inputs.
-- Add a secure W&B API-key input.
-- Call Sera through the public API only.
-- Build the notebook against the fixed SeraResult fixture first.
-- Separate setup, run, progress, result, and benchmark sections.
-- Make reruns safe and predictable.
+- Create the Marimo notebook as a normal Python file.
+- Add model, prompt, and secure W&B key inputs.
+- Add setup, run, progress, result, benchmark, and evidence sections.
+- Render the complete flow from the fixed fixture.
+- Keep one switch between fixture mode and live Sera mode.
+- Make reruns safe.
 
 Result:
 
-- A notebook that renders the complete Sera experience from fixture data
-- A notebook entry point that can switch from fixture data to the real library
+- Complete notebook using fixture data
+- One integration point for the live library
 
 Win condition:
 
-The notebook tells the full product story before the GPU backend is connected, and switching to the real backend requires changing one construction point.
+The notebook tells the complete product story before GPU work is ready. Connecting the live backend changes one construction point.
 
 Depends on:
 
 - Barrat B1
-- Vishnu V2 for the fixture schema
+- Vishnu V2
 
-Blocks:
-
-- Barrat B8
-- Barrat B9
-
-## B3 — Progress and failure experience
+## B3 — Progress, failure, and result views
 
 Priority: P0
 
@@ -110,33 +96,31 @@ Status: TODO
 Todo:
 
 - Show the current phase, model, trial, and remaining budget.
-- Translate specialist and arbiter actions into short user-facing messages.
-- Show deterministic rejections separately from failed GPU trials.
-- Show quality failure and rollback clearly.
-- Show a clear final state for success, no safe improvement, cancellation, and system failure.
-- Keep full technical details available without putting them in the main path.
+- Show why each specialist is active or inactive.
+- Separate validation rejection, GPU failure, quality failure, and rollback.
+- Compare baseline with the recommendation.
+- Lead with p95 latency, throughput, peak memory, and quality.
+- Show alternatives on the frontier in plain English.
+- Show no-safe-improvement as a valid result.
+- Define the exact text used by result.print_summary().
 
 Result:
 
-- Progress component
-- Failure component
-- Approved copy for every public run state
+- Fixture-backed progress view
+- Fixture-backed result view
+- Golden plain-text summary
+- Complete success and failure copy
 
 Win condition:
 
-A user always knows what Sera is doing, why a candidate was rejected, and whether the returned model is safe to use.
+Using the fixture, a new reader can answer what Sera changed, why it changed it, whether quality passed, and which returned model to use.
 
 Depends on:
 
-- Barrat B1
-- Vishnu V3 event schema
-- Vishnu V11 failure states
+- Start: Barrat B1 and Vishnu V2
+- Live acceptance: Vishnu V3, V7, V10, and V13
 
-Blocks:
-
-- Barrat B8
-
-## B4 — Result report
+## B4 — Weave presentation contract
 
 Priority: P0
 
@@ -144,146 +128,112 @@ Status: TODO
 
 Todo:
 
-- Show baseline and recommended configuration side by side.
-- Lead with latency improvement, peak-memory change, throughput change, and quality result.
-- Show the measured frontier without requiring the user to understand Pareto optimization.
-- Show rejected configurations and the reasons for rejection.
-- Show phase-two results for each model separately.
-- Add a copyable configuration and a copyable usage example.
-- Add a link to the Weave trace.
+- Name the root trace and child operations.
+- Define the visible fields for evidence, proposal, prediction, trial, gate, revert, and revision.
+- Define one quality-rejection trace story.
+- Define one failed-prediction-to-revised-action trace story.
+- Remove noisy backend fields from the judge-facing view.
 
 Result:
 
-- Notebook result view
-- Plain-text summary used by result.print_summary()
-- Report layout that works for success and no-safe-improvement outcomes
+- Trace naming and field contract
+- Two golden trace stories
 
 Win condition:
 
-A new user can answer four questions in less than 20 seconds:
-
-1. What did Sera change?
-2. How much faster is it?
-3. Did quality pass?
-4. What model object do I use now?
+Vishnu can add Weave instrumentation without choosing product language or trace layout.
 
 Depends on:
 
 - Barrat B1
-- Vishnu V7 reduced metric schema
-- Vishnu V13 frontier and placement result
-- Vishnu V14 Weave trace URL
 
-Blocks:
+## B5 — Live Weave trace QA
 
-- Barrat B8
-- Barrat B9
-
-## B5 — Weave trace story
-
-Priority: P1
+Priority: P0
 
 Status: TODO
 
 Todo:
 
-- Define readable names for the root trace and child operations.
-- Define the fields that judges must see for a proposal, prediction, trial, quality gate, and revision.
-- Hide noisy implementation fields from the main story.
-- Prepare one trace that shows a failed prediction changing the next decision.
-- Prepare one trace that shows a quality rejection.
+- Compare live trace names and fields with the B4 contract.
+- Confirm that one trace shows agent disagreement and arbitration.
+- Confirm that one trace shows measured failure changing the next action.
+- Confirm that evaluations link to the correct trial.
+- Confirm that no secret appears.
 
 Result:
 
-- Trace naming and display specification for Vishnu
-- Two judge-ready Weave traces
+- Judge-ready Weave trace
+- Trace defects reported to Vishnu
 
 Win condition:
 
-A judge can open one trace and see evidence, agent disagreement, experiment selection, measured failure, and the corrected next action.
+A judge can understand the self-correcting loop from one trace without a spoken explanation.
 
 Depends on:
 
-- Barrat B1
-- Vishnu V14 for implemented trace operations
+- Barrat B4
+- Vishnu V12
 
-Blocks:
+## B6 — Benchmark and ablation view
 
-- Barrat B8
-- Barrat B9
-
-## B6 — Grid-search benchmark view
-
-Priority: P1
+Priority: P0
 
 Status: TODO
 
 Todo:
 
-- Show Sera and naive grid search under the same trial budget.
 - Plot best valid p95 latency after each trial.
-- Mark quality failures instead of hiding them.
-- Show trials-to-near-oracle for each method.
-- Show the random-search distribution.
-- Show the telemetry and history ablation results.
-- State that grid search is a benchmark control, not part of Sera.
+- Compare Sera with naive fixed-order grid search under the same budget.
+- Show the uniform-random distribution.
+- Show one intelligence ablation.
+- Mark quality failures.
+- State that grid search is a test control, not part of Sera.
+- Write one exact benchmark conclusion from the measured data.
 
 Result:
 
-- One compact benchmark chart
+- One search-efficiency chart
 - One ablation chart
-- One paragraph that states the result without exaggeration
+- One accurate benchmark statement
 
 Win condition:
 
-The charts show that Sera reaches a strong valid configuration earlier than fixed-order grid search and beats the median random baseline.
+The view makes trial efficiency clear. It does not rely on an unfair candidate set, hidden failures, or an unbounded grid.
 
 Depends on:
 
-- Vishnu V15 benchmark dataset and summary schema
+- Barrat B1
+- Vishnu V14
 
-Blocks:
+## B7a — Quick-start draft
 
-- Barrat B8
-- Barrat B9
-
-## B7 — Quick-start documentation
-
-Priority: P1
+Priority: P0
 
 Status: TODO
 
 Todo:
 
-- Write installation instructions.
-- Write the smallest working example.
-- Explain quick mode and verified mode.
-- Explain required environment variables without exposing keys.
-- Explain supported models and hardware.
-- Explain what Sera can and cannot prove.
+- Write installation steps from Vishnu's recorded environment.
+- Write the smallest working call.
+- Explain W&B and Hugging Face environment variables.
+- Explain quick mode, verified mode, and limits.
 - Add one-model and two-model examples.
 
 Result:
 
-- README quick start
-- Notebook setup instructions
-- Clear limitations section
+- Draft README quick start
 
 Win condition:
 
-A developer can start Sera from a clean Molab notebook without help.
+The instructions contain every command and input needed for a clean Molab run.
 
 Depends on:
 
-- Vishnu V1 Molab smoke test
-- Vishnu V16 package installation
-- Barrat B1
+- Vishnu V1
+- Vishnu V2
 
-Blocks:
-
-- Barrat B10
-
-## B8 — Three-minute demo
+## B7b — Clean-install documentation QA
 
 Priority: P0
 
@@ -291,155 +241,184 @@ Status: TODO
 
 Todo:
 
-- Write a three-minute script with no more than two slides.
-- Start with the one-call product experience.
-- Show one specialist disagreement.
-- Show Sera choosing a live lever and skipping a dead lever.
-- Show a quality rejection or contention failure.
-- Show the next decision changing from the evidence.
-- Show the final result and grid-search comparison.
-- Keep model download and long trials outside the live demo.
+- Follow the quick start in a clean Molab session.
+- Record every failed or missing step.
+- Correct the documentation.
+- Repeat the clean install once.
 
 Result:
 
-- Timed demo script
-- Prepared notebook state
-- One backup recording
-- At most two supporting slides
+- Verified quick start
 
 Win condition:
 
-The complete demonstration finishes in less than three minutes and proves utility, agent collaboration, self-correction, measured performance, and meaningful Weave use.
+The second clean session installs Sera and completes the documented quick-mode example without verbal help.
+
+Depends on:
+
+- Barrat B7a
+- Vishnu V15
+
+## B8 — Three-minute live demo
+
+Priority: P0
+
+Status: TODO
+
+Todo:
+
+- Write a three-minute script with at most two slides.
+- Start with the one-call user experience.
+- Show one live lever and one skipped dead lever.
+- Show a quality or contention failure.
+- Show the next action changing from measured evidence.
+- Show the final model, Weave trace, and benchmark.
+- Keep downloads and long trials outside the live path.
+- Record a backup demo.
+
+Result:
+
+- Timed live demo
+- Prepared notebook state
+- Backup recording
+- At most two slides
+
+Win condition:
+
+Three timed rehearsals finish within three minutes and prove utility, collaboration, self-correction, measured performance, and sponsor use.
 
 Depends on:
 
 - Barrat B2
 - Barrat B3
-- Barrat B4
 - Barrat B5
 - Barrat B6
-- Vishnu V10 phase-one vertical slice
-- Vishnu V13 joint placement
-- Vishnu V15 benchmark
+- Barrat B7b
+- Vishnu V11 through V15
 
-Blocks:
+## B9 — Hackathon submission
 
-- Barrat B10
+Priority: P0
 
-## B9 — Usability test
+Status: TODO
 
-Priority: P1
+Todo:
+
+- Write the two-to-three sentence summary.
+- Explain the self-improving loop.
+- Explain the fair benchmark against naive grid search.
+- List every sponsor tool and its exact use.
+- Add the repository, notebook, trace, charts, and demo video.
+- Check every link in a signed-out browser.
+- Complete team and survey requirements.
+
+Result:
+
+- Complete AGI House submission
+- Public project material
+- Demo video under two minutes
+
+Win condition:
+
+Every required field is complete, every link opens, and the two-minute submission video is distinct from the three-minute live demo.
+
+Depends on:
+
+- Barrat B8
+- Vishnu V15
+
+## B10 — Unassisted usability test
+
+Priority: P2
 
 Status: TODO
 
 Todo:
 
 - Give the notebook to one developer who did not build Sera.
-- Ask them to start a quick-mode run.
-- Record every point where they need an explanation.
-- Fix unclear API names, copy, ordering, and errors.
-- Repeat the test once.
+- Observe the first run without explaining it.
+- Record confusion and errors.
+- Fix the highest-impact problem.
 
 Result:
 
 - Short usability log
-- Fixed notebook and public copy
+- One tested improvement
 
 Win condition:
 
-The second user completes the main flow without verbal help.
+The developer starts a quick-mode run and identifies the returned model without help.
 
 Depends on:
 
-- Barrat B2
-- Barrat B3
-- Barrat B4
-- Vishnu V16 installable package
+- Barrat B7b
 
-Blocks:
+## Shared checkpoints
 
-- Barrat B10
-
-## B10 — Hackathon submission
-
-Priority: P0
-
-Status: TODO
-
-Todo:
-
-- Write the two-to-three sentence project summary.
-- List W&B Weave, W&B Inference, Molab, CoreWeave, vLLM, and Hugging Face usage.
-- Explain the self-improving loop.
-- Explain the benchmark against naive grid search.
-- Add the public repository link.
-- Add the notebook, Weave trace, charts, and demo video.
-- Verify team and survey requirements.
-
-Result:
-
-- Complete AGI House submission
-- Public repository with clear setup
-- Demo video under two minutes
-
-Win condition:
-
-Every submission field is complete, every link works in a signed-out browser, and a judge can understand Sera without running the code.
-
-Depends on:
-
-- Barrat B7
-- Barrat B8
-- Barrat B9
-- Vishnu V16 release candidate
-
-## Product checkpoints
-
-### Checkpoint P-A: Contract
+### C1 — Contract
 
 Required:
 
 - Barrat B1
 - Vishnu V2
 
-Output:
+Pass condition:
 
-The notebook and backend use the same SeraResult fixture.
+The notebook and backend use the same fixture, events, result fields, and names.
 
-### Checkpoint P-B: First vertical slice
+### C2 — Fixture product
 
 Required:
 
 - Barrat B2
 - Barrat B3
-- Vishnu V5
+- Barrat B4
 
-Output:
+Pass condition:
 
-One real model runs through baseline, one candidate trial, result display, and cleanup.
+The complete user and judge experience works from fixed data.
 
-### Checkpoint P-C: Complete story
+### C3 — Measured vertical slice
 
 Required:
 
-- Barrat B4
+- Barrat B3
+- Vishnu V1 through V10
+
+Pass condition:
+
+One model completes a baseline, one fixed candidate trial, quality gate, final result assembly, final runner activation, and cleanup.
+
+### C4 — Agent proof
+
+Required:
+
 - Barrat B5
-- Barrat B6
-- Vishnu V13
-- Vishnu V14
-- Vishnu V15
+- Vishnu V11
+- Vishnu V12
 
-Output:
+Pass condition:
 
-The notebook shows optimization, self-correction, joint placement, Weave evidence, and the grid-search benchmark.
+A measured failure changes the next selected experiment, and Weave shows why.
+
+### C5 — Demo proof
+
+Required:
+
+- Barrat B6 through B9
+- Vishnu V13 through V15
+
+Pass condition:
+
+Joint placement, benchmark, install, demo, and submission all work from one release candidate.
 
 ## Barrat definition of done
 
-A Barrat task is done only when:
+A task is done only when:
 
-- The user-facing behavior is present in the notebook or documentation.
-- It works with the agreed SeraResult schema.
-- Success, failure, and empty states are handled.
+- Its stated artifact exists.
+- Success, failure, and empty states are covered.
+- It matches the shared fixture or live schema.
 - The language is simple and direct.
-- The output supports the three-minute demo.
-- Vishnu can consume the result without guessing.
+- Its win condition has been checked.
+- Any cross-person dependency is complete.
