@@ -96,8 +96,8 @@ def staged_boundaries(monkeypatch):
                 proposed_value=value if option is not None else None,
                 evidence_used=['p95_latency_ms'], confidence=.5,
                 expected_trial_cost=1 if option is not None else 0,
-                predicted_metric_change='Synthetic hypothesis, checked by the 3% objective gate',
-                falsification_condition='Quality fails, inherited latency regresses, or gain is below 3%',
+                predicted_metric_change='Synthetic positive gain, subject to the declared objective gate',
+                falsification_condition='Quality fails, inherited latency exceeds its 3% allowance, or gain fails its own threshold',
                 reason='Use the recorded synthetic measurements; this does not predict a real speedup')
 
         def review(self, evidence):
@@ -128,24 +128,26 @@ def staged_boundaries(monkeypatch):
     return state
 
 
-def run_stages(tmp_path):
+def run_stages(tmp_path, min_improvement_pct=None):
+    options = {} if min_improvement_pct is None else {'min_improvement_pct': min_improvement_pct}
     return sera.optimize(models=[MODEL_ID], prompts=['2+3'], stages=['latency', 'quantization'],
         k=3.0, output_dir=tmp_path/'stages',
         evaluation=lambda prompt, output: output == '5', evaluation_version='synthetic-stages-v1',
-        constraints=sera.Constraints(quality_floor=.99))
+        constraints=sera.Constraints(quality_floor=.99), **options)
 
 
-@pytest.mark.parametrize('cache_latency,cache_memory,cache_correct,expected_cache,expected_reason', [
-    (90.0, 1700, True, 'fp8', None),
-    (90.0, 1970, True, 'auto', 'objective-improvement-below-threshold'),
-    (91.0, 1700, True, 'auto', 'candidate-constraints-failed'),
-    (80.0, 1700, False, 'auto', 'candidate-constraints-failed'),
+@pytest.mark.parametrize('cache_latency,cache_memory,cache_correct,expected_cache,expected_reason,min_gain', [
+    (90.9, 1960, True, 'fp8', None, None),
+    (90.0, 2000, True, 'auto', 'objective-improvement-below-threshold', None),
+    (93.6, 1700, True, 'auto', 'candidate-constraints-failed', None),
+    (80.0, 1700, False, 'auto', 'candidate-constraints-failed', None),
+    (90.0, 1970, True, 'auto', 'objective-improvement-below-threshold', 3.0),
 ])
 def test_real_ordered_pipeline_rebases_runs_swarm_and_gates_candidates(
-        tmp_path, staged_boundaries, cache_latency, cache_memory, cache_correct, expected_cache, expected_reason):
+        tmp_path, staged_boundaries, cache_latency, cache_memory, cache_correct, expected_cache, expected_reason, min_gain):
     state = staged_boundaries
     state.update(cache_latency=cache_latency, cache_memory=cache_memory, cache_correct=cache_correct)
-    with run_stages(tmp_path) as result:
+    with run_stages(tmp_path, min_improvement_pct=min_gain) as result:
         assert result.report['status'] == 'ready'
         assert len(result.checkpoints) == 2
         first, second = result.checkpoints
@@ -154,16 +156,23 @@ def test_real_ordered_pipeline_rebases_runs_swarm_and_gates_candidates(
         assert second['configuration']['max_num_batched_tokens'] == 1024
         assert second['configuration']['kv_cache_dtype'] == expected_cache
         assert state['stages'][1]['baseline_configuration'].model_dump() == first['configuration']
-        assert state['stages'][1]['constraints'].p95_latency_ms == 90.0
-        assert all(stage['objective'].min_improvement_fraction == .03 for stage in state['stages'])
+        assert state['stages'][1]['constraints'].p95_latency_ms == pytest.approx(92.7)
+        assert all(stage['objective'].min_improvement_fraction == (min_gain or 0.0) / 100
+                   for stage in state['stages'])
         baselines = [item for item in state['measurements'] if item['baseline']]
         assert len(baselines) == 2
         assert baselines[1]['configuration'] == first['configuration']
         assert baselines[1]['folder'].endswith('002-quantization/baseline')
         assert all(item['workload']['concurrency'] == [1, 2, 4, 8] for item in state['measurements'])
         first_report = json.loads((tmp_path/'stages/001-latency/result.json').read_text())
-        assert first_report['search_trials'][0]['decision']['reason'] == 'objective-improvement-below-threshold'
-        assert first_report['search_trials'][0]['decision']['selected'] == 'baseline'
+        first_decision = first_report['search_trials'][0]['decision']
+        assert first_decision['objective_improvement_fraction'] == pytest.approx(.02)
+        if min_gain is None:
+            assert first_decision['selected'] == 'candidate'
+            assert first_decision['outcome'] == 'improved'
+        else:
+            assert first_decision['reason'] == 'objective-improvement-below-threshold'
+            assert first_decision['selected'] == 'baseline'
         assert first_report['decision']['selected'] == 'trial-2'
         assert first_report['returned_runner_closed'] is True
         second_report = json.loads((tmp_path/'stages/002-quantization/result.json').read_text())
