@@ -5,7 +5,7 @@ import os
 import time
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, ValidationError, model_validator
 
 from .config import (CONTROL_ROLES, CONTROL_VALUE_ADAPTERS, Candidate, RuntimeConfig,
                      validate_candidate, validate_control_candidate, validate_control_value)
@@ -203,6 +203,8 @@ class WandbAgent:
         entry = {"role": role, "provider": self.provider, "model": self.model, "project": self.project,
                  "schema_hash": content_hash(wire_schema), "request_schema": wire_schema,
                  "evidence": evidence, "messages": messages, "attempts": [], **prompt_metadata}
+        if getattr(self, 'endpoint_fingerprint', None) is not None:
+            entry['endpoint_fingerprint'] = self.endpoint_fingerprint
         self.history.append(entry)
         for attempt_index in range(2):
             payload = {"model": self.model, "messages": messages, "temperature": 0, "max_tokens": 2048,
@@ -283,3 +285,57 @@ class WandbAgent:
             "A completed deployment meeting constraints confirms feasibility; a failed deployment "
             "or failed gate refutes it. Missing baseline measurements do not make an executed "
             "deployment trial untested and cannot support a speedup claim.")
+
+
+class OpenAICompatibleAgent(WandbAgent):
+    """Typed investigators through an operator-trusted HTTPS gateway.
+
+    LiteLLM proxies use this protocol. This is not a public URL validation service:
+    a web backend must allowlist endpoints before constructing an agent.
+    """
+
+    provider = 'openai-compatible'
+
+    def __init__(self, *, project, model, base_url, api_key=None):
+        from urllib.parse import urlsplit
+        try:
+            url = urlsplit(base_url)
+            valid = (url.scheme == 'https' and url.hostname and url.port != 0
+                     and not url.username and not url.password and not url.query and not url.fragment
+                     and not any(character.isspace() for character in base_url))
+        except (TypeError, ValueError):
+            valid = False
+        if not valid:
+            raise ValueError('Use a trusted HTTPS base URL without credentials, query, or fragment')
+        key = api_key if api_key is not None else os.environ.get('SERA_AGENT_API_KEY')
+        if not isinstance(key, str) or not key.strip():
+            raise ValueError('Supply api_key or set SERA_AGENT_API_KEY in this process')
+        super().__init__(project=project, model=model)
+        self.base_url = base_url.rstrip('/')
+        self.endpoint_fingerprint = content_hash({'base_url': self.base_url})
+        self._api_key = SecretStr(key)
+
+    def fork(self):
+        return OpenAICompatibleAgent(project=self.project, model=self.model,
+            base_url=self.base_url, api_key=self._api_key.get_secret_value())
+
+    def _complete(self, payload):
+        import httpx
+        import openai
+        try:
+            # Do not forward the Weave project or ambient OpenAI credentials to a gateway.
+            with openai.OpenAI(base_url=self.base_url, api_key=self._api_key.get_secret_value(),
+                               project='', organization='', timeout=90, max_retries=0,
+                               http_client=httpx.Client(follow_redirects=False)) as client:
+                body = client.chat.completions.create(**payload).model_dump(mode='json')
+            # A misconfigured gateway can echo credentials in a successful response.
+            encoded = json.dumps(body, allow_nan=False)
+            secrets = (self._api_key.get_secret_value(), os.environ.get('WANDB_API_KEY', ''))
+            if any(secret and secret in encoded for secret in secrets):
+                raise ProviderTransportError('Provider response contains a credential')
+            return body
+        except openai.APIStatusError as error:
+            raise ProviderTransportError(f'Provider HTTP {error.status_code}',
+                                         http_status=error.status_code) from None
+        except openai.APIConnectionError as error:
+            raise ProviderTransportError(type(error).__name__) from None

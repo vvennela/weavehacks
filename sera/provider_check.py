@@ -99,6 +99,8 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None):
               "schemas": {name: schema.model_json_schema() for name, schema in SCHEMAS.items()},
               "requests": agent.history, "context_checks": [],
               "limits": "Synthetic evidence; schema compatibility only, not search quality or GPU evidence."}
+    if getattr(agent, 'endpoint_fingerprint', None) is not None:
+        record['endpoint_fingerprint'] = agent.endpoint_fingerprint
     path = folder / "result.json"
     save_json(path, record)
     try:
@@ -149,6 +151,9 @@ def require_provider_check(path, agent):
     import json
     record = json.loads(Path(path).read_text())
     provider = getattr(agent, "provider", "wandb")
+    endpoint = getattr(agent, 'endpoint_fingerprint', None)
+    if record.get('endpoint_fingerprint') != endpoint:
+        raise ValueError('Provider check does not match this endpoint')
     if record.get("provider", "wandb") != provider:
         raise ValueError("Provider check does not match this provider transport")
     if (record.get("schema_version") != "sera-provider-check-v1"
@@ -162,6 +167,8 @@ def require_provider_check(path, agent):
         raise ValueError(f"A complete {total}-request provider check is required")
     first = 0
     for case, entry in zip(provider_cases(), requests):
+        if entry.get('endpoint_fingerprint') != endpoint:
+            raise ValueError('Provider request does not match this endpoint')
         if entry.get("provider", "wandb") != provider:
             raise ValueError("Provider request does not match this provider transport")
         if entry.get("role") != case["role"] or entry.get("evidence") != case["evidence"]:
@@ -193,9 +200,12 @@ def require_provider_check(path, agent):
             raise ValueError("Provider check contains a request that failed both attempts")
     if first < total - 1:
         raise ValueError(f"Provider check needs at least {total - 1} first-pass valid responses")
-    return {"path": str(Path(path).resolve()), "schema_hash": schema_hash(),
+    validation = {"path": str(Path(path).resolve()), "schema_hash": schema_hash(),
             "model": agent.model, "provider": provider,
             "first_pass_valid": first, "valid_with_one_retry": total}
+    if endpoint is not None:
+        validation['endpoint_fingerprint'] = endpoint
+    return validation
 
 
 def main(argv=None):
@@ -204,15 +214,21 @@ def main(argv=None):
     parser.add_argument("--project", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--model", default=AGENT_MODEL, help="Hosted investigator model to certify")
-    parser.add_argument("--provider", choices=['wandb', 'codex-relay'], default='wandb')
+    parser.add_argument("--provider", choices=['wandb', 'codex-relay', 'openai-compatible'], default='wandb')
+    parser.add_argument('--base-url', help='Trusted HTTPS compatible gateway; key from SERA_AGENT_API_KEY')
     parser.add_argument("--relay-dir", help="Shared request directory for the local Codex controller")
     args = parser.parse_args(argv)
     if (args.provider == 'codex-relay') != bool(args.relay_dir):
         parser.error('--relay-dir is required only with --provider codex-relay')
+    if (args.provider == 'openai-compatible') != bool(args.base_url):
+        parser.error('--base-url is required only with --provider openai-compatible')
     agent = None
     if args.provider == 'codex-relay':
         from .relay import RelayAgent
         agent = RelayAgent(project=args.project, model=args.model, relay_dir=args.relay_dir)
+    elif args.provider == 'openai-compatible':
+        from .agent import OpenAICompatibleAgent
+        agent = OpenAICompatibleAgent(project=args.project, model=args.model, base_url=args.base_url)
     report = check_provider(project=args.project, output_dir=args.output_dir, model=args.model, agent=agent)
     print({key: report[key] for key in ("passed", "first_pass_valid", "valid_with_one_retry")})
     return 0 if report['passed'] else 1

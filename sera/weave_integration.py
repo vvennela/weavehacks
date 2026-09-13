@@ -92,6 +92,10 @@ class TracedInvestigationAgent:
         return getattr(self._agent, 'provider', 'wandb')
 
     @property
+    def endpoint_fingerprint(self):
+        return getattr(self._agent, 'endpoint_fingerprint', None)
+
+    @property
     def history(self):
         return self._agent.history
 

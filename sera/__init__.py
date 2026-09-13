@@ -6,7 +6,7 @@ from .api import optimize
 from .stages import StagedResult
 from .recovery import inspect_recovery, resume
 from .runtime import SeraModel, SeraResponse
-from .agent import WandbAgent
+from .agent import OpenAICompatibleAgent, WandbAgent
 from .hardware import HardwareAssignment, ModelDescriptor
 from .portable_runtime import PortableSeraModel, optimize_on_hardware
 from .placement import place, measure_placement_references, PlacementResult, PlacementWorkload, PlacementMemoryEstimate
@@ -20,3 +20,4 @@ __all__ += ["place", "PlacementResult", "PlacementWorkload", "PlacementMemoryEst
             "PlacementPlan", "PlacementService", "PlacementConstraints", "measure_placement_references"]
 __all__ += ["optimize_placement", "PlacementSearchResult"]
 __all__ += ["StagedResult"]
+__all__ += ["OpenAICompatibleAgent"]
