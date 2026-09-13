@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from copy import deepcopy
 from itertools import islice
 import math
+import json
 from threading import Lock
 
 from sera.storage import content_hash
@@ -117,6 +118,13 @@ class WeaveEvidenceReader:
         seen = set()
         for call in calls:
             payload = getattr(call, 'output', None)
+            if isinstance(payload, Mapping):
+                try:
+                    # Weave returns boxed numbers and non-sliceable list wrappers.
+                    # Normalize before exact-type checks, hashes, or sample selection.
+                    payload = json.loads(json.dumps(payload, allow_nan=False))
+                except (TypeError, ValueError):
+                    raise WeaveEvidenceError('Weave read returned a non-JSON payload') from None
             name = getattr(call, 'op_name', '').split('/op/')[-1].split(':')[0]
             identifier = getattr(call, 'id', None)
             if (getattr(call, 'trace_id', None) != self._trace_id or not getattr(call, 'ended_at', None)

@@ -199,3 +199,30 @@ def test_example_and_load_counts_remain_bounded_at_larger_declared_scope():
     assert len(slow['records']) == 2 and slow['omitted_record_count'] == 16
     loads = reader('load_metrics', {'trace_scope': scope})
     assert len(loads['records']) == 12 and loads['omitted_record_count'] == 24
+
+
+def test_weave_boxed_numbers_and_nonsliceable_lists_are_normalized_before_validation():
+    class BoxedInt(int):
+        pass
+
+    class BoxedFloat(float):
+        pass
+
+    class WeaveList(list):
+        def __getitem__(self, index):
+            if isinstance(index, slice):
+                raise TypeError('Slices not yet supported')
+            return super().__getitem__(index)
+
+    records = calls()
+    records[0].output['latency_ms'] = BoxedFloat(999)
+    records[0].output['input'] = WeaveList([{'role': 'user', 'content': 'question'}])
+    records[-1].output['reduced']['request_count'] = BoxedInt(2)
+    records[-1].output['quality_requests'] = BoxedInt(2)
+    records[-1].output['self_check_requests'] = BoxedInt(2)
+    records[-1].output['loads'] = WeaveList(records[-1].output['loads'])
+    result = WeaveEvidenceReader(Client(records), 'this-run')('latency_outliers', evidence())
+    assert result['records'][0]['call_id'] == 'measured-0'
+    assert type(result['records'][0]['latency_ms']) is float
+    assert result['records'][0]['input'] == [{'role': 'user', 'content': 'question'}]
+    assert isinstance(records[0].output['input'], WeaveList)
