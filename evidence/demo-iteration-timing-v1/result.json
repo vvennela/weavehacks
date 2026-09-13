@@ -1,0 +1,103 @@
+{
+  "scope": "First investigator inspection through post-trial review; excludes initial deployment and final runner restoration.",
+  "limits": [
+    "Three rounds per model, one machine and workload; not a provider speed benchmark.",
+    "Pretrial time is wall time, not the sum of parallel model calls.",
+    "Luna round two includes the recorded connection interruption.",
+    "Astra round two includes a 191-second graph-execution startup."
+  ],
+  "runs": [
+    {
+      "run": "live-astra-expanded-v1",
+      "rounds": [
+        {
+          "round": 1,
+          "trial_id": "trial-2",
+          "started_at": "2026-09-13 13:57:35.488366+00:00",
+          "ended_at": "2026-09-13 14:01:18.717728+00:00",
+          "review_call_id": "01a09b12-5147-7c56-b285-e31ad8a2e866",
+          "elapsed_seconds": 223.229362,
+          "pretrial_agent_wall_seconds": 98.797214,
+          "startup_seconds": 63.07147341000018,
+          "posttrial_review_seconds": 14.645759
+        },
+        {
+          "round": 2,
+          "trial_id": "trial-3",
+          "started_at": "2026-09-13 14:01:18.863773+00:00",
+          "ended_at": "2026-09-13 14:07:12.856290+00:00",
+          "review_call_id": "01a09b17-cc36-7ffd-966e-bf5a3e92bce7",
+          "elapsed_seconds": 353.992517,
+          "pretrial_agent_wall_seconds": 103.859722,
+          "startup_seconds": 191.19497330800004,
+          "posttrial_review_seconds": 9.633533
+        },
+        {
+          "round": 3,
+          "trial_id": "trial-4",
+          "started_at": "2026-09-13 14:07:13.232618+00:00",
+          "ended_at": "2026-09-13 14:11:34.211857+00:00",
+          "review_call_id": "01a09b1b-c6c6-79bc-b9ea-4551dd77ad84",
+          "elapsed_seconds": 260.979239,
+          "pretrial_agent_wall_seconds": 122.370022,
+          "startup_seconds": 79.08336292400054,
+          "posttrial_review_seconds": 10.237007
+        }
+      ],
+      "mean_seconds": 279.40037266666667,
+      "median_seconds": 260.979239,
+      "mean_pretrial_agent_wall_seconds": 108.34231933333334,
+      "mean_startup_seconds": 111.11660321400025,
+      "source_sha256": {
+        "result.json": "b6e0adf3d25159c9f41943b1b293f36c21ea9ba5545b8ee392fc6bf9d8cd25d1",
+        "weave-calls-normalized.json": "430d73a4b735d9341ca71314a4d85440535c2a839b4ba09dc143e1801e0bc63f"
+      }
+    },
+    {
+      "run": "live-luna-expanded-v2",
+      "rounds": [
+        {
+          "round": 1,
+          "trial_id": "trial-2",
+          "started_at": "2026-09-13 14:19:03.497365+00:00",
+          "ended_at": "2026-09-13 14:23:29.486332+00:00",
+          "review_call_id": "01a09b26-af3c-7185-a58a-103418bfb708",
+          "elapsed_seconds": 265.988967,
+          "pretrial_agent_wall_seconds": 144.726239,
+          "startup_seconds": 64.06713579999996,
+          "posttrial_review_seconds": 10.641593
+        },
+        {
+          "round": 2,
+          "trial_id": "trial-3",
+          "started_at": "2026-09-13 14:23:29.632528+00:00",
+          "ended_at": "2026-09-13 14:30:44.751692+00:00",
+          "review_call_id": "01a09b29-d91f-751a-98db-e69eab9e6b01",
+          "elapsed_seconds": 435.119164,
+          "pretrial_agent_wall_seconds": 84.951773,
+          "startup_seconds": 62.0609691059999,
+          "posttrial_review_seconds": 238.576558
+        },
+        {
+          "round": 3,
+          "trial_id": "trial-4",
+          "started_at": "2026-09-13 14:30:45.120532+00:00",
+          "ended_at": "2026-09-13 14:34:15.202416+00:00",
+          "review_call_id": "01a09b30-9234-747e-bc21-56c39e375d7a",
+          "elapsed_seconds": 210.081884,
+          "pretrial_agent_wall_seconds": 91.04527,
+          "startup_seconds": 63.066496551000455,
+          "posttrial_review_seconds": 8.429454
+        }
+      ],
+      "mean_seconds": 303.730005,
+      "median_seconds": 265.988967,
+      "mean_pretrial_agent_wall_seconds": 106.90776066666666,
+      "mean_startup_seconds": 63.06486715233344,
+      "source_sha256": {
+        "result.json": "4881095aa98763fe0a945b8c9ef6eabd503edba5e30658408f39a6b8647d873c",
+        "weave-calls-normalized.json": "5e9a7d6ad2f18cdabf17e00c759643a37901bc784396725abaaf15623a636f37"
+      }
+    }
+  ]
+}
