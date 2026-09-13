@@ -163,6 +163,19 @@ def _trial_lines(trial):
     if diagnosis:
         lines.append(f"Observed experiment result: {diagnosis.get('failure_kind', MISSING)}.")
         observed = diagnosis.get('observed') or {}
+        failure = observed.get('runtime_failure') or {}
+        if failure:
+            lines.append(f"Startup evidence: {failure.get('category', MISSING)}. "
+                         f"{failure.get('known_message', '')}")
+            if failure.get('kernel_source'):
+                lines.append(f"Reported kernel location: {failure['kernel_source']}:"
+                             f"{failure.get('kernel_line', MISSING)}.")
+            source = failure.get('source') or {}
+            lines.append(f"Failure log: {source.get('path', MISSING)}; "
+                         f"lines={', '.join(map(str, source.get('line_numbers', []))) or MISSING}; "
+                         f"SHA256={source.get('sha256', MISSING)}.")
+        if diagnosis.get('failure_kind') == 'startup-failed' and observed.get('quality') is None:
+            lines.append('No task-quality measurement was collected for this startup failure.')
         objective = observed.get('objective') or {}
         if objective:
             lines.append(f"{objective.get('priority', MISSING)}: "

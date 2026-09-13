@@ -4,6 +4,12 @@ Sera recommends and measures inference configurations, rejects quality failures,
 
 ## Demo rehearsal: plain-English guide
 
+### Latest swarm recording
+
+The [two-iteration GPU run](evidence/live-swarm-investigation-v1/README.md) is saved with its [Weave trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09a31-ec01-7c30-86cd-c51337b414a9). Three investigators compared findings. The context candidate crashed at startup; the batch candidate passed quality but gained only 0.054%, below 5%. Sera returned the working baseline and released the GPU.
+
+The run exposed a real gap: round two skipped fresh failure inspections and repeated incorrect token-count explanations. It proves safe recovery, not successful failure diagnosis. The updated code requires a failure inspection and exposes the specific startup-error record. The no-GPU follow-up check is still in progress. The older staged rehearsal below remains a separate recording.
+
 ### What we are building
 
 Sera helps someone run an AI model on the GPU they have. A GPU is the hardware that runs the model, and its memory limits how large a model it can hold. Sera checks possible settings, asks an AI agent to recommend a plan, tests that plan, and returns a model the user can actually use. It must reject a plan when the answers fail the user's checks.

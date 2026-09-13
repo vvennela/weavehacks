@@ -19,6 +19,23 @@ def test_report_separates_observed_failure_from_unproven_cause():
     assert 'Do not repeat the measured configuration.' in text
 
 
+def test_report_shows_specific_startup_error_without_claiming_a_cause():
+    report = {'search': {'rounds': []}, 'search_trials': [{'trial_id': 'trial-1',
+        'status': 'startup-failed', 'diagnosis': {'failure_kind': 'startup-failed',
+        'observed': {'quality': None, 'runtime_failure': {
+            'category': 'cutlass-internal-error',
+            'known_message': 'cutlass_gemm_caller reported Error Internal.',
+            'kernel_source': 'cutlass_gemm_caller.cuh', 'kernel_line': 62,
+            'source': {'path': 'server.log', 'line_numbers': [443, 578], 'sha256': 'source-hash'}}},
+        'root_cause': {'status': 'not-established'}}}]}
+    text = render_investigation(report)
+    assert 'Startup evidence: cutlass-internal-error' in text
+    assert 'cutlass_gemm_caller.cuh:62' in text
+    assert 'server.log; lines=443, 578; SHA256=source-hash' in text
+    assert 'No task-quality measurement was collected for this startup failure.' in text
+    assert 'Root cause: not-established' in text
+
+
 def test_swarm_report_shows_inspections_board_and_observed_overlap():
     checks = []
     for index, name in enumerate(['scheduling', 'memory_context', 'output_quality']):

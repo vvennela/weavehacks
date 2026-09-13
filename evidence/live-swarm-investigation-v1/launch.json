@@ -1,0 +1,30 @@
+{
+  "source_commit": "61aad6c9e8b08aea4de595963f3aabe3400ef00e",
+  "command": [
+    "/tmp/uv-venv/bin/python",
+    "-u",
+    "-m",
+    "experiments.run_investigation",
+    "--model",
+    "Qwen/Qwen2.5-72B-Instruct",
+    "--swarm",
+    "--auto-space",
+    "--budget",
+    "2",
+    "--priority",
+    "latency",
+    "--concurrency",
+    "1",
+    "2",
+    "4",
+    "8",
+    "--project",
+    "vvennela-n-a/wandb_agent_default_project",
+    "--provider-check",
+    "evidence/provider-v5/result.json",
+    "--output-dir",
+    "/marimo/sera-evidence/live-swarm-investigation-v1"
+  ],
+  "gpu_memory_mib_before": 0,
+  "scope": "Real autonomous swarm. Baseline plus at most two single-setting candidate trials. No forced second trial, no lowered gates."
+}
