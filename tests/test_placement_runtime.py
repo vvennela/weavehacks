@@ -220,3 +220,165 @@ def test_unresolved_gpu_identity_still_attempts_both_closes(owned, monkeypatch):
     assert set(calls) == {MODEL_ID, GLM_MODEL_ID}
     assert owner.record['cleanup_pass'] is False
     assert 'cleanup-accounting-GPUProcessIdentityError' in owner.record['cleanup_errors']
+
+
+@pytest.fixture
+def total_owned(monkeypatch):
+    import sera.placement_runtime as runtime
+    owner = runtime.SharedGPUOwner(validate_placement_plan(plan_data()), memory_accounting='total-device')
+    owner.record.update(status='active', gpu={'uuid':'test-gpu'}, memory_before_mib=0)
+    owner.groups = {MODEL_ID:100, GLM_MODEL_ID:200}
+    owner.models = [SimpleNamespace(model_id=model, record={'status':'ready'}) for model in owner.groups]
+    snapshot = dict(uuid='test-gpu', used_mib=600, total_mib=1000)
+    rows = [dict(uuid='test-gpu', pid=1, used_mib=600)]
+    monkeypatch.setattr(runtime, 'gpu_snapshot', lambda: snapshot)
+    monkeypatch.setattr(runtime, 'gpu_process_rows', lambda: rows)
+    monkeypatch.setattr(runtime.os, 'getpgid', lambda pid: pid)
+    return runtime, owner, snapshot, rows
+
+
+def test_accounting_mode_must_be_explicit_and_known():
+    from sera.placement_runtime import SharedGPUOwner
+    assert SharedGPUOwner(plan_data()).memory_accounting == 'per-service'
+    with pytest.raises(ValueError, match='accounting'):
+        SharedGPUOwner(plan_data(), memory_accounting='auto')
+
+
+def test_total_device_mode_accepts_unmapped_pid_without_inventing_service_memory(total_owned):
+    _, owner, _, _ = total_owned
+    owner.check()
+    assert owner.record['memory_accounting'] == 'total-device'
+    assert owner.record['service_peak_memory_mib'] == {MODEL_ID:None, GLM_MODEL_ID:None}
+    assert owner.record['sampled_peak_memory_mib'] == 600
+    assert owner.record['per_service_memory_verified'] is False
+    assert owner.record['unresolved_gpu_processes'][0]['pid'] == 1
+    assert all(model.record['sampled_peak_memory_mib'] is None for model in owner.models)
+
+
+@pytest.mark.parametrize('field,value', [('used_mib',801), ('uuid','other-gpu'),
+                                        ('total_mib',999), ('used_mib',-1)])
+def test_total_device_mode_preserves_device_limits_and_identity(total_owned, field, value):
+    _, owner, snapshot, _ = total_owned
+    snapshot[field] = value
+    with pytest.raises(RuntimeError):
+        owner.check()
+
+
+def test_total_device_rejects_identifiable_unrelated_gpu_process(total_owned):
+    _, owner, _, rows = total_owned
+    rows.append(dict(uuid='test-gpu', pid=900, used_mib=1))
+    with pytest.raises(RuntimeError):
+        owner.check()
+    assert 'unrelated-gpu-process' in owner.record['errors']
+
+
+def test_total_device_query_failure_remains_fatal(total_owned, monkeypatch):
+    runtime, owner, _, _ = total_owned
+    def unavailable():
+        raise ValueError('N/A')
+    monkeypatch.setattr(runtime, 'gpu_process_rows', unavailable)
+    with pytest.raises(RuntimeError):
+        owner.check()
+    assert owner.record['telemetry_errors'] == 1
+
+
+def test_total_device_invisible_pid_is_a_declared_limit_not_fake_ownership(total_owned, monkeypatch):
+    runtime, owner, _, rows = total_owned
+    rows[0]['pid'] = 54321
+    def missing(pid):
+        raise ProcessLookupError(pid)
+    monkeypatch.setattr(runtime.os, 'getpgid', missing)
+    owner.check()
+    assert owner.record['unresolved_gpu_processes'][0]['pid'] == 54321
+    assert owner.record['last_processes'][0]['process_group'] is None
+
+
+@pytest.mark.parametrize('busy', [False, True])
+def test_total_device_acquisition_keeps_idle_check_and_exclusive_lock(total_owned, monkeypatch, tmp_path, busy):
+    runtime, owner, snapshot, rows = total_owned
+    snapshot['used_mib'] = 0
+    if not busy:
+        rows.clear()
+    lock = tmp_path/'owner.lock'
+    monkeypatch.setattr(runtime, 'Path', lambda _: lock)
+    if busy:
+        with pytest.raises(RuntimeError, match='already in use'):
+            owner.acquire()
+        assert owner._lock_file is None
+    else:
+        owner.acquire()
+        competitor = runtime.SharedGPUOwner(plan_data(), memory_accounting='total-device')
+        try:
+            with pytest.raises(BlockingIOError):
+                competitor.acquire()
+            assert competitor._lock_file is None
+        finally:
+            owner._release_lock()
+
+
+def test_total_device_rechecks_idle_memory_after_acquiring_lock(total_owned, monkeypatch, tmp_path):
+    runtime, owner, snapshot, rows = total_owned
+    rows.clear()
+    samples = iter([dict(snapshot, used_mib=0), dict(snapshot, used_mib=129)])
+    monkeypatch.setattr(runtime, 'gpu_snapshot', lambda: next(samples))
+    monkeypatch.setattr(runtime, 'Path', lambda _: tmp_path/'owner.lock')
+    with pytest.raises(RuntimeError, match='already in use'):
+        owner.acquire()
+    assert owner._lock_file is None
+
+
+def test_total_device_service_cleanup_checks_local_group_and_defers_gpu_release(total_owned, monkeypatch):
+    runtime, owner, _, _ = total_owned
+    def signal(group, value):
+        assert value == 0
+        assert group in owner.groups.values()
+        raise ProcessLookupError(group)
+    monkeypatch.setattr(runtime.os, 'killpg', signal)
+    owner.verify_service_cleanup(owner.models[0])
+    record = owner.models[0].record
+    assert record['cleanup_pass'] is True
+    assert record['owned_local_process_group_released'] is True
+    assert record['gpu_release_verification'] == 'deferred-to-owner-final-close'
+
+
+@pytest.mark.parametrize('remaining', ['gpu-row', 'device-memory', 'local-group', None])
+def test_total_device_final_cleanup_requires_all_three_release_checks(total_owned, monkeypatch, remaining):
+    runtime, owner, snapshot, rows = total_owned
+    calls = []
+    for model in owner.models:
+        model.close = lambda model=model: calls.append(model.model_id)
+    if remaining != 'gpu-row':
+        rows.clear()
+    snapshot['used_mib'] = 129 if remaining == 'device-memory' else 0
+    def signal(group, value):
+        assert group in owner.groups.values() and value == 0
+        if remaining != 'local-group':
+            raise ProcessLookupError(group)
+    monkeypatch.setattr(runtime.os, 'killpg', signal)
+    tick = iter([0, 20, 40, 60, 80, 100])
+    monkeypatch.setattr(runtime.time, 'monotonic', lambda: next(tick))
+    if remaining is None:
+        owner.close()
+    else:
+        with pytest.raises(CleanupError):
+            owner.close()
+    assert owner.record['cleanup_pass'] is (remaining is None)
+    assert set(calls) == {MODEL_ID, GLM_MODEL_ID}
+
+
+def test_total_device_cleanup_query_error_cannot_pass_or_skip_either_close(total_owned, monkeypatch):
+    runtime, owner, _, _ = total_owned
+    calls = []
+    for model in owner.models:
+        model.close = lambda model=model: calls.append(model.model_id)
+    def no_group(group, signal):
+        raise ProcessLookupError(group)
+    monkeypatch.setattr(runtime.os, 'killpg', no_group)
+    def unavailable():
+        raise ValueError('N/A')
+    monkeypatch.setattr(runtime, 'gpu_process_rows', unavailable)
+    with pytest.raises(CleanupError):
+        owner.close()
+    assert owner.record['cleanup_pass'] is False
+    assert set(calls) == {MODEL_ID, GLM_MODEL_ID}
+    assert 'cleanup-accounting-ValueError' in owner.record['cleanup_errors']
