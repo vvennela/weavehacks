@@ -4,6 +4,19 @@ Updated 2026-09-13. **Single-model swarm and constrained two-model placement dem
 This file separates implementation from measured acceptance. It does not mark
 unproven features complete because their tests pass.
 
+Latest check: the final installed-wheel joint repeat failed GLM's latency gate
+(192.68 ms versus the fixed 187.93 ms ceiling). Both models passed task quality,
+memory stayed below 24 GiB, and cleanup returned the GPU to zero usage. The older
+passing joint run below remains valid historical evidence, not a guarantee that
+the latest repeat passed. The cause of the timing difference is not established.
+
+The blank [Example run notebook](notebooks/Example%20run.ipynb) and hosted-provider
+adapters are pushed. Source `89030bd` passes 1,568 tests with one optional skip.
+Astra through the OpenAI API and LiteLLM passed a connection smoke. The first
+[full provider check](evidence/openai-example-v1/README.md) passed 33 of 34 cases
+and stopped before GPU work on a specialist-role mismatch. The direct API route
+has not yet completed a live optimization. No API keys are stored in the notebook.
+
 ## What works
 
 The autonomous loop has real Luna and Astra recordings: three investigators read
@@ -18,9 +31,18 @@ cleanly. The [Luna repeat](evidence/live-luna-expanded-v2/README.md) also comple
 with an 18.73% gain on that workload; it required one controller reconnection.
 Neither result proves general reasoning reliability or globally optimal settings.
 
-The combined source suite passes **1,360 tests**, with one optional marimo skip
-(`uv run --frozen --extra dev pytest -q`, 45.97 s). The final focused placement/runtime/recovery/portable/API check passes
-149 tests. Clean installation checks are separate from live GPU acceptance.
+The final source suite passes **1,512 tests**, with one optional marimo skip
+(`uv run --frozen --extra dev pytest -q`, 62.22 s) on `befda96`, in a fresh frozen
+development environment. The previously stale lock file now includes the current
+package and its dependencies. Clean installation checks are separate from live GPU acceptance.
+
+[Ordered stages](docs/staged-optimization.md) are implemented and tested through
+the real pipeline with synthetic GPU/provider boundaries. For
+`stages=['latency', 'quantization'], k=3.0`, a 2% memory gain with 1% latency
+regression is accepted; 4% latency regression and quality failures are rejected.
+`k` is the allowed regression in earlier objectives, not a minimum gain. Each
+stage remeasures the previous winner, freezes its evidence, and preserves the
+earlier limits. These tests do not establish a live staged speedup.
 
 The [README quick check](README.md#quick-test-does-the-loop-work) passes 45 offline
 checks and includes a repeatable script that saves a synthetic loop report. It
@@ -35,18 +57,19 @@ requires no GPU or API key and makes no real inference-performance claim.
 | 3. Free GPU capacity | Qwen72B FP8 fits where its BF16 weights exceed the physical card. The Qwen0.6B + GLM9B FP8 pair now passes together within a declared 24 GiB budget, peaking at 19,904 MiB. | The matching BF16 placement rejection is an estimate, not measured savings or proof that every BF16 allocation fails. Real 2/4/8-GPU validation is excluded by user agreement, not completed. |
 | 4. Recovery | Single-model SQLite checkpoints, exclusive ownership, interrupted-trial handling, and safe resume are merged. Offline process-kill tests pass. | Live unattended outage recovery and long-running reliability tests are deferred. Placement resume is not implemented; the single-model resume constraints remain explicit. |
 | 5. Pressure scenarios | Both frozen pilots ran, their raw counters were audited, and cleanup passed. | Neither scenario met its acceptance thresholds. No cache-pressure or reversed-pressure optimization claim. |
-| 6. Release | Final combined-code joint rehearsal and clean base/swarm wheel checks pass. Both returned runners are usable and cleanup is verified. | No generic production certification, live outage test, or soak test. Installed-wheel GPU provenance and partner presentation rehearsal remain separate acceptance items. |
+| 6. Release | Clean base/swarm wheel checks pass. The previous source joint run returned usable runners and cleaned up. | The final installed-wheel repeat failed GLM latency. No generic production certification, live outage test, or soak test. Partner presentation rehearsal remains separate. |
 
 Evidence: [benchmark and pressure audit](evidence/final-benchmark-audit-v1/README.md),
 [live grid comparison](evidence/live-grid-comparison-v1/README.md),
 [capacity calibration](evidence/capacity-calibration-v1/README.md),
 [passing joint placement](evidence/live-placement-total-v1/README.md),
 [SQLite recovery](docs/optimizer-recovery.md),
-[latest clean package checks](evidence/final-package-release-v3/README.md).
+[latest clean package checks](evidence/stable-release-package-v2/README.md).
 
-The final tested wheel is built from source `6130d9e`; SHA-256:
-`7be439e26fc5f68aacc35ae2f49e261e3198769c818e90549061357a8a43b6bf`.
-Both clean installations and all 66 packaged source-file comparisons pass.
+The final tested wheel is built from source `befda96`; SHA-256:
+`e5e3a0856385e4da8523f5d9f4aa294a86bf490dbc99bf1dcd2c1144e653334d`.
+Both clean installations and all 68 packaged source-file comparisons pass.
+Two independent builds have identical bytes; 23 package audit commands pass.
 
 ## Passing joint placement
 

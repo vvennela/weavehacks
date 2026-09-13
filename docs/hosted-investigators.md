@@ -11,6 +11,19 @@ do not replace that GPU runtime.
 
 ## Keys and model identity
 
+For the blank, step-by-step demo, open [Example run.ipynb](../notebooks/Example%20run.ipynb)
+from the repository checkout. It has no saved keys or outputs. Use its hidden
+runtime prompts, then check each service before GPU work.
+
+The `litellm-openai` route calls OpenAI directly through the LiteLLM SDK; it does
+not require a proxy or the Codex controller. Install `.[swarm,litellm]`, select
+`gpt-6-astra`, and provide an OpenAI API key separately from the W&B tracing key.
+The SDK route uses a fixed OpenAI endpoint, low reasoning effort, a 2,048-token
+completion limit, and the same local proposal and evidence validation. Its wire
+schema omits the unsupported root `anyOf`; local validation still enforces those
+action/value combinations. Certificates record and check the exact wire schema.
+The provider compatibility check remains required before GPU execution.
+
 - `SERA_AGENT_API_KEY` authenticates investigator requests to the chosen endpoint.
 - `WANDB_API_KEY` authenticates Weave logging and reads. It is still required for
   the configured traced swarm, even when W&B does not host the investigators.

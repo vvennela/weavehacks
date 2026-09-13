@@ -14,9 +14,9 @@ recordings remain unchanged, including failed experiments.
 | --- | --- |
 | Autonomous single-model loop | Passed: three investigators, shared findings, arbiter selection, measured feedback, progress-based stop, usable returned runner, and cleanup in the saved [Astra and Luna runs](../evidence/expanded-swarm-comparison/README.md). |
 | Joint model acceptance | Passed: the specified Qwen0.6B + GLM9B pair meets unchanged quality, latency, overlap, total-device memory, returned-runner, and cleanup gates. [Independent audit](../evidence/live-placement-total-v1/README.md). |
-| Source regression suite | 1,360 passed, one optional marimo skip on the backend source included in `f61e6ae`. The final package check records its exact source and dependency versions. |
-| Clean package installation | Passed for the existing [v3 wheel](../evidence/final-package-release-v3/README.md). Rebuild and verify the final documentation-bearing wheel before distribution. |
-| Installed-package live joint run | Pending final wheel rehearsal. A source-checkout run does not satisfy installed-package provenance. |
+| Source regression suite | 1,512 passed, one optional marimo skip on `befda96`, in a fresh frozen development environment. |
+| Clean package installation | Passed for the final [staged release wheel](../evidence/stable-release-package-v2/README.md): 23 checks, 68 source files matched, two byte-identical builds. |
+| Installed-package live joint run | Failed: GLM p95 was 192.68 ms against the fixed 187.93 ms ceiling. Both task gates, memory, and cleanup passed. The earlier passing source run does not override this repeat. |
 | Credential handling | Keys stay in the environment. Reports do not contain secret values. A local Codex controller remains required for the demonstrated investigator route. |
 
 Do not promote a failed gate by lowering its threshold. Preserve the failed
@@ -30,6 +30,10 @@ result, fix the cause, and rerun the affected check.
 - The default investigator search has no total trial cap. It stops under the
   progress and confirmation rule, or when no legal experiment remains. A caller
   can explicitly request a cap. Eight options per specialist is not a trial cap.
+- Ordered stages support latency, memory, and supported quantization controls.
+  `k` permits bounded regression in earlier objectives; the next objective must
+  improve and quality remains fixed. Synthetic integration tests pass. A live
+  staged speedup and whole-sequence crash resume remain unproven.
 - The joint run uses Qwen3-0.6B BF16 and GLM-4-9B FP8 weights/BF16 KV. Each passes
   eight task checks and 96 timed task checks at concurrency 1/2/4/8. Each model's
   worst-load p95 must stay within 10% of its matching isolated p95.
