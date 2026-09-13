@@ -152,3 +152,49 @@ def test_wire_schema_matches_each_integer_control_bounds_and_role():
         assert branch['agent_role'] == {'const': 'batching'}
         expected = TypeAdapter(RuntimeConfig.model_fields[lever].rebuild_annotation()).json_schema()
         assert branch['proposed_value'] == expected
+
+
+def test_request_schema_has_only_exact_non_null_metrics_without_mutating_base():
+    from sera.agent import request_schema
+    original = Proposal.model_json_schema()
+    schema = request_schema('proposal', {'metrics': {'zero': 0, 'missing': None, 'latency': 12}})
+    assert schema['properties']['evidence_used']['items'] == {
+        'type': 'string', 'enum': ['latency', 'zero']}
+    assert Proposal.model_json_schema() == original
+    assert 'enum' not in original['properties']['evidence_used']['items']
+    assert request_schema('frontier', {}) == FrontierDecision.model_json_schema()
+
+
+@pytest.mark.parametrize('metrics', [{}, {'missing': None}])
+def test_no_metric_fails_closed_before_provider_call(monkeypatch, metrics):
+    import sys
+    from types import SimpleNamespace
+    from sera.agent import WandbAgent
+
+    def unexpected_call(**kwargs):
+        pytest.fail('No metric must fail before constructing an API client')
+
+    monkeypatch.setenv('WANDB_API_KEY', 'not-a-real-test-key')
+    monkeypatch.setitem(sys.modules, 'openai', SimpleNamespace(OpenAI=unexpected_call))
+    agent = WandbAgent(project='test/project')
+    with pytest.raises(ValueError, match='available metric'):
+        agent.request('proposal', {'metrics': metrics}, 'Propose')
+    assert agent.history == []
+
+
+@pytest.mark.parametrize('citation', ['metrics.p95_latency_ms', 'p95_latency_ms=100', 'missing', ' p95_latency_ms '])
+def test_dynamic_response_validation_rejects_unavailable_citations(citation):
+    import json
+    from sera.agent import parse_response
+    evidence = {'metrics': {'p95_latency_ms': 100, 'missing': None}}
+    with pytest.raises(ValueError, match='evidence'):
+        parse_response('proposal', json.dumps(proposal_data() | {'evidence_used': [citation]}), evidence)
+
+
+def test_dynamic_validation_does_not_replace_parent_and_specialist_context_validation():
+    import json
+    from sera.agent import parse_response
+    # This is schema-valid data, but the real parent/budget validator must still reject it later.
+    parsed = parse_response('proposal', json.dumps(proposal_data()),
+                            {'metrics': {'p95_latency_ms': 100}})
+    assert parsed == Proposal(**proposal_data())

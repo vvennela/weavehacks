@@ -4,7 +4,8 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .agent import AGENT_MODEL, SCHEMAS, WandbAgent, schema_hash, validate_proposal
+from .agent import (AGENT_MODEL, REQUEST_SCHEMA_PROTOCOL, SCHEMAS, WandbAgent,
+                    parse_response, request_schema, schema_hash, validate_proposal)
 from .config import MODEL_ID, RuntimeConfig, SUPPORTED_CHANGES
 from .storage import content_hash, save_json
 
@@ -86,6 +87,7 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL):
     record = {"schema_version": "sera-provider-check-v1", "model": model, "project": project,
               "created_at": datetime.now(timezone.utc).isoformat(), "status": "running",
               "schema_hash": schema_hash(), "cases_hash": content_hash(cases), "cases": cases,
+              "request_schema_protocol": REQUEST_SCHEMA_PROTOCOL,
               "schemas": {name: schema.model_json_schema() for name, schema in SCHEMAS.items()},
               "requests": agent.history, "context_checks": [],
               "limits": "Synthetic evidence; schema compatibility only, not search quality or GPU evidence."}
@@ -150,6 +152,10 @@ def require_provider_check(path, agent):
     for case, entry in zip(provider_cases(), requests):
         if entry.get("role") != case["role"] or entry.get("evidence") != case["evidence"]:
             raise ValueError("Provider check cases do not match the frozen experiment")
+        expected_schema = request_schema(case["role"], case["evidence"])
+        if (entry.get("schema_hash") != content_hash(expected_schema)
+                or entry.get("request_schema") != expected_schema):
+            raise ValueError("Provider check request schema does not match the frozen evidence")
         attempts = entry.get("attempts", [])
         if not 1 <= len(attempts) <= 2:
             raise ValueError("Each provider request allows at most one retry")
@@ -159,7 +165,7 @@ def require_provider_check(path, agent):
                 choice = attempt["raw_response"]["choices"][0]
                 if choice.get("finish_reason") != "stop":
                     raise ValueError("Incomplete provider response")
-                parsed = SCHEMAS[case["role"]].model_validate_json(choice["message"]["content"])
+                parsed = parse_response(case["role"], choice["message"]["content"], case["evidence"])
                 valid.append(True)
             except (ValueError, KeyError, TypeError, IndexError):
                 valid.append(False)
