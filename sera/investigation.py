@@ -64,11 +64,12 @@ def round_evidence(initial, search, trials, remaining):
         review_error=trial.get('review_error')) for trial in trials]
     evidence['previous_rounds'] = [dict(round=record['round'], trial_ids=record['trial_ids'][:],
         arbiter=deepcopy(record.get('arbiter')), arbiter_error=record.get('arbiter_error'),
+        specialist_participation=deepcopy(record.get('specialist_participation', [])),
         specialists=[{key: deepcopy(check[key]) for key in
                       ('role', 'status', 'proposal', 'error', 'arbiter_proposal_id')
                       if key in check} for check in record['specialists']]) for record in search['rounds']]
     # Exact metric names remain valid citations, including failed-trial measurements.
-    for index, trial in enumerate(trials, 1):
+    for index, trial in enumerate(trials, search.get('initial_trials_used', 0) + 1):
         metrics = dict(trial.get('reduced', {}))
         metrics['sampled_peak_memory_mib'] = trial['runtime'].get('sampled_peak_memory_mib')
         metrics.update(load_snapshot_metrics(trial))
@@ -77,7 +78,28 @@ def round_evidence(initial, search, trials, remaining):
     return evidence
 
 
+def specialist_participation(evidence, legal):
+    """Record eligibility separately from actual requests and their outcomes."""
+    participation = []
+    for role in ('quantization', 'batching'):
+        count = sum(entry[0] == role for entry in legal)
+        enabled = any(CONTROL_ROLES.get(lever) == role and values
+                      for lever, values in evidence['supported_changes'].items())
+        if count:
+            reason = 'Legal untested candidates are available for this specialist.'
+        elif not enabled:
+            reason = 'No control values are enabled for this specialist in this run.'
+        else:
+            reason = 'No legal untested candidate remains for this specialist.'
+        participation.append(dict(role=role, status='active' if count else 'inactive',
+                                  reason=reason, legal_candidate_count=count))
+    participation.append(dict(role='parallelism', status='inactive', legal_candidate_count=0,
+        reason='Single-GPU runtime fixes tensor_parallel_size at 1; parallelism controls are not enabled.'))
+    return participation
+
+
 def choose_experiments(agent, evidence, legal, record, remaining):
+    record['specialist_participation'] = specialist_participation(evidence, legal)
     proposals = {}
     for role in ('quantization', 'batching'):
         entries = [entry for entry in legal if entry[0] == role]
@@ -143,7 +165,7 @@ def choose_experiments(agent, evidence, legal, record, remaining):
 
 
 def investigate(*, result, active, agent, history_start, budget, objective, constraints,
-                evaluation, evaluation_version, workload):
+                evaluation, evaluation_version, workload, initial_trials_used=0):
     from . import pipeline
 
     report, folder = result.report, result.output_dir
@@ -165,9 +187,13 @@ def investigate(*, result, active, agent, history_start, budget, objective, cons
     try:
         # Ownership has already transferred from optimize. Even setup failures
         # must close the running baseline.
+        if (type(initial_trials_used) is not int
+                or not 0 <= initial_trials_used <= budget.max_candidate_trials):
+            raise ValueError('Initial trials used must be an integer within the candidate budget')
         baseline = report['baseline']
         baseline_config = RuntimeConfig.model_validate(report['baseline_configuration'])
-        search = dict(budget=budget.model_dump(), trials_used=0, rounds=[], stop_reason=None)
+        search = dict(budget=budget.model_dump(), initial_trials_used=initial_trials_used,
+                      trials_used=initial_trials_used, rounds=[], stop_reason=None)
         report.update(mode='agent-investigation', search=search, search_trials=[],
                       limits=['single model', 'already-active single-setting controls',
                               'no combination trials', 'no live search-advantage claim'])
