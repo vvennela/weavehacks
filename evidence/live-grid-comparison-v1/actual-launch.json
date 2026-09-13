@@ -1,0 +1,19 @@
+{
+  "source_revision": "6601669e47879b0492cab09130123a363ae8b91a",
+  "command": [
+    "/tmp/uv-venv/bin/python",
+    "-m",
+    "benchmarks.live_comparison",
+    "run-live",
+    "--registration",
+    "/marimo/sera-evidence/grid-comparison-registration-v1.json",
+    "--output-dir",
+    "/marimo/sera-evidence/live-grid-comparison-v1"
+  ],
+  "cwd": "/marimo/sera-grid-comparison-v1",
+  "registration_hash": "2843eee593b706529bd178369ef91a529900ee6cb8412ce27ffa553e019c1eb5",
+  "started_at": "2026-09-13T16:26:49.251196+00:00",
+  "agent_model": "gpt-5.6-luna",
+  "scope": "Exploratory live swarm versus frozen full grid; not full section19 certification.",
+  "max_candidate_trials": null
+}

@@ -1,0 +1,9 @@
+{
+  "registration_hash": "2843eee593b706529bd178369ef91a529900ee6cb8412ce27ffa553e019c1eb5",
+  "started_at": "2026-09-13T16:26:49.551697+00:00",
+  "status": "closed",
+  "source_settings": "live_arguments(registration); explicit FP8 baseline; no total trial cap",
+  "result_hash": "1c4d5b7c80386fdce73c5f28c1efc057f056522d8c05d4636cc0d917184117d3",
+  "closed_at": "2026-09-13T16:40:42.682102+00:00",
+  "weave_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09b97-cb9a-701a-a608-ea20decf8416"
+}
