@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b44-eb54-7d11-aea5-86c4c85cac63"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"selected_trial_id\":\"trial-1\",\"prediction_outcome\":\"confirmed\",\"reason\":\"The trial was measured and accepted: p95 latency decreased from 72.793829 ms to 44.002404 ms, a 39.55% improvement exceeding the 5% objective, while quality passed and generation_errors remained 0. This supports the measured p95 portion of the prediction; no unmeasured TTFT gain is claimed. Evidence: status, decision, reduced, and decision/candidate_quality.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12749,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":403,"reasoning_output_tokens":288}}

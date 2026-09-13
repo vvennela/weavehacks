@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"b57139986ab8e567e12c6a7c758c84a46a1fa3b396ced928e2b699d47e041a21\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"enforce_eager\",\"proposed_value\":false,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"trial_2_successful_requests\",\"trial_2_generation_errors\",\"sampled_peak_memory_mib\",\"trial_2_sampled_peak_memory_mib\"],\"predicted_metric_change\":\"Hypothesis: graph-enabled execution (enforce_eager=false) will reduce p95_latency_ms from the baseline 72.79382900014753 ms by at least 5%, with successful_requests unchanged and generation_errors remaining 0; quality must still meet the fixed 0.99 floor.\",\"confidence\":0.55,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute this prediction if the trial's p95_latency_ms is not at least 5% below 72.79382900014753 ms, or if successful_requests falls, generation_errors rises above 0, or the fixed quality floor fails. Check source call 01a09b44-ea04-7916-85aa-2c6f5385c7f4 and fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, decision/candidate_quality; also compare trial-2 source call 01a09b47-3296-77b3-bb96-2fb0b5c36332 and its same paths.\",\"reason\":\"Observed failure: trial-2 was collected successfully but objective-not-improved: trial_2_p95_latency_ms was 75.49963299970841 ms versus baseline p95_latency_ms 72.79382900014753 ms, with no generation errors; source call 01a09b47-3296-77b3-bb96-2fb0b5c36332, paths status, decision, reduced, runtime/sampled_peak_memory_mib, decision/candidate_quality. The cause is unknown and not established by that observation. Trial-1 evidence at source call 01a09b44-ea04-7916-85aa-2c6f5385c7f4 shows a large accepted latency result, but its tested control is unavailable in the current candidates. I therefore select the legal, untested enforce_eager=false graph-execution candidate to test whether execution strategy affects latency while preserving quality; measured memory does not by itself establish causality.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 22574,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 913,
+    "reasoning_output_tokens": 342
+  }
+}

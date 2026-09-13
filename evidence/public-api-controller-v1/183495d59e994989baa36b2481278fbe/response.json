@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"The recorded failed experiment was trial-2: p95 latency increased from 72.79382900014753 ms to 75.49963299970841 ms, yielding -0.03717078819353494 improvement against the required 0.05, while all 12 requests succeeded and generation_errors was 0. The diagnosis explicitly leaves the root cause not established, so inspect persisted latency-outlier evidence before selecting another experiment.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 16218,
+    "cached_input_tokens": 5888,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 222,
+    "reasoning_output_tokens": 106
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"The observed failure is trial-2 objective-not-improved: measured p95 latency was 75.49963299970841 ms versus the 72.79382900014753 ms baseline, an improvement fraction of -0.03717078819353494 below the required 0.05, despite 12 successful requests and zero generation errors. The root cause remains unknown; recorded cumulative queue and TTFT snapshots do not establish causality. Inspect latency outliers to examine persisted per-load latency behavior after the failed experiment.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 16461,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 268,
+    "reasoning_output_tokens": 135
+  }
+}

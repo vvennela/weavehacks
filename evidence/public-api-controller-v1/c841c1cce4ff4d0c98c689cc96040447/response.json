@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-scheduling-prefix-001\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"enable_prefix_caching\",\"proposed_value\":true,\"evidence_used\":[\"p95_latency_ms\",\"p50_latency_ms\",\"concurrency_1_cumulative_snapshot_mean_ttft_ms\",\"concurrency_4_cumulative_snapshot_mean_ttft_ms\",\"successful_requests\",\"generation_errors\",\"input_tokens\"],\"predicted_metric_change\":\"For repeated prompts, enable_prefix_caching is predicted to reduce p95_latency_ms and concurrency_1_cumulative_snapshot_mean_ttft_ms relative to baseline; this is an unmeasured hypothesis. The fixed prompt evidence is input_token_ids (25 tokens per prepared prompt), and read 01a09b42-fd9f-7971-8e32-f2596be0a51a reports successful repeated-load measurements.\",\"confidence\":0.45,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute the prediction if the trial preserves quality but shows no latency reduction, or increases p95_latency_ms, at the measured repeated-prompt scope; also refute operational usefulness if generation_errors rises or successful_requests falls. Compare against baseline read 01a09b42-fd9f-7971-8e32-f2596be0a51a and fixed path input_token_ids.\",\"reason\":\"No observed execution or inspection failure exists: baseline had successful_requests=12 and generation_errors=0, while inspection records for read calls 01a09b42-fd9f-7971-8e32-f2596be0a51a and 01a09b42-fd99-7b71-ade1-9837d99bc1a8 were complete. Baseline p95_latency_ms was 72.79382900014753, with concurrency_1_cumulative_snapshot_mean_ttft_ms 28.81622314453125 and concurrency_4_cumulative_snapshot_mean_ttft_ms 32.726168632507324. The unknown cause of latency is not treated as proven; because the workload explicitly uses repeated prompts and the fixed evidence path input_token_ids shows 25-token prepared prompts, prefix reuse is a legal, untested hypothesis. This setting changes the next experiment by testing that hypothesis directly under the declared cache-evaluation scope.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17579,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 738,
+    "reasoning_output_tokens": 233
+  }
+}

@@ -2,7 +2,7 @@
 
 The completed single-model recordings are saved under `evidence/expanded-swarm-comparison`. This checklist distinguishes implementation from live acceptance.
 
-Current checkpoint: items 1–4 from the work plan are merged as the three groups below. The combined suite passes 917 tests. Clean installation of the merged wheel passes; the installed public API is undergoing a separate Molab rehearsal. Transport recovery has offline fault coverage, not a new demonstrated live outage. The benchmark collector and replay adapters are implemented, but no new frozen GPU collection or search-superiority result exists. See [package validation](simple-release-validation.md), [recovery scope](relay-recovery.md), and [benchmark instructions](benchmark-collection.md).
+Current checkpoint: items 1–4 from the work plan are merged as the three groups below. The combined suite passes 917 tests. Clean installation and the [installed public API rehearsal](../evidence/public-api-release-v1/README.md) pass; that quick-mode run explicitly does not pass task correctness. It completed three investigation rounds, returned a runner, saved a Weave trace, and cleaned up. Transport recovery has offline fault coverage, not a new demonstrated live outage. The benchmark collector and replay adapters are implemented, but no new frozen GPU collection or search-superiority result exists. See [package validation](simple-release-validation.md), [recovery scope](relay-recovery.md), and [benchmark instructions](benchmark-collection.md).
 
 ## 1. Simple entry point and packaging
 

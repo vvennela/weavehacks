@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-memory-context-001\",\"agent_role\":\"quantization\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen3-0.6B\",\"changed_lever\":\"kv_cache_dtype\",\"proposed_value\":\"fp8\",\"evidence_used\":[\"sampled_peak_memory_mib\",\"generation_errors\",\"p95_latency_ms\",\"successful_requests\"],\"predicted_metric_change\":\"The fp8 KV-cache trial should reduce sampled_peak_memory_mib relative to the baseline while preserving successful_requests and generation_errors; p95_latency_ms may remain similar, with no claimed gain before measurement. This tests cache precision directly despite the baseline's lack of observed failure, using inspection call IDs 01a09b42-fd9d-7a36-a4cd-cd77a14d5941 and 01a09b42-fd99-7b71-ade1-9837d99bc1a8 and prepared lengths from input_token_ids.\",\"confidence\":0.62,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute the prediction if sampled_peak_memory_mib does not decrease, or if generation_errors becomes nonzero or successful_requests declines; materially worse p95_latency_ms would also reject the setting. Compare against the baseline observations from inspection call IDs 01a09b42-fd9d-7a36-a4cd-cd77a14d5941 and 01a09b42-fd99-7b71-ade1-9837d99bc1a8, with input_token_ids as the fixed prompt-length evidence path.\",\"reason\":\"Observed failure: none. The baseline completed all 12 requests with generation_errors 0, successful_requests 12, and zero preemptions; inspection call IDs 01a09b42-fd9d-7a36-a4cd-cd77a14d5941 and 01a09b42-fd99-7b71-ade1-9837d99bc1a8 show successful outputs, while input_token_ids reports 25 prepared tokens per prompt. The unknown is whether cache precision affects memory or latency under this workload. fp8 is an available-for-trial, model-specific cache control and is the most direct untested memory experiment; context reduction is not selected because a smaller max_model_len alone does not establish lower reserved KV memory at fixed gpu_memory_utilization.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17143,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 869,
+    "reasoning_output_tokens": 364
+  }
+}

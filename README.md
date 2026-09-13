@@ -8,7 +8,7 @@ The [candidate catalog and expanding search](docs/candidate-catalog.md) describe
 
 ### Current release work
 
-The simple API, clean-install packaging, controller recovery, and frozen benchmark collector are merged. The combined suite passes **917 tests**. See [release acceptance](docs/release-acceptance.md), [the simple API](docs/simple-release.md), and [benchmark collection](docs/benchmark-collection.md). Clean installation passes; a separate installed-package GPU rehearsal is in progress. Recovery fault tests are not proof of a real unattended outage, and collector implementation is not proof that Sera beats grid or random search. Two-model placement and broader hardware remain later work.
+The simple API, clean-install packaging, controller recovery, and frozen benchmark collector are merged. The combined suite passes **917 tests**. Clean installation and the [installed-package GPU rehearsal](evidence/public-api-release-v1/README.md) pass: three rounds, automatic stop, returned runner, Weave trace, and clean shutdown. That quick-mode rehearsal does not establish task correctness; its wrong arithmetic answers are saved. See [release acceptance](docs/release-acceptance.md), [the simple API](docs/simple-release.md), and [benchmark collection](docs/benchmark-collection.md). Recovery fault tests are not proof of a real unattended outage, and collector implementation is not proof that Sera beats grid or random search. Two-model placement and broader hardware remain later work.
 
 ### Current expanded loop
 

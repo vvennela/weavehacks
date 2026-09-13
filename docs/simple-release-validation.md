@@ -12,7 +12,7 @@ The merged API and recovery wheel was checked again outside the checkout.
 - Combined API, recovery, and benchmark suite at `316de88`: **917 passed**.
 - The same wheel was installed in Molab through marimo's package manager. A fresh isolated process found `sera.api.optimize` in site-packages and accepted the existing 34-case Luna certificate. It reused the existing GPU runtime and cached model files.
 
-The live check is separate from these local checks. Do not treat the local smoke as a GPU result.
+The [separate live installed-package check](../evidence/public-api-release-v1/README.md) passed its runtime acceptance: three investigation rounds, a returned runner, a Weave trace, and cleanup. It used quick-mode token agreement and failed arithmetic correctness. Do not treat either the local smoke or that runtime acceptance as task-quality validation.
 
 ## Original API worker check
 

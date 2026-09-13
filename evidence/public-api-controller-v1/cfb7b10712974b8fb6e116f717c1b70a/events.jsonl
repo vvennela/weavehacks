@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09b47-6395-7293-94a4-64d961be5b9b"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"The observed failure is trial-2 objective-not-improved: measured p95 latency was 75.49963299970841 ms versus the 72.79382900014753 ms baseline, an improvement fraction of -0.03717078819353494 below the required 0.05, despite 12 successful requests and zero generation errors. The root cause remains unknown; recorded cumulative queue and TTFT snapshots do not establish causality. Inspect latency outliers to examine persisted per-load latency behavior after the failed experiment.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":16461,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":268,"reasoning_output_tokens":135}}
