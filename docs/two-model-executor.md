@@ -40,7 +40,8 @@ profiles = {
         glm_prompts, glm_scorer, "my-task-v1", Workload(concurrency=[1, 2, 4, 8])),
 }
 with place(plan=frozen_plan, workloads=profiles,
-           memory_estimates=frozen_estimates, output_dir="placement-run-001") as result:
+           memory_estimates=frozen_estimates, output_dir="placement-run-001",
+           weave_project="your-team/your-project") as result:
     if result.models:
         for model in result.models:
             print(model.model_id, model.generate("A fresh task prompt").text)
@@ -82,8 +83,49 @@ joint gate. Sampling is once per second and can miss short peaks. This is not
 hardware partitioning or a continuous memory cap. NVIDIA queries do not run
 inside each request's latency timer.
 
-The executor records local evidence. It does not automatically create a Weave
-root; no placement trace or placement-agent claim is established by these tests.
+## Optional Weave tracing
+
+Set `weave_project` to create a `sera_place` root. Install the `swarm` extra and
+configure the usual W&B credentials first. Omit the option to keep execution local
+and avoid importing or initializing Weave.
+
+The trace includes each model's saved isolated and joint requests, output text,
+token IDs, measured latency, usage, and safe error type. These events are exported
+after each service's measurement finishes; their span duration is logging time,
+not inference latency. Both service threads retain the same placement root.
+
+`placement_quality_gate` records absolute task scores and per-prompt failures for
+serial and timed outputs. `placement_decision` includes rejected requirements,
+overlap, measured latency changes, and shared memory failures.
+`placement_runtime_failure` uses known startup signatures and hashed log
+references, not arbitrary server exception text. The saved result includes the
+trace URL and export status. Trace failures do not turn a bad model into a passing
+model or rewrite measured quality.
+
+The root ends before returning live runners. Later `close()` exports and flushes
+a separate `placement_cleanup` event carrying the original root URL and plan hash.
+Fresh user requests after return are not automatically traced by this wrapper.
+Failed trace persistence or root export closes runners that cannot reach the
+caller. Cleanup failure remains a failure even when trace export also fails.
+
+These tracing paths have offline tests with a fake Weave service. No live
+placement trace is claimed until a GPU run passes the existing prerequisites.
+
+## Remaining agent selection contract
+
+The existing `ArbiterDecision` can name one legal proposal ID or abstain. That
+shape can also reference a caller-supplied placement plan ID, but it does not
+itself supply placement evidence or establish eligibility. The current provider
+certificate explicitly exercises single-model cases, with placement unsupported.
+It is not a placement-context certification.
+
+Before enabling automatic selection, bind every offered plan to its matching
+isolated measurements, task/workload hash, physical GPU identity, configuration,
+and memory limits. Define the user's placement objective and stopping/trial
+contract, then check the provider against those placement contexts. The
+deterministic executor must remain the final gate after selection. No new schema,
+certificate claim, trial budget, allocation, or latency threshold is invented by
+the tracing addition.
 
 ## Live gates still open
 

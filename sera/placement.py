@@ -5,6 +5,7 @@ Inputs freeze the plan and task requirements before any model starts.
 """
 
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
 from dataclasses import dataclass, field
 from pathlib import Path
 import threading
@@ -18,6 +19,7 @@ from .placement_runtime import SharedGPUOwner
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
 from .storage import content_hash, save_json
+from .tracing import emit_event, TraceSinkError
 
 
 class PlacementMemoryEstimate(BaseModel):
@@ -104,7 +106,8 @@ def collect_joint(models, profiles):
             raise
 
     with ThreadPoolExecutor(max_workers=2) as executor:
-        futures = {model.model_id: executor.submit(collect, model) for model in models}
+        # Preserve the caller's Weave root and event sink in both service threads.
+        futures = {model.model_id: executor.submit(copy_context().run, collect, model) for model in models}
         trials = {model_id: future.result() for model_id, future in futures.items()}
     values = list(trials.values())
     overlap = []
@@ -126,6 +129,15 @@ class PlacementResult:
     report: dict
     output_dir: Path
     owner: object = None
+    _trace_on_close: object = field(default=None, repr=False)
+
+    def _event(self, name, payload):
+        try:
+            emit_event(name, payload)
+        except TraceSinkError as error:
+            self.report.setdefault('trace_export_failures', []).append(
+                dict(event=error.event_name, error_type=error.error_type))
+            self.report['trace_status'] = 'failed'
 
     def _save(self):
         self.report['returned_runtimes'] = [model.record for model in self.models]
@@ -142,6 +154,9 @@ class PlacementResult:
                  'Memory peaks are sampled, not continuous allocation enforcement.',
                  'This is one explicit placement plan, not an agent-selected or globally optimal placement.',
                  'No quantization-enabled placement claim without an unchanged-budget unquantized comparison.']
+        if self.report.get('weave_url'):
+            lines.extend(['', f"Weave trace: {self.report['weave_url']}",
+                          f"Trace export: {self.report.get('trace_status', 'unavailable')}"])
         for service in self.report['plan']['services']:
             peak = self.report.get('shared_runtime', {}).get('service_peak_memory_mib', {}).get(service['model_id'])
             lines.append(f"{service['model_id']}: allocation={service['allocation_bytes']} bytes; "
@@ -164,6 +179,8 @@ class PlacementResult:
                 cleanup_error=type(error).__name__)
             raise
         finally:
+            if self._trace_on_close is not None:
+                self._trace_on_close(self)
             self._save()
 
     def __enter__(self):
@@ -173,12 +190,22 @@ class PlacementResult:
         self.close()
 
 
-def place(*, plan, workloads, memory_estimates, output_dir):
+def place(*, plan, workloads, memory_estimates, output_dir, weave_project=None):
     """Measure one caller-selected pair. Never silently return only one model.
 
     Failed quality returns an empty result with evidence. Cleanup errors raise and
     remain saved. The caller owns both successful runners and must close them.
     """
+    arguments = dict(plan=plan, workloads=workloads, memory_estimates=memory_estimates, output_dir=output_dir)
+    if weave_project is None:
+        return _place(**arguments)
+    if not isinstance(weave_project, str) or not weave_project.strip():
+        raise ValueError('weave_project must be an explicit nonempty project name')
+    from .placement_tracing import run_traced_placement
+    return run_traced_placement(_place, arguments, weave_project)
+
+
+def _place(*, plan, workloads, memory_estimates, output_dir, _result_observer=None):
     plan = validate_placement_plan(plan)
     model_ids = {service.model_id for service in plan.services}
     if set(workloads) != model_ids or set(memory_estimates) != model_ids:
@@ -202,6 +229,8 @@ def place(*, plan, workloads, memory_estimates, output_dir):
         isolated={}, isolated_gates={}, isolated_runtimes=[], decision=dict(outcome='not-attempted', reason='pending'),
         quantization_enabled_placement=False, returned_runner_closed=True)
     result = PlacementResult([], report, folder)
+    if _result_observer is not None:
+        _result_observer(result)
     result._save()
     for service in plan.services:
         if estimates[service.model_id].total_bytes > service.allocation_bytes:
@@ -227,6 +256,10 @@ def place(*, plan, workloads, memory_estimates, output_dir):
                     and model.record.get('telemetry_errors') == 0)
                 gate['passed'] = gate['passed'] and gate['memory_pass']
                 report['isolated_gates'][service.model_id] = gate
+                result._event('placement_quality_gate', dict(
+                    plan_hash=plan.plan_hash, phase='isolated', model_id=service.model_id,
+                    revision=service.revision, config_hash=trial['config_hash'], gate=gate,
+                    task_quality=trial['task_quality'], measured_task_quality=trial['measured_task_quality']))
             finally:
                 model.close()
                 result._save()
@@ -263,6 +296,11 @@ def place(*, plan, workloads, memory_estimates, output_dir):
                 isolated_p95_latency_ms=before, joint_p95_latency_ms=after,
                 slowdown_fraction=after/before-1 if before and after else None,
                 cause='not-established')
+            result._event('placement_quality_gate', dict(
+                plan_hash=plan.plan_hash, phase='joint', model_id=model_id,
+                revision=trial['runtime']['revision'], config_hash=trial['config_hash'],
+                gate=joint['gates'][model_id], task_quality=trial['task_quality'],
+                measured_task_quality=trial['measured_task_quality']))
         owner.check()
         required_windows = len(next(iter(profiles.values())).workload.concurrency)
         joint['overlap_pass'] = len(joint['overlap']) == required_windows and all(
