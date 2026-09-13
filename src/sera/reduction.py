@@ -34,7 +34,7 @@ class Digest:
 
     # Where is the pressure?
     kv_occupancy: float               # 0-1, fraction of KV cache in use
-    mem_bandwidth_util: float         # 0-1, fraction of HBM bandwidth consumed
+    mem_bandwidth_util: float | None  # 0-1 fraction of HBM bandwidth, or None if unmeasured
     preemption_rate: float            # preemptions per completed request
     seq_slot_utilization: float       # 0-1, concurrency vs max_num_seqs
 
@@ -63,7 +63,12 @@ class Digest:
         """
         out = [
             f"KV cache occupancy is {self.kv_occupancy:.1%}.",
-            f"Memory bandwidth utilization is {self.mem_bandwidth_util:.1%}.",
+            (
+                f"Memory bandwidth utilization is {self.mem_bandwidth_util:.1%}."
+                if self.mem_bandwidth_util is not None
+                else "Memory bandwidth utilization was not measurable on this "
+                "substrate — treat it as unknown, not as idle."
+            ),
             f"Sequence slot utilization is {self.seq_slot_utilization:.1%} of max_num_seqs.",
             f"Preemptions per request: {self.preemption_rate:.3f}.",
             f"Measured p95 is {self.p95_slo_ratio:.2f}x the SLO"

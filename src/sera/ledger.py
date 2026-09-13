@@ -52,7 +52,16 @@ class Substrate(str, Enum):
 
 @dataclass
 class Measurement:
-    """What the trial actually did."""
+    """What the trial actually did.
+
+    `mem_bandwidth_util` is None when the substrate could not measure it. vLLM exposes
+    no such metric and NVML memory-controller utilization is unavailable in many
+    containers, so None is the common case on real hardware. The specification is
+    explicit that this must not be papered over: "Unavailable metrics are recorded as
+    unavailable. Sera must not replace missing measurements with agent estimates."
+    Recording 0.0 would read to the quantization specialist as "bandwidth is idle",
+    which is the opposite of "we do not know".
+    """
 
     p50_latency_ms: float
     p95_latency_ms: float
@@ -60,7 +69,7 @@ class Measurement:
     footprint_gb: float
     kv_occupancy: float = 0.0
     preemptions: int = 0
-    mem_bandwidth_util: float = 0.0
+    mem_bandwidth_util: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)

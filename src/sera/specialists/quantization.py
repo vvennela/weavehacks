@@ -43,7 +43,13 @@ class QuantizationSpecialist(Specialist):
             WEIGHT_LADDER[idx_now + 1] if idx_now + 1 < len(WEIGHT_LADDER) else None
         )
 
-        bandwidth_bound = d.mem_bandwidth_util >= BANDWIDTH_LIVE_THRESHOLD
+        # None means the substrate could not measure it. Comparing None-as-zero
+        # against the threshold would silently conclude "not bandwidth bound" from
+        # an absence of evidence, so the bandwidth argument is simply unavailable
+        # and the specialist has to make its case on prefill share or cache pressure.
+        bw = d.mem_bandwidth_util
+        bandwidth_known = bw is not None
+        bandwidth_bound = bandwidth_known and bw >= BANDWIDTH_LIVE_THRESHOLD
         kv_pressured = d.kv_occupancy >= KV_PRESSURE_THRESHOLD
 
         # Precision is not only a bandwidth lever. On prefill-dominated traffic the
@@ -58,9 +64,13 @@ class QuantizationSpecialist(Specialist):
 
         if not bandwidth_bound and not kv_pressured and not compute_live:
             why = (
-                f"bandwidth utilization {d.mem_bandwidth_util:.1%} is below "
-                f"{BANDWIDTH_LIVE_THRESHOLD:.0%} and KV occupancy {d.kv_occupancy:.1%} is low"
-            )
+                (
+                    f"bandwidth utilization {bw:.1%} is below "
+                    f"{BANDWIDTH_LIVE_THRESHOLD:.0%}"
+                )
+                if bandwidth_known
+                else "bandwidth utilization was not measurable, so it cannot support a case"
+            ) + f" and KV occupancy {d.kv_occupancy:.1%} is low"
             if compute_bound and not tensor_core_gain:
                 why += (
                     f"; prefill dominates at {d.prefill_token_share:.0%} but the next step "
@@ -137,7 +147,7 @@ class QuantizationSpecialist(Specialist):
         # a specialist loses calibration and, with it, its share of the budget.
         if bandwidth_bound:
             mechanism = (
-                f"Bandwidth utilization is {d.mem_bandwidth_util:.1%} and weights are "
+                f"Bandwidth utilization is {bw:.1%} and weights are "
                 f"{d.weights_share_of_footprint:.0%} of the footprint at "
                 f"{d.weight_bytes_per_param:.0f} bytes/param. Every decode step re-reads the "
                 f"full weight tensor, so {cfg.weight_dtype} to {nxt} cuts the bytes that "
@@ -148,8 +158,12 @@ class QuantizationSpecialist(Specialist):
             mechanism = (
                 f"Prefill is {d.prefill_token_share:.0%} of tokens and p95 is "
                 f"{d.p95_slo_ratio:.2f}x SLO, so this is compute bound rather than "
-                f"bandwidth bound — utilization is only {d.mem_bandwidth_util:.1%}. "
-                f"{nxt} runs on native tensor cores at materially higher throughput, so "
+                + (
+                    f"bandwidth bound — utilization is only {bw:.1%}. "
+                    if bandwidth_known
+                    else "bandwidth bound, and bandwidth was not measurable here. "
+                )
+                + f"{nxt} runs on native tensor cores at materially higher throughput, so "
                 "the win here is arithmetic, not bytes."
             )
             expected, confidence = 40.0, 0.6

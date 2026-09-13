@@ -23,12 +23,21 @@ from .runner.sim_runner import SimRunner
 from .spec import load_spec
 
 
-def select_runner(force_sim: bool = False) -> TrialRunner:
+def select_runner(force_sim: bool = False, fake_vllm: bool = False) -> TrialRunner:
     """Real hardware when it is reachable, the analytic model otherwise.
 
     The choice is announced rather than silent: a run that quietly fell back to
     simulation and reported the numbers as measurements would be worse than useless.
     """
+    if fake_vllm:
+        # The full vLLM client path — process management, health waiting, streaming
+        # HTTP, Prometheus parsing — against a fake server. No GPU, no weights. This
+        # exercises far more real code than the analytic simulator does.
+        from .runner.fake_vllm import fake_launcher  # noqa: PLC0415
+        from .runner.vllm_runner import VllmRunner  # noqa: PLC0415
+
+        return VllmRunner(launcher=fake_launcher)
+
     if force_sim or not os.environ.get("SERA_VLLM_HOST"):
         return SimRunner()
 
@@ -49,6 +58,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--spec", default="specs/demo.yaml")
     ap.add_argument("--ledger", default="runs/ledger.jsonl")
     ap.add_argument("--sim", action="store_true", help="force the simulator")
+    ap.add_argument(
+        "--fake-vllm",
+        action="store_true",
+        help="run the real vLLM client against a fake server (no GPU, no weights)",
+    )
     ap.add_argument("--phase", choices=["1", "2", "both"], default="both")
     ap.add_argument("--quiet", action="store_true")
     ap.add_argument("--fresh", action="store_true", help="discard any existing ledger")
@@ -60,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
         ledger_path.unlink()
 
     traced = tracing.init()
-    runner = select_runner(force_sim=args.sim)
+    runner = select_runner(force_sim=args.sim, fake_vllm=args.fake_vllm)
     ledger = Ledger(ledger_path)
     verbose = not args.quiet
 
