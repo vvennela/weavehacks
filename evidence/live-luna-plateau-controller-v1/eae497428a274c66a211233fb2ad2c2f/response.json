@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"keep-baseline\",\"proposal_id\":\"proposal-refine-abstain-1\",\"agent_role\":\"batching\",\"parent_trial_id\":\"baseline\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":null,\"proposed_value\":null,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"trial_2_successful_requests\",\"trial_2_generation_errors\"],\"predicted_metric_change\":\"No new measured improvement is predicted because this is an abstention and no GPU trial is authorized.\",\"confidence\":0.96,\"expected_trial_cost\":0,\"falsification_condition\":\"Refuted only if an authorized, independently measured legal setting achieves at least 5% lower p95_latency_ms than 771.0232489998816 ms while preserving quality and workload constraints, with evidence at source call 01a09aca-4cd8-73a9-bb1e-79bf88ddab44 and fixed paths decision, reduced, and task_quality/per_prompt.\",\"reason\":\"Observed failure: trial-2 was collected successfully, with trial_2_successful_requests=96 and trial_2_generation_errors=0, but trial_2_p95_latency_ms=770.3376119998211 ms versus baseline p95_latency_ms=771.0232489998816 ms, an improvement of only 0.000889255934824125, below the required 0.05; this is recorded by diagnosis call 01a09aca-4cd8-73a9-bb1e-79bf88ddab44 at fixed paths status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. The cause is unknown and not established by these observations. The output_quality peer's max_model_len=256 suggestion is not adopted because it is an unmeasured peer opinion, and the supplied evidence gives no measured allocation basis for a context-limit change. The completed inspection call 01a09ac7-4a23-7d88-b724-afbfca240144 likewise does not establish a causal scheduling or memory explanation. With confirmation_round_pending and no GPU-trial authorization, retain baseline.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 18444,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 669,
+    "reasoning_output_tokens": 206
+  }
+}

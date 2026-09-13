@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"No quality failure is observed: verified quality passed with mean 1.0 and all 8 scored prompts valid. Latency is measured at p50 701.75 ms and p95 771.02 ms, while p99 is explicitly unreliable. The cause of the latency tail is unknown, so inspecting latency outliers is the most useful legal read-only next action.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11383,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 216,
+    "reasoning_output_tokens": 113
+  }
+}

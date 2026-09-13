@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"load_metrics\"],\"reason\":\"No execution failure was observed: the persisted candidate diagnosis records status collected, zero generation errors, and quality mean 1.0 passing the 0.99 floor; the candidate was accepted because it met constraints. The cause of the latency outcome remains unknown, and the completed latency-outlier inspection does not establish a model, kernel, memory-pressure, or scheduling cause. A read of persisted load metrics is useful to inspect the available concurrency and latency measurements before any further decision.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12514,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 273,
+    "reasoning_output_tokens": 153
+  }
+}

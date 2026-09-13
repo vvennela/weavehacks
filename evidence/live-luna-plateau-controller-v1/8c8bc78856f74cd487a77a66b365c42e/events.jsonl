@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a09aca-71d6-7820-af5f-530e72226496"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"The recorded experiment collected successfully with zero generation errors and passed quality at mean 1.0, but p95 latency improved only 0.000889, below the required 0.05, so the objective failed. The diagnosis explicitly states the root cause is not established; model, kernel, memory-pressure, and scheduling causes remain unknown. Inspect latency outliers to examine the persisted latency distribution before selecting another setting.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12455,"cached_input_tokens":8960,"cache_write_input_tokens":0,"output_tokens":203,"reasoning_output_tokens":92}}

@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"action\":\"trial\",\"proposal_id\":\"sera-output-quality- max-model-len-256\",\"agent_role\":\"batching\",\"parent_trial_id\":\"trial-2\",\"model_id\":\"Qwen/Qwen2.5-72B-Instruct\",\"changed_lever\":\"max_model_len\",\"proposed_value\":256,\"evidence_used\":[\"p95_latency_ms\",\"trial_2_p95_latency_ms\",\"successful_requests\",\"trial_2_successful_requests\",\"generation_errors\",\"trial_2_generation_errors\",\"sampled_peak_memory_mib\",\"trial_2_sampled_peak_memory_mib\"],\"predicted_metric_change\":\"Test whether max_model_len=256 changes p95_latency_ms from the baseline 771.0232489998816 ms; no measured gain is claimed. The prediction is that latency may improve modestly while successful_requests remain complete and generation_errors remain zero, based on the fixed prepared prompt range documented at source call 01a09ac7-4a16-7854-a84d-981e6016b017 under measured_facts.baseline.prepared_prompt_tokens. This is a hypothesis only: source call 01a09ac7-4a23-7d88-b724-afbfca240144 states that a smaller context cap alone does not establish lower reserved KV memory.\",\"confidence\":0.35,\"expected_trial_cost\":1,\"falsification_condition\":\"Refute the prediction if source call 01a09aca-4cd8-73a9-bb1e-79bfca240144 records p95_latency_ms improvement below 5% versus baseline, or if successful_requests falls below 96, generation_errors becomes nonzero, quality verification at task_quality/per_prompt fails, or sampled_peak_memory_mib does not decrease. The observed trial-2 failure was objective-not-improved, with trial_2_p95_latency_ms=770.3376119998211 versus p95_latency_ms=771.0232489998816; this does not establish a cause.\",\"reason\":\"Observed failure: source call 01a09aca-4cd8-73a9-bb1e-79bfca240144 records trial-2 as collected but objective-not-improved: trial_2_p95_latency_ms was 770.3376119998211 ms versus p95_latency_ms 771.0232489998816 ms, an improvement of only 0.000889255934824125, below the required 0.05; successful_requests remained 96 and generation_errors remained 0. The same diagnosis marks root cause not-established and cites status, decision, reduced, runtime/sampled_peak_memory_mib, and task_quality/per_prompt. Hypothesis: max_model_len=256 is an untested legal setting and may affect latency for the measured prepared prompts, but the evidence does not prove a memory or scheduling mechanism; source call 01a09ac7-4a23-7d88-b724-afbfca240144 records the prepared prompt mean as 94.375 tokens, while the supplied rules explicitly reject inferring smaller reserved KV memory from a lower context cap at fixed gpu_memory_utilization. I therefore propose a bounded test of this setting rather than accepting the prior batching result or claiming an unmeasured gain.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 17421,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1007,
+    "reasoning_output_tokens": 332
+  }
+}

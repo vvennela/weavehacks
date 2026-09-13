@@ -1,0 +1,19 @@
+{
+  "model": "gpt-5.6-luna",
+  "transport": "codex-cli",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "message": {
+        "content": "{\"ranked_proposal_ids\":[\"latency_outliers\"],\"reason\":\"Observed baseline latency is p95 771.0232489998816 ms versus p50 701.7532730001221 ms, with 96 successful requests and no generation errors; p99 is explicitly unreliable. The cause of the tail-latency spread is unknown, so inspecting latency outliers is the most useful next read-only action for the latency objective.\"}"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 11383,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 204,
+    "reasoning_output_tokens": 102
+  }
+}
