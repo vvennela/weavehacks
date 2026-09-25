@@ -1,0 +1,13 @@
+{
+  "name": "libxsmm-panel32-distance1-guarded-b-prefetch",
+  "hypothesis": "Add only the selected guarded distance-1 B prefetch to the active panel32 loop in eb091b1e…. Before demand loads, test x8>1 and issue PRFM PLDL1KEEP at x0+2048. This hints at K=1 through K=511 and skips the hint on the last iteration. The offset fits the PRFM immediate form. No registers are added; demand loads, pointer advances, all 512 ordered FP32 updates, ABI, stack, SME transitions, timed packing/allocation, stores, fallback and BSD notices remain unchanged. This active-path change is absent from the supplied measured history. Benefit is unverified. No tools or tests were run. Compilation, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls, min(candidate)>1.05*max(control), and holdout validation remain required under unchanged power settings. No throughput or repeatability gain is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+  "edits": [
+    {
+      "old": "    \"Lpanel32_368:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"",
+      "new": "    \"Lpanel32_368:\\n\"\n    \"cmp\\tx8, #0x1\\n\"\n    \"b.ls\\tLpanel32_skip_b_prefetch\\n\"\n    \"prfm\\tpldl1keep, [x0, #0x800]\\n\"\n    \"Lpanel32_skip_b_prefetch:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\""
+    }
+  ]
+}

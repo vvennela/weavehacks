@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_schedule",
+    "k_loop_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "vector_access",
+    "address_generation",
+    "tail_alignment",
+    "prefetch_locality",
+    "b_panel_layout",
+    "assembly_audit",
+    "cache_conflict_layout",
+    "cache_blocking",
+    "scratch_lifetime",
+    "transpose_fusion"
+  ],
+  "rationale": "These 15 roles target the active sera_libxsmm_panel32 path in eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf. Schedule and register specialists cover bounded K lookahead, active-loop unrolling, operand lifetimes and FP32 update order. Address generation covers pointer and branch work. Vector access, B layout and panel packing cover legal wider loads, respecting the existing 128-byte packed-A and 2048-byte B strides and counting all packing costs. A transpose and transpose fusion examine distinct changes to the active packing sequence. Cache blocking, cache-conflict layout and prefetch locality review access patterns without assuming a cache bottleneck. Tail alignment and scratch lifetime cover the current 64-byte alignment, allocation bounds, valid stack use and per-call storage. Assembly audit checks instruction legality, ABI preservation, x18 avoidance and whether each proposal changes executed code.\n\nFour ZA tiles, twice-used operand vectors, one SME region and reusable 64 KiB scratch already exist; restating them is not an experiment. Earlier full512 unroll results do not measure active panel32 unrolling. This selects advisor roles only, not experiments or their order. Specialist proposals still require shared review and joint ranking. No agents were invoked, edits made or tests run. Advice remains unverified; all fixed gates, budgets, fallback behavior and power-mode separation remain unchanged."
+}

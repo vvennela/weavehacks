@@ -1,0 +1,82 @@
+
+kernel-opt @ 76db49356748
+  submission   /var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-kernel-1j0fhlzg
+  hash         sha256:48c3b5f38698…  
+  params       n=512  tolerance=0.002
+  PASSED       gflops=732.93 (max)
+  config       mode=validation*  n=512*  tolerance=0.002*  machine=MacBook-Pro-8.local*   (* = primary)
+  report       /Users/vishnuv/.autolab/hills/runs/kernel-opt/20260925T220456Z-b965e26f/report.json
+
+wrote /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-2.json
+{
+  "hill": "kernel-opt",
+  "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+  "commit": "34cf4e8f6319252dfb8c368ba7c918c00bdece87",
+  "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+  "submission_git": null,
+  "passed": true,
+  "config": [
+    {
+      "name": "mode",
+      "value": "validation",
+      "primary": true
+    },
+    {
+      "name": "n",
+      "value": 512,
+      "primary": true
+    },
+    {
+      "name": "tolerance",
+      "value": 0.002,
+      "primary": true
+    },
+    {
+      "name": "machine",
+      "value": "MacBook-Pro-8.local",
+      "primary": true
+    }
+  ],
+  "metrics": [
+    {
+      "name": "gflops",
+      "value": 732.9295830213516,
+      "direction": "max"
+    }
+  ],
+  "details": {
+    "seconds_best_of_3": 0.00036624999484047294,
+    "timings_seconds": [
+      0.0004078329948242754,
+      0.0004101250087842345,
+      0.00036624999484047294
+    ],
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+    "compiler_flags": [
+      "-O3",
+      "-march=native",
+      "-ffast-math",
+      "-shared",
+      "-fPIC",
+      "-lm"
+    ],
+    "architecture": "arm64",
+    "platform": "Darwin",
+    "checksum": 8728.939453125
+  },
+  "params": {
+    "n": 512,
+    "tolerance": 0.002
+  },
+  "final": false,
+  "official": true,
+  "official_reason": null,
+  "hill_spec_version": 2,
+  "tool": {
+    "version": "0.11.0",
+    "sha256": "970e4a3fcb74c27e0c56b62efd22b4fab82a755229a8aef8f90bbc00a9cfe275"
+  },
+  "timestamp": "2026-09-25T22:04:57Z",
+  "report_version": 1,
+  "signature": "hmac-sha256:3e96cce12dd264cb2fe58765442d89c22a157c0e7e777e5e5d14feb8147c1864"
+}

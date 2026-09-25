@@ -1,0 +1,72 @@
+{
+  "hill": "kernel-opt",
+  "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+  "commit": "34cf4e8f6319252dfb8c368ba7c918c00bdece87",
+  "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+  "submission_git": null,
+  "passed": true,
+  "config": [
+    {
+      "name": "mode",
+      "value": "validation",
+      "primary": true
+    },
+    {
+      "name": "n",
+      "value": 512,
+      "primary": true
+    },
+    {
+      "name": "tolerance",
+      "value": 0.002,
+      "primary": true
+    },
+    {
+      "name": "machine",
+      "value": "MacBook-Pro-8.local",
+      "primary": true
+    }
+  ],
+  "metrics": [
+    {
+      "name": "gflops",
+      "value": 1035.5945920019321,
+      "direction": "max"
+    }
+  ],
+  "details": {
+    "seconds_best_of_3": 0.00025920901680365205,
+    "timings_seconds": [
+      0.00032941598328761756,
+      0.00031683300039730966,
+      0.00025920901680365205
+    ],
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+    "compiler_flags": [
+      "-O3",
+      "-march=native",
+      "-ffast-math",
+      "-shared",
+      "-fPIC",
+      "-lm"
+    ],
+    "architecture": "arm64",
+    "platform": "Darwin",
+    "checksum": 8728.939453125
+  },
+  "params": {
+    "n": 512,
+    "tolerance": 0.002
+  },
+  "final": false,
+  "official": true,
+  "official_reason": null,
+  "hill_spec_version": 2,
+  "tool": {
+    "version": "0.11.0",
+    "sha256": "970e4a3fcb74c27e0c56b62efd22b4fab82a755229a8aef8f90bbc00a9cfe275"
+  },
+  "timestamp": "2026-09-25T21:57:01Z",
+  "report_version": 1,
+  "signature": "hmac-sha256:4ada86ac21e199d2797a757d6994e1f10cf225be68624015766de24af71761b9"
+}

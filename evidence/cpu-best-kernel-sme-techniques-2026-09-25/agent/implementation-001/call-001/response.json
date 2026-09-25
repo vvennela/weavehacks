@@ -1,0 +1,13 @@
+{
+  "name": "libxsmm-panel32-pointer-adds-after-za1",
+  "hypothesis": "Implement only the selected active panel32 schedule: load both operand pairs, update ZA0 and ZA1, advance both pointers, then update ZA2 and ZA3. The pointer adds may overlap with the remaining FMOPA work; benefit is unverified. This change is absent from the supplied measured history. All 512 iterations, operand addresses, per-output FP32 update order, ABI, stack handling, timed packing and allocation, fallback, and BSD notices remain unchanged. No tools or tests were run. Require compilation, all 48 public cases at tolerance 0.002, ten validation reports and ten alternating fresh imported controls under unchanged power settings. Promotion still requires min(candidate)>1.05*max(control), followed by holdout validation. No speedup or repeatability gain is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+  "edits": [
+    {
+      "old": "    \"Lpanel32_368:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"\n    \"add\\tx0, x0, x9\\n\"\n    \"add\\tx3, x3, x10\\n\"\n    \"fmopa\\tza0.s, p1/m, p0/m, z2.s, z0.s\\n\"\n    \"fmopa\\tza1.s, p1/m, p2/m, z2.s, z1.s\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Lpanel32_368\\n\"",
+      "new": "    \"Lpanel32_368:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"\n    \"fmopa\\tza0.s, p1/m, p0/m, z2.s, z0.s\\n\"\n    \"fmopa\\tza1.s, p1/m, p2/m, z2.s, z1.s\\n\"\n    \"add\\tx0, x0, x9\\n\"\n    \"add\\tx3, x3, x10\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Lpanel32_368\\n\""
+    }
+  ]
+}

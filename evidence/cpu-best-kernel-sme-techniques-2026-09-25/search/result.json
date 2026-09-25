@@ -1,0 +1,893 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "completed",
+  "trials": [
+    {
+      "name": "libxsmm-reference-with-unused-panel32",
+      "hypothesis": "Original full512 GEMM body plus an optional unused generated panel primitive",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/source/kernel.c",
+      "source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "status": "passed",
+      "scores": [
+        890.8266173293197,
+        635.7263842037138,
+        773.0322803058693,
+        673.6146822982674,
+        809.2498747397683,
+        1004.120181778896,
+        1079.8625911084607,
+        840.2840540102177,
+        1009.1557840253873,
+        921.7997022790786
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/validation-9.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 865.5553356697687,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    },
+    {
+      "name": "libxsmm-n512-panel32-one-streaming-region",
+      "hypothesis": "Reuse the panel32 packing and compute body for sixteen row panels inside one SME region with one 64 KiB scratch allocation. Saved registers x21/x22/x23 retain B/A/C bases, x26 retains scratch, x27 counts panels, and x28 holds the byte offset; these registers are saved and restored by the existing prologue and epilogue and are otherwise unused by the supplied helper body. Each panel resets B, A, C, scratch and the packing cursor. A and C advance by 65536 bytes, covering all 512 output rows once. SP resets to scratch after packing and returns to the saved stack top after the last panel. The FP32 K loop, ZA setup, output stores, general-size fallback and complete license notices remain unchanged. This differs from the measured sixteen-call wrapper. Reduced entry/exit overhead is an unverified hypothesis; comparison against full512 measures the complete layout and control-flow change and cannot isolate transition costs. No tools or tests were run. Compilation, full-GEMM correctness and fresh repeated paired performance validation remain required under the unchanged gates and initial power settings. No speedup or throughput above 1800 GFLOP/s is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/source/kernel.c",
+      "source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "status": "passed",
+      "scores": [
+        1037.4317493337078,
+        952.743438891641,
+        895.7821885956537,
+        747.8165001292614,
+        857.2789074912052,
+        963.4291929367785,
+        899.1578143883601,
+        1031.2857351144694,
+        853.8702179669502,
+        1047.0422376869117
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/validation-9.json"
+      ],
+      "control_scores": [
+        968.0605424189555,
+        1064.6919469172421,
+        1006.4732329463003,
+        1004.4357654067649,
+        827.6538513833749,
+        1011.2163452866617,
+        1050.628026141138,
+        766.3190830310396,
+        899.7847292950087,
+        596.9092593345922
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-001/control-9.json"
+      ],
+      "median_gflops": 925.9506266400006,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the user-selected panel32 research source.\n\nAcross ten runs, the candidate scored 747.82–1047.04 GFLOP/s versus paired controls of 596.91–1064.69. It won 4/10 pairs. Candidate and control spreads were 299.23 and 467.78 GFLOP/s. Its minimum fails the required >1117.93 GFLOP/s threshold (1.05 × maximum paired control). These overlapping, variable results establish no repeatable gain or cause.\n\nThe candidate exceeded the fresh initial baseline peak of 1079.8626 and paired-control peak of 1064.6919 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 runs each. Historical modes remain separate and do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nNext implementation must follow the specialist-ranked board and make a distinct change to the active panel32 path under the unchanged gates and budgets. This replay supplies repeatability evidence, not a new optimization. No individual advisor effect, GEMM gain from calibration, or hardware ceiling is established."
+      }
+    },
+    {
+      "name": "libxsmm-panel32-pointer-adds-after-za1",
+      "hypothesis": "Implement only the selected active panel32 schedule: load both operand pairs, update ZA0 and ZA1, advance both pointers, then update ZA2 and ZA3. The pointer adds may overlap with the remaining FMOPA work; benefit is unverified. This change is absent from the supplied measured history. All 512 iterations, operand addresses, per-output FP32 update order, ABI, stack handling, timed packing and allocation, fallback, and BSD notices remain unchanged. No tools or tests were run. Require compilation, all 48 public cases at tolerance 0.002, ten validation reports and ten alternating fresh imported controls under unchanged power settings. Promotion still requires min(candidate)>1.05*max(control), followed by holdout validation. No speedup or repeatability gain is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/source/kernel.c",
+      "source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "status": "passed",
+      "scores": [
+        1046.7033563805448,
+        939.682904385826,
+        1060.4857245907642,
+        387.655933988038,
+        1025.2163295773348,
+        1035.5945920019321,
+        996.205223267639,
+        1050.1142676861093,
+        708.8171620479706,
+        1075.1783172284315
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-9.json"
+      ],
+      "control_scores": [
+        941.3272573776369,
+        893.1712329754055,
+        713.2127983131938,
+        772.6606313541947,
+        1019.8567190460346,
+        984.3292772365588,
+        835.1625976751104,
+        918.2491584321377,
+        522.6720194434748,
+        995.1268519078116
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/control-9.json"
+      ],
+      "median_gflops": 1030.4054607896335,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nThe candidate won 9/10 pairs, but throughput ranged from 387.66–1075.18 GFLOP/s versus controls of 522.67–1019.86. Repeat spreads were 687.52 and 497.18 GFLOP/s. Its minimum of 387.66 fails the required >1070.85 GFLOP/s threshold (1.05 × maximum paired control). Keep all ten results; the low run cannot be excluded. These results do not establish repeatable improvement.\n\nThe candidate exceeded its fresh paired-control peak in 6/10 runs and the fresh initial imported peak of 1079.8626 in 0/10. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical power modes remain separate and do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 scheduling change as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. The scores do not isolate pointer scheduling from other effects or establish an individual advisor’s contribution."
+      }
+    },
+    {
+      "name": "libxsmm-panel32-next-operands-before-branch",
+      "hypothesis": "Implement the selected software pipeline in the active panel32 K loop, starting from eb091b1e…. A prologue loads K=0. Each of 511 loop iterations updates ZA0–ZA3, loads the next operands into the same registers, advances the pointers, and branches. A final drain updates all four tiles for K=511 without another load. This preserves 512 loads per operand stream, pointer totals, and each output's FP32 accumulation order without register copies or extra accumulators. Placing loads before loop control tests load-latency overlap; benefit is unverified. This active-panel32 change is absent from the supplied measured history. Packing, allocation, stores, ABI, stack handling, fallback and all BSD notices remain unchanged. No tools or tests were run. Compilation, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls, the fixed promotion gate and holdout validation remain required. No throughput or repeatability gain is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/source/kernel.c",
+      "source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "status": "passed",
+      "scores": [
+        716.9443929836941,
+        880.9568122068177,
+        887.3900102998489,
+        1035.7664763501227,
+        911.1088800692797,
+        1026.68665823742,
+        595.4210422627164,
+        884.5885377999632,
+        698.2923935726059,
+        1005.063804414036
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-9.json"
+      ],
+      "control_scores": [
+        940.3676244430231,
+        962.4205770904282,
+        892.307228524544,
+        972.7367367643877,
+        580.5578945044148,
+        990.8402311589523,
+        1024.562746838766,
+        786.8177586600441,
+        873.5545955618412,
+        574.9104344531163
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/control-9.json"
+      ],
+      "median_gflops": 885.989274049906,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption; promoted=false confirms no promotion. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, d09f7c26… scored 595.42–1035.77 GFLOP/s versus paired controls of 574.91–1024.56. It won 5/10 pairs. Candidate and control spreads were 440.35 and 449.65 GFLOP/s. Its minimum fails the required >1075.79 GFLOP/s threshold (1.05 × maximum paired control). These overlapping, variable results establish no repeatable gain. All ten results remain relevant.\n\nThe candidate exceeded its fresh paired-control peak in 2/10 runs and the fresh initial imported peak of 1079.8625911084607 in 0/10. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical power-mode results do not enter eligibility. The ten-run goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 software pipeline as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. These scores do not establish a load-latency mechanism, an individual advisor’s effect, or a hardware ceiling."
+      }
+    },
+    {
+      "name": "libxsmm-panel32-subs-bne-k-loop-control",
+      "hypothesis": "Apply the selected counter rewrite to Lpanel32_368, the single active panel32 compute loop. The recommendation's reference to two compute loops does not match this path; the two inactive full512 loops remain unchanged. SUBS/B.NE retains 512 iterations, pointer bounds and per-output FP32 update order. Instruction count remains two; no speedup is established. The historical SUBS/B.NE experiment modified full512, so this active-panel32 change is distinct from supplied measured sources. ABI, SME transitions, stack, timed packing/allocation, stores, fallback and all BSD notices remain unchanged. No tools or tests were run. Assembly acceptance, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls, the fixed promotion gate and holdout validation remain required under unchanged power settings.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/source/kernel.c",
+      "source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "status": "passed",
+      "scores": [
+        1001.0010732250855,
+        875.09518986084,
+        750.7802400181534,
+        1033.2706954556381,
+        996.8193458429972,
+        877.5985461981168,
+        880.4770361467664,
+        933.9613804223521,
+        924.0463197585029,
+        966.7566760020774
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-9.json"
+      ],
+      "control_scores": [
+        800.9006435996766,
+        933.2827437036337,
+        952.1790669511673,
+        953.3084802536544,
+        160.72382008773246,
+        988.4103606319673,
+        688.51671926729,
+        1032.7737682746192,
+        1073.0251266980379,
+        902.5588892108664
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/control-9.json"
+      ],
+      "median_gflops": 929.0038500904275,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, this candidate scored 750.78–1033.27 GFLOP/s versus paired controls of 160.72–1073.03. It won 5/10 pairs. Candidate and control spreads were 282.49 and 912.30 GFLOP/s. Its minimum fails the required >1126.68 GFLOP/s threshold (1.05 × maximum paired control). Retain all results, including the 160.72 control. These mixed, overlapping results establish no repeatable gain.\n\nThe candidate exceeded the fresh initial imported peak of 1079.8626 and its paired-control peak of 1073.0251 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 SUBS/B.NE change as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. These scores establish no causal benefit from loop control or individual advisor contribution."
+      }
+    },
+    {
+      "name": "libxsmm-panel32-fmopa-order-0213",
+      "hypothesis": "Change only the active panel32 FMOPA order to ZA0, ZA2, ZA1, ZA3. This groups operations using the same B vector and tests instruction scheduling; benefit is unverified. Each tile retains its operands, predicates and K=0..511 FP32 update order. This change is absent from the supplied measured history. Loads, pointer advances, ABI, SME transitions, stack, timed packing/allocation, stores, fallback and BSD notices remain unchanged. No tools or tests were run. Compilation, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls under unchanged power settings, the fixed promotion gate and holdout validation remain required.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/source/kernel.c",
+      "source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "status": "passed",
+      "scores": [
+        551.0132060915225,
+        1063.637266332398,
+        1018.5718743765765,
+        886.7801570829539,
+        987.1962965261336,
+        950.9141714575367,
+        964.4399250578715,
+        969.9565411012654,
+        1019.0513975240332,
+        752.3584410514497
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-9.json"
+      ],
+      "control_scores": [
+        659.7492264982867,
+        491.5653043643289,
+        242.19747614451813,
+        898.5287087831098,
+        1039.2712208025666,
+        809.1498441424955,
+        995.8947895580682,
+        1087.699122323039,
+        1044.4959094233077,
+        867.3197306249854
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/control-9.json"
+      ],
+      "median_gflops": 967.1982330795685,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption; promoted=false confirms no promotion. Discard d079e341… and retain the imported incumbent unchanged. Preserve eb091b1e… as the user-selected panel32 research base.\n\nAcross ten runs, the candidate scored 551.01–1063.64 GFLOP/s versus paired controls of 242.20–1087.70. It won 3/10 pairs. Candidate and control spreads were 512.62 and 845.50 GFLOP/s. Its minimum of 551.01 fails the required >1142.08 GFLOP/s threshold (1.05 × maximum control). Retain all ten pairs, including the low scores. These results establish no repeatable gain.\n\nThe candidate exceeded the fresh initial imported peak of 1079.8626 and its paired-control peak of 1087.6991 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord the active-panel32 FMOPA order 0,2,1,3 as measured. Preserve the specialist-ranked queue, fixed gates and budgets. These scores establish neither a scheduling cause nor an individual advisor’s effect."
+      }
+    },
+    {
+      "name": "libxsmm-panel32-distance1-guarded-b-prefetch",
+      "hypothesis": "Add only the selected guarded distance-1 B prefetch to the active panel32 loop in eb091b1e…. Before demand loads, test x8>1 and issue PRFM PLDL1KEEP at x0+2048. This hints at K=1 through K=511 and skips the hint on the last iteration. The offset fits the PRFM immediate form. No registers are added; demand loads, pointer advances, all 512 ordered FP32 updates, ABI, stack, SME transitions, timed packing/allocation, stores, fallback and BSD notices remain unchanged. This active-path change is absent from the supplied measured history. Benefit is unverified. No tools or tests were run. Compilation, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls, min(candidate)>1.05*max(control), and holdout validation remain required under unchanged power settings. No throughput or repeatability gain is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/source/kernel.c",
+      "source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "status": "passed",
+      "scores": [
+        849.2535044086823,
+        939.1338951402291,
+        732.9295830213516,
+        759.0083894780298,
+        956.2799790291248,
+        928.4408667878274,
+        690.212727573165,
+        950.6345522761719,
+        928.7105728628059,
+        907.5142292702686
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-9.json"
+      ],
+      "control_scores": [
+        1004.5936316206673,
+        937.3564663457354,
+        1054.0644857171367,
+        896.5271725671589,
+        854.7784233504939,
+        1027.504212046433,
+        1012.3298888858033,
+        809.252288842611,
+        997.437785595189,
+        691.3237117207792
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/control-9.json"
+      ],
+      "median_gflops": 917.977548029048,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Discard 31064bf4… and retain the imported incumbent unchanged. Preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, the candidate scored 690.21–956.28 GFLOP/s versus paired controls of 691.32–1054.06. It won 4/10 pairs. Candidate and control spreads were 266.07 and 362.74 GFLOP/s. Its minimum fails the required >1106.77 GFLOP/s threshold (1.05 × maximum control). These overlapping results establish no repeatable gain; retain all ten pairs.\n\nIt exceeded the fresh initial imported peak of 1079.8625911084607 and its paired-control peak of 1054.0644857171367 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 guarded prefetch as measured. The scores do not isolate prefetch, guard-branch or cache effects, or establish an individual advisor’s contribution. Preserve the fixed gates and budgets; the supplied block has used all six candidate slots, including the replay."
+      }
+    }
+  ],
+  "target_gflops": 1800,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/source/kernel.c",
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 10,
+    "min_improvement": 0.05,
+    "max_seconds": 1800
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "candidate-budget",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/final.json",
+  "final_gflops": 916.5530208813,
+  "final_minimum_gflops": 603.940064993528
+}

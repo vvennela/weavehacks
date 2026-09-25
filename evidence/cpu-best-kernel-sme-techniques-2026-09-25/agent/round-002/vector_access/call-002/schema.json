@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "sme_fp32_schedule",
+          "k_loop_schedule",
+          "a_transpose",
+          "panel_packing",
+          "prefetch_locality",
+          "b_panel_layout",
+          "cache_conflict_layout",
+          "transpose_fusion"
+        ]
+      },
+      "minItems": 8,
+      "maxItems": 8
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ranking",
+    "reason"
+  ]
+}

@@ -1,0 +1,1519 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 73,
+  "batch_size": 3,
+  "pending": [
+    "k_loop_schedule"
+  ],
+  "implementations": 5,
+  "adjudications": [
+    {
+      "source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the user-selected panel32 research source.\n\nAcross ten runs, the candidate scored 747.82–1047.04 GFLOP/s versus paired controls of 596.91–1064.69. It won 4/10 pairs. Candidate and control spreads were 299.23 and 467.78 GFLOP/s. Its minimum fails the required >1117.93 GFLOP/s threshold (1.05 × maximum paired control). These overlapping, variable results establish no repeatable gain or cause.\n\nThe candidate exceeded the fresh initial baseline peak of 1079.8626 and paired-control peak of 1064.6919 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 runs each. Historical modes remain separate and do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nNext implementation must follow the specialist-ranked board and make a distinct change to the active panel32 path under the unchanged gates and budgets. This replay supplies repeatability evidence, not a new optimization. No individual advisor effect, GEMM gain from calibration, or hardware ceiling is established."
+    },
+    {
+      "source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nThe candidate won 9/10 pairs, but throughput ranged from 387.66–1075.18 GFLOP/s versus controls of 522.67–1019.86. Repeat spreads were 687.52 and 497.18 GFLOP/s. Its minimum of 387.66 fails the required >1070.85 GFLOP/s threshold (1.05 × maximum paired control). Keep all ten results; the low run cannot be excluded. These results do not establish repeatable improvement.\n\nThe candidate exceeded its fresh paired-control peak in 6/10 runs and the fresh initial imported peak of 1079.8626 in 0/10. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical power modes remain separate and do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 scheduling change as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. The scores do not isolate pointer scheduling from other effects or establish an individual advisor’s contribution."
+    },
+    {
+      "source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption; promoted=false confirms no promotion. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, d09f7c26… scored 595.42–1035.77 GFLOP/s versus paired controls of 574.91–1024.56. It won 5/10 pairs. Candidate and control spreads were 440.35 and 449.65 GFLOP/s. Its minimum fails the required >1075.79 GFLOP/s threshold (1.05 × maximum paired control). These overlapping, variable results establish no repeatable gain. All ten results remain relevant.\n\nThe candidate exceeded its fresh paired-control peak in 2/10 runs and the fresh initial imported peak of 1079.8625911084607 in 0/10. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical power-mode results do not enter eligibility. The ten-run goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 software pipeline as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. These scores do not establish a load-latency mechanism, an individual advisor’s effect, or a hardware ceiling."
+    },
+    {
+      "source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, this candidate scored 750.78–1033.27 GFLOP/s versus paired controls of 160.72–1073.03. It won 5/10 pairs. Candidate and control spreads were 282.49 and 912.30 GFLOP/s. Its minimum fails the required >1126.68 GFLOP/s threshold (1.05 × maximum paired control). Retain all results, including the 160.72 control. These mixed, overlapping results establish no repeatable gain.\n\nThe candidate exceeded the fresh initial imported peak of 1079.8626 and its paired-control peak of 1073.0251 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 SUBS/B.NE change as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. These scores establish no causal benefit from loop control or individual advisor contribution."
+    },
+    {
+      "source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption; promoted=false confirms no promotion. Discard d079e341… and retain the imported incumbent unchanged. Preserve eb091b1e… as the user-selected panel32 research base.\n\nAcross ten runs, the candidate scored 551.01–1063.64 GFLOP/s versus paired controls of 242.20–1087.70. It won 3/10 pairs. Candidate and control spreads were 512.62 and 845.50 GFLOP/s. Its minimum of 551.01 fails the required >1142.08 GFLOP/s threshold (1.05 × maximum control). Retain all ten pairs, including the low scores. These results establish no repeatable gain.\n\nThe candidate exceeded the fresh initial imported peak of 1079.8626 and its paired-control peak of 1087.6991 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord the active-panel32 FMOPA order 0,2,1,3 as measured. Preserve the specialist-ranked queue, fixed gates and budgets. These scores establish neither a scheduling cause nor an individual advisor’s effect."
+    },
+    {
+      "source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Discard 31064bf4… and retain the imported incumbent unchanged. Preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, the candidate scored 690.21–956.28 GFLOP/s versus paired controls of 691.32–1054.06. It won 4/10 pairs. Candidate and control spreads were 266.07 and 362.74 GFLOP/s. Its minimum fails the required >1106.77 GFLOP/s threshold (1.05 × maximum control). These overlapping results establish no repeatable gain; retain all ten pairs.\n\nIt exceeded the fresh initial imported peak of 1079.8625911084607 and its paired-control peak of 1054.0644857171367 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 guarded prefetch as measured. The scores do not isolate prefetch, guard-branch or cache effects, or establish an individual advisor’s contribution. Preserve the fixed gates and budgets; the supplied block has used all six candidate slots, including the replay."
+    }
+  ],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "single-thread"
+    ]
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "selected",
+      "roles": [
+        "sme_fp32_schedule",
+        "k_loop_schedule",
+        "register_reuse",
+        "a_transpose",
+        "panel_packing",
+        "vector_access",
+        "address_generation",
+        "tail_alignment",
+        "prefetch_locality",
+        "b_panel_layout",
+        "assembly_audit",
+        "cache_conflict_layout",
+        "cache_blocking",
+        "scratch_lifetime",
+        "transpose_fusion"
+      ],
+      "advice": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "advice": "Experiment: within the active panel32 K loop, test a two-step software pipeline using the existing four ZA tiles. Load the current A/B vectors, issue FMOPA to ZA0–ZA3 in the existing per-tile K order, then load the next K operands before the loop branches. Use a prologue for the first pair and a drain that skips the load after K=511. Keep each output tile’s 512 FP32 updates in the same order; do not add accumulators or change the panel path, packing, or fallback. This differs from the measured lookahead proposal, which loaded into z4–z7 and copied registers each iteration, and from unroll proposals that targeted the inactive full512 NN body. Hypothesis: placing next-step loads between the current FMOPA group and branch may hide load latency without register copies. No throughput gain is established.",
+          "risks": "The current active loop already has four independent ZA accumulators, so remaining latency may not be exposed by this schedule. Extra live operands or control flow may increase register pressure or reduce throughput. Prologue and drain must not read beyond K=511, and every tile must retain its original FP32 accumulation order. The full call must still include all input loads, packing, allocation, and stores.",
+          "abstain": false
+        },
+        {
+          "role": "k_loop_schedule",
+          "status": "received",
+          "advice": "Propose one schedule change in the active `sera_libxsmm_panel32` K loop: keep both paired LD1W instructions first, issue the ZA0 and ZA1 FMOPA operations, then advance the B and packed-A pointers, then issue the ZA2 and ZA3 FMOPA operations. This preserves each ZA tile’s FP32 K order and the existing loads, strides, and 512 iterations. The pointer adds may overlap with the remaining FMOPA work. This differs from the supplied pointer-scheduling proposals, which changed the inactive full512 NN body; no gain is established.",
+          "risks": "The interposed adds may reduce instruction scheduling quality or expose ZA dependencies. Validate assembly and ABI behavior, bounds and stack safety, all 48 public cases and the 0.002 tolerance. Then compare ten runs against fresh alternating unchanged controls under the same power settings. Keep packing and allocation inside `gemm`; do not change the fallback or license text.",
+          "abstain": false
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "advice": "Abstain. In the active panel32 K loop, each loaded A vector is already used by two FMOPA instructions, and each loaded B vector is also used by two. Those four instructions cover the output tile using the existing four ZA tiles. The supplied evidence identifies no further legal register reuse across K steps: the next step has different inputs, and no additional ZA tiles are available. A new register schedule would test load scheduling or add register pressure, not improve input reuse itself.",
+          "risks": "Claiming a reuse gain would repeat an optimization already present in the measured source. The prior lookahead experiment changed the inactive full512 path and lost its paired runs; it does not establish an outcome for panel32.",
+          "abstain": true
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "advice": "Propose `libxsmm-transpose-direct-panel-consumption` as one end-to-end layout experiment. For each supported size, keep the existing full-call transpose as the control, then compare a changed fallback that packs A directly into the exact layout consumed by the FP32 outer-product kernel, removing the separate `at` buffer and transpose pass. Keep all packing and allocation inside `gemm`; preserve the n=512 panel32 dispatch unchanged. Measure transpose/packing, consumption, and total timed `gemm` cost for every supported `n`, with correctness over the existing 48 cases and tolerance 0.002. The supplied evidence gives no measurements for this experiment, so it is a hypothesis only. If direct packing cannot feed the existing consumer without changing arithmetic order or ABI, abstain rather than substitute a different kernel.",
+          "risks": "The proposed direct layout and consumer integration are not specified by the supplied source, so implementation feasibility and any speed effect are unverified. Packing may cost as much as the transpose, require a larger allocation, or worsen consumer access. The n=512 path does not currently execute `sme_transpose`, so its frozen timing cannot measure fallback changes. Do not combine its result with fallback-size results or attribute a joint outcome to transpose alone. Preserve the existing fallback if allocation fails; include all allocation, packing, and consumption in timed calls.",
+          "abstain": false
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Propose a bounded B-panel layout for the active panel32 path: for each 32-column output panel, pack B as `packed_b[k*32+c] = B[k*512+j+c]` into a 64 KiB buffer allocated inside `gemm`. Keep the existing sixteen 32-row bands, single SME region, four ZA tiles, and FP32 K update order. Pass the packed panel to the unchanged compute loop, then pack the next column panel. This makes each K-step B load contiguous within its panel; whether that improves useful reuse enough to offset packing and extra panel work is unknown. The supplied source history has a distinct full512 packed-B proposal, but it changes the inactive full512 path and does not test this active panel32 layout. This is an unverified proposal, not a measured gain.",
+          "risks": "Packing and allocation add timed work and may reduce throughput. The buffer must hold exactly 512×32 FP32 values (64 KiB); all indices and panel transitions need bounds checks. Keep allocation failure on the existing correct fallback path. Check n=512 correctness and all 48 public cases, including tails and n<=0, fresh inputs, full output overwrite, input preservation, and the 0.002 tolerance. Check assembly and ABI behavior, including SME state and stack restoration. Compare ten validation reports and ten alternating paired controls with power and settings unchanged; require the existing promotion gate and holdout. Preserve FP32 arithmetic and its per-output K update order.",
+          "abstain": false
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "Abstain. No distinct, well-supported vector-access change is established for the active `eb091b1e…` panel32 path. Its K loop already uses paired contiguous LD1W operations for packed A and B. The supplied evidence does not establish a legal wider-load form for their different K strides, or alignment beyond the existing 64-byte scratch alignment; source matrix alignment is uncontrolled. A new layout would add timed packing and allocation, with no evidence that it improves the full call. Keep the active source unchanged pending a specific legal layout and instruction sequence.",
+          "risks": "Wider loads or alignment assumptions could read outside operands or change address behavior. Any layout conversion adds timed work. Performance and correctness are unverified; the supplied noisy results do not support attributing an outcome to vector access.",
+          "abstain": true
+        },
+        {
+          "role": "address_generation",
+          "status": "received",
+          "advice": "Propose an active panel32 K-loop counter rewrite: replace each `sub x8, x8, #1` / `cbnz x8, loop` pair with `subs x8, x8, #1` / `b.ne loop`, in both 512-step compute loops. This preserves each loop’s 512 ordered FP32 updates and pointer bounds while removing the separate counter-to-zero test. It is distinct from the supplied measured changes, which include W32 counters and other schedules. Test assembly acceptance, ABI and SME state preservation, correctness at n=512 and the existing general-size/tail/n<=0 cases, and the fixed tolerance. Then use the unchanged repeated paired-control and holdout gates. This is unverified advice; do not infer a speedup.",
+          "risks": "The compare-and-branch form may not improve scheduling or throughput; results could regress or vary. No performance or correctness result is supplied for this change.",
+          "abstain": false
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "Abstain. The active n=512 panel32 path has no FP32 tail, and its packing cursor and scratch accesses already use 64-byte-aligned steps. A distinct tail or alignment change is not supported by the supplied evidence. The general-size fallback handles arbitrary sizes and tails; changing it would not improve the measured panel32 path.",
+          "risks": "A new tail or alignment path could change bounds or ABI behavior without evidence of benefit. No source change, tests, or performance results are proposed.",
+          "abstain": true
+        },
+        {
+          "role": "prefetch_locality",
+          "status": "received",
+          "advice": "Propose one active-path experiment: add guarded distance-2 `PRFM PLDL1KEEP` hints to the panel32 K loop, targeting B at `x0+4096` bytes and packed A at `x3+256` bytes. The supplied loop advances B by 2,048 bytes and packed A by 128 bytes per K step, so these offsets target K+2. Issue the hints only while more than two K steps remain; keep all demand loads and FP32 updates unchanged. The M4 Pro evidence lists a 128-byte cache line and 128 KiB P-core L1D. The active panel touches about 64 KiB of B data and 64 KiB of packed A per panel, so prefetching might help keep upcoming lines available, but that fit is approximate and does not establish a benefit. Measure the full timed `gemm`, including both prefetch instructions and their guard, under the unchanged correctness, paired-control, repeat, and holdout gates.",
+          "risks": "Prefetch may add instruction and branch cost, evict useful data, or have no effect. The earlier distance-4 prefetch result was for the inactive full512 NN path and regressed in its supplied measurements; it does not predict this active panel32 experiment. No cause or speedup is established. Check that guarded hints never address beyond K=511, preserve the ABI and fallback, and pass the existing general-size and tolerance checks.",
+          "abstain": false
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Test one distinct change in the active panel32 path: inside `gemm`, pack each 32-column B panel into a temporary K-major, contiguous layout, then update the panel32 SME loads and panel pointer steps to consume it. Preserve every FP32 value and the existing accumulation order. Keep allocation and packing inside the timed call; retain the general-size fallback and full GEMM ABI. Hypothesis: contiguous B accesses may improve the SME consumer enough to offset packing and allocation costs. This is unverified.",
+          "risks": "Packing adds a 1 MiB buffer and a full B read/write pass, which may outweigh any consumer benefit. It also changes the active assembly addressing, so bounds, panel transitions, stack/ABI state, and output coverage need careful validation. Do not infer a speedup from isolated load results.",
+          "abstain": false
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Abstain. The supplied active panel32 path is inline SME assembly, not compiler-generated code, and no compiler output or disassembly for the reconstructed active source was supplied. The visible K loop has paired operand loads, pointer updates, four FMOPA instructions, and loop control, but that alone does not establish a bottleneck. I cannot justify a distinct assembly change without inventing evidence.",
+          "risks": "Any instruction-level change would be unverified and could affect FP32 update order, register or ABI state, stack safety, or load bounds. No performance gain can be inferred from this source text alone.",
+          "abstain": true
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "advice": "Propose one active panel32 experiment: pad each packed-A K slice from 128 to 192 bytes. Keep its 128 data bytes unchanged, add 64 unused bytes, allocate 98,304 bytes for 512 slices, and update the packing cursor, both compute-loop A-pointer advances, and both rewinds to use the 192-byte stride. The existing second-row-half address remains at offset 64 within each slice. Hypothesis: the changed scratch address pattern may reduce cache-set conflicts; this is unverified. Compare the complete timed gemm call, including the larger allocation and all packing traffic, against fresh same-mode controls. Preserve the full512 path, fallback, FP32 update order, ABI, and license text.",
+          "risks": "The 128-byte slice already matches the supplied 128-byte cache-line size, and the supplied evidence does not establish a conflict. Padding increases scratch footprint by 50%; it may add address-generation cost or worsen cache behavior. Check that every packed store and both consumers stay within the 98,304-byte allocation, including the final K slice and second row half. Run the fixed correctness cases and tolerance checks, then the existing ten validation reports, ten alternating paired controls, promotion gate, and holdout with power source and settings unchanged. Do not infer a cache cause from noisy scores.",
+          "abstain": false
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "ABSTAIN. The supplied best source already uses a 32-row panel with one 64 KiB scratch buffer, computes all 16 column panels for each row panel, and keeps the full call in one SME region. Changing cache-block traversal would repeat an existing design or move away from the active panel32 path. The supplied evidence does not identify a cache bottleneck or support a distinct cache-blocking change.",
+          "risks": "No new experiment is proposed. Existing measurements do not establish a repeatable gain for the panel32 kernel, and they do not establish that cache behavior caused its score variation.",
+          "abstain": true
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Test a 32-K-step scratch microbuffer in the active panel32 path. Pack 32 K values for the current 32-row A panel into 4 KiB, consume that block, then pack the next block. Keep the four ZA accumulators live across all 16 blocks so each output retains its K update order. This reduces the reserved FP32 scratch from 64 KiB to 4 KiB. Keep allocation and packing inside gemm.",
+          "risks": "The current path already allocates scratch once per call and overwrites it during packing; it does not explicitly clear the buffer. This change may save stack space without reducing initialization work, while adding block-loop overhead. Verify all 512 K updates, pointer bounds, stack alignment, ABI state, FP32 tolerance 0.002, general-size fallback, and the complete timed call. Measure repeated paired controls under unchanged settings; do not infer a gain from one score.",
+          "abstain": false
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Propose a bounded transpose-fusion experiment in the active panel32 path. For each 32-row A band, transpose a small K-by-row tile into a temporary buffer, then feed that tile to the existing FP32 FMOPA loop before writing it to the full 64 KiB scratch panel. Keep the current column-panel traversal and accumulation order. Process all 512 K values exactly once per row band; do not recompute the transpose for each output-column panel. Count tile-buffer writes and reads, full-panel writes and reads, and any added allocation or pointer work inside gemm. Compare against the exact eb091b1e source and unchanged paired controls. This tests whether fusing transpose with consumption can remove full-panel traffic; it is unmeasured advice, not a performance claim.",
+          "risks": "Fusion may require restructuring the active assembly and stack use, may increase SME transitions or register pressure, and may simply move rather than remove data movement. A design that repeats transpose work for each of the 16 output-column panels would add 15 redundant transposes per A band and should be rejected. Preserve row-major C=A@B, FP32 update order, general-size fallback, ABI state, 64-byte stack alignment, bounds, and all license text. Validate fresh inputs, full output overwrite, input preservation, all 48 public cases including tails and n<=0, and the existing 0.002 tolerance. Then use the fixed ten-run validation and paired-control gates without changing power settings; compare historical and fresh same-mode peaks separately.",
+          "abstain": false
+        }
+      ],
+      "ballots": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "address_generation",
+            "panel_packing",
+            "prefetch_locality",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "cache_conflict_layout",
+            "b_panel_layout",
+            "a_transpose"
+          ],
+          "reason": "Prioritize the active K-loop schedules: they preserve the four-tile design and ordered FP32 updates while testing load placement or loop control. The evidence contains no measured gain for these active-path changes. Panel packing and prefetch are next: they may improve operand access, but add timed work; the earlier distance-4 prefetch regressed on the inactive full512 path, which does not establish the outcome here. Scratch blocking and transpose fusion require more restructuring and may add loop or data movement costs. Padding has no demonstrated cache conflict and increases scratch use. The large B layout has higher packing and addressing costs. A transpose-only fallback change does not affect the fixed n=512 benchmark, so it ranks last.",
+          "format_repairs": 0
+        },
+        {
+          "role": "k_loop_schedule",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "address_generation",
+            "panel_packing",
+            "transpose_fusion",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "b_panel_layout",
+            "a_transpose"
+          ],
+          "reason": "The active panel32 reduction loop loads both operands, advances both pointers, then updates all four ZA tiles. Moving the pointer adds between FMOPA operations is a small, bounded schedule change that preserves each tile’s FP32 order. The proposed load lookahead also targets this active loop, but needs careful prologue and drain bounds. SUBS/B.NE is low risk, though it still uses two instructions. Packing B per panel and fusing transpose with consumption may reduce data movement, but add layout, allocation, or assembly complexity. Prefetch and A-slice padding have weaker support: the prior prefetch result was on the inactive path, and the supplied evidence does not establish cache conflicts. Smaller scratch adds K-block loop work; the 1 MiB B layout and fallback-only transpose change have the largest timed-cost or relevance concerns. No proposal has measured evidence of a gain on the active path.",
+          "format_repairs": 0
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "address_generation",
+            "prefetch_locality",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "a_transpose"
+          ],
+          "reason": "Prior evidence shows the active panel32 path already reuses each loaded A and B vector across two FMOPA operations and updates all four ZA tiles. I rank schedules that retain this reuse without adding live vectors first: interleaving pointer updates may use existing FMOPA work to cover their cost, while the two-step pipeline could hide load latency but raises register-pressure risk. Counter and prefetch changes are smaller tests, though prior counter results were mixed and distance-4 prefetch regressed on the inactive path. Layout, fusion, padding, and microbuffer proposals add packing or loop work without measured support; direct A transpose affects the fallback, not the n=512 timed path. These are experiment priorities, not predictions of measured gains or causes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "panel_packing",
+            "b_panel_layout",
+            "prefetch_locality",
+            "address_generation",
+            "transpose_fusion",
+            "a_transpose",
+            "scratch_lifetime",
+            "cache_conflict_layout"
+          ],
+          "reason": "Prioritize active panel32 changes with plausible gains and bounded scope. The two K schedules preserve FP32 update order and test whether load placement or pointer work can overlap FMOPA; neither has direct active-path measurements. Packing one B panel at a time is ahead of a full 1 MiB B layout because it limits added storage and packing work while testing contiguous consumption. Prefetch is lower because the supplied distance-4 test on the inactive path regressed, though that result does not settle this active-path variant. Counter fusion is a small, low-risk test. Transpose fusion and direct A packing may reduce data movement, but their integration with the existing consumer is underspecified; the n=512 panel32 path already packs A directly, so the fallback-only transpose change does not address its timed workload. Scratch microblocking adds loop work without reducing packing, and 192-byte A padding increases footprint without evidence of cache conflicts.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "panel_packing",
+            "prefetch_locality",
+            "address_generation",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "cache_conflict_layout",
+            "b_panel_layout",
+            "a_transpose"
+          ],
+          "reason": "Prioritize small changes to the active panel32 compute loop, then the bounded 64 KiB B-panel layout. Scheduling has lower layout and allocation risk; the panel layout tests useful reuse directly, but its packing cost is unmeasured. Prefetch and counter changes have less expected benefit. Scratch blocking and transpose fusion restructure the active path, while padded A slices lack evidence of cache conflicts. The 1 MiB B layout adds substantial timed traffic. Direct A packing affects the fallback, not the fixed n=512 path. No proposal has measured evidence of improvement.",
+          "format_repairs": 0
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "address_generation",
+            "prefetch_locality",
+            "scratch_lifetime",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "cache_conflict_layout",
+            "a_transpose"
+          ],
+          "reason": "This is a hypothesis ranking, not a measured-performance ranking. I put small changes to the active K loop first: they keep the current layout and FP32 update order, with limited bounds risk. Prefetching is next because the supplied cache-line and L1D facts make it testable, though earlier prefetch advice regressed on the inactive path and does not predict this result. Scratch blocking may reduce reserved space, but adds loop work. B layouts and transpose fusion have greater potential to change data access, but add timed packing or require a more complex active-path rewrite; the per-panel packing proposal may repeat work under the current row-band traversal. Padding has no supplied evidence of a cache conflict and increases footprint. The general-path transpose proposal does not affect the fixed n=512 timing and its direct-consumption layout is underspecified.",
+          "format_repairs": 0
+        },
+        {
+          "role": "address_generation",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "address_generation",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "scratch_lifetime",
+            "panel_packing",
+            "transpose_fusion",
+            "cache_conflict_layout",
+            "b_panel_layout",
+            "a_transpose"
+          ],
+          "reason": "Prior measurements show large run-to-run variation and no promoted panel32 change, so they do not support causal performance claims. Test the small active-loop scheduling edits first: moving pointer updates between FMOPA operations may overlap work, while SUBS/B.NE is simple but still uses two instructions and may not reduce loop-control cost. The software pipeline has greater bounds and register-pressure risk. Prefetch is bounded but adds hints and a guard. Scratch blocking adds loop and packing complexity. The remaining proposals change layouts or transpose handling, with higher traffic, allocation, and correctness risk; the n=512 path does not use the fallback transpose, so that proposal has weak relevance to the timed workload.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "address_generation",
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "panel_packing",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "cache_conflict_layout",
+            "a_transpose",
+            "b_panel_layout"
+          ],
+          "reason": "Ranked the small active-loop changes first because they preserve the panel layout and FP32 update order, with limited bounds risk. Guarded prefetch is next; its benefit is uncertain and its K+2 accesses need strict bounds. Packing and fusion could improve data movement but add timed work and more complex pointer handling. Padding has a speculative cache benefit and increases scratch use. The transpose proposal targets fallback sizes rather than the fixed n=512 path, and direct packing lacks a specified consumer layout. The 1 MiB B layout has the highest cost and addressing risk. No proposal has measured evidence of a gain.",
+          "format_repairs": 0
+        },
+        {
+          "role": "prefetch_locality",
+          "status": "received",
+          "ranking": [
+            "prefetch_locality",
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "address_generation",
+            "panel_packing",
+            "scratch_lifetime",
+            "b_panel_layout",
+            "cache_conflict_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "The active loop streams one 128-byte cache line from each operand per K step, and the supplied M4 Pro profile reports 128-byte lines and 128 KiB P-core L1D. That makes guarded distance-2 prefetch the most direct locality hypothesis, though its hints and guard must be timed; the earlier distance-4 result regressed on the inactive full512 path and does not predict this one. Pointer scheduling and loop-control edits are smaller changes that preserve the 512-step FP32 order. Packing B adds work even though each active B load already reads a contiguous 128-byte panel slice. Padding A increases scratch by 50% despite its current 128-byte slice matching the cache-line size. Scratch blocking and transpose fusion restructure the active loop and add control or data movement; direct A packing targets only fallback sizes, not the measured n=512 path. All gains remain unverified.",
+          "format_repairs": 0
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "ranking": [
+            "panel_packing",
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "address_generation",
+            "prefetch_locality",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "transpose_fusion",
+            "a_transpose",
+            "b_panel_layout"
+          ],
+          "reason": "Test active panel32 B packing first: it directly targets B access locality, while the prior packed-B result changed the inactive full512 path and does not measure this proposal. Keep all packing timed and preserve K order. Next test the smaller active-loop scheduling and counter changes. Prefetch has added instruction cost, and the padding and scratch proposals add layout or loop complexity without evidence of a benefit. Transpose fusion has substantial implementation risk; A transpose targets only the fallback, not the frozen n=512 path. b_panel_layout is this same experiment ID and appears once.",
+          "format_repairs": 0
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "address_generation",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "The active panel32 assembly visibly loads operands, advances both pointers, issues four FMOPA operations, then decrements and branches for each K step. The pointer adds sit between loads and FMOPA; moving them between FMOPA operations is a small schedule test with unchanged updates. Fusing decrement and branch is similarly bounded, though neither change is known to improve timing. A two-step load pipeline may hide latency but needs a guarded prologue and drain. Distance-2 prefetch has bounded addresses, but prefetching adds instructions and the supplied distance-4 inactive-path candidate regressed; that result does not predict this path. Scratch padding and K-block scratch reuse have uncertain benefit and add memory or loop work. B packing may improve load layout, but adds timed packing. The larger B layout adds a 1 MiB buffer and pass. Transpose fusion requires more restructuring, while `a_transpose` targets the fallback; frozen n=512 uses panel32 and does not measure it. All proposals are unverified. The ranking reflects expected value and implementation risk, not measured gains.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "address_generation",
+            "cache_conflict_layout",
+            "prefetch_locality",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "panel_packing",
+            "a_transpose",
+            "b_panel_layout"
+          ],
+          "reason": "Prioritize small active-loop changes that preserve FP32 update order and avoid extra packing. The 128-byte A slice matches the stated cache-line size, and the evidence does not show a conflict; 192-byte padding may alter set mapping, but it grows scratch from 64 KiB to 96 KiB while the panel’s B data is about 64 KiB, risking pressure on the 128 KiB L1D. Test it after lower-cost loop changes, and judge only the complete timed call. The prior padded-layout measurements changed the inactive full512 path and do not establish a result for this active panel32 proposal. Larger layout and transpose changes add substantial timed work and correctness risk.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "address_generation",
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "panel_packing",
+            "transpose_fusion",
+            "b_panel_layout",
+            "a_transpose"
+          ],
+          "reason": "I ranked the small active-loop changes first. Fusing the decrement with the branch is a bounded test; moving pointer updates between FMOPA operations is also a limited schedule change. Both target the active panel32 path and preserve K order, though neither has measured support. The lookahead schedule may hide load latency, but its prologue and drain add bounds and correctness risk. Prefetch is easy to test but may add instruction cost; the earlier inactive-path prefetch regressed, which does not predict this path. A 4 KiB scratch microbuffer adds K-block loop work without reducing packing volume. Padding has no demonstrated cache-conflict basis and increases scratch size. Packing B adds timed work; full B-panel packing adds substantially more memory traffic. Transpose fusion requires a more invasive assembly change. The A transpose proposal affects fallback sizes, not the measured n=512 path. No proposal has evidence of a repeatable gain, and noisy prior scores do not identify causes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "address_generation",
+            "prefetch_locality",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "a_transpose"
+          ],
+          "reason": "Prioritize small active-path K-loop changes that preserve FP32 update order and avoid new buffers. Pointer scheduling has a direct overlap hypothesis; the two-step pipeline has more boundary and register risk. Counter fusion is a small, testable change. Prefetch and B-panel packing may help operand access, but add instructions or timed copying; the earlier prefetch regression was on the inactive path and does not predict this one. Transpose fusion and 32-K scratch blocking could reduce data movement or scratch footprint, but require substantial loop restructuring, and the current scratch is already allocated once and is not cleared. A-slice padding is speculative, increases footprint, and may worsen locality. A transpose change targets fallback sizes; it does not affect the fixed n=512 panel32 timing.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "address_generation",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "panel_packing",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "transpose_fusion",
+            "b_panel_layout",
+            "a_transpose"
+          ],
+          "reason": "Prioritize small, local changes in the active panel32 loop: pointer scheduling and loop control have low correctness risk and little added timed work. Software pipelining and guarded prefetches may help, but add scheduling or instruction overhead; neither has active-path measurements. Packing, microbuffering, and padding add timed work or restructure the loop, with uncertain benefit. Transpose fusion could remove full-panel traffic in principle, but a small tile cannot serve all 16 column panels without retaining the full transpose, repeating transpose work, or changing accumulator scheduling. Reject any version that repeats transpose work per panel; first show a design that preserves the K update order and actually reduces total movement. The direct-A fallback proposal does not affect the fixed n=512 path. All advice is unmeasured; previous noisy or losing results on other paths do not establish causes here.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "k_loop_schedule",
+          "status": "proposed",
+          "source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+          "name": "libxsmm-panel32-pointer-adds-after-za1",
+          "hypothesis": "Implement only the selected active panel32 schedule: load both operand pairs, update ZA0 and ZA1, advance both pointers, then update ZA2 and ZA3. The pointer adds may overlap with the remaining FMOPA work; benefit is unverified. This change is absent from the supplied measured history. All 512 iterations, operand addresses, per-output FP32 update order, ABI, stack handling, timed packing and allocation, fallback, and BSD notices remain unchanged. No tools or tests were run. Require compilation, all 48 public cases at tolerance 0.002, ten validation reports and ten alternating fresh imported controls under unchanged power settings. Promotion still requires min(candidate)>1.05*max(control), followed by holdout validation. No speedup or repeatability gain is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1046.7033563805448,
+              939.682904385826,
+              1060.4857245907642,
+              387.655933988038,
+              1025.2163295773348,
+              1035.5945920019321,
+              996.205223267639,
+              1050.1142676861093,
+              708.8171620479706,
+              1075.1783172284315
+            ],
+            "control_scores": [
+              941.3272573776369,
+              893.1712329754055,
+              713.2127983131938,
+              772.6606313541947,
+              1019.8567190460346,
+              984.3292772365588,
+              835.1625976751104,
+              918.2491584321377,
+              522.6720194434748,
+              995.1268519078116
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "revise",
+              "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nThe candidate won 9/10 pairs, but throughput ranged from 387.66–1075.18 GFLOP/s versus controls of 522.67–1019.86. Repeat spreads were 687.52 and 497.18 GFLOP/s. Its minimum of 387.66 fails the required >1070.85 GFLOP/s threshold (1.05 × maximum paired control). Keep all ten results; the low run cannot be excluded. These results do not establish repeatable improvement.\n\nThe candidate exceeded its fresh paired-control peak in 6/10 runs and the fresh initial imported peak of 1079.8626 in 0/10. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical power modes remain separate and do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 scheduling change as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. The scores do not isolate pointer scheduling from other effects or establish an individual advisor’s contribution."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-002/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "sme_fp32_schedule",
+          "status": "proposed",
+          "source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+          "name": "libxsmm-panel32-next-operands-before-branch",
+          "hypothesis": "Implement the selected software pipeline in the active panel32 K loop, starting from eb091b1e…. A prologue loads K=0. Each of 511 loop iterations updates ZA0–ZA3, loads the next operands into the same registers, advances the pointers, and branches. A final drain updates all four tiles for K=511 without another load. This preserves 512 loads per operand stream, pointer totals, and each output's FP32 accumulation order without register copies or extra accumulators. Placing loads before loop control tests load-latency overlap; benefit is unverified. This active-panel32 change is absent from the supplied measured history. Packing, allocation, stores, ABI, stack handling, fallback and all BSD notices remain unchanged. No tools or tests were run. Compilation, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls, the fixed promotion gate and holdout validation remain required. No throughput or repeatability gain is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              716.9443929836941,
+              880.9568122068177,
+              887.3900102998489,
+              1035.7664763501227,
+              911.1088800692797,
+              1026.68665823742,
+              595.4210422627164,
+              884.5885377999632,
+              698.2923935726059,
+              1005.063804414036
+            ],
+            "control_scores": [
+              940.3676244430231,
+              962.4205770904282,
+              892.307228524544,
+              972.7367367643877,
+              580.5578945044148,
+              990.8402311589523,
+              1024.562746838766,
+              786.8177586600441,
+              873.5545955618412,
+              574.9104344531163
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "revise",
+              "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption; promoted=false confirms no promotion. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, d09f7c26… scored 595.42–1035.77 GFLOP/s versus paired controls of 574.91–1024.56. It won 5/10 pairs. Candidate and control spreads were 440.35 and 449.65 GFLOP/s. Its minimum fails the required >1075.79 GFLOP/s threshold (1.05 × maximum paired control). These overlapping, variable results establish no repeatable gain. All ten results remain relevant.\n\nThe candidate exceeded its fresh paired-control peak in 2/10 runs and the fresh initial imported peak of 1079.8625911084607 in 0/10. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical power-mode results do not enter eligibility. The ten-run goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 software pipeline as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. These scores do not establish a load-latency mechanism, an individual advisor’s effect, or a hardware ceiling."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-003/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "address_generation",
+          "status": "proposed",
+          "source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+          "name": "libxsmm-panel32-subs-bne-k-loop-control",
+          "hypothesis": "Apply the selected counter rewrite to Lpanel32_368, the single active panel32 compute loop. The recommendation's reference to two compute loops does not match this path; the two inactive full512 loops remain unchanged. SUBS/B.NE retains 512 iterations, pointer bounds and per-output FP32 update order. Instruction count remains two; no speedup is established. The historical SUBS/B.NE experiment modified full512, so this active-panel32 change is distinct from supplied measured sources. ABI, SME transitions, stack, timed packing/allocation, stores, fallback and all BSD notices remain unchanged. No tools or tests were run. Assembly acceptance, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls, the fixed promotion gate and holdout validation remain required under unchanged power settings.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1001.0010732250855,
+              875.09518986084,
+              750.7802400181534,
+              1033.2706954556381,
+              996.8193458429972,
+              877.5985461981168,
+              880.4770361467664,
+              933.9613804223521,
+              924.0463197585029,
+              966.7566760020774
+            ],
+            "control_scores": [
+              800.9006435996766,
+              933.2827437036337,
+              952.1790669511673,
+              953.3084802536544,
+              160.72382008773246,
+              988.4103606319673,
+              688.51671926729,
+              1032.7737682746192,
+              1073.0251266980379,
+              902.5588892108664
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "revise",
+              "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Retain the imported incumbent unchanged and preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, this candidate scored 750.78–1033.27 GFLOP/s versus paired controls of 160.72–1073.03. It won 5/10 pairs. Candidate and control spreads were 282.49 and 912.30 GFLOP/s. Its minimum fails the required >1126.68 GFLOP/s threshold (1.05 × maximum paired control). Retain all results, including the 160.72 control. These mixed, overlapping results establish no repeatable gain.\n\nThe candidate exceeded the fresh initial imported peak of 1079.8626 and its paired-control peak of 1073.0251 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 SUBS/B.NE change as measured. Follow the specialist-ranked queue for the next distinct implementation under unchanged gates and budgets. These scores establish no causal benefit from loop control or individual advisor contribution."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-004/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        }
+      ],
+      "rationale": "These 15 roles target the active sera_libxsmm_panel32 path in eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf. Schedule and register specialists cover bounded K lookahead, active-loop unrolling, operand lifetimes and FP32 update order. Address generation covers pointer and branch work. Vector access, B layout and panel packing cover legal wider loads, respecting the existing 128-byte packed-A and 2048-byte B strides and counting all packing costs. A transpose and transpose fusion examine distinct changes to the active packing sequence. Cache blocking, cache-conflict layout and prefetch locality review access patterns without assuming a cache bottleneck. Tail alignment and scratch lifetime cover the current 64-byte alignment, allocation bounds, valid stack use and per-call storage. Assembly audit checks instruction legality, ABI preservation, x18 avoidance and whether each proposal changes executed code.\n\nFour ZA tiles, twice-used operand vectors, one SME region and reusable 64 KiB scratch already exist; restating them is not an experiment. Earlier full512 unroll results do not measure active panel32 unrolling. This selects advisor roles only, not experiments or their order. Specialist proposals still require shared review and joint ranking. No agents were invoked, edits made or tests run. Advice remains unverified; all fixed gates, budgets, fallback behavior and power-mode separation remain unchanged.",
+      "board": [
+        {
+          "experiment_id": "sme_fp32_schedule",
+          "recommendation": "Experiment: within the active panel32 K loop, test a two-step software pipeline using the existing four ZA tiles. Load the current A/B vectors, issue FMOPA to ZA0–ZA3 in the existing per-tile K order, then load the next K operands before the loop branches. Use a prologue for the first pair and a drain that skips the load after K=511. Keep each output tile’s 512 FP32 updates in the same order; do not add accumulators or change the panel path, packing, or fallback. This differs from the measured lookahead proposal, which loaded into z4–z7 and copied registers each iteration, and from unroll proposals that targeted the inactive full512 NN body. Hypothesis: placing next-step loads between the current FMOPA group and branch may hide load latency without register copies. No throughput gain is established.",
+          "risks": "The current active loop already has four independent ZA accumulators, so remaining latency may not be exposed by this schedule. Extra live operands or control flow may increase register pressure or reduce throughput. Prologue and drain must not read beyond K=511, and every tile must retain its original FP32 accumulation order. The full call must still include all input loads, packing, allocation, and stores."
+        },
+        {
+          "experiment_id": "k_loop_schedule",
+          "recommendation": "Propose one schedule change in the active `sera_libxsmm_panel32` K loop: keep both paired LD1W instructions first, issue the ZA0 and ZA1 FMOPA operations, then advance the B and packed-A pointers, then issue the ZA2 and ZA3 FMOPA operations. This preserves each ZA tile’s FP32 K order and the existing loads, strides, and 512 iterations. The pointer adds may overlap with the remaining FMOPA work. This differs from the supplied pointer-scheduling proposals, which changed the inactive full512 NN body; no gain is established.",
+          "risks": "The interposed adds may reduce instruction scheduling quality or expose ZA dependencies. Validate assembly and ABI behavior, bounds and stack safety, all 48 public cases and the 0.002 tolerance. Then compare ten runs against fresh alternating unchanged controls under the same power settings. Keep packing and allocation inside `gemm`; do not change the fallback or license text."
+        },
+        {
+          "experiment_id": "a_transpose",
+          "recommendation": "Propose `libxsmm-transpose-direct-panel-consumption` as one end-to-end layout experiment. For each supported size, keep the existing full-call transpose as the control, then compare a changed fallback that packs A directly into the exact layout consumed by the FP32 outer-product kernel, removing the separate `at` buffer and transpose pass. Keep all packing and allocation inside `gemm`; preserve the n=512 panel32 dispatch unchanged. Measure transpose/packing, consumption, and total timed `gemm` cost for every supported `n`, with correctness over the existing 48 cases and tolerance 0.002. The supplied evidence gives no measurements for this experiment, so it is a hypothesis only. If direct packing cannot feed the existing consumer without changing arithmetic order or ABI, abstain rather than substitute a different kernel.",
+          "risks": "The proposed direct layout and consumer integration are not specified by the supplied source, so implementation feasibility and any speed effect are unverified. Packing may cost as much as the transpose, require a larger allocation, or worsen consumer access. The n=512 path does not currently execute `sme_transpose`, so its frozen timing cannot measure fallback changes. Do not combine its result with fallback-size results or attribute a joint outcome to transpose alone. Preserve the existing fallback if allocation fails; include all allocation, packing, and consumption in timed calls."
+        },
+        {
+          "experiment_id": "panel_packing",
+          "recommendation": "Propose a bounded B-panel layout for the active panel32 path: for each 32-column output panel, pack B as `packed_b[k*32+c] = B[k*512+j+c]` into a 64 KiB buffer allocated inside `gemm`. Keep the existing sixteen 32-row bands, single SME region, four ZA tiles, and FP32 K update order. Pass the packed panel to the unchanged compute loop, then pack the next column panel. This makes each K-step B load contiguous within its panel; whether that improves useful reuse enough to offset packing and extra panel work is unknown. The supplied source history has a distinct full512 packed-B proposal, but it changes the inactive full512 path and does not test this active panel32 layout. This is an unverified proposal, not a measured gain.",
+          "risks": "Packing and allocation add timed work and may reduce throughput. The buffer must hold exactly 512×32 FP32 values (64 KiB); all indices and panel transitions need bounds checks. Keep allocation failure on the existing correct fallback path. Check n=512 correctness and all 48 public cases, including tails and n<=0, fresh inputs, full output overwrite, input preservation, and the 0.002 tolerance. Check assembly and ABI behavior, including SME state and stack restoration. Compare ten validation reports and ten alternating paired controls with power and settings unchanged; require the existing promotion gate and holdout. Preserve FP32 arithmetic and its per-output K update order."
+        },
+        {
+          "experiment_id": "address_generation",
+          "recommendation": "Propose an active panel32 K-loop counter rewrite: replace each `sub x8, x8, #1` / `cbnz x8, loop` pair with `subs x8, x8, #1` / `b.ne loop`, in both 512-step compute loops. This preserves each loop’s 512 ordered FP32 updates and pointer bounds while removing the separate counter-to-zero test. It is distinct from the supplied measured changes, which include W32 counters and other schedules. Test assembly acceptance, ABI and SME state preservation, correctness at n=512 and the existing general-size/tail/n<=0 cases, and the fixed tolerance. Then use the unchanged repeated paired-control and holdout gates. This is unverified advice; do not infer a speedup.",
+          "risks": "The compare-and-branch form may not improve scheduling or throughput; results could regress or vary. No performance or correctness result is supplied for this change."
+        },
+        {
+          "experiment_id": "prefetch_locality",
+          "recommendation": "Propose one active-path experiment: add guarded distance-2 `PRFM PLDL1KEEP` hints to the panel32 K loop, targeting B at `x0+4096` bytes and packed A at `x3+256` bytes. The supplied loop advances B by 2,048 bytes and packed A by 128 bytes per K step, so these offsets target K+2. Issue the hints only while more than two K steps remain; keep all demand loads and FP32 updates unchanged. The M4 Pro evidence lists a 128-byte cache line and 128 KiB P-core L1D. The active panel touches about 64 KiB of B data and 64 KiB of packed A per panel, so prefetching might help keep upcoming lines available, but that fit is approximate and does not establish a benefit. Measure the full timed `gemm`, including both prefetch instructions and their guard, under the unchanged correctness, paired-control, repeat, and holdout gates.",
+          "risks": "Prefetch may add instruction and branch cost, evict useful data, or have no effect. The earlier distance-4 prefetch result was for the inactive full512 NN path and regressed in its supplied measurements; it does not predict this active panel32 experiment. No cause or speedup is established. Check that guarded hints never address beyond K=511, preserve the ABI and fallback, and pass the existing general-size and tolerance checks."
+        },
+        {
+          "experiment_id": "b_panel_layout",
+          "recommendation": "Test one distinct change in the active panel32 path: inside `gemm`, pack each 32-column B panel into a temporary K-major, contiguous layout, then update the panel32 SME loads and panel pointer steps to consume it. Preserve every FP32 value and the existing accumulation order. Keep allocation and packing inside the timed call; retain the general-size fallback and full GEMM ABI. Hypothesis: contiguous B accesses may improve the SME consumer enough to offset packing and allocation costs. This is unverified.",
+          "risks": "Packing adds a 1 MiB buffer and a full B read/write pass, which may outweigh any consumer benefit. It also changes the active assembly addressing, so bounds, panel transitions, stack/ABI state, and output coverage need careful validation. Do not infer a speedup from isolated load results."
+        },
+        {
+          "experiment_id": "cache_conflict_layout",
+          "recommendation": "Propose one active panel32 experiment: pad each packed-A K slice from 128 to 192 bytes. Keep its 128 data bytes unchanged, add 64 unused bytes, allocate 98,304 bytes for 512 slices, and update the packing cursor, both compute-loop A-pointer advances, and both rewinds to use the 192-byte stride. The existing second-row-half address remains at offset 64 within each slice. Hypothesis: the changed scratch address pattern may reduce cache-set conflicts; this is unverified. Compare the complete timed gemm call, including the larger allocation and all packing traffic, against fresh same-mode controls. Preserve the full512 path, fallback, FP32 update order, ABI, and license text.",
+          "risks": "The 128-byte slice already matches the supplied 128-byte cache-line size, and the supplied evidence does not establish a conflict. Padding increases scratch footprint by 50%; it may add address-generation cost or worsen cache behavior. Check that every packed store and both consumers stay within the 98,304-byte allocation, including the final K slice and second row half. Run the fixed correctness cases and tolerance checks, then the existing ten validation reports, ten alternating paired controls, promotion gate, and holdout with power source and settings unchanged. Do not infer a cache cause from noisy scores."
+        },
+        {
+          "experiment_id": "scratch_lifetime",
+          "recommendation": "Test a 32-K-step scratch microbuffer in the active panel32 path. Pack 32 K values for the current 32-row A panel into 4 KiB, consume that block, then pack the next block. Keep the four ZA accumulators live across all 16 blocks so each output retains its K update order. This reduces the reserved FP32 scratch from 64 KiB to 4 KiB. Keep allocation and packing inside gemm.",
+          "risks": "The current path already allocates scratch once per call and overwrites it during packing; it does not explicitly clear the buffer. This change may save stack space without reducing initialization work, while adding block-loop overhead. Verify all 512 K updates, pointer bounds, stack alignment, ABI state, FP32 tolerance 0.002, general-size fallback, and the complete timed call. Measure repeated paired controls under unchanged settings; do not infer a gain from one score."
+        },
+        {
+          "experiment_id": "transpose_fusion",
+          "recommendation": "Propose a bounded transpose-fusion experiment in the active panel32 path. For each 32-row A band, transpose a small K-by-row tile into a temporary buffer, then feed that tile to the existing FP32 FMOPA loop before writing it to the full 64 KiB scratch panel. Keep the current column-panel traversal and accumulation order. Process all 512 K values exactly once per row band; do not recompute the transpose for each output-column panel. Count tile-buffer writes and reads, full-panel writes and reads, and any added allocation or pointer work inside gemm. Compare against the exact eb091b1e source and unchanged paired controls. This tests whether fusing transpose with consumption can remove full-panel traffic; it is unmeasured advice, not a performance claim.",
+          "risks": "Fusion may require restructuring the active assembly and stack use, may increase SME transitions or register pressure, and may simply move rather than remove data movement. A design that repeats transpose work for each of the 16 output-column panels would add 15 redundant transposes per A band and should be rejected. Preserve row-major C=A@B, FP32 update order, general-size fallback, ABI state, 64-byte stack alignment, bounds, and all license text. Validate fresh inputs, full output overwrite, input preservation, all 48 public cases including tails and n<=0, and the existing 0.002 tolerance. Then use the fixed ten-run validation and paired-control gates without changing power settings; compare historical and fresh same-mode peaks separately."
+        }
+      ],
+      "board_hash": "9b072180ff7f5abec624eb3607cb556dd9d145a0a4ef3230e5a07d2bcbe1989f",
+      "experiment_order": [
+        "k_loop_schedule",
+        "sme_fp32_schedule",
+        "address_generation"
+      ]
+    },
+    {
+      "round": 2,
+      "status": "selected",
+      "roles": [
+        "sme_fp32_schedule",
+        "k_loop_schedule",
+        "register_reuse",
+        "a_transpose",
+        "panel_packing",
+        "vector_access",
+        "address_generation",
+        "tail_alignment",
+        "prefetch_locality",
+        "b_panel_layout",
+        "assembly_audit",
+        "cache_conflict_layout",
+        "cache_blocking",
+        "scratch_lifetime",
+        "transpose_fusion"
+      ],
+      "advice": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "advice": "Propose one active-panel32 FMOPA order change: issue ZA0, ZA2, ZA1, ZA3 for each K step instead of ZA0, ZA1, ZA2, ZA3. Each tile still receives the same operand pair and processes K=0…511 in order. This groups the two FMOPA operations that use each B vector, testing whether adjacent B operand reuse improves issue scheduling. This exact order is not among the supplied active-panel32 measurements. No gain is established.",
+          "risks": "The loop already updates four independent ZA tiles per K step, so changing their order may have no effect or may reduce throughput. Preserve the existing predicates, loads, pointer advances, and per-tile FP32 update order. Check assembly acceptance, ABI and SME state, stack and operand bounds, and all 48 public cases at tolerance 0.002. If correct, use ten validation reports and ten alternating fresh imported controls with power settings unchanged; apply the existing promotion and holdout gates. Keep all packing and allocation inside gemm.",
+          "abstain": false
+        },
+        {
+          "role": "k_loop_schedule",
+          "status": "received",
+          "advice": "Propose a distinct K-loop schedule in the active `sera_libxsmm_panel32` loop: keep the two paired LD1W loads and four FMOPA operations in their current order, but move the existing counter decrement and branch between FMOPA 2 and FMOPA 3. This tests whether loop-control work can overlap with the final independent tile updates. It preserves all 512 loads, pointer advances, per-tile FP32 update order, and the final iteration’s bounds. It differs from the measured pointer-add interleaving, software pipeline, and SUBS/B.NE variants. No gain is established.",
+          "risks": "The branch may disrupt FMOPA issue scheduling or expose a ZA dependency; results may regress or vary. Check that the counter is decremented exactly once per iteration and the loop still executes 512 times. Assemble with the fixed compiler flags, verify ABI and SME state handling, and run all 48 public cases at tolerance 0.002, including tails and n<=0. Then collect ten validation reports and ten alternating paired controls under unchanged power settings; apply the existing promotion and holdout gates. Keep packing and allocation inside `gemm` and preserve the fallback and BSD notices.",
+          "abstain": false
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "advice": "Abstain. In the active panel32 loop, each loaded A vector and each loaded B vector already feed two FMOPA operations, covering the output tile with the four available ZA tiles. Reusing either operand across another K step would be invalid because the values differ; holding more vectors across steps adds register pressure without reducing the required input loads. The prior evidence identifies no distinct register-reuse experiment.",
+          "risks": "Further reuse claims would duplicate existing work or change load scheduling, which is a separate experiment. The earlier active-path scheduling changes did not pass promotion; their noisy outcomes do not establish why. No new checks or measurements are proposed.",
+          "abstain": true
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "advice": "Test a fused A transpose and consumer-pack path for fallback sizes. Replace the separate `at` buffer and `sme_transpose` pass with packing that writes A directly into the layout consumed by `sme_gemm`, and keep that packing and its allocation inside `gemm`. Preserve the n=512 panel32 dispatch unchanged. Measure the complete timed call, including packing and consumption, across the existing supported sizes; report each size separately. This is an unverified hypothesis that removing an intermediate layout conversion or buffer may reduce total cost.",
+          "risks": "The supplied source does not define a direct packed layout for `sme_gemm`, so this needs a precise layout and bounds design before implementation. It may only move the same data-conversion cost, add packing overhead, or reduce consumer locality. The fixed n=512 timing does not exercise the fallback path, so it cannot establish a gain there. Preserve allocation-failure behavior, FP32 update order, all 48 correctness cases, tolerance 0.002, ABI, and full-call timing. Compare fresh repeated controls for each measured size and do not attribute combined packing and consumption results to transpose alone.",
+          "abstain": false
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Propose a 32-column B-panel layout for the active panel32 path. Inside `gemm`, allocate 1 MiB and pack `packed_b[j*65536 + k*32 + c] = B[k*512 + j*32 + c]` for `j=0..15`, `k=0..511`, and `c=0..31`. Keep the existing row-band and column-panel traversal; for each column panel, point the K loop at its packed panel. Each K step then reads the same 32 B values from a contiguous 128-byte range, while the existing A packing, four ZA tiles, and FP32 update order stay unchanged. Allocation and all B packing remain in the timed call. This may improve useful B access, but no gain is measured.",
+          "risks": "Packing adds 1 MiB of writes and allocation work; the larger footprint or packing cost may erase any benefit. Check packed-panel bounds and cleanup, allocation-failure fallback, full output coverage, unchanged inputs, all 48 public cases including tails and n<=0, and the 0.002 tolerance. Check SME state, stack, ABI, and per-output FP32 update order. Then collect ten validation reports and ten alternating paired controls with power settings unchanged; apply the existing promotion gate and holdout check. Keep historical AC and battery results separate.",
+          "abstain": false
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "Abstain. The active panel32 path already uses paired contiguous FP32 loads. No distinct legal wider-load or useful store change is established by the supplied evidence: A and B have different K strides, and no input alignment guarantee is given. Keep the kernel unchanged.",
+          "risks": "Assuming wider-load encodings or stronger alignment could break bounds or address correctness. New packing would add timed work, and the noisy results do not establish a vector-access benefit. No new checks or measurements are proposed.",
+          "abstain": true
+        },
+        {
+          "role": "address_generation",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence shows that three distinct active panel32 inner-loop changes have already been measured: moving pointer adds between FMOPA operations, pipelining next-step loads, and replacing SUB/CBNZ with SUBS/B.NE. Their ten-run results did not pass the fixed promotion gate. No other bounded, useful address-generation change is supported by the supplied source evidence without proposing a new index/layout or risking operand bounds.",
+          "risks": "A new counter or pointer scheme would repeat the already-tested loop-control/address-generation ideas or require unverified changes to the active kernel. No new experiment or gain is established.",
+          "abstain": true
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "Abstain. The active n=512 panel32 path has no FP32 tail, and the supplied evidence shows its scratch packing steps are 64-byte aligned. The arbitrary-size fallback already handles tails. No distinct useful tail or alignment change is supported by the evidence.",
+          "risks": "Changing the fallback would not optimize the measured panel32 path and could introduce out-of-bounds access. No source change, test, or performance result is proposed.",
+          "abstain": true
+        },
+        {
+          "role": "prefetch_locality",
+          "status": "received",
+          "advice": "Test one guarded distance-1 `PRFM PLDL1KEEP` for B in the active panel32 K loop: while more than one K step remains, prefetch `[x0, #2048]`. The supplied loop advances B by 2,048 bytes per K step; this targets the next row’s 128-byte operand segment. The supplied M4 Pro profile reports 128-byte cache lines and 128 KiB P-core L1D. This tests whether an explicit hint helps the strided B stream; it does not establish a benefit. Keep A loads, demand loads, FP32 update order, loop count, and all other behavior unchanged.",
+          "risks": "The next B segment is only one K step ahead, so the hint may arrive too late, duplicate hardware prefetching, or add overhead and evict useful data. A prior distance-4 prefetch proposal targeted the inactive full512 path and regressed; that result does not predict this active-path change. Check that the guard prevents a prefetch beyond K=511 and preserves ABI, fallback, and tolerance. Measure the complete timed gemm, including the hint and guard, with the fixed correctness cases, ten validation reports, ten alternating fresh imported controls, promotion gate, and holdout. Keep power settings unchanged and make no causal claim from noisy scores.",
+          "abstain": false
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Propose one experiment on the active `sera_libxsmm_panel32` path: inside `gemm`, pack B into sixteen 32-column panels, each stored as `packed_b[p*65536 + k*32 + c] = B[k*512 + p*32 + c]`. Update the panel32 consumer to select the matching packed panel and advance 128 bytes per K step, while preserving all FP32 values and each output’s K update order. Keep allocation and packing in the timed call, with the existing ABI and general-size fallback. This is distinct from the supplied packed-B experiment on the inactive full512 path. Hypothesis: shorter, contiguous K-step addresses may improve the active consumer enough to offset packing and allocation costs. The effect is unverified.",
+          "risks": "Packing adds a 1 MiB allocation and reads and writes all of B, which may outweigh any consumer benefit. Verify panel selection, bounds, pointer resets, complete C coverage, ABI and stack state, input preservation, fallback behavior, and all 48 public cases at tolerance 0.002. Then collect ten validation reports and ten alternating paired controls with power settings unchanged; apply the existing promotion and holdout gates. Do not infer a gain from isolated load behavior or noisy scores.",
+          "abstain": false
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Abstain. The supplied source shows inline SME assembly, but no compiler output or disassembly for the reconstructed active panel32 source. Its K loop contains paired loads, pointer updates, four FMOPA instructions, and loop control; this does not identify a bottleneck by itself. The prior active-panel pointer-scheduling candidate e4c91526… won 9/10 pairs but failed the fixed promotion gate, so it does not establish a scheduling benefit or a new experiment.",
+          "risks": "Choosing an instruction change without compiler output would be speculation. It could alter FP32 update order, operand bounds, or ABI and stack behavior. No throughput gain is established.",
+          "abstain": true
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "advice": "Test a 160-byte packed-A K-slice stride in the active panel32 path. Keep each slice’s 128 data bytes and add 32 unused bytes. For 512 slices, reserve 81,920 bytes; update the packing destinations, active A-pointer step, and loop rewind to match. The 128-byte stride currently touches one cache-line-sized span per K step. A 160-byte stride changes the address pattern, which may reduce cache conflicts, but the supplied evidence does not establish that conflicts occur or that padding will help. Measure the complete timed gemm call, including the larger scratch allocation and packing traffic, against fresh unchanged controls.",
+          "risks": "This increases scratch use by 25% and may add address-generation cost, split data across cache lines, or worsen performance. The P-core L1D is 128 KiB, but the supplied evidence does not give its cache-set geometry or prove the scratch fits there with other active data. Bounds check the final slice: its last data byte is at offset 81,887, within the 81,920-byte allocation. Check all packed stores and active consumers, the ABI and stack handling, all 48 public cases at tolerance 0.002, then ten validation reports, ten alternating paired controls, the fixed promotion gate, and holdout with power settings unchanged. Keep power-mode results separate; do not infer a cache cause from noisy scores.",
+          "abstain": false
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "ABSTAIN. No distinct, evidence-supported cache-blocking experiment is known for the active panel32 path. It already processes 32-row panels across all 16 column panels with one 64 KiB scratch buffer and one SME region. Changing traversal would repeat an existing proposal or require an unverified redesign.",
+          "risks": "The supplied measurements do not identify a cache bottleneck or show that cache behavior caused score variation. The active panel32 replay and scheduling candidates did not pass promotion; their results do not establish a cache-related cause.",
+          "abstain": true
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Abstain. No distinct scratch-lifetime change is supported by the supplied evidence: the active panel32 path already allocates one 64 KiB scratch area per gemm call, overwrites it during packing, and uses it across the panel computation. The proposed 4 KiB K-block buffer would require repacking and consuming each K block while keeping all four ZA accumulators live; that adds loop and packing work, with no supplied evidence that scratch reservation or initialization limits throughput. The prior pointer-scheduling experiment and its noisy results do not test this idea.",
+          "risks": "Changing scratch lifetime or packing cadence could add overhead or disturb operand bounds, stack handling, or FP32 update order. If reconsidered, validate the full 512-step reduction, stack alignment and ABI, timed packing/allocation, all 48 public cases at tolerance 0.002, then ten validation reports and ten alternating paired controls under unchanged settings. Do not infer a gain from the prior joint outcome.",
+          "abstain": true
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Test a 32×32 K-by-row transpose tile in the active panel32 path. For each of the 16 output-column panels, transpose the next 32 K values for the current 32-row band into the temporary tile, then immediately feed those values to the existing four FP32 FMOPA accumulators. Keep each output’s K updates in order and write results only after all 512 K values. This avoids writing and rereading the full 64 KiB packed-A panel, but repeats the A transpose for all 16 column panels: 16 × 64 KiB of A input reads per row band, versus one 64 KiB read for the current packing. Count temporary-tile writes and reads, allocation, and every input load in timed gemm. Compare the complete path with the exact eb091b1e source and unchanged paired controls.",
+          "risks": "Repeated transpose work may outweigh the avoided full-panel traffic; the temporary tile still adds writes and reads. The changed schedule may also increase SME transitions, register pressure, or stack risk. Preserve the row-major GEMM ABI, FP32 update order, fallback, ABI state, 64-byte stack alignment, bounds, tolerance, and license text. Check compilation, fresh inputs, full output overwrite, input preservation, all 48 public cases including tails and n<=0, and tolerance 0.002. Then use the fixed ten-run validation and paired-control gates with power settings unchanged. This is unverified advice, not a measured result.",
+          "abstain": false
+        }
+      ],
+      "ballots": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "k_loop_schedule",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "Test the active loop’s FMOPA reorder and guarded next-B prefetch first: both are small changes with low correctness risk, though their expected gains are uncertain. The counter/branch move is similarly low risk but may interrupt FMOPA scheduling. Padding changes every packed-A address and adds scratch traffic; the two packed-B proposals both add a 1 MiB buffer and timed packing, so they have greater cost and implementation risk. Transpose fusion repeats A reads across column panels. The A-transpose fusion targets fallback sizes, not the fixed n=512 panel32 path. Prior active-path scheduling and pipeline measurements were variable and did not pass promotion; they do not establish causality or predict these distinct proposals.",
+          "format_repairs": 0
+        },
+        {
+          "role": "k_loop_schedule",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "The counter branch placement is a small change to the active reduction loop and preserves each tile’s FP32 update order, though prior loop-schedule experiments did not establish a repeatable gain. Reordering FMOPA operations is similarly low risk with limited expected benefit. The distance-1 prefetch and padded A layout change only active-path access behavior, but earlier prefetch and padding trials on the inactive kernel regressed and do not establish benefits here. The two packed-B proposals are near-duplicates with 1 MiB of timed packing overhead, so they rank below the smaller changes. Transpose fusion repeats A conversion across column panels, while A-transpose fusion targets fallback sizes rather than the fixed n=512 benchmark.",
+          "format_repairs": 0
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "prefetch_locality",
+            "panel_packing",
+            "b_panel_layout",
+            "cache_conflict_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "Test the low-risk active-loop schedules first. Grouping FMOPA operations by reused B vector is the most direct reuse hypothesis; moving loop control between independent tile updates is another small change. A guarded next-B prefetch is easy to bound, though prior inactive-path prefetch results do not predict this path. The two packed-B proposals describe essentially the same layout, so test one before the other and avoid treating them as independent evidence. Padding has unverified cache benefits and adds scratch use. Transpose fusion repeats A reads across panels, while A transpose fusion targets fallback sizes and does not affect the fixed n=512 timing.",
+          "format_repairs": 0
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "ranking": [
+            "prefetch_locality",
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "a_transpose",
+            "cache_conflict_layout",
+            "b_panel_layout",
+            "panel_packing",
+            "transpose_fusion"
+          ],
+          "reason": "The guarded next-step B prefetch and loop scheduling changes keep the active n=512 path and its FP32 update order, with limited source changes. Prior active-path schedule measurements were noisy and did not pass promotion, so these remain hypotheses. Fusing transpose with packing targets the fallback path, but the fixed n=512 timing does not measure it and the proposal needs a precise layout design. The padded A layout and packed-B proposals add scratch or timed conversion work without evidence of cache benefit; the two B layouts describe the same packing scheme, so they should not be treated as independent gains. Transpose fusion repeats A reads across column panels, making its full-call benefit least supported.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "panel_packing",
+            "b_panel_layout",
+            "prefetch_locality",
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "cache_conflict_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "The active loop already loads each K step’s 32 B values contiguously, so the two B-panel proposals mainly change the stride between steps. They are near duplicates; test one first, then the other only if its source is distinct. Packing adds 1 MiB of traffic, so any gain must survive full-call timing. The guarded next-step prefetch is a small, bounded change, though the earlier distance-4 full512 prefetch regressed and does not predict this active-path result. FMOPA reorder and counter placement have low correctness risk but uncertain benefit; prior active-loop scheduling and control variants did not pass promotion. A padding changes scratch traffic and has no established cache-conflict cause. Transpose fusion repeats A reads across column panels, while the general-size A fusion does not affect the fixed n=512 score. No supplied noisy result establishes causality.",
+          "format_repairs": 0
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "ranking": [
+            "prefetch_locality",
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "a_transpose",
+            "transpose_fusion"
+          ],
+          "reason": "No supplied result establishes a repeatable gain for these proposals. The active panel32 replay and prior active-loop schedule variants failed promotion, so prioritize low-overhead changes with limited correctness risk: guarded next-step B prefetch, then FMOPA and loop-control scheduling. A-slice padding and B packing change layouts and add work; earlier padding and packed-B results on other paths did not promote, which is caution rather than proof about this path. A transpose fusion has the largest workload and scheduling change. The A-transpose proposal only targets fallback sizes, outside the n=512 timing objective.",
+          "format_repairs": 0
+        },
+        {
+          "role": "address_generation",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "Start with the active-loop FMOPA reorder: it preserves each tile’s FP32 update order and adds no packing or allocation. Next test branch placement, then guarded prefetch; both are small active-path changes, though prior loop-schedule and prefetch experiments did not show repeatable gains and those measurements targeted different code. Scratch padding and B repacking change memory layout and add address or packing costs. The two B-panel proposals are closely related and both carry a 1 MiB packing cost. Transpose fusion repeats A reads across column panels. A transpose fusion for fallback sizes does not affect the fixed n=512 timing. No proposal has measured evidence of a gain.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "prefetch_locality",
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "a_transpose",
+            "transpose_fusion"
+          ],
+          "reason": "Prior active-panel32 scheduling and pipeline changes passed correctness but did not pass promotion; their noisy, overlapping results give no repeatable gain. Rank the bounded next-B prefetch first because it is a small change with low bounds risk, then the two distinct K-loop schedules. A 160-byte A stride is a bounded layout test, but padding adds scratch and packing cost without evidence of cache conflicts. The two packed-B proposals describe the same layout, so testing both would duplicate work; rank them together and test at most one. A transpose fusion proposal lacks a defined consumer layout, while the other transpose proposal affects fallback sizes rather than the fixed n=512 timing. The supplied evidence does not establish gains for any proposal.",
+          "format_repairs": 0
+        },
+        {
+          "role": "prefetch_locality",
+          "status": "received",
+          "ranking": [
+            "prefetch_locality",
+            "panel_packing",
+            "b_panel_layout",
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "cache_conflict_layout",
+            "a_transpose",
+            "transpose_fusion"
+          ],
+          "reason": "Rank the guarded B prefetch first: it is a small change to the active K loop, and its 2,048-byte lookahead matches the supplied B stride and 128-byte cache-line evidence. The hint and guard still add timed work, so benefit is unverified. The two B-panel proposals describe the same packed layout; keep them adjacent and treat either result as evidence about that layout, not as independent confirmation. The active loop already uses four ZA tiles, so changing FMOPA order or moving loop control has limited expected benefit. A-stride padding lacks cache-set evidence and increases scratch use. A transpose fusion repeats A reads across 16 column panels; the separate A-transpose proposal applies to fallback sizes, outside the fixed n=512 timing.",
+          "format_repairs": 0
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "ranking": [
+            "b_panel_layout",
+            "panel_packing",
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "a_transpose",
+            "transpose_fusion"
+          ],
+          "reason": "Prior packed-B work on the inactive full512 path regressed, so it gives no evidence of a gain here. The active-path panel layout is still worth testing because it targets the requested B access pattern and preserves K order; packing cost must be included. `panel_packing` and `b_panel_layout` describe effectively the same layout, so test only one if their implementations match. FMOPA reordering and moving loop control have low correctness risk but uncertain throughput benefit; prior active-loop scheduling trials did not show repeatable gains. Prefetching is cheap to try, but the prior inactive-path prefetch regressed. A-slice padding has unproven cache benefit and adds traffic. A transpose affects fallback sizes, not the fixed n=512 timing. Transpose fusion repeats A reads across 16 panels, making its expected cost high.",
+          "format_repairs": 0
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "k_loop_schedule",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "The visible active K loop has two paired LD1W loads, two pointer updates, four FMOPA operations, and a decrement/branch each step. This exposes loop and address work as a concrete schedule target; instruction count alone does not show it limits throughput. Rank the FMOPA reorder and one guarded prefetch first because they avoid new allocation and packing traffic. The counter/branch move is also localized, but placing control flow inside the FMOPA group may disrupt issue scheduling. A-stride padding has moderate bounds and stack risk. The two packed-B proposals are near-duplicates and both add 1 MiB of timed packing, so test them only after lower-cost changes. Transpose fusion repeats A conversion across column panels; fallback A-transpose fusion does not exercise the fixed n=512 timing. Supplied active-path measurements show no repeatable promotion, and noisy outcomes do not establish a cause or benefit for any proposal.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "cache_conflict_layout",
+            "prefetch_locality",
+            "panel_packing",
+            "b_panel_layout",
+            "a_transpose",
+            "transpose_fusion"
+          ],
+          "reason": "The two active-loop scheduling proposals preserve data layout and FP32 update order, so test them before proposals that add memory traffic. The 160-byte A stride is a bounded, smaller layout change, but cache conflicts are unproven; prior padding results changed an inactive path and showed no repeatable gain. Test the guarded one-step prefetch next: the supplied cache-line and stride evidence makes it plausible, while the prior distance-four result on the inactive path does not settle it. The two B-packing proposals are nearly the same experiment and both add 1 MiB of allocation and packing traffic, so rank them together. A-transpose fusion applies only to fallback sizes and lacks a defined consumer layout; transpose fusion repeats A conversion across column panels and adds traffic, so it has the weakest expected net benefit.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "k_loop_schedule",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "The active panel32 path already has four independent ZA tiles. Changing FMOPA order and placing loop control between independent updates are small, distinct tests, though prior scheduling variants produced noisy results without promotion. A guarded next-step B prefetch is also a small change; the earlier distance-4 result targeted inactive code and does not predict this proposal. The 160-byte A stride has a concrete bounds design but no evidence of cache conflicts. The two B-packing proposals specify the same layout and add 1 MiB of timed packing, so they should be treated as near-duplicates with substantial cost and correctness risk. Transpose fusion repeats A reads across column panels, while A-transpose fusion targets fallback sizes and does not affect the fixed n=512 workload.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "panel_packing",
+            "b_panel_layout",
+            "transpose_fusion",
+            "a_transpose"
+          ],
+          "reason": "Prior active-panel32 loop schedule tests were inconclusive, but they avoid extra packing and allocation, so test these low-overhead changes first. The proposed B layouts are effectively duplicates: both pack the same sixteen 32-column panels and add 1 MiB of timed allocation and packing; prior packed-B work on the inactive path regressed, which is cautionary but not direct evidence about panel32. Padding adds scratch and address work without evidence of conflicts. Transpose fusion repeats A reads across all column panels. A-transpose fusion affects fallback sizes, while the frozen n=512 timing uses panel32.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "k_loop_schedule",
+            "sme_fp32_schedule",
+            "prefetch_locality",
+            "cache_conflict_layout",
+            "transpose_fusion",
+            "panel_packing",
+            "b_panel_layout",
+            "a_transpose"
+          ],
+          "reason": "The loop-control change is a small edit to the active path and keeps each tile’s FP32 update order. Reordering FMOPA operations is similarly low scope, but the four tiles are already independent. A guarded next-B prefetch is cheap to test, though its benefit is uncertain. Padding changes the active scratch layout but adds footprint and address work; prior padding results on other paths do not establish an effect here. Transpose fusion avoids full-panel traffic but repeats A reads 16 times per band, so its traffic cost looks high. The two packed-B proposals are near duplicates and both add a full B read, allocation, and 1 MiB of writes; test at most one before considering the other. The A-transpose fusion proposal targets fallback sizes, not the fixed n=512 panel32 path. No proposal has measured results on this active kernel, and noisy historical scores do not establish causality.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "sme_fp32_schedule",
+          "status": "proposed",
+          "source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+          "name": "libxsmm-panel32-fmopa-order-0213",
+          "hypothesis": "Change only the active panel32 FMOPA order to ZA0, ZA2, ZA1, ZA3. This groups operations using the same B vector and tests instruction scheduling; benefit is unverified. Each tile retains its operands, predicates and K=0..511 FP32 update order. This change is absent from the supplied measured history. Loads, pointer advances, ABI, SME transitions, stack, timed packing/allocation, stores, fallback and BSD notices remain unchanged. No tools or tests were run. Compilation, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls under unchanged power settings, the fixed promotion gate and holdout validation remain required.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              551.0132060915225,
+              1063.637266332398,
+              1018.5718743765765,
+              886.7801570829539,
+              987.1962965261336,
+              950.9141714575367,
+              964.4399250578715,
+              969.9565411012654,
+              1019.0513975240332,
+              752.3584410514497
+            ],
+            "control_scores": [
+              659.7492264982867,
+              491.5653043643289,
+              242.19747614451813,
+              898.5287087831098,
+              1039.2712208025666,
+              809.1498441424955,
+              995.8947895580682,
+              1087.699122323039,
+              1044.4959094233077,
+              867.3197306249854
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption; promoted=false confirms no promotion. Discard d079e341… and retain the imported incumbent unchanged. Preserve eb091b1e… as the user-selected panel32 research base.\n\nAcross ten runs, the candidate scored 551.01–1063.64 GFLOP/s versus paired controls of 242.20–1087.70. It won 3/10 pairs. Candidate and control spreads were 512.62 and 845.50 GFLOP/s. Its minimum of 551.01 fails the required >1142.08 GFLOP/s threshold (1.05 × maximum control). Retain all ten pairs, including the low scores. These results establish no repeatable gain.\n\nThe candidate exceeded the fresh initial imported peak of 1079.8626 and its paired-control peak of 1087.6991 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord the active-panel32 FMOPA order 0,2,1,3 as measured. Preserve the specialist-ranked queue, fixed gates and budgets. These scores establish neither a scheduling cause nor an individual advisor’s effect."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-005/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "prefetch_locality",
+          "status": "proposed",
+          "source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+          "name": "libxsmm-panel32-distance1-guarded-b-prefetch",
+          "hypothesis": "Add only the selected guarded distance-1 B prefetch to the active panel32 loop in eb091b1e…. Before demand loads, test x8>1 and issue PRFM PLDL1KEEP at x0+2048. This hints at K=1 through K=511 and skips the hint on the last iteration. The offset fits the PRFM immediate form. No registers are added; demand loads, pointer advances, all 512 ordered FP32 updates, ABI, stack, SME transitions, timed packing/allocation, stores, fallback and BSD notices remain unchanged. This active-path change is absent from the supplied measured history. Benefit is unverified. No tools or tests were run. Compilation, all 48 public cases at tolerance 0.002, ten validation reports, ten alternating fresh imported controls, min(candidate)>1.05*max(control), and holdout validation remain required under unchanged power settings. No throughput or repeatability gain is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              849.2535044086823,
+              939.1338951402291,
+              732.9295830213516,
+              759.0083894780298,
+              956.2799790291248,
+              928.4408667878274,
+              690.212727573165,
+              950.6345522761719,
+              928.7105728628059,
+              907.5142292702686
+            ],
+            "control_scores": [
+              1004.5936316206673,
+              937.3564663457354,
+              1054.0644857171367,
+              896.5271725671589,
+              854.7784233504939,
+              1027.504212046433,
+              1012.3298888858033,
+              809.252288842611,
+              997.437785595189,
+              691.3237117207792
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed at tolerance 0.002, but eligible=false prohibits adoption. Discard 31064bf4… and retain the imported incumbent unchanged. Preserve eb091b1e… as the panel32 research base.\n\nAcross ten runs, the candidate scored 690.21–956.28 GFLOP/s versus paired controls of 691.32–1054.06. It won 4/10 pairs. Candidate and control spreads were 266.07 and 362.74 GFLOP/s. Its minimum fails the required >1106.77 GFLOP/s threshold (1.05 × maximum control). These overlapping results establish no repeatable gain; retain all ten pairs.\n\nIt exceeded the fresh initial imported peak of 1079.8625911084607 and its paired-control peak of 1054.0644857171367 in 0/10 runs each. Separately, it exceeded the saved Battery Automatic peak of 1668.5964359101147, AC initial peak of 1685.6230608449698, and later AC control peak of 1687.3925479742732 in 0/10 each. Historical modes do not enter eligibility. The consistency goal is unmet; comparator policy remains pending. No holdout result is supplied.\n\nRecord this active-panel32 guarded prefetch as measured. The scores do not isolate prefetch, guard-branch or cache effects, or establish an individual advisor’s contribution. Preserve the fixed gates and budgets; the supplied block has used all six candidate slots, including the replay."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-006/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        }
+      ],
+      "rationale": "Retain these 15 specialists for the active sera_libxsmm_panel32 path in eb091b1e…. Scheduling, register reuse, address generation and assembly review cover distinct load lookahead and unrolling changes while preserving FP32 update order. Transpose, packing, B layout and fusion cover timed operand preparation. Vector access and alignment cover legal wider transfers, the 128-byte packed-A stride, the 2048-byte B stride and the existing 64-byte scratch alignment. Cache, prefetch and scratch specialists cover bounded layouts, access locality and workspace safety without assuming a measured bottleneck. The board must exclude duplicates of the measured pointer-add schedule, next-operands-before-branch pipeline and SUBS/B.NE rewrite. Four ZA tiles, vector reuse, one SME region and reusable scratch already exist. Dedicated tile-count, transition, replacement-fast-path and fallback optimization roles add less relevant coverage; Strassen is outside scope. This selects expertise only, not experiments or their order. Advisors must propose distinct changes and jointly rank them. No advisor work or measurements were performed here; performance advice remains unverified.",
+      "board": [
+        {
+          "experiment_id": "sme_fp32_schedule",
+          "recommendation": "Propose one active-panel32 FMOPA order change: issue ZA0, ZA2, ZA1, ZA3 for each K step instead of ZA0, ZA1, ZA2, ZA3. Each tile still receives the same operand pair and processes K=0…511 in order. This groups the two FMOPA operations that use each B vector, testing whether adjacent B operand reuse improves issue scheduling. This exact order is not among the supplied active-panel32 measurements. No gain is established.",
+          "risks": "The loop already updates four independent ZA tiles per K step, so changing their order may have no effect or may reduce throughput. Preserve the existing predicates, loads, pointer advances, and per-tile FP32 update order. Check assembly acceptance, ABI and SME state, stack and operand bounds, and all 48 public cases at tolerance 0.002. If correct, use ten validation reports and ten alternating fresh imported controls with power settings unchanged; apply the existing promotion and holdout gates. Keep all packing and allocation inside gemm."
+        },
+        {
+          "experiment_id": "k_loop_schedule",
+          "recommendation": "Propose a distinct K-loop schedule in the active `sera_libxsmm_panel32` loop: keep the two paired LD1W loads and four FMOPA operations in their current order, but move the existing counter decrement and branch between FMOPA 2 and FMOPA 3. This tests whether loop-control work can overlap with the final independent tile updates. It preserves all 512 loads, pointer advances, per-tile FP32 update order, and the final iteration’s bounds. It differs from the measured pointer-add interleaving, software pipeline, and SUBS/B.NE variants. No gain is established.",
+          "risks": "The branch may disrupt FMOPA issue scheduling or expose a ZA dependency; results may regress or vary. Check that the counter is decremented exactly once per iteration and the loop still executes 512 times. Assemble with the fixed compiler flags, verify ABI and SME state handling, and run all 48 public cases at tolerance 0.002, including tails and n<=0. Then collect ten validation reports and ten alternating paired controls under unchanged power settings; apply the existing promotion and holdout gates. Keep packing and allocation inside `gemm` and preserve the fallback and BSD notices."
+        },
+        {
+          "experiment_id": "a_transpose",
+          "recommendation": "Test a fused A transpose and consumer-pack path for fallback sizes. Replace the separate `at` buffer and `sme_transpose` pass with packing that writes A directly into the layout consumed by `sme_gemm`, and keep that packing and its allocation inside `gemm`. Preserve the n=512 panel32 dispatch unchanged. Measure the complete timed call, including packing and consumption, across the existing supported sizes; report each size separately. This is an unverified hypothesis that removing an intermediate layout conversion or buffer may reduce total cost.",
+          "risks": "The supplied source does not define a direct packed layout for `sme_gemm`, so this needs a precise layout and bounds design before implementation. It may only move the same data-conversion cost, add packing overhead, or reduce consumer locality. The fixed n=512 timing does not exercise the fallback path, so it cannot establish a gain there. Preserve allocation-failure behavior, FP32 update order, all 48 correctness cases, tolerance 0.002, ABI, and full-call timing. Compare fresh repeated controls for each measured size and do not attribute combined packing and consumption results to transpose alone."
+        },
+        {
+          "experiment_id": "panel_packing",
+          "recommendation": "Propose a 32-column B-panel layout for the active panel32 path. Inside `gemm`, allocate 1 MiB and pack `packed_b[j*65536 + k*32 + c] = B[k*512 + j*32 + c]` for `j=0..15`, `k=0..511`, and `c=0..31`. Keep the existing row-band and column-panel traversal; for each column panel, point the K loop at its packed panel. Each K step then reads the same 32 B values from a contiguous 128-byte range, while the existing A packing, four ZA tiles, and FP32 update order stay unchanged. Allocation and all B packing remain in the timed call. This may improve useful B access, but no gain is measured.",
+          "risks": "Packing adds 1 MiB of writes and allocation work; the larger footprint or packing cost may erase any benefit. Check packed-panel bounds and cleanup, allocation-failure fallback, full output coverage, unchanged inputs, all 48 public cases including tails and n<=0, and the 0.002 tolerance. Check SME state, stack, ABI, and per-output FP32 update order. Then collect ten validation reports and ten alternating paired controls with power settings unchanged; apply the existing promotion gate and holdout check. Keep historical AC and battery results separate."
+        },
+        {
+          "experiment_id": "prefetch_locality",
+          "recommendation": "Test one guarded distance-1 `PRFM PLDL1KEEP` for B in the active panel32 K loop: while more than one K step remains, prefetch `[x0, #2048]`. The supplied loop advances B by 2,048 bytes per K step; this targets the next row’s 128-byte operand segment. The supplied M4 Pro profile reports 128-byte cache lines and 128 KiB P-core L1D. This tests whether an explicit hint helps the strided B stream; it does not establish a benefit. Keep A loads, demand loads, FP32 update order, loop count, and all other behavior unchanged.",
+          "risks": "The next B segment is only one K step ahead, so the hint may arrive too late, duplicate hardware prefetching, or add overhead and evict useful data. A prior distance-4 prefetch proposal targeted the inactive full512 path and regressed; that result does not predict this active-path change. Check that the guard prevents a prefetch beyond K=511 and preserves ABI, fallback, and tolerance. Measure the complete timed gemm, including the hint and guard, with the fixed correctness cases, ten validation reports, ten alternating fresh imported controls, promotion gate, and holdout. Keep power settings unchanged and make no causal claim from noisy scores."
+        },
+        {
+          "experiment_id": "b_panel_layout",
+          "recommendation": "Propose one experiment on the active `sera_libxsmm_panel32` path: inside `gemm`, pack B into sixteen 32-column panels, each stored as `packed_b[p*65536 + k*32 + c] = B[k*512 + p*32 + c]`. Update the panel32 consumer to select the matching packed panel and advance 128 bytes per K step, while preserving all FP32 values and each output’s K update order. Keep allocation and packing in the timed call, with the existing ABI and general-size fallback. This is distinct from the supplied packed-B experiment on the inactive full512 path. Hypothesis: shorter, contiguous K-step addresses may improve the active consumer enough to offset packing and allocation costs. The effect is unverified.",
+          "risks": "Packing adds a 1 MiB allocation and reads and writes all of B, which may outweigh any consumer benefit. Verify panel selection, bounds, pointer resets, complete C coverage, ABI and stack state, input preservation, fallback behavior, and all 48 public cases at tolerance 0.002. Then collect ten validation reports and ten alternating paired controls with power settings unchanged; apply the existing promotion and holdout gates. Do not infer a gain from isolated load behavior or noisy scores."
+        },
+        {
+          "experiment_id": "cache_conflict_layout",
+          "recommendation": "Test a 160-byte packed-A K-slice stride in the active panel32 path. Keep each slice’s 128 data bytes and add 32 unused bytes. For 512 slices, reserve 81,920 bytes; update the packing destinations, active A-pointer step, and loop rewind to match. The 128-byte stride currently touches one cache-line-sized span per K step. A 160-byte stride changes the address pattern, which may reduce cache conflicts, but the supplied evidence does not establish that conflicts occur or that padding will help. Measure the complete timed gemm call, including the larger scratch allocation and packing traffic, against fresh unchanged controls.",
+          "risks": "This increases scratch use by 25% and may add address-generation cost, split data across cache lines, or worsen performance. The P-core L1D is 128 KiB, but the supplied evidence does not give its cache-set geometry or prove the scratch fits there with other active data. Bounds check the final slice: its last data byte is at offset 81,887, within the 81,920-byte allocation. Check all packed stores and active consumers, the ABI and stack handling, all 48 public cases at tolerance 0.002, then ten validation reports, ten alternating paired controls, the fixed promotion gate, and holdout with power settings unchanged. Keep power-mode results separate; do not infer a cache cause from noisy scores."
+        },
+        {
+          "experiment_id": "transpose_fusion",
+          "recommendation": "Test a 32×32 K-by-row transpose tile in the active panel32 path. For each of the 16 output-column panels, transpose the next 32 K values for the current 32-row band into the temporary tile, then immediately feed those values to the existing four FP32 FMOPA accumulators. Keep each output’s K updates in order and write results only after all 512 K values. This avoids writing and rereading the full 64 KiB packed-A panel, but repeats the A transpose for all 16 column panels: 16 × 64 KiB of A input reads per row band, versus one 64 KiB read for the current packing. Count temporary-tile writes and reads, allocation, and every input load in timed gemm. Compare the complete path with the exact eb091b1e source and unchanged paired controls.",
+          "risks": "Repeated transpose work may outweigh the avoided full-panel traffic; the temporary tile still adds writes and reads. The changed schedule may also increase SME transitions, register pressure, or stack risk. Preserve the row-major GEMM ABI, FP32 update order, fallback, ABI state, 64-byte stack alignment, bounds, tolerance, and license text. Check compilation, fresh inputs, full output overwrite, input preservation, all 48 public cases including tails and n<=0, and tolerance 0.002. Then use the fixed ten-run validation and paired-control gates with power settings unchanged. This is unverified advice, not a measured result."
+        }
+      ],
+      "board_hash": "94e38540a13cf54ca8a39a35354df414b654e4d38be8d9108f2908f601d85e32",
+      "experiment_order": [
+        "sme_fp32_schedule",
+        "prefetch_locality",
+        "k_loop_schedule"
+      ]
+    }
+  ]
+}

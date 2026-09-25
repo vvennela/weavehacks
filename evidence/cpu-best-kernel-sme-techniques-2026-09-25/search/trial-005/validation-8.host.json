@@ -1,0 +1,14 @@
+{
+  "before": {
+    "timestamp_utc": "2026-09-25T22:04:00.809102+00:00",
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t39%; discharging; 0:59 remaining present: true\n",
+    "power_settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+  },
+  "after": {
+    "timestamp_utc": "2026-09-25T22:04:01.876060+00:00",
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t39%; discharging; 0:59 remaining present: true\n",
+    "power_settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+  }
+}

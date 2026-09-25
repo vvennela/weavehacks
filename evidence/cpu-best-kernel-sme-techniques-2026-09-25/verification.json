@@ -1,0 +1,2189 @@
+{
+  "phase": "cpu-best-kernel-sme-techniques-2026-09-25",
+  "status": "completed",
+  "target_gflops": 1800,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/source/kernel.c",
+  "stop_reason": "candidate-budget",
+  "source_hashes_verified": true,
+  "baseline_sha256": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+  "replay_sha256": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+  "signed_report_count": 131,
+  "scored_report_count": 131,
+  "raw_timing_sample_count": 393,
+  "baseline_validation_count": 10,
+  "replay_and_candidate_validation_count": 60,
+  "paired_control_score_count": 60,
+  "public_correctness_case_count": 336,
+  "signature_verification": "hills verify passed for every retained report",
+  "power_source": "Battery Power",
+  "power_settings_unchanged": true,
+  "calls": 73,
+  "implementation_attempts": 5,
+  "round_summaries": [
+    {
+      "round": 1,
+      "status": "selected",
+      "ballot_count": 15,
+      "board_ids": [
+        "sme_fp32_schedule",
+        "k_loop_schedule",
+        "a_transpose",
+        "panel_packing",
+        "address_generation",
+        "prefetch_locality",
+        "b_panel_layout",
+        "cache_conflict_layout",
+        "scratch_lifetime",
+        "transpose_fusion"
+      ],
+      "ranked_order": [
+        "k_loop_schedule",
+        "sme_fp32_schedule",
+        "address_generation"
+      ],
+      "order_verified": true
+    },
+    {
+      "round": 2,
+      "status": "selected",
+      "ballot_count": 15,
+      "board_ids": [
+        "sme_fp32_schedule",
+        "k_loop_schedule",
+        "a_transpose",
+        "panel_packing",
+        "prefetch_locality",
+        "b_panel_layout",
+        "cache_conflict_layout",
+        "transpose_fusion"
+      ],
+      "ranked_order": [
+        "sme_fp32_schedule",
+        "prefetch_locality",
+        "k_loop_schedule"
+      ],
+      "order_verified": true
+    }
+  ],
+  "trials": [
+    {
+      "index": 0,
+      "name": "libxsmm-reference-with-unused-panel32",
+      "status": "passed",
+      "source_sha256": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "correctness": {
+        "passed": true,
+        "cases": 48,
+        "source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c"
+      },
+      "validation_count": 10,
+      "control_count": 0,
+      "score_min": 635.7263842037138,
+      "score_median": 865.5553356697687,
+      "score_max": 1079.8625911084607,
+      "control_min": null,
+      "control_max": null,
+      "eligible": null,
+      "promoted": null
+    },
+    {
+      "index": 1,
+      "name": "libxsmm-n512-panel32-one-streaming-region",
+      "status": "passed",
+      "source_sha256": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "correctness": {
+        "passed": true,
+        "cases": 48,
+        "source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf"
+      },
+      "validation_count": 10,
+      "control_count": 10,
+      "score_min": 747.8165001292614,
+      "score_median": 925.9506266400006,
+      "score_max": 1047.0422376869117,
+      "control_min": 596.9092593345922,
+      "control_max": 1064.6919469172421,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "index": 2,
+      "name": "libxsmm-panel32-pointer-adds-after-za1",
+      "status": "passed",
+      "source_sha256": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "correctness": {
+        "passed": true,
+        "cases": 48,
+        "source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec"
+      },
+      "validation_count": 10,
+      "control_count": 10,
+      "score_min": 387.655933988038,
+      "score_median": 1030.4054607896335,
+      "score_max": 1075.1783172284315,
+      "control_min": 522.6720194434748,
+      "control_max": 1019.8567190460346,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "index": 3,
+      "name": "libxsmm-panel32-next-operands-before-branch",
+      "status": "passed",
+      "source_sha256": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "correctness": {
+        "passed": true,
+        "cases": 48,
+        "source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66"
+      },
+      "validation_count": 10,
+      "control_count": 10,
+      "score_min": 595.4210422627164,
+      "score_median": 885.989274049906,
+      "score_max": 1035.7664763501227,
+      "control_min": 574.9104344531163,
+      "control_max": 1024.562746838766,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "index": 4,
+      "name": "libxsmm-panel32-subs-bne-k-loop-control",
+      "status": "passed",
+      "source_sha256": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "correctness": {
+        "passed": true,
+        "cases": 48,
+        "source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d"
+      },
+      "validation_count": 10,
+      "control_count": 10,
+      "score_min": 750.7802400181534,
+      "score_median": 929.0038500904275,
+      "score_max": 1033.2706954556381,
+      "control_min": 160.72382008773246,
+      "control_max": 1073.0251266980379,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "index": 5,
+      "name": "libxsmm-panel32-fmopa-order-0213",
+      "status": "passed",
+      "source_sha256": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "correctness": {
+        "passed": true,
+        "cases": 48,
+        "source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3"
+      },
+      "validation_count": 10,
+      "control_count": 10,
+      "score_min": 551.0132060915225,
+      "score_median": 967.1982330795685,
+      "score_max": 1063.637266332398,
+      "control_min": 242.19747614451813,
+      "control_max": 1087.699122323039,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "index": 6,
+      "name": "libxsmm-panel32-distance1-guarded-b-prefetch",
+      "status": "passed",
+      "source_sha256": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "correctness": {
+        "passed": true,
+        "cases": 48,
+        "source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b"
+      },
+      "validation_count": 10,
+      "control_count": 10,
+      "score_min": 690.212727573165,
+      "score_median": 917.977548029048,
+      "score_max": 956.2799790291248,
+      "control_min": 691.3237117207792,
+      "control_max": 1054.0644857171367,
+      "eligible": false,
+      "promoted": false
+    }
+  ],
+  "final": {
+    "present": true,
+    "source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+    "score": 916.5530208813,
+    "status": "completed",
+    "target_met": false,
+    "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-best-kernel-sme-techniques-2026-09-25/search/trial-000/source/kernel.c",
+    "final_minimum_gflops": 603.940064993528,
+    "holdout_path": "search/final.json"
+  },
+  "performance_runs_executed_by_verifier": false,
+  "reports": [
+    {
+      "path": "search/trial-000/validation-0.json",
+      "sha256": "545b353f9025685c47ff4cc3781a887fcecd92e40e6ef87f3a1aaf89fac6f653",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 890.8266173293197,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000347500026691705,
+        0.0003070419770665467,
+        0.00030133299878798425
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-1.json",
+      "sha256": "316dcb4dc440928c3e792f2c0909697aba70e6fa66f188ec45fe75170595e861",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 635.7263842037138,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0010029160184785724,
+        0.0005571670189965516,
+        0.0004222499846946448
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-2.json",
+      "sha256": "a0a5e19456d99e91745628dd3e82d5f33c7658cd04810cc1572e4abb732d72f4",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 773.0322803058693,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005007089930586517,
+        0.0003472499956842512,
+        0.0004120410012546927
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-3.json",
+      "sha256": "7217b0616fd0c2a18ff895686d413def761d2412ab62c32060634a62ac249ef0",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 673.6146822982674,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00040862499736249447,
+        0.00039850000757724047,
+        0.00040008299401961267
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-4.json",
+      "sha256": "62a209c9573c0343fb2acfd1bf552fdbd5196309e1a5c4d5fd03c0571e58f9e8",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 809.2498747397683,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005418330256361514,
+        0.00033170898677781224,
+        0.00047008300316520035
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-5.json",
+      "sha256": "87795e4b3c1f9c15f6248d17b3b425210d390a037432906d4baef11864f45b5d",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1004.120181778896,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003476249985396862,
+        0.0003591249987948686,
+        0.0002673339913599193
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-6.json",
+      "sha256": "2e2c26eff233e21a750f46f8b259ee060a0da051b6788f4f41bd86f3d6220ec6",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1079.8625911084607,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003606660175137222,
+        0.00026087500737048686,
+        0.0002485829754732549
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-7.json",
+      "sha256": "7bca0339233f94f6eb3f7c98b7dcec37c34e062ccf8d344aa21f52fbf791203a",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 840.2840540102177,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003194579912815243,
+        0.0003787080058827996,
+        0.0004414999857544899
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-8.json",
+      "sha256": "4d306baac814bfd970838c679bee67ed91f7801b91786682a77eab687e8a2d7d",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1009.1557840253873,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003734579950105399,
+        0.0003487080102786422,
+        0.0002660000172909349
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-9.json",
+      "sha256": "4cd395643db5db78378b3b4b87908813d8b625663e072c08f8dc9ee242cf4c7b",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 921.7997022790786,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00047529200674034655,
+        0.0003678330103866756,
+        0.00029120800900273025
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-0.json",
+      "sha256": "04dda4edca5578c28ad6bcd9fb2ddff0a1b1ca41a476016706573276455cea85",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 1037.4317493337078,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00047941599041223526,
+        0.00025874999118968844,
+        0.0003544999926816672
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-1.json",
+      "sha256": "e0634e2d227f8da988d2a4a569909c949739e18615c243d9ada952480f2ea24a",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 952.743438891641,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00032716698478907347,
+        0.0002817499917000532,
+        0.00047166700824163854
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-2.json",
+      "sha256": "291f54f80a371351645a81d026843a4801f6554b861c63d92e6a7b995b02aa34",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 895.7821885956537,
+      "final": false,
+      "raw_timings_seconds": [
+        0.001444583002012223,
+        0.0014535420050378889,
+        0.00029966598958708346
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-3.json",
+      "sha256": "ed6296adf528f8971682ae984d64961a4e199d30f831fabbd94762fa0a39a4b1",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 747.8165001292614,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004820000031031668,
+        0.0003589589905459434,
+        0.0003882500168401748
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-4.json",
+      "sha256": "b649af1b0d01e92a40fc904f53fb8fa71f5235a22a60a9cb593e07dd1a681c22",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 857.2789074912052,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0027202920173294842,
+        0.00031312499777413905,
+        0.0005254580173641443
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-5.json",
+      "sha256": "06f21ba9254a185d25749f28fb8511d71e39dc2fa74185041908dc9bae9ff021",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 963.4291929367785,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00032458300120197237,
+        0.0002786249970085919,
+        0.00037237501237541437
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-6.json",
+      "sha256": "3fbf2104060d72bf01c3b3e186b3dbeb9761ec6c20a4e741c4c7b124704819d8",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 899.1578143883601,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004472919972613454,
+        0.00031095798476599157,
+        0.0002985409810207784
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-7.json",
+      "sha256": "cccec74f4bfe1294116a499d0c5407573a33e2f9d77e46d54594bbfccb5596ba",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 1031.2857351144694,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035354102146811783,
+        0.000260292028542608,
+        0.0005247500084806234
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-8.json",
+      "sha256": "9333189c7ef0934f398faa894895783fd6de35fbed1d5b548f1a7174110559eb",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 853.8702179669502,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003730409953277558,
+        0.0003437080013100058,
+        0.00031437500729225576
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-9.json",
+      "sha256": "744bca49f6fcf0292cf08176347b76369bb38d05d0de10369ab1d863fd9c92b1",
+      "submission_hash": "sha256:83daa2b0460e84287b764e64037ede0341df3d5fd6e147251f14a6f76c3e5759",
+      "expected_source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "score": 1047.0422376869117,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003367080062162131,
+        0.0003348749887663871,
+        0.00025637500220909715
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-0.json",
+      "sha256": "624894515c5b69a31a104f4345a58b058f9d57077ba8ce0409db5a71c41e86ab",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 968.0605424189555,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003649999853223562,
+        0.0003740419924724847,
+        0.00027729201246984303
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-1.json",
+      "sha256": "508cb9097cc765f683620f4c352194f3a7a589a1a1b3d39ce37c087a82b91694",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1064.6919469172421,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00034262501867488027,
+        0.0002636660065036267,
+        0.0002521249989513308
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-2.json",
+      "sha256": "dcae04e284388ea5a8583043a49415a3c7083d6f3d8c361200a9676f684fba7b",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1006.4732329463003,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004832920094486326,
+        0.0002705829974729568,
+        0.00026670898660086095
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-3.json",
+      "sha256": "2b1ec80d9ac2519d6c9ce60559ae41a0192856de5df2820e08a7634c6228b103",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1004.4357654067649,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00043691598693840206,
+        0.00042883300920948386,
+        0.0002672499977052212
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-4.json",
+      "sha256": "e3a2f96d816443d2fb42d5f1ea79d28b417e25f94132a1d7dac6c64b9d6274b9",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 827.6538513833749,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003338330134283751,
+        0.000324332999298349,
+        0.0003912920074071735
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-5.json",
+      "sha256": "872574c19fe6dbadd9884d349cf7645f2b3308ff7fa36b017114a63785c2f759",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1011.2163452866617,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00047370800166390836,
+        0.00039500001003034413,
+        0.0002654579875525087
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-6.json",
+      "sha256": "3f7d0f0152096999b7f3c185805504f6596e489ca1c03e41f8d75f7ee16b9c16",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1050.628026141138,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003407079784665257,
+        0.0002654579875525087,
+        0.00025549999554641545
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-7.json",
+      "sha256": "1e57849710878125a36a8e38798be15dd4740f4de566225c70d1f1569392dc51",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 766.3190830310396,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000378625001758337,
+        0.0003972089907620102,
+        0.00035029201535508037
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-8.json",
+      "sha256": "ca71af6b4aa8145bfc413c69481b2d8630d6fc2ad8aa52a42c816d89bd4ca5e0",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 899.7847292950087,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005471670010592788,
+        0.0004003749927505851,
+        0.00029833297594450414
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-9.json",
+      "sha256": "88e9fb9960b57b29e7499fc5d99ac0bbe8ee4cb7bd425f27d36426478963acec",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 596.9092593345922,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004599579842761159,
+        0.00044970898306928575,
+        0.0004597500083036721
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-0.json",
+      "sha256": "732cd7b5289efca5c2ac72ab68c26e5fb3b0eeb042f183ac95ce6ea94a60c214",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 1046.7033563805448,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003936669963877648,
+        0.000380749988835305,
+        0.00025645800633355975
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-1.json",
+      "sha256": "30185abcd0854255239b6d17398be1643e4c94b0c4f3534a2f3b39847d00a91c",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 939.682904385826,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004182080156169832,
+        0.0002856659993994981,
+        0.00036429098690859973
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-2.json",
+      "sha256": "d1463581fef1341a09aaa945e22b4f1911c94eff2903a9854b47e82f3d5542a5",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 1060.4857245907642,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00033316700137220323,
+        0.0003926670178771019,
+        0.00025312500656582415
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-3.json",
+      "sha256": "113f362d77770bfa64a2e1ef31d814388b347df60110dfe4b6f617ea0523ef2f",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 387.655933988038,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000692458008415997,
+        0.0008687919762451202,
+        0.002710750006372109
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-4.json",
+      "sha256": "b327058e3ddc75b603cbdac760440ba2db4aaaf7450c0fc48a44357c66b8f160",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 1025.2163295773348,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003401669964659959,
+        0.0002618329890538007,
+        0.0003434169921092689
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-5.json",
+      "sha256": "2eb65d01ace5f730fbc27f766fd1b5fc3383866c6dab6e9e5b6b43d817298a0c",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 1035.5945920019321,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00032941598328761756,
+        0.00031683300039730966,
+        0.00025920901680365205
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-6.json",
+      "sha256": "04624eba12c11539b1a6f1c15127166b080d957ff175487b4dd680aff512a88b",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 996.205223267639,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000340958999004215,
+        0.00026945798890665174,
+        0.0003861250006593764
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-7.json",
+      "sha256": "d228f76d150d95238971a581e44ccd2e60b3648e1df4b6b7d577b19e55078614",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 1050.1142676861093,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035887499689124525,
+        0.0003222920058760792,
+        0.0002556249964982271
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-8.json",
+      "sha256": "860b96b01092d230a8dab1d512209c8f055e9c48b2e43b0a24ff26ade1c7fe45",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 708.8171620479706,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000408666004659608,
+        0.0003787090245168656,
+        0.0014287919912021607
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-9.json",
+      "sha256": "a516f2bff1f09b042928dbc4c785fe27eefae0f2dd79b55889fc809e38dcb544",
+      "submission_hash": "sha256:e1480c4453395a3a065a455f2c1dd99ecc3a9be3073fe5513c231c14232175b3",
+      "expected_source_hash": "e4c91526fd8f80848c7a8745d71bddb0928672029e53bbe7fd7b3c88fd97aaec",
+      "score": 1075.1783172284315,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003443750028964132,
+        0.00036925001768395305,
+        0.0002496659872122109
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-0.json",
+      "sha256": "efa2b1de624057d6961268831d63bace2c7dd42625c23adaaebbdb28be0a1c71",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 941.3272573776369,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004258749831933528,
+        0.0003952080151066184,
+        0.00028516698512248695
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-1.json",
+      "sha256": "cfda88578fc7755e9508efa11738354fb93e324d974758b2839f6cf2cf4951cd",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 893.1712329754055,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003707919968292117,
+        0.0003005419857800007,
+        0.0004282910085748881
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-2.json",
+      "sha256": "bd86fcdb493a71d351c99f8f5a266d33915ce2ecfd1341e8523fa74794466b7e",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 713.2127983131938,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0011023340048268437,
+        0.0003934170235879719,
+        0.00037637498462572694
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-3.json",
+      "sha256": "574054ae8cdeb776e952513fefc2e14d7d867912ac9cdd59e03ec18c704ac9ba",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 772.6606313541947,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003474170225672424,
+        0.0008960419800132513,
+        0.0003589160041883588
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-4.json",
+      "sha256": "4a6a6c4c69941ccfe1b832352bab3d19607d33bb326a8d08f7b5a5c92ad3aa83",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1019.8567190460346,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003715419734362513,
+        0.0002632089890539646,
+        0.0005700410110875964
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-5.json",
+      "sha256": "d1feff13a269eb0caa003f930e17fdaa0f444e37bc5bb4bd613a2dbe06d6462d",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 984.3292772365588,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000508166995132342,
+        0.0002727090031839907,
+        0.0005334169836714864
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-6.json",
+      "sha256": "18733ae1854361171fab2f330c39380589abf5d968593e9b9832e82608c5b34b",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 835.1625976751104,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000403957994421944,
+        0.0004374999844003469,
+        0.0003214169992133975
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-7.json",
+      "sha256": "5cc310c84b6cf8486cf5ef700e0415a4dca0799b57aa19aa8cea7985572d940a",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 918.2491584321377,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004935839970130473,
+        0.0006870420183986425,
+        0.0002923340070992708
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-8.json",
+      "sha256": "09989121f0ef3cf167f9ba9b5bf30c876d8bbe7bc0044956c6fefcc905919f4c",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 522.6720194434748,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005135829851496965,
+        0.0006291659956332296,
+        0.0005778749764431268
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-9.json",
+      "sha256": "6ec8044712785bbe2a700106ac57404620e2045c06f4a25a71e91375992d2227",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 995.1268519078116,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00032858297345228493,
+        0.00026974998763762414,
+        0.00027716701151803136
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-0.json",
+      "sha256": "712e7230171e0ced816f2024059f704e325b31dfbe03733c50475bfdfaae1d32",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 716.9443929836941,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004649589827749878,
+        0.00042304201633669436,
+        0.0003744160057976842
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-1.json",
+      "sha256": "a5e94c7f4dd2524ce18753715ab27e02f228c2c2cc92d457da3cabaf739be29f",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 880.9568122068177,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000343167019309476,
+        0.0005495829973369837,
+        0.00030470898491330445
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-2.json",
+      "sha256": "cc46104dd7a5a4ffb20700ccb6ab5a050c32ec2a1e1d243583db2792590134b0",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 887.3900102998489,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005232080002315342,
+        0.0003921670140698552,
+        0.0003024999750778079
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-3.json",
+      "sha256": "0956ab276044cb7248290977ed9ef87ac5de17b6ab66bfc4849780818c3dde0c",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 1035.7664763501227,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003284169943071902,
+        0.0004482500080484897,
+        0.000259166001342237
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-4.json",
+      "sha256": "018ebf045b81e1328dc8bc78511d2790ac44346eefa3f3ad67a135d8b3724ab9",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 911.1088800692797,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00034254201455041766,
+        0.0003291659813839942,
+        0.000294625002425164
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-5.json",
+      "sha256": "7313e26d7ddcc2da37ab5f3416a65c6a141b7191805dc31b174265ea5d386e79",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 1026.68665823742,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003707919968292117,
+        0.00026145801530219615,
+        0.0004031670105177909
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-6.json",
+      "sha256": "a136782cb64153248157f69c08410ec6aad67857db2239cecea9682f3ab9e2c5",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 595.4210422627164,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004616660007741302,
+        0.0005537079996429384,
+        0.00045083300210535526
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-7.json",
+      "sha256": "bb5f9ad39b695ce7bb9e9930b970afa52e0eef83098c02241dc675566dc5eb3d",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 884.5885377999632,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003574579895939678,
+        0.0003034579858649522,
+        0.0003400839923415333
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-8.json",
+      "sha256": "4b9c21f2d76602beddee095f1a4e5f7294d332ef30a9a6b65bdc324b0ae73e5f",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 698.2923935726059,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000471249979455024,
+        0.00038441698416136205,
+        0.0004359580052550882
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-9.json",
+      "sha256": "a4e117594d6d0d74f8354a549ceac8f27b22bbe2dd91b3eebb3e9e7878ddd768",
+      "submission_hash": "sha256:fda29940484cdf9e15a130956c7995be50cbd3fab2bb43bc355b344c045c4828",
+      "expected_source_hash": "d09f7c26ec9520519e98bce00b511ec929edc0241c1784fbecfd48eda6cccf66",
+      "score": 1005.063804414036,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003436249971855432,
+        0.0003656249900814146,
+        0.00026708299992606044
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-0.json",
+      "sha256": "0eb77976f8f7762d2a62eb4c01cd6b028aad8b1c100c363d445e8935ac7140d3",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 940.3676244430231,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00039674999425187707,
+        0.00030870799673721194,
+        0.00028545799432322383
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-1.json",
+      "sha256": "6afaaf39953571bfa4ee4783906453d45b99e46519900dad78b00f481acf254c",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 962.4205770904282,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004323330067563802,
+        0.0002789169957395643,
+        0.0003704999980982393
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-2.json",
+      "sha256": "e0f078baa7e51e3858b10f41c2dc719ba09df6c7be4a812b5955aa303fa957b8",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 892.307228524544,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00032891600858420134,
+        0.0004826250078622252,
+        0.00030083299498073757
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-3.json",
+      "sha256": "cb0b250d958dcf343dacde6e72ae228bb00184915405aae06221f63409b4ebe5",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 972.7367367643877,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00048304200754500926,
+        0.0002759589988272637,
+        0.00044279100256972015
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-4.json",
+      "sha256": "31ea1097c50c764f945fa7403c1a0781fdb3c3edf541c018d9e8f85d9a5d1e06",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 580.5578945044148,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004623749991878867,
+        0.0004907500115223229,
+        0.0005590830114670098
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-5.json",
+      "sha256": "6580e85ae3aec1af89b94d3e80f13e030a875408edb8f277f87fe79c306a4fa0",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 990.8402311589523,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003626249963417649,
+        0.00027091699303127825,
+        0.000349667010596022
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-6.json",
+      "sha256": "5f8934d511279d1c13bbe9857c82ebe35731e0adf8f6e1091eec7ca9685de847",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1024.562746838766,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004227499885018915,
+        0.0002620000159367919,
+        0.00029504200210794806
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-7.json",
+      "sha256": "b7384f63d7297770117b74245ce80e2ed532190c7fd484f3da94bad637a872ab",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 786.8177586600441,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003605829842854291,
+        0.0003680409863591194,
+        0.0003411659854464233
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-8.json",
+      "sha256": "54e1452f125029409f894d1a90c07782dedaffb8feeaa64d19afa9dac36d9472",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 873.5545955618412,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00041570799658074975,
+        0.00031462498009204865,
+        0.0003072909894399345
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-9.json",
+      "sha256": "aaaade54783504743b8868eb6c1236567098dbafb08d64c0620544d9f5c7f6cb",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 574.9104344531163,
+      "final": false,
+      "raw_timings_seconds": [
+        0.001568417006637901,
+        0.0005516670062206686,
+        0.0004669170011766255
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-0.json",
+      "sha256": "958efbe8a1711b191b5bd077d5772425133505f3f3f3f1ae4912dc48b050d59d",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 1001.0010732250855,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003497500147204846,
+        0.00037458300357684493,
+        0.00026816700119525194
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-1.json",
+      "sha256": "1674dbb85c8fff76a7cf03a81037ab6b10a7d00952569029015ee68669d80f4e",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 875.09518986084,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00038929100264795125,
+        0.0003067500074394047,
+        0.0004163330013398081
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-2.json",
+      "sha256": "d596464e6ca6529c6f913e8026c152c91902556a066a7f3bdf27265a9b74d00f",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 750.7802400181534,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035754198324866593,
+        0.00039283299702219665,
+        0.000414082984207198
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-3.json",
+      "sha256": "4e2e7dd04e655d9db2487fccee172c34db20f14eb594630abdf47ca8f0553463",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 1033.2706954556381,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003307499864604324,
+        0.0002597919956315309,
+        0.0004528749850578606
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-4.json",
+      "sha256": "a0b029aabde6f46ed0380beb86b740d91c36de928c7a6b5b0522d5013899489b",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 996.8193458429972,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00043937499867752194,
+        0.0002692919806577265,
+        0.0002782499941531569
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-5.json",
+      "sha256": "958a2e3507f16bd39afeba540fc6e916383ae1879738c8a43a27af4d205068dd",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 877.5985461981168,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00034662499092519283,
+        0.0005636249843519181,
+        0.00030587500077672303
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-6.json",
+      "sha256": "e4f1317d07cfd960580004cfe9ba0925f8c8b0c4e10f56e81a01270ea3b7698e",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 880.4770361467664,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00040666700806468725,
+        0.0003048750222660601,
+        0.0004649579932447523
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-7.json",
+      "sha256": "37222bb1d7cb2831201e3dc6feb6189374d07729b3cc06d4dd0e256247840fc9",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 933.9613804223521,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004617920203600079,
+        0.0004667920002248138,
+        0.0002874160127248615
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-8.json",
+      "sha256": "90289117d230d043dbfcda6faed87beabb99e189ffeaf450fa18c56e11c515e3",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 924.0463197585029,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004006249946542084,
+        0.00030375001369975507,
+        0.0002905000001192093
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-9.json",
+      "sha256": "4ad0f27a3e2d2ec2644d8758898724efa30af98f30b04b461412ee3281573797",
+      "submission_hash": "sha256:8ef7f5ffc6a094f79c148bb637aee1aea9aa24c09de6481bf166c5c3de62dfcc",
+      "expected_source_hash": "ecd461f323014fadf6497cdeea6f035b9678ae9e639671d32956509ea6ffa62d",
+      "score": 966.7566760020774,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005468750023283064,
+        0.00032724998891353607,
+        0.00027766599669121206
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-0.json",
+      "sha256": "19ef3411263c37892c1a29126ab1b3a7254f94946761cface8a6e3900f80d46d",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 800.9006435996766,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003351669874973595,
+        0.0003679169749375433,
+        0.0003513749979902059
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-1.json",
+      "sha256": "62c6ce6b9c400da3c39f1f8cee2484dcbc64a0dce701c26d7326f8c164693246",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 933.2827437036337,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035524999839253724,
+        0.0003795000084210187,
+        0.0002876250073313713
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-2.json",
+      "sha256": "afeeeefb9185df61fb0b64dfbd9537cc4349bc7969655c7208fa25441d49b310",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 952.1790669511673,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000458958005765453,
+        0.0003137500025331974,
+        0.00028191698947921395
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-3.json",
+      "sha256": "973607778a86247017cbb07de588c1bed43d588351ef721c594c6bccca00744d",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 953.3084802536544,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004470410058274865,
+        0.0002815829939208925,
+        0.00029841699870303273
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-4.json",
+      "sha256": "0401e4b85d20b0796891fea42fa7327c0657783b2ec4545b128d958a45156304",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 160.72382008773246,
+      "final": false,
+      "raw_timings_seconds": [
+        0.02443541699904017,
+        0.0016701659769751132,
+        0.021943165978882462
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-5.json",
+      "sha256": "4269fe8151ded9f2d95b548d01d989754c3f50d06b3d1d844fe5caed8fe60d24",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 988.4103606319673,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00034995898022316396,
+        0.0003863750025629997,
+        0.00027158300508745015
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-6.json",
+      "sha256": "6e553ea37eecae86bbed7ecaba4087de457b85d30f2986b9b40589905da4463f",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 688.51671926729,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0006724160048179328,
+        0.0012140840117353946,
+        0.00038987500010989606
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-7.json",
+      "sha256": "f77233b36efcc7769530d995949994f652199e1b8b6ea518b17d02f50f7402f1",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1032.7737682746192,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004166669968981296,
+        0.00025991699658334255,
+        0.00027020799461752176
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-8.json",
+      "sha256": "18fbd1c3499dbc25150b3bd0b7a2a9fbf9bb9f56faa1c6a00f68192464e07808",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1073.0251266980379,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003582079953048378,
+        0.0002501669805496931,
+        0.00025795900728553534
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-9.json",
+      "sha256": "e66cba8762345544ee2d2b52bf7f344dbb61bdb41d9e62490c9ce86b98db8508",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 902.5588892108664,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0006005420000292361,
+        0.0003262090031057596,
+        0.00029741600155830383
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-0.json",
+      "sha256": "5ef254ea4d219c7c901844f27852b022e7075dfaed6de1f274f0a360a909f148",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 551.0132060915225,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005705420044250786,
+        0.00048716700985096395,
+        0.0006493330001831055
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-1.json",
+      "sha256": "2fcc46d9291667d11c039887f44813fe62b20433ddf7086706ce68b0dab22381",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 1063.637266332398,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003504579945001751,
+        0.0002523750008549541,
+        0.0003767500165849924
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-2.json",
+      "sha256": "84d7198db6fbb82ad9a31d38e4d131cc55cdf8d65b2bcbb70e72c65ed30e094c",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 1018.5718743765765,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003604580124374479,
+        0.00032891699811443686,
+        0.00026354100555181503
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-3.json",
+      "sha256": "d54e5fb73184583fbd44799baf1f119bbcdde60f1675a81abaf872d256900d4a",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 886.7801570829539,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003387919859960675,
+        0.00036095798714086413,
+        0.00030270800925791264
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-4.json",
+      "sha256": "fb4eaab589e917322ba55eb6579a8bdceb02698367cd6a0b251f511d6fcabb8e",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 987.1962965261336,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003413749800529331,
+        0.0002719170006457716,
+        0.00033374998020008206
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-5.json",
+      "sha256": "2474f0e7a04994b7e4966cf682f8a595486dcec0762eceb655f7f2f04415ae0f",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 950.9141714575367,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00047879101475700736,
+        0.0002945419983007014,
+        0.00028229199233464897
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-6.json",
+      "sha256": "6a084e6ce36a500c0971fcfe0e223321927ea487737c900fb6bb237a4e4c7ef1",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 964.4399250578715,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003701660025399178,
+        0.00030395801877602935,
+        0.0002783329982776195
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-7.json",
+      "sha256": "06bada74a5b79e520351ee0103227c6a9bc1780b5f2ae4867c301c3da94a4e77",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 969.9565411012654,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035408299299888313,
+        0.0002767499827314168,
+        0.00048387498827651143
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-8.json",
+      "sha256": "29f4e9e40cfb2af78199552c3b2f4356e2d8f60ea59c5373626fa55305bb2a0b",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 1019.0513975240332,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00033741697552613914,
+        0.0002634169941302389,
+        0.0003558750031515956
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-9.json",
+      "sha256": "df8bb2a52027c7d9bde540ce2b5fc92b4fd3b4a6fc8f46046a777eec498e0828",
+      "submission_hash": "sha256:f6417112356d8da7170bf633689d7bab262a9d6777cff55f4ca40b07e134cd02",
+      "expected_source_hash": "d079e341f8cf847de28926ee286753e16365ffdbbc5aabf9422198616fa3dcf3",
+      "score": 752.3584410514497,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005013330082874745,
+        0.0007404159987345338,
+        0.0003567919775377959
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-0.json",
+      "sha256": "6780514ad3318da63c38dff3d854381c60166afacba502d50457c0a5a839fea2",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 659.7492264982867,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00040687498403713107,
+        0.0004280419962015003,
+        0.0008840830123517662
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-1.json",
+      "sha256": "d55aaba480953975005f5f14767562d05afe82dd11791040fff092ce3594d809",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 491.5653043643289,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005460829997900873,
+        0.0013303339947015047,
+        0.0017107079911511391
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-2.json",
+      "sha256": "c5107652cf1dc90a4365a027a645d8799f62b0f0ad32befca3d087db9278b5fe",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 242.19747614451813,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0016333750099875033,
+        0.0011083330027759075,
+        0.0013248750183265656
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-3.json",
+      "sha256": "88fb1b4793814e663d3f7e04ce0016f0eb52362e7cd0d1b75321e06e56eb9d8d",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 898.5287087831098,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00039999998989515007,
+        0.0002987500047311187,
+        0.000406459002988413
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-4.json",
+      "sha256": "3da3ffaa2959ef16519412973a234758e619179d101bcc8d69f2cac2b1ff3e94",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1039.2712208025666,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035849999403581023,
+        0.00028404200566001236,
+        0.0002582920133136213
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-5.json",
+      "sha256": "2377982596c73f84c577946c9a5411fc1b6fc0a5bd7ee397075a952775c47125",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 809.1498441424955,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003317499940749258,
+        0.0004962079983670264,
+        0.00043808299233205616
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-6.json",
+      "sha256": "dece32b84489f6aa131821aecea6fcd871373da765f9cd016b70e1e7f6dc4f40",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 995.8947895580682,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00039908301550894976,
+        0.00026954198256134987,
+        0.0003897080023307353
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-7.json",
+      "sha256": "9e4d86b1b00c7dacaf3f7029c18206e71c6f2f2955e425e0792d433a69239118",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1087.699122323039,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035795802250504494,
+        0.0002752500004135072,
+        0.0002467920130584389
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-8.json",
+      "sha256": "a6ead1c97a16a64f3c05890a4229c9b7c58fbe0fac50deaba3c1ef6e28cab60d",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1044.4959094233077,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003323339915368706,
+        0.0002570000069681555,
+        0.0006189589912537485
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-9.json",
+      "sha256": "e349ed7b8a4d3bf2538e79bf185ee6d2275e1329658c16414d5aad6585648d29",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 867.3197306249854,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005554170056711882,
+        0.0004535409971140325,
+        0.00030949999927543104
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-0.json",
+      "sha256": "908cefdaf6993a752dccbe51aa619224aa71f708255eb7b1a9b0c469bac23846",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 849.2535044086823,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00048441599938087165,
+        0.0004602920089382678,
+        0.0003160840133205056
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-1.json",
+      "sha256": "8f0b83b4726c962006372949dfdb3972b7153367fa3a31a5c45e934dfcb1e71b",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 939.1338951402291,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003897080023307353,
+        0.00028583299717865884,
+        0.00043149999692104757
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-2.json",
+      "sha256": "86f4ffce0871d9385282171b61eaffdd4d9bb924d659483d3728d6f656b35670",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 732.9295830213516,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0004078329948242754,
+        0.0004101250087842345,
+        0.00036624999484047294
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-3.json",
+      "sha256": "79a977f925d26fbe65e34b26f8c9ca0db423dd93612ca71f934c608f0edbf276",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 759.0083894780298,
+      "final": false,
+      "raw_timings_seconds": [
+        0.012393540993798524,
+        0.00035366599331609905,
+        0.004946250002831221
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-4.json",
+      "sha256": "d6f4571502574f987a28de5f9bc1304acdf53483583b038b18dbca1ab0a311af",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 956.2799790291248,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00039845798164606094,
+        0.00028070801636204123,
+        0.0004273749946150929
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-5.json",
+      "sha256": "54eec6b3d4ed43f307b52e3631133eede15d7ce2c9386bb0e7c92b5c57e9e475",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 928.4408667878274,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005356250039767474,
+        0.0002891249896492809,
+        0.00033862501732073724
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-6.json",
+      "sha256": "a753f9542242013a171b87dec34ad6f9ceef579015cdb83296689cc1a514fa06",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 690.212727573165,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0009813749929890037,
+        0.0004658339894376695,
+        0.00038891698932275176
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-7.json",
+      "sha256": "6de66596b63b1ffbf0efd12a6313ac083881d75597f34427925e0b5d2d399f2c",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 950.6345522761719,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00039129098877310753,
+        0.000347083987435326,
+        0.00028237502556294203
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-8.json",
+      "sha256": "c18c8eae6021e2103c89c4ec8c351657756ee2d00cac7a77efc4bc3cc424c389",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 928.7105728628059,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005197080026846379,
+        0.00033233402064070106,
+        0.00028904102509841323
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/validation-9.json",
+      "sha256": "0f8e49d5628677a10f92e1d52177575b96aa5f838a5db14c4c17e51d6eee6ec3",
+      "submission_hash": "sha256:48c3b5f386986cc9618f394f94a508e54adf668a4fca0a4b6710273b2cd81c21",
+      "expected_source_hash": "31064bf4df1c79435799d866c66162a0acf85d502ccd99334c255596f03dda5b",
+      "score": 907.5142292702686,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000389833003282547,
+        0.00042879197280853987,
+        0.0002957920078188181
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-0.json",
+      "sha256": "b2851ceb5805bb13694b9a646d244b7bbb1f0d0061b64c49a10c602c01a5fcf6",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1004.5936316206673,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003683749819174409,
+        0.0002701659977901727,
+        0.0002672080008778721
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-1.json",
+      "sha256": "085f9ecf221cea18f2bdb8bc675db3a6bd0a1bdf85446d168869697a8604debb",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 937.3564663457354,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00046241702511906624,
+        0.00036612499388866127,
+        0.0002863749978132546
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-2.json",
+      "sha256": "054366ddcc8bc71c2f131b4aefb2492f385a6fc98c70d7672f2bfb8072cac84f",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1054.0644857171367,
+      "final": false,
+      "raw_timings_seconds": [
+        0.000417333998484537,
+        0.00035083398688584566,
+        0.00025466701481491327
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-3.json",
+      "sha256": "5136db85566fb7a347ffe06a82332ab64c74541f456df846af126bc7a2498767",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 896.5271725671589,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00043650000588968396,
+        0.00034333299845457077,
+        0.00029941697721369565
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-4.json",
+      "sha256": "fcd4fd8a55a0f3fd64248178ba45fe689769ae226156f42d2849d25ef0053021",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 854.7784233504939,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00041362500633113086,
+        0.0003140409826301038,
+        0.00036804101546294987
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-5.json",
+      "sha256": "02de1e3ea26db76331ad8c46be5a514494983f0c6912d61fcb2bf490fe71ca11",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1027.504212046433,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003531250113155693,
+        0.0002919999824371189,
+        0.0002612499811220914
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-6.json",
+      "sha256": "35bff2bb8b07816581d21ffff998575013951ab676abb5015fd71ccb7e3e3ece",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 1012.3298888858033,
+      "final": false,
+      "raw_timings_seconds": [
+        0.00035279200528748333,
+        0.0002651659888215363,
+        0.0002690000110305846
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-7.json",
+      "sha256": "c476c6bcd89a184ea8d3af64090078e15ea7a8d57724e90ccd57b4cacd7a18ca",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 809.252288842611,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0003317079972475767,
+        0.00040499999886378646,
+        0.00041629199404269457
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-8.json",
+      "sha256": "3992403b8eb6df5647866921f3df33df803c5faa74f0dead295953dd65fdf63e",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 997.437785595189,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0005700420006178319,
+        0.0002838750078808516,
+        0.00026912501198239625
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-006/control-9.json",
+      "sha256": "36440910bfc1c9a0fb0fac891b49be2e275920ddb035b0c34b3a8f6c773293ba",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 691.3237117207792,
+      "final": false,
+      "raw_timings_seconds": [
+        0.0007888750114943832,
+        0.0005985840107314289,
+        0.0003882919845636934
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/final.json",
+      "sha256": "847235e1e16d2d02285ec31af5d4fc4d04000f82e479bfcfba1dd0777fbf230e",
+      "submission_hash": "sha256:7c4e7045f7edd4fc6f3cf35b2214c865e35803d10e48e839b17f80775269f1cf",
+      "expected_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+      "score": 916.5530208813,
+      "final": true,
+      "raw_timings_seconds": [
+        0.0003907080099452287,
+        0.0002928749890998006,
+        0.00033404200803488493
+      ],
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    }
+  ]
+}

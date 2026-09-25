@@ -229,3 +229,34 @@ unchanged imported baseline. The variation occurs within the three calls of each
 report as well as between reports; current evidence does not isolate its cause.
 No kernel source, benchmark rule, power setting or correctness tolerance changed.
 Evidence: `evidence/cpu-best-kernel-repeatability-2026-09-25`.
+
+
+## Published SME techniques and local estimates, 2026-09-25
+
+The user requested implementation of the techniques behind the published roughly
+2,000 GFLOP/s compute result. The best panel32 kernel already has four independent
+ZA accumulators, operand reuse, and one SME region. Two 15-specialist boards ranked
+five further active-loop changes: pointer scheduling, a load pipeline, a condition-code
+countdown, accumulator instruction order, and guarded next-row B prefetch. Astra-high
+implemented and reviewed them through 73 Codex calls within the existing budget.
+
+All five new sources and the exact best-source replay passed 48 correctness cases
+each. None passed the ten-pair promotion gate. The highest new candidate score was
+1,075.18 GFLOP/s; its median was 1,030.41 and range 387.66–1,075.18, with 9/10 paired
+wins. These Battery Low Power results do not supersede the historical 1,701.65 AC
+sample or establish repeatability. The unchanged imported baseline remained selected
+and scored 916.55 in the final check. All 131 signed reports and 393 raw timing samples
+verified, with unchanged power settings. Evidence: `evidence/cpu-best-kernel-sme-techniques-2026-09-25`.
+
+A separate original FP32 compute-only probe measured one, two and four ZA tiles over
+ten rotated rounds. Battery Low Power medians were 331.79, 663.92 and 1,327.43 GFLOP/s;
+the four-tile maximum was 1,336.08. Twelve native tests cover exact output, bounds and
+callee-saved vector registers across all three entries. This probe is not GEMM or a
+physical ceiling. Evidence: `evidence/cpu-sme-peak-calibration-2026-09-25`.
+
+The primary published 2,008 GFLOP/s result is a base-M4 compute microbenchmark, not an
+M4 Pro measurement. Holding that compute rate fixed and assuming 10–20 microseconds
+of extra non-overlapped work gives 1,746.68–1,868.25 GFLOP/s for classical 512³ GEMM.
+Reaching 2,000 would allow only 0.535 microseconds of such extra work. These costs are
+assumptions, not measured components. No Automatic-mode M4 Pro calibration was made
+in this phase. See `docs/sera-sme-throughput-references-2026-09-25.md`.

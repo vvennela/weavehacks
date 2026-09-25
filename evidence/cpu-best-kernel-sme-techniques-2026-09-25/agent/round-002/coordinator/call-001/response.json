@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_schedule",
+    "k_loop_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "vector_access",
+    "address_generation",
+    "tail_alignment",
+    "prefetch_locality",
+    "b_panel_layout",
+    "assembly_audit",
+    "cache_conflict_layout",
+    "cache_blocking",
+    "scratch_lifetime",
+    "transpose_fusion"
+  ],
+  "rationale": "Retain these 15 specialists for the active sera_libxsmm_panel32 path in eb091b1e…. Scheduling, register reuse, address generation and assembly review cover distinct load lookahead and unrolling changes while preserving FP32 update order. Transpose, packing, B layout and fusion cover timed operand preparation. Vector access and alignment cover legal wider transfers, the 128-byte packed-A stride, the 2048-byte B stride and the existing 64-byte scratch alignment. Cache, prefetch and scratch specialists cover bounded layouts, access locality and workspace safety without assuming a measured bottleneck. The board must exclude duplicates of the measured pointer-add schedule, next-operands-before-branch pipeline and SUBS/B.NE rewrite. Four ZA tiles, vector reuse, one SME region and reusable scratch already exist. Dedicated tile-count, transition, replacement-fast-path and fallback optimization roles add less relevant coverage; Strassen is outside scope. This selects expertise only, not experiments or their order. Advisors must propose distinct changes and jointly rank them. No advisor work or measurements were performed here; performance advice remains unverified."
+}
