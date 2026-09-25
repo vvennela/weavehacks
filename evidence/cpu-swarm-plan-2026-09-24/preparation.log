@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-plan-2026-09-24/prepare.py", line 43, in <module>
+    candidate=team.propose(history,timeout=1800)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vishnuv/Documents/Documents/weavehacks/sera/kernel_advisory.py", line 237, in propose
+    raise RuntimeError('One or more specialist rankings failed; batch was not selected')
+RuntimeError: One or more specialist rankings failed; batch was not selected

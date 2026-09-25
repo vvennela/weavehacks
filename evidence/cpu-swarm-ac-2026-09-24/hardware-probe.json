@@ -1,0 +1,19 @@
+{
+  "source_sha256": "b1e03b72b0d2fdfb71f0d98bd0e5c44c659f291c192f7e09ceeffeaff5fbeb21",
+  "compiler_command": [
+    "cc",
+    "-O3",
+    "-march=native",
+    "evidence/cpu-swarm-ac-2026-09-24/hardware-probe.c",
+    "-o",
+    "/tmp/sera-sme-width"
+  ],
+  "execution_command": [
+    "/tmp/sera-sme-width"
+  ],
+  "stdout": "16\n",
+  "streaming_fp32_lanes": 16,
+  "streaming_bits": 512,
+  "timing_claim": false,
+  "cpu": "Apple M4 Pro"
+}

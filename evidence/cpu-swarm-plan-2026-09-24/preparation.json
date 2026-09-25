@@ -1,0 +1,18 @@
+{
+  "implementation_commit": "03743d05482318521e803c1cf1aa8895ed9884d1",
+  "implementation_hashes": {
+    "kernel_advisory.py": "139ca8870124a0f049ccb18cd03b242b8d955a9ee83c96a5e6d4f8b6badf61de",
+    "kernel_swarm_plan.py": "49363ac8067a5f7ffbd56b1299b9509bb61b5ea79425d2753befa66af8add3f7",
+    "codex_agent.py": "99994bf5b8b48c451da8cf923ee54c2a2ff0e1004ec1b624b719774bf50a47c5",
+    "kernel_search.py": "380a4a40fe9378b3833c3725f9b3e1620a7eb906f760e20dd045193e63350f26",
+    "cpu_kernel_validation.py": "3ed5143ed2c0b0b41e6fc2aa4ca8af07eac36e7a4dc07f1de5e945c2baa650c2",
+    "kernel_advisor_roles.py": "cc651fda2326a4378bf672e8d1a43cef13ade422d68781aaf2ad1f46061d91c0",
+    "kernel_tools.py": "ddd41492b3bca34345922440c56707349709065754d9ac221ccfd9da40ef9096"
+  },
+  "target_gflops": 1800,
+  "max_implementations": 3,
+  "batch_size": 3,
+  "max_model_calls": 108,
+  "performance_measurements": false,
+  "power": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t55%; discharging; 2:04 remaining present: true\n"
+}

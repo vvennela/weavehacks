@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "sme_fp32_tiles",
+          "sme_fp32_schedule",
+          "register_reuse",
+          "a_transpose",
+          "panel_packing",
+          "cache_blocking",
+          "vector_access",
+          "loop_order",
+          "address_generation",
+          "compiler_codegen",
+          "tail_alignment",
+          "n512_fast_path",
+          "b_panel_layout",
+          "streaming_region_cost"
+        ]
+      },
+      "minItems": 14,
+      "maxItems": 14
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ranking",
+    "reason"
+  ]
+}

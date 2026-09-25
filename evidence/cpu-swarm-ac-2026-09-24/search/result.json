@@ -1,0 +1,614 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "completed",
+  "trials": [
+    {
+      "name": "existing-sme",
+      "hypothesis": "Unchanged AC baseline",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-000/source/kernel.c",
+      "source_hash": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+      "status": "passed",
+      "scores": [
+        1270.2012501061822,
+        1445.789816356168,
+        1536.8500954022952
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-000/validation-2.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 1445.789816356168,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    },
+    {
+      "name": "sme_fp32_tiles",
+      "hypothesis": "Interchange the column-tile and reduction loops to load each pair of A vectors once per reduction step. Four FP32 ZA tiles hold one output block, so partial sums must be stored to C and reloaded between reduction steps. This added traffic may outweigh A-load reuse. Correctness and performance are unverified; no promotion decision is supported yet.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-001/source/kernel.c",
+      "source_hash": "3ba1eae036e72c1b089d9dad7a788cc1d232a0026dd78503835bd8ca0c250c68",
+      "status": "passed",
+      "scores": [
+        47.93241209471232,
+        49.597756196464964,
+        47.70277766706538
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-001/validation-2.json"
+      ],
+      "control_scores": [
+        1510.1854052116528,
+        1226.6624724723301,
+        1145.3246378666672
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-001/control-2.json"
+      ],
+      "median_gflops": 47.93241209471232,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "3ba1eae036e72c1b089d9dad7a788cc1d232a0026dd78503835bd8ca0c250c68",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "The candidate passed the supplied correctness checks but is ineligible for adoption. Across three AC trials, it achieved 47.70–49.60 GFLOP/s versus paired controls of 1145.32–1510.19 GFLOP/s: 95.8–96.8% lower throughput in every pair. This regression exceeds the observed repeat variation. Discard the candidate and retain the incumbent; these measurements do not establish the cause."
+      }
+    },
+    {
+      "name": "compiler_codegen",
+      "hypothesis": "For full n=512 tiles, replace reduction-loop index multiplication with pointers advanced by 512 floats. Preserve FP32 MOPA selectors 0–3, increasing-k accumulation, and the existing general path. A separate final step prevents pointer advancement beyond the matrix. This experiment is absent from the supplied measured history. Compilation, assembly, correctness, and performance remain unverified; the compiler may already produce equivalent code. Retain the incumbent pending correctness checks and repeated paired AC trials.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-002/source/kernel.c",
+      "source_hash": "2eb8da042e1dea22feffd6f9c524cb627973eaa10aef39ef62f9380a7ffaf839",
+      "status": "passed",
+      "scores": [
+        1583.690047606618,
+        1389.3599082355647,
+        1383.0891499218026
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-002/validation-2.json"
+      ],
+      "control_scores": [
+        1491.647890988238,
+        1322.8895827407343,
+        893.4208775750162
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-002/control-2.json"
+      ],
+      "median_gflops": 1389.3599082355647,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "2eb8da042e1dea22feffd6f9c524cb627973eaa10aef39ef62f9380a7ffaf839",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "The candidate passed the supplied correctness checks, but eligible=false prohibits adoption. Paired AC throughput gains were 6.2%, 5.0%, and 54.8%. Candidate results ranged from 1383.09–1583.69 GFLOP/s; controls ranged from 893.42–1491.65 GFLOP/s. The largest gain coincided with the lowest control, and substantial repeat variation prevents a stable performance conclusion. These results do not establish that pointer advancement caused a gain. Retain the incumbent and carry this unverified lead into the next jointly ranked experiment under unchanged correctness and repeated-control gates."
+      }
+    },
+    {
+      "name": "address_generation",
+      "hypothesis": "Replace indexed reduction loads with four advancing pointers for every matrix size. Advance only when another reduction step remains. Preserve predicates, ZA selectors 0–3, FP32 reduction order, transpose, and tail handling. This differs from the tested n=512-only pointer path. Compilation, correctness, and performance remain unverified; retain the incumbent pending correctness checks and repeated paired AC trials.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-003/source/kernel.c",
+      "source_hash": "cd2558e0573d6fbc768798acbc1cb9e12c8dfff68125c7e110a1bfc51fd77993",
+      "status": "passed",
+      "scores": [
+        1403.8923582133943,
+        1302.8254106184925,
+        1524.8462856172978
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-003/validation-2.json"
+      ],
+      "control_scores": [
+        1528.8237096613148,
+        1007.1075621145387,
+        1444.1718924026168
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-003/control-2.json"
+      ],
+      "median_gflops": 1403.8923582133943,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "cd2558e0573d6fbc768798acbc1cb9e12c8dfff68125c7e110a1bfc51fd77993",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Paired AC throughput changes were −8.2%, +29.4%, and +5.6%. Candidate scores ranged from 1302.83–1524.85 GFLOP/s; controls ranged from 1007.11–1528.82 GFLOP/s. The mixed results and large repeat variation do not establish a stable gain or its cause. Retain the incumbent and use this inconclusive evidence to inform the next jointly ranked implementation under unchanged gates."
+      }
+    },
+    {
+      "name": "register_reuse",
+      "hypothesis": "Starting from the unchanged incumbent, load A0 and both B vectors, issue the two MOPAs using A0, then load A1 and issue its two MOPAs. Preserve FP32 arithmetic, ZA selectors 0–3, tile mapping, increasing-k accumulation, allocation, transpose, and general tails. This source variant is absent from the supplied measured history. The compiler may produce equivalent code. Compilation, correctness, and performance remain unverified; retain the incumbent pending correctness checks and repeated paired AC trials under unchanged gates.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-004/source/kernel.c",
+      "source_hash": "4689487fd76f9eca947abb1ae73b38f0c25c7241665505cc1918183649b24d40",
+      "status": "passed",
+      "scores": [
+        811.6968370669714,
+        1483.0687329294026,
+        1393.564905406668
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-004/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-004/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-004/validation-2.json"
+      ],
+      "control_scores": [
+        1597.0410543776825,
+        1017.6027289204618,
+        1505.24829301313
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-004/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-004/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-004/control-2.json"
+      ],
+      "median_gflops": 1393.564905406668,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "4689487fd76f9eca947abb1ae73b38f0c25c7241665505cc1918183649b24d40",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Paired AC throughput changes were −49.2%, +45.7%, and −7.4%. Candidate scores ranged from 811.70–1483.07 GFLOP/s; controls ranged from 1017.60–1597.04 GFLOP/s. Two losses, one gain, and large repeat variation do not establish a stable improvement or its cause. Retain the incumbent and use this inconclusive result to inform the next jointly ranked implementation under unchanged benchmark and promotion gates."
+      }
+    },
+    {
+      "name": "cache_blocking",
+      "hypothesis": "Explicitly unroll the incumbent reduction loop by two, applying the four FP32 MOPAs for k before those for k+1. Keep ZA selectors 0–3, predicates, transpose layout, allocation, and output stores unchanged. A final reduction step handles odd n without reading past the input. This source variant is absent from the supplied measured history. Reduced loop-control overhead is an unverified hypothesis; compilation, correctness at tolerance 0.002, and performance have not been tested. Retain the incumbent pending general-size correctness checks and fresh repeated serial AC paired trials under unchanged gates.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-005/source/kernel.c",
+      "source_hash": "b72c1ae1d1fe31878d2b3d52e0c9851277dc10f61d224c649dcc187cbbcf66d1",
+      "status": "passed",
+      "scores": [
+        1002.4065848223175,
+        1561.4247713026978,
+        1462.863518238312
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-005/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-005/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-005/validation-2.json"
+      ],
+      "control_scores": [
+        1074.455309285413,
+        1446.1169198426464,
+        1343.2923019486238
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-005/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-005/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-005/control-2.json"
+      ],
+      "median_gflops": 1462.863518238312,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "b72c1ae1d1fe31878d2b3d52e0c9851277dc10f61d224c649dcc187cbbcf66d1",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Paired AC throughput changes were −6.7%, +8.0%, and +8.9%. Candidate scores ranged from 1002.41–1561.42 GFLOP/s; controls ranged from 1074.46–1446.12 GFLOP/s. Mixed paired results and large repeat variation do not establish a stable improvement or its cause. Retain the incumbent and use this inconclusive evidence to inform the next jointly ranked implementation under unchanged gates."
+      }
+    }
+  ],
+  "target_gflops": 1800,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-000/source/kernel.c",
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 3,
+    "min_improvement": 0.05,
+    "max_seconds": 1800
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "search-exhausted",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-2026-09-24/search/final.json",
+  "final_gflops": 1579.4130852862834,
+  "final_minimum_gflops": 1206.691187600873
+}

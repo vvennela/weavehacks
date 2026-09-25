@@ -1,0 +1,71 @@
+{
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "timing_claim": false,
+  "sources": {
+    "baseline": {
+      "source": "evidence/cpu-specialists-codex-2026-09-24/search/trial-000/source/kernel.c",
+      "sha256": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+      "command": [
+        "cc",
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-fPIC",
+        "-S",
+        "evidence/cpu-specialists-codex-2026-09-24/search/trial-000/source/kernel.c",
+        "-o",
+        "evidence/cpu-swarm-plan-2026-09-24/assembly/baseline.s"
+      ],
+      "loop_label": "LBB2_7",
+      "loop_instructions": [
+        "\tadd\tx15, x7, x26",
+        "\tld1w\t{ z0.s }, p0/z, [x15]",
+        "\tadd\tx15, x20, x26",
+        "\tld1w\t{ z1.s }, p1/z, [x15]",
+        "\tadd\tx15, x24, x26",
+        "\tld1w\t{ z2.s }, p2/z, [x15]",
+        "\tadd\tx15, x12, x26",
+        "\tld1w\t{ z3.s }, p3/z, [x15]",
+        "\tfmopa\tza0.s, p0/m, p2/m, z0.s, z2.s",
+        "\tfmopa\tza1.s, p0/m, p3/m, z0.s, z3.s",
+        "\tfmopa\tza2.s, p1/m, p2/m, z1.s, z2.s",
+        "\tfmopa\tza3.s, p1/m, p3/m, z1.s, z3.s",
+        "\tadd\tx26, x26, x14",
+        "\tsubs\tx28, x28, #1",
+        "\tb.ne\tLBB2_7"
+      ],
+      "static_instruction_count": 15
+    },
+    "constant-512": {
+      "source": "evidence/cpu-astra-luna-2026-09-24/candidate/kernel.c",
+      "sha256": "3eb823dcf4cc48e60404729587264a3d815a2e1a35bb5f378c4f816a811fa714",
+      "command": [
+        "cc",
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-fPIC",
+        "-S",
+        "evidence/cpu-astra-luna-2026-09-24/candidate/kernel.c",
+        "-o",
+        "evidence/cpu-swarm-plan-2026-09-24/assembly/constant-512.s"
+      ],
+      "loop_label": "LBB2_28",
+      "loop_instructions": [
+        "\tldr\tz0, [x7]",
+        "\tld1w\t{ z1.s }, p0/z, [x7, x8, lsl #2]",
+        "\tldr\tz2, [x19]",
+        "\tld1w\t{ z3.s }, p0/z, [x19, x8, lsl #2]",
+        "\tfmopa\tza0.s, p0/m, p0/m, z0.s, z2.s",
+        "\tfmopa\tza1.s, p0/m, p0/m, z0.s, z3.s",
+        "\tfmopa\tza2.s, p0/m, p0/m, z1.s, z2.s",
+        "\tfmopa\tza3.s, p0/m, p0/m, z1.s, z3.s",
+        "\tadd\tx19, x19, #2048",
+        "\tadd\tx7, x7, #2048",
+        "\tsubs\tx13, x13, #1",
+        "\tb.ne\tLBB2_28"
+      ],
+      "static_instruction_count": 12
+    }
+  }
+}

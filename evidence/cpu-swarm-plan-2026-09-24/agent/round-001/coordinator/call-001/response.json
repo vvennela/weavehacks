@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_tiles",
+    "sme_fp32_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "loop_order",
+    "address_generation",
+    "compiler_codegen",
+    "tail_alignment",
+    "scratch_lifetime",
+    "n512_fast_path",
+    "b_panel_layout",
+    "streaming_region_cost"
+  ],
+  "rationale": "Select 15 advisors covering four-tile FP32 computation, data movement, loop structure, compiler behavior, and correctness. Replace prefetch_locality and general_c_fallback from the default roster with b_panel_layout and streaming_region_cost: supplied sources leave B packing unexplored and do not isolate streaming-region fusion from other changes. Tail and fast-path advisors retain responsibility for general dimensions, odd tails, and n<=0; scratch review includes timed allocation and cleanup. The n512 advisor reviews the existing correctness-only specialization without proposing it unchanged. Schedule and packing advisors must distinguish new proposals from prior sources. Compiler advice remains unverified because no generated assembly is supplied. Battery scores establish no gain or causal ranking. This roster supports joint batch selection; it does not claim that a batch has been jointly ranked. Preserve every fixed benchmark constraint and require serial measurements against fresh AC controls before any speedup or acceptance claim."
+}

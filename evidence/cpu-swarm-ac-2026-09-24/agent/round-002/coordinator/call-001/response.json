@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "address_generation",
+    "compiler_codegen",
+    "tail_alignment",
+    "scratch_lifetime",
+    "n512_fast_path",
+    "b_panel_layout",
+    "streaming_region_cost",
+    "za_four_tile_reuse",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Replace sme_fp32_tiles and loop_order with za_four_tile_reuse and cache_conflict_layout. The per-k C spill experiment passed supplied correctness checks but lost throughput in every AC pair; reject that implementation without attributing the outcome to one advisor or assuming its cause. The four-tile review should propose a distinct mapping that retains accumulation in ZA. Scratch-layout review adds an unverified stride and padding hypothesis; no cache bottleneck is established. Retain address_generation and compiler_codegen because both pointer experiments remain inconclusive and unpromoted. Schedule, register reuse, and vector access cover the consumer; transpose, packing, blocking, B layout, scratch lifetime, and streaming regions cover complete-call costs. n512_fast_path and tail_alignment cover specialization and the general contract. Retain the incumbent. These selections do not establish an experiment ranking or measured gains. Follow the next joint ranking and judge each experiment using actual correctness results and repeated paired AC measurements under all unchanged gates; battery history is not an equivalent control."
+}
