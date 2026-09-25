@@ -22,6 +22,8 @@ PLAN_SCHEMA = object_schema(dict(
                minItems=15, maxItems=15), rationale=dict(type='string')))
 ADVICE_SCHEMA = object_schema(dict(advice=dict(type='string'), risks=dict(type='string'),
                                   abstain=dict(type='boolean')))
+REVIEW_SCHEMA = object_schema(dict(
+    decision=dict(type='string', enum=['adopt', 'reject', 'revise']), reason=dict(type='string')))
 SOURCE_SCHEMA = object_schema(dict(name=dict(type='string'), hypothesis=dict(type='string'),
                                   source=dict(type='string'), stop=dict(type='boolean')))
 RULES = (
@@ -36,7 +38,7 @@ RULES = (
 class KernelAdvisoryTeam:
     """Caller owns budgets and evaluation; Astra chooses roles and implements.
 
-    Each round makes two Astra-high calls and fifteen Luna calls. Independent
+    Each evaluated round makes three Astra-high calls and fifteen Luna calls. Independent
     advice goes only to the coordinator, avoiding all-to-all communication.
     Evaluated history is supplied by kernel_search, never by an agent.
     """
@@ -51,13 +53,14 @@ class KernelAdvisoryTeam:
         self.max_rounds, self.timeout = max_rounds, timeout
         self.factory = agent_factory or CodexJSONAgent
         self.rounds, self.identity = [], None
+        self.adjudications = []
         self._save()
 
     def _save(self):
         save_json(self.folder / 'state.json', dict(
             schema_version='sera-kernel-advisory-v1', coordinator='gpt-6-astra',
             coordinator_reasoning='high', advisor_model='gpt-6-luna', advisor_count=15,
-            max_rounds=self.max_rounds, max_model_calls=self.max_rounds * 17,
+            max_rounds=self.max_rounds, max_model_calls=self.max_rounds * 18, adjudications=self.adjudications,
             profile=self.profile, rounds=self.rounds))
 
     def _remaining(self, deadline):
@@ -76,7 +79,7 @@ class KernelAdvisoryTeam:
                 self.identity = identity
             evidence.append({key: trial.get(key) for key in (
                 'name', 'hypothesis', 'source_hash', 'status', 'scores', 'control_scores',
-                'promoted', 'error', 'comparison_identity')}
+                'promoted', 'adjudication', 'error', 'comparison_identity')}
                 | dict(source=Path(trial['source']).read_text()))
             for record in self.rounds:
                 if record.get('source_hash') == trial.get('source_hash'):
@@ -107,6 +110,39 @@ class KernelAdvisoryTeam:
         """Save the last measured outcome even when the search budget ends."""
         self._evidence(history)
 
+    def adjudicate(self, history, trial, *, eligible, timeout):
+        """Let Astra judge the experiment; fixed gates remain non-overridable."""
+        deadline = time.monotonic() + timeout
+        self._remaining(deadline)
+        evidence = self._evidence(history)
+        if len(self.adjudications) >= self.max_rounds:
+            raise RuntimeError('Coordinator experiment review budget exhausted')
+        record = dict(source_hash=trial['source_hash'], eligible=eligible, status='reviewing')
+        self.adjudications.append(record)
+        self._save()
+        try:
+            agent = self.factory(work_dir=self.folder / f'review-{len(self.adjudications):03d}',
+                                 model='gpt-6-astra', reasoning_effort='high', timeout=self.timeout)
+            decision = agent.request(RULES + '\n' + self.task +
+                '\nYou are Sera. Make the final decision on this measured candidate: adopt, '
+                'reject, or revise. Base the decision on correctness, paired controls and '
+                'repeat variation. Adopt only if the fixed evaluator gates marked it eligible. '
+                'Reject discards this candidate; revise retains the incumbent and informs '
+                'your next implementation. Explain the evidence.\nCandidate under review:\n' +
+                json.dumps(dict(source_hash=trial['source_hash'], eligible=eligible)) +
+                '\nMeasured history:\n' + json.dumps(evidence), REVIEW_SCHEMA,
+                timeout=self._remaining(deadline))
+            if (decision.get('decision') not in {'adopt', 'reject', 'revise'} or
+                    not isinstance(decision.get('reason'), str)):
+                raise ValueError('Malformed coordinator experiment review')
+            record.update(status='reviewed', **decision)
+            self._save()
+            return decision
+        except BaseException as error:
+            record.update(status='failed', error=f'{type(error).__name__}: {error}')
+            self._save()
+            raise
+
     def propose(self, history, *, timeout):
         deadline = time.monotonic() + timeout
         self._remaining(deadline)
@@ -120,9 +156,9 @@ class KernelAdvisoryTeam:
         self._save()
         common = RULES + '\n' + self.task + '\nHardware profile:\n' + json.dumps(self.profile)
         common += '\nMeasured history:\n' + json.dumps(evidence)
-        coordinator = self.factory(work_dir=folder / 'coordinator', model='gpt-6-astra',
-                                   reasoning_effort='high', timeout=self.timeout)
         try:
+            coordinator = self.factory(work_dir=folder / 'coordinator', model='gpt-6-astra',
+                                       reasoning_effort='high', timeout=self.timeout)
             plan = coordinator.request(common + '\nYou are Sera, the implementing coordinator. '
                 'Select exactly 15 distinct relevant advisor IDs from this catalog. You may '
                 'replace any prior advisor at each round based on evidence. Role descriptions '

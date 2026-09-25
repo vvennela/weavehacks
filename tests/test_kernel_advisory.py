@@ -95,3 +95,33 @@ def test_expired_deadline_dispatches_no_agents(tmp_path):
 def test_advisory_team_is_exported():
     import sera
     assert sera.KernelAdvisoryTeam is KernelAdvisoryTeam
+
+
+def test_astra_reviews_recorded_experiment_and_persists_reason(tmp_path):
+    calls=[]
+    def factory(**settings):
+        class Agent:
+            def request(self,prompt,schema,*,timeout):
+                calls.append((settings,prompt))
+                return dict(decision='reject',reason='The repeated timing gain is unconfirmed')
+        return Agent()
+    team=KernelAdvisoryTeam(work_dir=tmp_path/'team',task='FP32',profile={},agent_factory=factory)
+    measured=history(tmp_path)
+    decision=team.adjudicate(measured,measured[0],eligible=False,timeout=60)
+    assert decision['decision']=='reject'
+    assert calls[0][0]['model']=='gpt-6-astra'
+    assert calls[0][0]['reasoning_effort']=='high'
+    assert '1000' in calls[0][1]
+    state=json.loads((tmp_path/'team/state.json').read_text())
+    assert state['adjudications'][0]['status']=='reviewed'
+    assert state['adjudications'][0]['source_hash']=='baseline'
+
+
+def test_setup_failure_is_recorded(tmp_path):
+    def factory(**settings):
+        raise OSError('setup failed')
+    team=KernelAdvisoryTeam(work_dir=tmp_path/'team',task='FP32',profile={},agent_factory=factory)
+    with pytest.raises(OSError):
+        team.propose(history(tmp_path),timeout=60)
+    state=json.loads((tmp_path/'team/state.json').read_text())
+    assert state['rounds'][0]['status']=='failed'

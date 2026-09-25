@@ -116,7 +116,7 @@ def test_request_rejects_malformed_or_non_object_responses(tmp_path, monkeypatch
         return ""
 
     monkeypatch.setattr("sera.codex_agent.run_command", run_command)
-    with pytest.raises((json.JSONDecodeError, ValueError)):
+    with pytest.raises((json.JSONDecodeError, TypeError)):
         agent(tmp_path).request("Choose a next step", SCHEMA, timeout=30)
 
 
@@ -124,7 +124,7 @@ def test_request_rejects_invalid_inputs_before_allocating_call(tmp_path):
     current = agent(tmp_path)
     with pytest.raises(ValueError, match="prompt"):
         current.request(" ", SCHEMA, timeout=30)
-    with pytest.raises(ValueError, match="schema"):
+    with pytest.raises(TypeError, match="schema"):
         current.request("prompt", [], timeout=30)
     with pytest.raises(ValueError, match="timeout"):
         current.request("prompt", SCHEMA, timeout=0)

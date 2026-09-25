@@ -58,7 +58,7 @@ def main():
                      if key.endswith("THREADS") or key == "PYTHONHASHSEED"},
         provider="Codex CLI, ChatGPT login only", coordinator="gpt-6-astra",
         coordinator_reasoning="high", advisor_model="gpt-6-luna", advisor_count=15,
-        max_model_calls=args.max_candidates * 17, host=initial_host,
+        max_model_calls=args.max_candidates * 18, host=initial_host,
         implementation_hashes={name: hashlib.sha256(
             (Path(sera.__file__).parent / name).read_bytes()).hexdigest() for name in
             ("kernel_search.py", "kernel_tools.py", "kernel_advisory.py", "kernel_advisor_roles.py",

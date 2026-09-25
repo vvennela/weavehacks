@@ -134,3 +134,32 @@ def test_default_target_does_not_accept_1790_gflops(tmp_path):
     report, _ = run(tmp_path, {"base": 1000, "new": 1790})
     assert report["target_met"] is False
     assert report["target_gflops"] == 1800
+
+
+@pytest.mark.parametrize('decision,expected_source',[('reject','base'),('revise','base'),('adopt','new')])
+def test_coordinator_has_final_say_after_measured_trial(tmp_path,decision,expected_source):
+    class Coordinator:
+        def propose(self,history,*,timeout):
+            return KernelCandidate('test','new','test')
+        def adjudicate(self,history,trial,*,eligible,timeout):
+            assert trial['promoted'] is False
+            assert trial['scores']==[1900]*3
+            assert trial['control_scores']==[1000]*3
+            assert eligible is True
+            assert history[-1]['source_hash']==trial['source_hash']
+            return dict(decision=decision,reason='Measured experiment review')
+    report,_=run(tmp_path,{'base':1000,'new':1900},propose=Coordinator())
+    assert Path(report['winner_source']).read_text()==expected_source
+    assert report['trials'][1]['adjudication']['decision']==decision
+
+
+def test_coordinator_cannot_adopt_an_ineligible_candidate(tmp_path):
+    class Coordinator:
+        def propose(self,history,*,timeout):
+            return KernelCandidate('test','new','test')
+        def adjudicate(self,history,trial,*,eligible,timeout):
+            assert eligible is False
+            return dict(decision='adopt',reason='Unsupported agent claim')
+    report,_=run(tmp_path,{'base':1000,'new':1010},propose=Coordinator())
+    assert Path(report['winner_source']).read_text()=='base'
+    assert report['trials'][1]['promoted'] is False

@@ -193,8 +193,23 @@ def optimize_kernel(*, baseline, propose, evaluate, output_dir, max_candidates=8
                 report["stop_reason"] = "duplicate-source"
                 break
             # Promotion requires separated observed ranges, not a lucky best sample.
-            current["promoted"] = (current["status"] == "passed" and min(current["scores"]) >
-                                    max(current["control_scores"]) * (1 + min_improvement))
+            eligible = (current["status"] == "passed" and min(current["scores"]) >
+                        max(current["control_scores"]) * (1 + min_improvement))
+            current["eligible_for_promotion"] = eligible
+            current["promoted"] = eligible
+            if callable(getattr(propose, "adjudicate", None)):
+                current["promoted"] = False
+                save()
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("Kernel search deadline reached before adjudication")
+                decision = propose.adjudicate(deepcopy(report["trials"]), deepcopy(current),
+                                              eligible=eligible, timeout=remaining)
+                if (not isinstance(decision, dict) or decision.get("decision") not in
+                        {"adopt", "reject", "revise"} or not isinstance(decision.get("reason"), str)):
+                    raise ValueError("Invalid coordinator adjudication")
+                current["adjudication"] = decision
+                current["promoted"] = eligible and decision["decision"] == "adopt"
             if current["promoted"]:
                 best = current
             save()

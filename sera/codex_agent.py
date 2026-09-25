@@ -34,7 +34,7 @@ class CodexJSONAgent:
         if not isinstance(prompt, str) or not prompt.strip():
             raise ValueError("prompt must be non-empty text")
         if not isinstance(schema, dict):
-            raise ValueError("schema must be a JSON object")
+            raise TypeError("schema must be a JSON object")
         try:
             schema_text = json.dumps(schema, ensure_ascii=False, indent=2)
         except (TypeError, ValueError) as error:
@@ -99,7 +99,7 @@ class CodexJSONAgent:
             )
             data = json.loads(response_path.read_text())
             if not isinstance(data, dict):
-                raise ValueError("Codex response must be a JSON object")
+                raise TypeError("Codex response must be a JSON object")
             return data
         finally:
             # Keep a complete per-call artifact set, including failed calls.
