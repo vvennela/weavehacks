@@ -69,3 +69,11 @@ The target is strictly greater than **1,780 GFLOP/s**, with the full single-thre
 - **Search competence:** compare against a fixed baseline and equal-budget deterministic/random search on several workloads and CPUs. Report failed runs and noise; do not select only successful examples.
 
 The independent [GPT-6 Luna audit](sera-production-audit-luna-2026-09-24.md) provides prioritized production findings. The intended next release is a supervised CPU research adapter with clear failure behavior, not an unattended general optimizer.
+
+## Measured outcome and user decisions
+
+Two six-candidate Codex-only searches completed. Neither met 1,780 GFLOP/s or retained a candidate. The frozen three-specialist run saved 40 independently verified signed reports and public correctness results for all seven sources. Its baseline varied from 620.24 to 1,059.26 GFLOP/s; the unchanged selected baseline scored 623.97 GFLOP/s on the final check. See the [complete measured report](../evidence/cpu-specialists-codex-2026-09-24/README.md). This demonstrates source modification, evaluation, and specialist feedback, not optimization superiority.
+
+The implemented routing checkpoint uses a 15-role catalog with at most three concurrent agents. The user's later decision is to have all 15 work together as GPT-6 Luna agents. The role choice is awaiting user adjudication: replace the three inapplicable single-thread MatMul roles, or retain them with explicit abstention. This requested design must not be described as already validated by the earlier Astra run.
+
+The user adjudicates product and research decisions. Changes to baseline stability limits, final acceptance thresholds, role definitions, and swarm behavior remain proposals until approved. Luna handles breadth analysis; the primary agent implements approved choices and performs depth analysis and validation.

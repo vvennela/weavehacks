@@ -1,0 +1,26 @@
+{
+  "baseline": "/Users/vishnuv/Documents/Documents/kernel-opt/kernel-opt-attempt-3-local/kernel.c",
+  "baseline_source": "#include <arm_sve.h>\n#include <arm_sme.h>\n#include <stdlib.h>\n#include <stddef.h>\n\n/* Transpose through ZA: contiguous row loads become contiguous column stores.\n * The heap layout remains at[k*n+i], exactly as consumed by sme_gemm. */\n__attribute__((target(\"sme\")))\n__arm_new(\"za\") __arm_locally_streaming\nstatic void sme_transpose(int n, const float *a, float *at) {\n    const int vl = (int)svcntsw();\n    for (int i = 0; i < n; i += 2*vl) {\n        const int rows0 = n-i < vl ? n-i : vl;\n        const int rows1 = n-i-vl < vl ? n-i-vl : vl;\n        svbool_t pi0 = svwhilelt_b32(i, n);\n        svbool_t pi1 = svwhilelt_b32(i+vl, n);\n        for (int k = 0; k < n; k += 2*vl) {\n            const int cols0 = n-k < vl ? n-k : vl;\n            const int cols1 = n-k-vl < vl ? n-k-vl : vl;\n            svbool_t pk0 = svwhilelt_b32(k, n);\n            svbool_t pk1 = svwhilelt_b32(k+vl, n);\n            for (int r = 0; r < rows0; ++r) {\n                svld1_hor_za32(0, r, pk0, a+(size_t)(i+r)*n+k);\n                if (cols1 > 0)\n                    svld1_hor_za32(1, r, pk1, a+(size_t)(i+r)*n+k+vl);\n            }\n            for (int r = 0; r < rows1; ++r) {\n                svld1_hor_za32(2, r, pk0, a+(size_t)(i+vl+r)*n+k);\n                if (cols1 > 0)\n                    svld1_hor_za32(3, r, pk1, a+(size_t)(i+vl+r)*n+k+vl);\n            }\n            for (int s = 0; s < cols0; ++s) {\n                svst1_ver_za32(0, s, pi0, at+(size_t)(k+s)*n+i);\n                if (rows1 > 0)\n                    svst1_ver_za32(2, s, pi1, at+(size_t)(k+s)*n+i+vl);\n            }\n            for (int s = 0; s < cols1; ++s) {\n                svst1_ver_za32(1, s, pi0, at+(size_t)(k+vl+s)*n+i);\n                if (rows1 > 0)\n                    svst1_ver_za32(3, s, pi1, at+(size_t)(k+vl+s)*n+i+vl);\n            }\n        }\n    }\n}\n\n/* CPU SME outer products: four ZA tiles hold a 2VL x 2VL output block. */\n__attribute__((target(\"sme\")))\n__arm_new(\"za\") __arm_locally_streaming\nstatic void sme_gemm(int n,const float *at,const float *b,float *c) {\n    const int vl=(int)svcntsw();\n    for(int i=0;i<n;i+=2*vl) {\n        svbool_t pi0=svwhilelt_b32(i,n),pi1=svwhilelt_b32(i+vl,n);\n        for(int j=0;j<n;j+=2*vl) {\n            svbool_t pj0=svwhilelt_b32(j,n),pj1=svwhilelt_b32(j+vl,n);\n            svzero_za();\n            for(int k=0;k<n;k++) {\n                svfloat32_t a0=svld1_f32(pi0,at+(size_t)k*n+i);\n                svfloat32_t a1=svld1_f32(pi1,at+(size_t)k*n+(i+vl<n?i+vl:i));\n                svfloat32_t b0=svld1_f32(pj0,b+(size_t)k*n+j);\n                svfloat32_t b1=svld1_f32(pj1,b+(size_t)k*n+(j+vl<n?j+vl:j));\n                svmopa_za32_f32_m(0,pi0,pj0,a0,b0);\n                svmopa_za32_f32_m(1,pi0,pj1,a0,b1);\n                svmopa_za32_f32_m(2,pi1,pj0,a1,b0);\n                svmopa_za32_f32_m(3,pi1,pj1,a1,b1);\n            }\n            for(int r=0;r<vl && i+r<n;r++) {\n                svst1_hor_za32(0,r,pj0,c+(size_t)(i+r)*n+j);\n                if(j+vl<n) svst1_hor_za32(1,r,pj1,c+(size_t)(i+r)*n+j+vl);\n            }\n            for(int r=0;r<vl && i+vl+r<n;r++) {\n                svst1_hor_za32(2,r,pj0,c+(size_t)(i+vl+r)*n+j);\n                if(j+vl<n) svst1_hor_za32(3,r,pj1,c+(size_t)(i+vl+r)*n+j+vl);\n            }\n        }\n    }\n}\nvoid gemm(int n,const float *restrict A,const float *restrict B,float *restrict C) {\n    if(n<=0)return;\n    float *at=malloc((size_t)n*n*sizeof(float));\n    if(!at) {\n        for(int i=0;i<n;i++)for(int j=0;j<n;j++) {\n            float x=0;for(int k=0;k<n;k++)x+=A[(size_t)i*n+k]*B[(size_t)k*n+j];\n            C[(size_t)i*n+j]=x;\n        }\n        return;\n    }\n    sme_transpose(n, A, at);\n    sme_gemm(n,at,B,C);\n    free(at);\n}\n",
+  "target_gflops": 1780.0,
+  "max_candidates": 6,
+  "max_seconds": 1200.0,
+  "agent_timeout": 180.0,
+  "scoring": "Frozen Hills kernel-opt; same machine, n=512, tolerance=0.002",
+  "comparison": "Three repeats; alternating unchanged control/candidate; separated ranges plus 5%",
+  "environment": {
+    "PYTHONHASHSEED": "0",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1"
+  },
+  "provider": "Codex CLI, ChatGPT login only",
+  "model": "Codex CLI default",
+  "implementation_hashes": {
+    "kernel_search.py": "434dbf9b6a22b235c749275ec33b6efbcd4ec78ea7ee14159ca5ecb1ef71dc5b",
+    "kernel_tools.py": "d0fbbd2f65b8edda34cbb834d6928c01c301920ba0ef9c5c07f3dbad244763ea",
+    "kernel_specialists.py": "f9c363489fcc2fa060858c9e8a9dc1172276bdb8bbe1adb87a3b5b8874e1aa46",
+    "cpu_kernel_validation.py": "3844572ecdafa3569a87bc213e0b68aa218a13fd72f6d17ba65b1b063553e971"
+  }
+}

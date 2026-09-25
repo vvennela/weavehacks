@@ -21,6 +21,13 @@ def test_router_selects_relevant_bounded_stable_team():
     assert all(role.id not in {"threading_numa", "model_precision", "operator_fusion"} for role in roles)
 
 
+def test_m4_profile_routes_exact_relevant_first_team():
+    profile = dict(capabilities=["cpu", "arm64", "neon", "simd", "sme", "single-thread"],
+                   tags=["gemm", "sme", "packing", "registers", "memory", "simd", "reuse"])
+    assert [role.id for role in route_specialists(profile, {}, limit=3)] == [
+        "sme_tiles", "register_tiling", "packing_layout"]
+
+
 def test_sme_specialist_requires_sme_capability():
     profile = dict(tags=["sme", "gemm"], capabilities=["cpu", "x86_64"])
     assert "sme_tiles" not in {role.id for role in route_specialists(profile, {}, limit=3)}

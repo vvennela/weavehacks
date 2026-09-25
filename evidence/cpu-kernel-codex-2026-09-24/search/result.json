@@ -1,0 +1,33 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "failed",
+  "trials": [
+    {
+      "name": "existing-sme",
+      "hypothesis": "Unchanged existing SME kernel",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24/search/trial-000/source/kernel.c",
+      "source_hash": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+      "status": "running",
+      "scores": [],
+      "reports": [],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": null
+    }
+  ],
+  "target_gflops": 1780.0,
+  "target_met": false,
+  "winner_source": null,
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 3,
+    "min_improvement": 0.05,
+    "max_seconds": 1800.0
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "error": "KeyboardInterrupt: "
+}

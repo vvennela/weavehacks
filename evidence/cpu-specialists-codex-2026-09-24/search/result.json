@@ -1,0 +1,674 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "completed",
+  "trials": [
+    {
+      "name": "existing-sme",
+      "hypothesis": "Unchanged existing SME kernel",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-000/source/kernel.c",
+      "source_hash": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+      "status": "passed",
+      "scores": [
+        620.2412567098598,
+        1059.2637841553458,
+        1037.263336329251
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-000/validation-2.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 1037.263336329251,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 4.494215501063989e-07
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    },
+    {
+      "name": "sme-panel-pack-fused-unroll4",
+      "hypothesis": "The baseline passed, but its 620–1059 GFLOP/s spread does not establish stable performance. Packing one A row panel in k-major order should reduce strided loads and keep that panel in cache while all column blocks consume it. One streaming region handles both packing and multiplication; full tiles use all-active predicates and four-way k unrolling. This is an unmeasured candidate, not a claim that the target is met.",
+      "specialist_id": "sme_tiles",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/source/kernel.c",
+      "source_hash": "0bdb3573944832a66cd3a3bd619de4aa7ef69e51c2e5121ed5aa5bd93f3d49ca",
+      "status": "passed",
+      "scores": [
+        1101.8387453444054,
+        851.6137084291054,
+        1014.2423146153016
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/validation-2.json"
+      ],
+      "control_scores": [
+        1060.1381476646065,
+        1048.9202132185542,
+        842.7003364868019
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/control-2.json"
+      ],
+      "median_gflops": 1014.2423146153016,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "0bdb3573944832a66cd3a3bd619de4aa7ef69e51c2e5121ed5aa5bd93f3d49ca",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 4.494215501063989e-07
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "promoted": false
+    },
+    {
+      "name": "sme-2x2-two-step-register-pipeline",
+      "hypothesis": "Keep the balanced 2VL by 2VL output tile in all four ZA accumulators. Preload two reduction steps into eight vector registers, then issue eight outer products. This may hide load latency and reduce loop overhead without high register pressure. Hoist tail offsets and advance input pointers once per two steps. The baseline varied from 620 to 1059 GFLOP/s; this candidate needs repeated measurements before any speed claim.",
+      "specialist_id": "register_tiling",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/source/kernel.c",
+      "source_hash": "93f462726f0b46ea599e9dbaec16798fb8a94b60ba0fa926172d2e230828fc70",
+      "status": "passed",
+      "scores": [
+        978.3524815085025,
+        739.7463514928492,
+        1029.3125792708934
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/validation-2.json"
+      ],
+      "control_scores": [
+        1035.7664763501227,
+        879.0354765908729,
+        1015.6775657025122
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/control-2.json"
+      ],
+      "median_gflops": 978.3524815085025,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "93f462726f0b46ea599e9dbaec16798fb8a94b60ba0fa926172d2e230828fc70",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 4.494215501063989e-07
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "promoted": false
+    },
+    {
+      "name": "sme-row-panel-pack",
+      "hypothesis": "Pack one 2VL-row panel of A into contiguous k-major vectors, then reuse it across all column blocks before packing the next panel. This retains the baseline's transpose work but reduces scratch space from n*n to n*2VL floats and replaces n-stride A loads with sequential panel loads. The expected gain is lower cache and address-generation cost; the supplied timing variation means this gain must be confirmed across repeats.",
+      "specialist_id": "packing_layout",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/source/kernel.c",
+      "source_hash": "0f8a2dc37315eb044241f9b9d316a3b64292d7e76ab63f15e13366437639182e",
+      "status": "passed",
+      "scores": [
+        1014.2385225918238,
+        920.2196861656419,
+        901.4223130361808
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/validation-2.json"
+      ],
+      "control_scores": [
+        822.684779349311,
+        1060.3098049990133,
+        892.4288345598962
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/control-2.json"
+      ],
+      "median_gflops": 920.2196861656419,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "0f8a2dc37315eb044241f9b9d316a3b64292d7e76ab63f15e13366437639182e",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 4.494215501063989e-07
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "promoted": false
+    },
+    {
+      "name": "sme-fused-transpose-1x4-tiles",
+      "hypothesis": "Start from existing-sme, the strongest measured median. The panel-packing and two-step pipeline trials did not establish a gain. This candidate uses one VL-by-4VL output block across four ZA tiles and keeps transpose and multiplication in one streaming region. The hypothesis is that reusing one A vector across four adjacent B vectors reduces repeated A traffic and improves B access locality. It requires five vector loads per four outer products instead of four, so the tradeoff needs measurement. This source is untested; the supplied results do not establish the 1780 GFLOP/s target.",
+      "specialist_id": "sme_tiles",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/source/kernel.c",
+      "source_hash": "becfc8218107e7722520e5c89e27f911ececa0acc74c8fdc07dd8cbbb713b66d",
+      "status": "passed",
+      "scores": [
+        977.7573714827544,
+        591.5398423086745,
+        858.7653789760197
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/validation-2.json"
+      ],
+      "control_scores": [
+        1082.0388949142207,
+        782.4213344835282,
+        990.0800659241107
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/control-2.json"
+      ],
+      "median_gflops": 858.7653789760197,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "becfc8218107e7722520e5c89e27f911ececa0acc74c8fdc07dd8cbbb713b66d",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 4.494215501063989e-07
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "promoted": false
+    },
+    {
+      "name": "sme-full-transpose-padded-stride",
+      "hypothesis": "Start from existing-sme, the strongest measured source. Add 32 floats of unused padding between transposed A rows. At n=512, this changes the row stride from 2048 to 2176 bytes. The hypothesis is that this reduces cache conflicts and repeated cache-line reads during multiplication. Padding is never initialized or consumed. The panel-packing trials did not establish an improvement, so this candidate retains the full transpose and baseline arithmetic. This candidate is unmeasured; the supplied results do not establish the 1780 GFLOP/s target.",
+      "specialist_id": "memory_traffic",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/source/kernel.c",
+      "source_hash": "7e62d20d751305c18a57bd81ca64004256c700f64202f2c0dab81a7b260bb078",
+      "status": "passed",
+      "scores": [
+        992.5217943371588,
+        1045.6840558269112,
+        1016.6391798847789
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/validation-2.json"
+      ],
+      "control_scores": [
+        1050.628026141138,
+        995.4368069746165,
+        818.5030886844471
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/control-2.json"
+      ],
+      "median_gflops": 1016.6391798847789,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "7e62d20d751305c18a57bd81ca64004256c700f64202f2c0dab81a7b260bb078",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 4.494215501063989e-07
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "promoted": false
+    },
+    {
+      "name": "sme-full-tile-staggered-unroll4",
+      "hypothesis": "Start from existing-sme, which has the highest measured median. Panel packing and batching two steps of loads did not improve that median. Keep its full transpose layout, but give complete output tiles an all-active, four-step loop that interleaves next-step loads with current-step outer products. This tests whether spreading loads across arithmetic reduces load stalls and loop overhead. Tail tiles retain predicated computation. This candidate is untested; the supplied timing spread does not establish a stable gain or achievement of the target.",
+      "specialist_id": "instruction_schedule",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-006/source/kernel.c",
+      "source_hash": "686915ceecfc592737c86afcba2a8ef51d19f4717df32e8666bf77834f4f1af0",
+      "status": "passed",
+      "scores": [
+        900.2856080030509,
+        1028.1613822594277,
+        732.0960435749655
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-006/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-006/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-006/validation-2.json"
+      ],
+      "control_scores": [
+        991.4513784202941,
+        993.8998301725899,
+        1037.6001586716977
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-006/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-006/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-006/control-2.json"
+      ],
+      "median_gflops": 900.2856080030509,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "686915ceecfc592737c86afcba2a8ef51d19f4717df32e8666bf77834f4f1af0",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 4.494215501063989e-07
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "promoted": false
+    }
+  ],
+  "target_gflops": 1780.0,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-000/source/kernel.c",
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 3,
+    "min_improvement": 0.05,
+    "max_seconds": 1200.0
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "candidate-budget",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/final.json",
+  "final_gflops": 623.9652339523095,
+  "final_minimum_gflops": 589.2291938743668
+}

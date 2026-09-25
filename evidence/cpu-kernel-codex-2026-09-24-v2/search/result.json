@@ -1,0 +1,233 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "completed",
+  "trials": [
+    {
+      "name": "existing-sme",
+      "hypothesis": "Unchanged existing SME kernel",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-000/source/kernel.c",
+      "source_hash": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+      "status": "passed",
+      "scores": [
+        946.5851659425534,
+        992.8264414285657,
+        1030.1302377943232
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-000/validation-2.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 992.8264414285657
+    },
+    {
+      "name": "sme-contiguous-panels-unroll4",
+      "hypothesis": "Pack A and B into contiguous 2VL-wide panels, then unroll the product loop by four. This replaces the baseline's n-float load strides with sequential loads and removes tail predicates from the product loop. Repeated panel use can offset the added B packing cost at n=512. This candidate is untested; repeated measurements must establish whether it exceeds 1780 GFLOP/s.",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-001/source/kernel.c",
+      "source_hash": "a762b48a8ae50d1b87a1d3dc6f5bcee4c9bdc263515ee50e83f274d8f1411683",
+      "status": "passed",
+      "scores": [
+        1029.30861628746,
+        699.5826404204772,
+        712.975978506514
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-001/validation-2.json"
+      ],
+      "control_scores": [
+        1020.993226698264,
+        987.1962965261336,
+        639.9578723667391
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-001/control-2.json"
+      ],
+      "median_gflops": 712.975978506514
+    },
+    {
+      "name": "sme-fused-a-panel-unroll2",
+      "hypothesis": "Start from existing-sme, the strongest measured source. Transpose one 2VL-row A panel, then reuse it across all B column blocks in the same streaming function. This reduces the active A scratch footprint and removes one streaming transition. Keep B unpacked because packing both inputs regressed in two repeats. Unroll the product loop by two and move second-vector offsets outside it. This candidate is untested; the supplied measurements do not establish the target throughput.",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-002/source/kernel.c",
+      "source_hash": "88f0605ce96a3e53359eb912844ce5101160345ab7c77169888e26812d3ca98a",
+      "status": "passed",
+      "scores": [
+        1059.2638449812466,
+        1114.6124152222114,
+        1053.2043173189027
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-002/validation-2.json"
+      ],
+      "control_scores": [
+        954.579708392969,
+        962.9971586156971,
+        1064.869323747484
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-002/control-2.json"
+      ],
+      "median_gflops": 1059.2638449812466
+    },
+    {
+      "name": "sme-fused-a-panel-staged-loads",
+      "hypothesis": "Start from sme-fused-a-panel-unroll2, the strongest measured source. For complete output tiles, load both reduction steps before issuing their outer products, use all-true predicates, and advance input pointers directly. This can hide load latency and reduce address work while retaining the measured A-panel packing scheme and unpacked B. Edge tiles retain predicated loads and stores. This candidate is untested; the supplied timing spread does not establish throughput above 1780 GFLOP/s.",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-003/source/kernel.c",
+      "source_hash": "53fe26fd33d1273167e64e02a64d0e31c7e1bf8b6a00107a0d7ed19f270f5d5e",
+      "status": "passed",
+      "scores": [
+        1096.4022430767989,
+        1117.70336998328,
+        786.2415777368327
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-003/validation-2.json"
+      ],
+      "control_scores": [
+        1047.8924256617488,
+        1104.4863276208966,
+        1051.9990896867787
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-003/control-2.json"
+      ],
+      "median_gflops": 1096.4022430767989
+    },
+    {
+      "name": "sme-fused-a-panel-wide-transpose",
+      "hypothesis": "Start from sme-fused-a-panel-staged-loads, the highest measured median. Transpose each A panel in 2VL-column blocks using all four ZA tiles. This halves the packing block count and shares row address work across adjacent loads, without packing B or increasing scratch traffic. Keep the measured product loop unchanged. The prior timing variation prevents claiming a reliable gain; this candidate requires correctness checks and repeated measurements against the unchanged baseline.",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-004/source/kernel.c",
+      "source_hash": "7336390735131c2ebcdac36e7d2bebd9165e6e73426b25dc22ee656d5e9c8717",
+      "status": "passed",
+      "scores": [
+        1071.0641546955553,
+        1097.1461595788755,
+        1028.9811151544159
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-004/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-004/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-004/validation-2.json"
+      ],
+      "control_scores": [
+        1019.6978526905898,
+        634.91289707507,
+        977.312342312201
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-004/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-004/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-004/control-2.json"
+      ],
+      "median_gflops": 1071.0641546955553
+    },
+    {
+      "name": "sme-fused-a-panel-four-step-row-pointers",
+      "hypothesis": "Start from sme-fused-a-panel-staged-loads, the highest measured median. Unroll complete-tile reduction loops by four while retaining staged loads in pairs. Advance B pointers from row starts, so unconditional pointer updates remain valid and remove the previous per-pair end check. This reduces loop and address-control work without adding packing traffic. Keep the original A packing and predicated edge path. This candidate is untested; the supplied timing variation does not establish a reliable gain or the 1780 GFLOP/s target.",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-005/source/kernel.c",
+      "source_hash": "c9c9d4a01dd3d70b4cdf33fccd4a1fe3764305407862304ee5c37088837f3a56",
+      "status": "passed",
+      "scores": [
+        1065.7487211767823,
+        1020.0194702565424,
+        858.1943025803108
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-005/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-005/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-005/validation-2.json"
+      ],
+      "control_scores": [
+        862.7897420799369,
+        1021.8016214843294,
+        993.2857150700744
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-005/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-005/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-005/control-2.json"
+      ],
+      "median_gflops": 1020.0194702565424
+    },
+    {
+      "name": "sme-fused-a-panel-paired-transpose",
+      "hypothesis": "Start from sme-fused-a-panel-staged-loads, the highest measured median. Add a full-block A-packing path that uses all-true predicates, advances row pointers, and processes two rows and two columns per iteration. This reduces packing loop and address work without changing the measured product loop or adding B packing. Keep predicated packing for tails. The wider transpose and four-step product trials did not show a reliable gain, so neither is retained. This candidate is untested; exceeding 1780 GFLOP/s in every repeat remains unproven.",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-006/source/kernel.c",
+      "source_hash": "e9792041a83a26d3e6dc0176837525b354f7bb8e75302b50fca1c007525d1293",
+      "status": "passed",
+      "scores": [
+        972.1519719965307,
+        797.6284018676686,
+        987.1962965261336
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-006/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-006/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-006/validation-2.json"
+      ],
+      "control_scores": [
+        987.9556892330162,
+        917.0758934310688,
+        1036.098311671006
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-006/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-006/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-006/control-2.json"
+      ],
+      "median_gflops": 972.1519719965307
+    }
+  ],
+  "target_gflops": 1780.0,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-000/source/kernel.c",
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 3,
+    "min_improvement": 0.05,
+    "max_seconds": 1800.0
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "candidate-budget",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-kernel-codex-2026-09-24-v2/search/final.json",
+  "final_gflops": 955.8510129383695
+}

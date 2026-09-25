@@ -1,0 +1,291 @@
+{
+  "schema_version": "sera-kernel-specialists-v1",
+  "profile": {
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "single-thread",
+      "neon",
+      "simd",
+      "sme"
+    ],
+    "tags": [
+      "gemm",
+      "sme",
+      "packing",
+      "registers",
+      "memory",
+      "simd",
+      "reuse"
+    ]
+  },
+  "profile_key": "9b8b546badfc3820fa90aead3cf08f893d9c2cb2a11c8ca96c21ef2c792974c5",
+  "calls": {
+    "sme_tiles": 2,
+    "register_tiling": 1,
+    "packing_layout": 1,
+    "memory_traffic": 1,
+    "instruction_schedule": 1
+  },
+  "memory": {
+    "sme_tiles": [
+      {
+        "source_hash": "0bdb3573944832a66cd3a3bd619de4aa7ef69e51c2e5121ed5aa5bd93f3d49ca",
+        "status": "passed",
+        "scores": [
+          1101.8387453444054,
+          851.6137084291054,
+          1014.2423146153016
+        ],
+        "control_scores": [
+          1060.1381476646065,
+          1048.9202132185542,
+          842.7003364868019
+        ],
+        "promoted": false,
+        "reports": [
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/validation-0.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/validation-1.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-001/validation-2.json"
+        ],
+        "comparison_identity": {
+          "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+          "config": {
+            "n": 512,
+            "tolerance": 0.002,
+            "machine": "MacBook-Pro-8.local"
+          },
+          "runtime": {
+            "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+            "compiler_flags": [
+              "-O3",
+              "-march=native",
+              "-ffast-math",
+              "-shared",
+              "-fPIC",
+              "-lm"
+            ],
+            "architecture": "arm64",
+            "platform": "Darwin"
+          }
+        },
+        "confidence": "single-trial-observation"
+      },
+      {
+        "source_hash": "becfc8218107e7722520e5c89e27f911ececa0acc74c8fdc07dd8cbbb713b66d",
+        "status": "passed",
+        "scores": [
+          977.7573714827544,
+          591.5398423086745,
+          858.7653789760197
+        ],
+        "control_scores": [
+          1082.0388949142207,
+          782.4213344835282,
+          990.0800659241107
+        ],
+        "promoted": false,
+        "reports": [
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/validation-0.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/validation-1.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-004/validation-2.json"
+        ],
+        "comparison_identity": {
+          "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+          "config": {
+            "n": 512,
+            "tolerance": 0.002,
+            "machine": "MacBook-Pro-8.local"
+          },
+          "runtime": {
+            "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+            "compiler_flags": [
+              "-O3",
+              "-march=native",
+              "-ffast-math",
+              "-shared",
+              "-fPIC",
+              "-lm"
+            ],
+            "architecture": "arm64",
+            "platform": "Darwin"
+          }
+        },
+        "confidence": "single-trial-observation"
+      }
+    ],
+    "register_tiling": [
+      {
+        "source_hash": "93f462726f0b46ea599e9dbaec16798fb8a94b60ba0fa926172d2e230828fc70",
+        "status": "passed",
+        "scores": [
+          978.3524815085025,
+          739.7463514928492,
+          1029.3125792708934
+        ],
+        "control_scores": [
+          1035.7664763501227,
+          879.0354765908729,
+          1015.6775657025122
+        ],
+        "promoted": false,
+        "reports": [
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/validation-0.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/validation-1.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-002/validation-2.json"
+        ],
+        "comparison_identity": {
+          "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+          "config": {
+            "n": 512,
+            "tolerance": 0.002,
+            "machine": "MacBook-Pro-8.local"
+          },
+          "runtime": {
+            "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+            "compiler_flags": [
+              "-O3",
+              "-march=native",
+              "-ffast-math",
+              "-shared",
+              "-fPIC",
+              "-lm"
+            ],
+            "architecture": "arm64",
+            "platform": "Darwin"
+          }
+        },
+        "confidence": "single-trial-observation"
+      }
+    ],
+    "packing_layout": [
+      {
+        "source_hash": "0f8a2dc37315eb044241f9b9d316a3b64292d7e76ab63f15e13366437639182e",
+        "status": "passed",
+        "scores": [
+          1014.2385225918238,
+          920.2196861656419,
+          901.4223130361808
+        ],
+        "control_scores": [
+          822.684779349311,
+          1060.3098049990133,
+          892.4288345598962
+        ],
+        "promoted": false,
+        "reports": [
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/validation-0.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/validation-1.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-003/validation-2.json"
+        ],
+        "comparison_identity": {
+          "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+          "config": {
+            "n": 512,
+            "tolerance": 0.002,
+            "machine": "MacBook-Pro-8.local"
+          },
+          "runtime": {
+            "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+            "compiler_flags": [
+              "-O3",
+              "-march=native",
+              "-ffast-math",
+              "-shared",
+              "-fPIC",
+              "-lm"
+            ],
+            "architecture": "arm64",
+            "platform": "Darwin"
+          }
+        },
+        "confidence": "single-trial-observation"
+      }
+    ],
+    "memory_traffic": [
+      {
+        "source_hash": "7e62d20d751305c18a57bd81ca64004256c700f64202f2c0dab81a7b260bb078",
+        "status": "passed",
+        "scores": [
+          992.5217943371588,
+          1045.6840558269112,
+          1016.6391798847789
+        ],
+        "control_scores": [
+          1050.628026141138,
+          995.4368069746165,
+          818.5030886844471
+        ],
+        "promoted": false,
+        "reports": [
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/validation-0.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/validation-1.json",
+          "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-specialists-codex-2026-09-24/search/trial-005/validation-2.json"
+        ],
+        "comparison_identity": {
+          "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+          "config": {
+            "n": 512,
+            "tolerance": 0.002,
+            "machine": "MacBook-Pro-8.local"
+          },
+          "runtime": {
+            "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+            "compiler_flags": [
+              "-O3",
+              "-march=native",
+              "-ffast-math",
+              "-shared",
+              "-fPIC",
+              "-lm"
+            ],
+            "architecture": "arm64",
+            "platform": "Darwin"
+          }
+        },
+        "confidence": "single-trial-observation"
+      }
+    ]
+  },
+  "dispatches": [
+    {
+      "call_id": 1,
+      "specialist_id": "sme_tiles",
+      "status": "queued",
+      "source_hash": "0bdb3573944832a66cd3a3bd619de4aa7ef69e51c2e5121ed5aa5bd93f3d49ca"
+    },
+    {
+      "call_id": 2,
+      "specialist_id": "register_tiling",
+      "status": "queued",
+      "source_hash": "93f462726f0b46ea599e9dbaec16798fb8a94b60ba0fa926172d2e230828fc70"
+    },
+    {
+      "call_id": 3,
+      "specialist_id": "packing_layout",
+      "status": "queued",
+      "source_hash": "0f8a2dc37315eb044241f9b9d316a3b64292d7e76ab63f15e13366437639182e"
+    },
+    {
+      "call_id": 4,
+      "specialist_id": "sme_tiles",
+      "status": "queued",
+      "source_hash": "becfc8218107e7722520e5c89e27f911ececa0acc74c8fdc07dd8cbbb713b66d"
+    },
+    {
+      "call_id": 5,
+      "specialist_id": "memory_traffic",
+      "status": "queued",
+      "source_hash": "7e62d20d751305c18a57bd81ca64004256c700f64202f2c0dab81a7b260bb078"
+    },
+    {
+      "call_id": 6,
+      "specialist_id": "instruction_schedule",
+      "status": "queued",
+      "source_hash": "686915ceecfc592737c86afcba2a8ef51d19f4717df32e8666bf77834f4f1af0"
+    }
+  ],
+  "max_calls": 6,
+  "max_active": 3,
+  "pending": 1
+}
