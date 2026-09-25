@@ -1,0 +1,24 @@
+# Next-board inventory (read-only)
+
+This inventory uses the scored source paths in `search/result.json` and source records in the prior compiler and transpose phases. It does not rank candidates.
+
+## Already measured; exclude aliases
+
+- The exact one-level Strassen, three-buffer wrapper is `search/trial-001/source/kernel.c` (SHA-256 `ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1`). It passed correctness but was not promoted: candidate scores were 433–568 GFLOP/s against paired controls 776–1,092. The buffer setup and P1–P7 packing/scatter schedule are at lines 774–927. Do not resubmit the same wrapper under a cache/workspace role.
+- Explicit NEON replacement of the Strassen pack loops is `search/trial-003/source/kernel.c` (SHA-256 `c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745`). A further “vectorize the three-buffer packing” proposal is an alias unless it changes the source mechanism beyond those NEON row loads/adds/subtracts/stores (lines 774–804).
+- Replacing K-loop `SUB/CBNZ` with `SUBS/B.NE` was measured as `libxsmm-full512-subs-bne-k-loop-control` (trial-002, SHA-256 `b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9`); it was not promoted. Prior phases also measured pointer/K-loop reorderings, 2-/4-step unrolling, FMOPA order, tile traversal/store variants, packed-B columns, distance-4 prefetch, 272-/288-byte padding, panel calls/streaming, reserve-scratch-once, and W32 counters. Names should be checked against `search/result.json` files before proposing another instruction/layout alias.
+- Full-call SME-transpose TB, NEON-transpose TB, and SME-transpose TA were measured and not promoted in `cpu-libxsmm-compiler-board-2026-09-25`. The exact TA/TB sources are hashes `6e229a14…` and `b675c970…`; the NEON TB hash is `8d0f6fa6…`. The baseline includes TT, but no full-call TT candidate appears in those scored trials.
+
+## Invalid or duplicate proposals to correct
+
+- The latest `panel_packing` proposal specifies a 32 KiB buffer for 32 rows across K=512. Its payload is 32×512×4 = 65,536 bytes (64 KiB), so the stated bound is short by 2×. Changing to 64 KiB yields the already measured 32-row-panel, one-streaming-region shape (`cpu-libxsmm-editable-panel-2026-09-25`, hash `eb091b1e…`): do not present that correction as an unmeasured experiment.
+- Earlier transpose-board proposals that used an A “transpose” identity copy were wrong: TB needs `a_col[i+j*512]=A[i*512+j]`; the identity layout computes the wrong product. A proposed ZA store order was also already present in baseline (ZA0/ZA1 before ZA2/ZA3). Direct-A-gather implementation in the compiler phase was rejected at compile stage; do not claim it was measured, but its recorded implementation is not a usable candidate.
+- SME2 paired-load post-index writeback at unequal A/B strides was proposed without instruction-form evidence. It remains unverified/infeasible until architecture/compiler encoding is established; do not infer legality from fewer pointer updates.
+
+## Distinct legal options still unmeasured
+
+- **Full-call TT transpose descriptor:** `sera_libxsmm_tt` is already supplied in the compiler-board baseline and has verified mapping evidence in `cpu-libxsmm-transpose-primitives-2026-09-25/mapping-luna.md`. For row-major C=A@B, transpose both inputs inside `gemm`, pass `[4]=B_col_kn`, `[10]=A_col_mk`, `[16]=C`, then call TT. Both fresh 1 MiB conversions, allocations and frees are timed; allocation failure must use unchanged NN. This is a distinct complete wrapper; unlike TA/TB, it has no scored full-call trial in the inspected compiler/transpose histories.
+- **Single-allocation Strassen workspace:** the latest board proposed one 768 KiB allocation partitioned into the same left/right/product buffers instead of three `malloc`s. This is distinct from the measured source at lines 813–822, preserves the same equations and timed work, and is still unmeasured. It changes allocator calls only; no runtime effect follows from that fact.
+- **Dense output staging for the same one-level formula:** a separate 4×256² output-quadrant workspace could receive product accumulation contiguously, then scatter each quadrant once to parent C. This is mathematically the same approved one-level FP32 algorithm, but adds workspace/initialization and has not been measured. Keep the existing three-buffer source as the reference; do not combine this with another algorithm or claim a benefit.
+
+All new wrappers must keep one Strassen level, FP32, tolerance 0.002, fresh operands, complete timed conversion/allocation/product/recombination/free, unchanged `n!=512` fallback, and allocation-failure correctness. Current baseline source is `baseline/kernel.c`, with the NN call at lines 773–784; no benchmark, test, or policy change was made for this inventory.

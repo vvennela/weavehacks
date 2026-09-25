@@ -1,0 +1,57 @@
+{
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+  "frozen_library_flags": [
+    "-O3",
+    "-march=native",
+    "-ffast-math",
+    "-shared",
+    "-fPIC",
+    "-lm"
+  ],
+  "inspection_assembly_flags": [
+    "-O3",
+    "-march=native",
+    "-ffast-math",
+    "-fPIC",
+    "-S"
+  ],
+  "measured_sources": [
+    {
+      "name": "libxsmm-n512-one-level-strassen-three-buffers",
+      "source_sha256": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+      "compiled_text_bytes": 37820,
+      "compiled_text_sha256": "41fa419d0291577babf1815660c964b0ef9ebf15b80d39083fcec8ecd374e91c",
+      "disassembly_sha256": "65708c9f184a46459d94858f12c3250f5d586e7f981c3e9e0468ef2b3810e3b2",
+      "compiler_assembly_sha256": "da3620a89b161035870e8d861cf798ba151ec8068473dc6793a15ebd828810e1",
+      "gemm_assembly_sha256": "2d70d4e8818549840e10e1359e65cba169790cb00673f8ef381d61b08814ff06",
+      "gemm_assembly_lines": 3464,
+      "static_call_site_counts": {
+        "_malloc": 5,
+        "_free": 6,
+        "_memcpy": 6,
+        "_bzero": 1,
+        "_sera_libxsmm_256": 7
+      }
+    },
+    {
+      "name": "libxsmm-strassen-three-buffers-neon-packing",
+      "source_sha256": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+      "compiled_text_bytes": 29012,
+      "compiled_text_sha256": "7b0b46d784b6ee6d202c174e9f4dc039b62bdd8ee99045acfedd4c5cce6028e9",
+      "disassembly_sha256": "5756448b411eefca56c92b5451f2182922ba0d3da4574101e82cc7eb214b4d47",
+      "compiler_assembly_sha256": "a8f4c359e230155db2b1ff33f5088ed7590b127908c85b70ca8e27867b00cd23",
+      "gemm_assembly_sha256": "f9084db0af4f5d3f2ddc9086ed10cce2a426c624a6bb29d45c85dbe55196f55c",
+      "gemm_assembly_lines": 1302,
+      "static_call_site_counts": {
+        "_malloc": 5,
+        "_free": 6,
+        "_memcpy": 6,
+        "_bzero": 1,
+        "_sera_libxsmm_256": 7
+      }
+    }
+  ],
+  "full_compiled_text_identical": false,
+  "performance_measured": false,
+  "limitation": "Compiler evidence alone does not measure component costs. Static call-site counts include fallback code and are not per-invocation counts."
+}
