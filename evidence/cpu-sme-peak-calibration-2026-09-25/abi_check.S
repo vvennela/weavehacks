@@ -17,7 +17,7 @@ _sera_peak_abi_check:
     fmov d13, x9
     fmov d14, x9
     fmov d15, x9
-    bl _sera_peak_4
+    blr x2
     mov x9, #0x1234
     mov x0, #0
     fmov x10, d8

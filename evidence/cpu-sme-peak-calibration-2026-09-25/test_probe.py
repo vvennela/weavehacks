@@ -27,9 +27,13 @@ def test_exact_fp32_accumulation_and_output_bounds(library,tiles,iterations):
     assert all(v==12345.0 for v in list(output)[1+tiles*lanes:])
 
 
-def test_streaming_transitions_preserve_callee_saved_vector_registers(library):
+@pytest.mark.parametrize('tiles',[1,2,4])
+def test_streaming_transitions_preserve_callee_saved_vector_registers(library,tiles):
     function=library.sera_peak_abi_check
-    function.argtypes=[ctypes.c_uint64,ctypes.POINTER(ctypes.c_float)]
+    function.argtypes=[ctypes.c_uint64,ctypes.POINTER(ctypes.c_float),ctypes.c_void_p]
     function.restype=ctypes.c_uint64
-    output=(ctypes.c_float*256)()
-    assert function(1,output)==0
+    output=(ctypes.c_float*256)(*([12345.0]*256))
+    probe=ctypes.cast(getattr(library,f'sera_peak_{tiles}'),ctypes.c_void_p)
+    assert function(1,output,probe)==0
+    assert list(output)[:tiles*16]==[float(64//tiles)]*(tiles*16)
+    assert list(output)[tiles*16:]==[12345.0]*(256-tiles*16)

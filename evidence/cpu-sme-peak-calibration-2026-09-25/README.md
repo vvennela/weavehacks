@@ -9,10 +9,15 @@ tiles, fixed all-one inputs, zeroed accumulators and one SME region per invocati
 Each invocation performs200,000 iterations. Ten rotated-order rounds use a fixed
 10,000-iteration warmup per variant. The returned streaming width is16FP32 lanes;
 each FMOPA counts512FLOPs, giving6,553,600,000FLOPs per measured invocation. Output
-rows are checked against exact representable integer accumulation results. Ten
+rows are checked against exact representable integer accumulation results. Twelve
 native tests cover0/1/17iterations, guards and callee-saved vector registers. The
 ABI test first exposed missing d8–d15 preservation; the corrected implementation
-saves/restores them across streaming transitions, and all10 tests pass.
+saves/restores them across streaming transitions. An independent Luna audit found
+that the ABI test called only the four-tile entry. The test helper now calls each
+selected entry through a function pointer, and checks output values and bounds to
+confirm which entry ran. The new checks first failed for one and two tiles; after
+fixing the test helper, all 12 tests pass. This coverage fix does not change the
+measured `probe.S` implementation or its saved results.
 
 Current measurement: Apple M4 Pro, Battery Low Power, no affinity, QoS, power or
 thread-policy changes. Source/compiler hashes, disassembly, every time sample and

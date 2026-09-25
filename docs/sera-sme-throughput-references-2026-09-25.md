@@ -4,7 +4,7 @@
 
 I found no primary published single-thread FP32 SME/FMOPA peak measurement for an Apple M4 Pro. The strongest directly relevant source is the Hello SME study on a 2024 11-inch iPad Pro with the base M4, not an M4 Pro. Its measured single performance-core FP32 FMOPA peak is 2,008 GFLOP/s using all four ZA tiles. Its best measured square GEMM result is 1,825.1 GFLOP/s at 512³, reported as 91% of that peak. These are useful reference points, not M4 Pro measurements.
 
-A 2,000 GFLOP/s GEMM target is 99.6% of the base-M4 measured microbenchmark peak and 9.6% above the paper's best measured GEMM result. That arithmetic does not establish that the target is achievable on M4 Pro. It says the target is at the base-M4 instruction-throughput ceiling, while the published GEMM implementation remained below it.
+A 2,000 GFLOP/s GEMM target is 99.6% of the base-M4 measured microbenchmark rate (within 0.4% of that measurement) and 9.6% above the paper's best measured GEMM result. That arithmetic does not establish that the target is achievable on M4 Pro. The published GEMM implementation remained below the measured microbenchmark rate.
 
 The current local four-tile calibration result supplied for this review is 1,327.4 GFLOP/s median, measured under Battery Low Power. It is 66.1% of 2,008 GFLOP/s, but it is not a normal-power M4 Pro peak measurement and cannot support a hardware-ceiling estimate. Do not extrapolate from it without a fresh controlled calibration.
 
