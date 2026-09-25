@@ -1,0 +1,25 @@
+{
+  "name": "libxsmm-n512-panel32-one-streaming-region",
+  "hypothesis": "Reuse the panel32 packing and compute body for sixteen row panels inside one SME region with one 64 KiB scratch allocation. Saved registers x21/x22/x23 retain B/A/C bases, x26 retains scratch, x27 counts panels, and x28 holds the byte offset; these registers are saved and restored by the existing prologue and epilogue and are otherwise unused by the supplied helper body. Each panel resets B, A, C, scratch and the packing cursor. A and C advance by 65536 bytes, covering all 512 output rows once. SP resets to scratch after packing and returns to the saved stack top after the last panel. The FP32 K loop, ZA setup, output stores, general-size fallback and complete license notices remain unchanged. This differs from the measured sixteen-call wrapper. Reduced entry/exit overhead is an unverified hypothesis; comparison against full512 measures the complete layout and control-flow change and cannot isolate transition costs. No tools or tests were run. Compilation, full-GEMM correctness and fresh repeated paired performance validation remain required under the unchanged gates and initial power settings. No speedup or throughput above 1800 GFLOP/s is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+  "edits": [
+    {
+      "old": "    sera_libxsmm_512(parameters);\n}\n\n/* Optional generated 32-row primitive. Baseline gemm above does not call it. */",
+      "new": "    sera_libxsmm_panel32(parameters);\n}\n\n/* Derived from the generated 32-row primitive: sixteen row panels compute\n   the full 512x512 product in one SME region with one scratch allocation. */"
+    },
+    {
+      "old": "    \"smstart\\n\"\n    \"mov\\tx20, sp\\n\"\n    \"sub\\tsp, sp, #0x10, lsl #12\\n\"\n    \"mov\\tx3, sp\\n\"\n    \"mov\\tx11, #0x20\\n\"\n    \"Lpanel32_70:\\n\"",
+      "new": "    \"smstart\\n\"\n    \"mov\\tx20, sp\\n\"\n    \"sub\\tsp, sp, #0x10, lsl #12\\n\"\n    \"mov\\tx21, x0\\n\"\n    \"mov\\tx22, x1\\n\"\n    \"mov\\tx23, x2\\n\"\n    \"mov\\tx26, sp\\n\"\n    \"mov\\tx27, #0x10\\n\"\n    \"mov\\tx28, #0x0\\n\"\n    \"Lpanel32_outer:\\n\"\n    \"mov\\tx0, x21\\n\"\n    \"add\\tx1, x22, x28\\n\"\n    \"add\\tx2, x23, x28\\n\"\n    \"mov\\tx3, x26\\n\"\n    \"mov\\tsp, x26\\n\"\n    \"mov\\tx11, #0x20\\n\"\n    \"Lpanel32_70:\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx11, Lpanel32_70\\n\"\n    \"sub\\tx1, x1, #0x800\\n\"\n    \"mov\\tsp, x20\\n\"\n    \"mov\\tx6, #0x200\\n\"\n    \"Lpanel32_330:\\n\"",
+      "new": "    \"cbnz\\tx11, Lpanel32_70\\n\"\n    \"sub\\tx1, x1, #0x800\\n\"\n    \"mov\\tsp, x26\\n\"\n    \"mov\\tx6, #0x200\\n\"\n    \"Lpanel32_330:\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx6, Lpanel32_330\\n\"\n    \"smstop\\n\"\n    \"mov\\tsp, x29\\n\"",
+      "new": "    \"cbnz\\tx6, Lpanel32_330\\n\"\n    \"add\\tx28, x28, #0x10, lsl #12\\n\"\n    \"sub\\tx27, x27, #0x1\\n\"\n    \"cbnz\\tx27, Lpanel32_outer\\n\"\n    \"mov\\tsp, x20\\n\"\n    \"smstop\\n\"\n    \"mov\\tsp, x29\\n\""
+    }
+  ]
+}

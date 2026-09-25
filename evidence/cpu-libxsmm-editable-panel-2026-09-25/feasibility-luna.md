@@ -2,16 +2,16 @@
 
 ## Conclusion
 
-Yes. The generated `M=512, N=32, K=512` helper already contains the complete 32-row output-panel computation. Its compact `Llibxsmm_440` output-tile loop covers all 512 columns for that one 32-row A panel. A new outer loop around **packing plus that existing tile loop** can repeat the panel 16 times while leaving `smstart`, stack setup, ABI prologue, `smstop`, and epilogue outside. This removes repeated helper entry/exit work; it does not remove repeated packing or GEMM work. This is a feasibility finding, not a speed claim or experiment selection.
+Yes. The generated `M=512, N=32, K=512` helper already contains the complete 32-row output-panel computation. Its compact `Lpanel32_330` output-tile loop covers all 512 columns for that one 32-row A panel. A new outer loop around **packing plus that existing tile loop** can repeat the panel 16 times while leaving `smstart`, stack setup, ABI prologue, `smstop`, and epilogue outside. This removes repeated helper entry/exit work; it does not remove repeated packing or GEMM work. This is a feasibility finding, not a speed claim or experiment selection.
 
 ## Verified helper facts
 
 The source of the evidence is the embedded helper in `cpu-libxsmm-generator-2026-09-25/panel_primitive.c`, cross-checked against `disassembly.txt`, `export.json`, and `assembly-audit.json`.
 
-- The helper is `_sera_libxsmm_panel32`, callable through the 176-byte LIBXSMM parameter block. It loads B, A, and C pointers from offsets `0x20`, `0x50`, and `0x80` respectively. Export metadata records descriptor `(M,N,K)=(512,32,512)`, `lda=ldb=ldc=512`, beta zero, and a 1,536-byte/384-instruction body.
+- The helper is `_sera_libxsmm_panel32`, callable through the 176-byte LIBXSMM parameter block. It loads B, A, and C pointers from offsets `0x20`, `0x50`, and `0x80` respectively. Export metadata records descriptor `(M,N,K)=(512,32,512)`, `lda=ldb=ldc=512`, beta zero, and a 1,536-byte/384-instruction body. In editable assembly, the relevant labels are `Lpanel32_70` (packing), `Lpanel32_330` (output-tile loop), and `Lpanel32_368` (K loop).
 - It has one `smstart` at offset `0x5c` and one `smstop` at `0x5cc`.
-- It reserves 64 KiB scratch at offset `0x64` (`sub sp,sp,#0x10000`) and sets `x3` to its base. The pack loop starts at `0x70`: 32 iterations load 32 vectors from the A-panel pointer (`x1`, advancing by `0x800` per vector) and ZA-transpose/store 16,384 FP32 values into that 64 KiB panel. The end at `0x328` rewinds `x1` by 64 KiB and restores `sp` from `x20`.
-- The compute/tile loop starts at `0x330`. It initializes `x6=512`; each body computes one 32-column block with a 512-iteration K loop (`x8=512` at `0x364`, body `0x368..0x38c`), then writes the tile and advances B/C traversal by 128 bytes. The `sub x6,#32; cbnz` at `0x5c4..0x5c8` runs 16 tile iterations. The last tile iteration leaves the loop; it does not perform another panel’s packing.
+- It reserves 64 KiB scratch at offset `0x64` (`sub sp,sp,#0x10000`) and sets `x3` to its base. The pack loop starts at `0x70`: its 32 iterations load 32 vectors from the A-panel pointer (`x1`, advancing by `0x800` per vector) and ZA-transpose/store 16,384 FP32 values into that 64 KiB panel. Each iteration subtracts `0x10000` from `x1` at `0x1c0` and adds `0x40` at `0x318`, for a net `+0x40` per iteration. The loop therefore advances `x1` by `0x800` total. At `0x324`, it subtracts `0x800` (2 KiB) to restore `x1` to the panel start; at `0x328` it restores `sp` from `x20`.
+- The compute/tile loop starts at `0x330` (`Lpanel32_330`). It initializes `x6=512`; each body computes one 32-column block with a 512-iteration K loop (`x8=512` at `0x364`, body `0x368..0x38c`, label `Lpanel32_368`), then writes the tile and advances B/C traversal by 128 bytes. The `sub x6,#32; cbnz` at `0x5c4..0x5c8` runs 16 tile iterations. The last tile iteration leaves the loop; it does not perform another panel’s packing.
 - In the current wrapper, each call sets `x0` to the unchanged B base, `x1` to `A + r*512`, and `x2` to `C + r*512`, where `r=0,32,...,480`. That pointer mapping is recorded in the generator review and exercised by panel correctness tests.
 - The body has no relocations or external calls; all direct branches are internal. Its raw `.long` representation was checked byte-for-byte against the exported primitive. The full BSD license is retained.
 
@@ -58,3 +58,7 @@ This is smaller than rewriting the 32-row arithmetic kernel: it reuses the verif
 - `evidence/cpu-libxsmm-generator-2026-09-25/assembly-audit.json`
 - `evidence/cpu-libxsmm-generator-2026-09-25/test_panel.py`
 - `evidence/cpu-libxsmm-generator-2026-09-25/generator-review-luna.md`
+
+## Correction note for earlier snapshots
+
+An earlier copy of this note misstated the packing-pointer rewind. Exact disassembly offsets are: `0x1c0` subtracts `0x10000` from `x1` inside each pack iteration; `0x318` adds `0x40` once per iteration; after 32 iterations, `0x324` subtracts `0x800` (2 KiB), not 64 KiB. Thus the 32 packing iterations net to `+0x800` before the final rewind restores the panel base. The editable labels are `Lpanel32_70`, `Lpanel32_330`, and `Lpanel32_368`; `Llibxsmm_440` is a label from the separate full-size kernel and does not name this helper. This note corrects the saved feasibility document for future review; it does not claim that a live run which already captured an earlier copy was updated.

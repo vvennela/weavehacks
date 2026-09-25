@@ -1,0 +1,25 @@
+{
+  "name": "libxsmm-full512-w32-k-loop-counters",
+  "hypothesis": "Change only the counter initialization, decrement and branch in Llibxsmm_478 and Llibxsmm_70c from X8 to W8. Each loop retains exactly 512 iterations, the original loads, pointer increments, four ordered FP32 FMOPA operations and pointer rewinds. This tests 32-bit loop control; performance is unknown. This change is absent from the supplied measured inventory. ABI, general-size fallback, tails, n<=0 behavior and complete license notices remain unchanged. No tools or tests were run. Compilation, full-GEMM correctness at tolerance 0.002 and fresh repeated paired measurements remain required under the fixed gates and unchanged power settings. Throughput above 1800 GFLOP/s is not established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+  "edits": [
+    {
+      "old": "    \"mov\\tx8, #0x200\\n\"\n    \"Llibxsmm_478:\\n\"",
+      "new": "    \"mov\\tw8, #0x200\\n\"\n    \"Llibxsmm_478:\\n\""
+    },
+    {
+      "old": "    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_478\\n\"",
+      "new": "    \"sub\\tw8, w8, #0x1\\n\"\n    \"cbnz\\tw8, Llibxsmm_478\\n\""
+    },
+    {
+      "old": "    \"mov\\tx8, #0x200\\n\"\n    \"Llibxsmm_70c:\\n\"",
+      "new": "    \"mov\\tw8, #0x200\\n\"\n    \"Llibxsmm_70c:\\n\""
+    },
+    {
+      "old": "    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_70c\\n\"",
+      "new": "    \"sub\\tw8, w8, #0x1\\n\"\n    \"cbnz\\tw8, Llibxsmm_70c\\n\""
+    }
+  ]
+}

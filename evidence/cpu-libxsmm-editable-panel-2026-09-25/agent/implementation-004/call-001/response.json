@@ -1,0 +1,21 @@
+{
+  "name": "libxsmm-full512-reserve-scratch-once",
+  "hypothesis": "Reserve the existing 128 KiB scratch once around all eight row bands. Reset SP and x3 from x26 before each packing pass, reset SP after packing, and restore the saved stack top before smstop. This tests reduced per-band stack setup; benefit is unverified. The original packing cursor behavior remains unchanged during packing. Compute loops, FP32 order, pointer traversal, stores, general-size fallback and complete license notices remain unchanged. This source change is absent from the supplied measured history. No tools or tests were run. Compilation, full-GEMM correctness and fresh repeated paired performance validation remain required under the fixed gates and unchanged power settings. Throughput above 1800 GFLOP/s is not established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+  "edits": [
+    {
+      "old": "    \"smstart\\n\"\n    \"mov\\tx7, #0x200\\n\"\n    \"Llibxsmm_64:\\n\"\n    \"mov\\tx20, sp\\n\"\n    \"sub\\tsp, sp, #0x20, lsl #12\\n\"\n    \"mov\\tx3, sp\\n\"\n    \"mov\\tx26, sp\\n\"\n    \"mov\\tx11, #0x20\\n\"\n    \"Llibxsmm_78:\\n\"",
+      "new": "    \"smstart\\n\"\n    \"mov\\tx20, sp\\n\"\n    \"sub\\tsp, sp, #0x20, lsl #12\\n\"\n    \"mov\\tx26, sp\\n\"\n    \"mov\\tx7, #0x200\\n\"\n    \"Llibxsmm_64:\\n\"\n    \"mov\\tsp, x26\\n\"\n    \"mov\\tx3, x26\\n\"\n    \"mov\\tx11, #0x20\\n\"\n    \"Llibxsmm_78:\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx11, Llibxsmm_78\\n\"\n    \"sub\\tx1, x1, #0x800\\n\"\n    \"mov\\tsp, x20\\n\"\n    \"mov\\tx6, #0x200\\n\"\n    \"Llibxsmm_440:\\n\"",
+      "new": "    \"cbnz\\tx11, Llibxsmm_78\\n\"\n    \"sub\\tx1, x1, #0x800\\n\"\n    \"mov\\tsp, x26\\n\"\n    \"mov\\tx6, #0x200\\n\"\n    \"Llibxsmm_440:\\n\""
+    },
+    {
+      "old": "    \"sub\\tx7, x7, #0x40\\n\"\n    \"cbnz\\tx7, Llibxsmm_64\\n\"\n    \"smstop\\n\"",
+      "new": "    \"sub\\tx7, x7, #0x40\\n\"\n    \"cbnz\\tx7, Llibxsmm_64\\n\"\n    \"mov\\tsp, x20\\n\"\n    \"smstop\\n\""
+    }
+  ]
+}

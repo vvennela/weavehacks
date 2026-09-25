@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "hypothesis": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "stop": {
+      "type": "boolean"
+    },
+    "base_source_hash": {
+      "type": "string"
+    },
+    "edits": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "old": {
+            "type": "string"
+          },
+          "new": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "old",
+          "new"
+        ]
+      }
+    }
+  },
+  "required": [
+    "name",
+    "hypothesis",
+    "source",
+    "stop",
+    "base_source_hash",
+    "edits"
+  ]
+}

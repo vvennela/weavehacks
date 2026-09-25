@@ -1,0 +1,17 @@
+{
+  "name": "libxsmm-full512-fmopa-order-0132",
+  "hypothesis": "Swap the ZA2 and ZA3 FMOPA instructions in Llibxsmm_478 and Llibxsmm_70c to test issue order 0,1,3,2. Each tile retains its operands, predicates and K=0..511 accumulation order. Loads, pointer updates, counters, rewinds, stores, fallback, ABI and complete license notices remain unchanged. This exact change is absent from the supplied measured history. No tools or tests were run. Compilation, full-GEMM correctness at tolerance 0.002 and fresh repeated paired performance checks remain required under the unchanged gates and initial power settings. No speedup, tile-reuse cause or throughput above 1800 GFLOP/s is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+  "edits": [
+    {
+      "old": "    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_478\\n\"",
+      "new": "    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_478\\n\""
+    },
+    {
+      "old": "    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_70c\\n\"",
+      "new": "    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_70c\\n\""
+    }
+  ]
+}

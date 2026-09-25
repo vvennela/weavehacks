@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "streaming_region_cost",
+    "assembly_audit",
+    "scratch_lifetime",
+    "panel_packing",
+    "a_transpose",
+    "transpose_fusion",
+    "vector_access",
+    "cache_blocking",
+    "loop_order",
+    "address_generation",
+    "k_loop_schedule",
+    "register_reuse",
+    "za_four_tile_reuse",
+    "n512_fast_path",
+    "tail_alignment"
+  ],
+  "rationale": "This roster covers changes expressible in the supplied editable assembly. Streaming-region, assembly-audit and scratch-lifetime advisors review one-entry panel traversal, register preservation and keeping scratch allocated during both packing and consumption. Panel-packing, A-transpose and transpose-fusion advisors examine distinct packing changes around Lpanel32_70. Vector-access, cache-blocking and loop-order advisors review coordinated layouts, loads, stores and traversal around Lpanel32_330. Address-generation and K-loop advisors examine control overhead, including the untested fixed 256-iteration two-K loop without the old cleanup logic; they must exclude measured schedules. Register-reuse and four-tile advisors review operand reuse within ZA0–ZA3. Fast-path and tail advisors check gemm dispatch, complete output coverage, general sizes and n<=0.\n\nThese are review assignments, not fifteen distinct experiments or a selected queue. Advisors must jointly remove duplicates and rank proposals. The one-entry helper remains an unverified hypothesis. New generated shapes are unavailable; measured sixteen-call, constant-shape C/SME, padding, traversal, packed-B and prefetch sources cannot be reissued unchanged. Preserve the complete license notices and fixed contract. The fresh baseline is 1031.3–1049.4 GFLOP/s; no supplied result establishes >1800 GFLOP/s. Any changed source requires fresh full-GEMM correctness and paired promotion gates under unchanged initial power settings, with power-mode records kept separate."
+}

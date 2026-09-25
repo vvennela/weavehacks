@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "assembly_audit",
+    "scratch_lifetime",
+    "panel_packing",
+    "a_transpose",
+    "transpose_fusion",
+    "vector_access",
+    "cache_blocking",
+    "loop_order",
+    "address_generation",
+    "k_loop_schedule",
+    "register_reuse",
+    "za_four_tile_reuse",
+    "b_panel_layout",
+    "cache_conflict_layout",
+    "tail_alignment"
+  ],
+  "rationale": "Replace streaming_region_cost and n512_fast_path with b_panel_layout and cache_conflict_layout. The one-region panel32 implementation eb091b1e is now measured and unpromoted; its wrapper, streaming, and traversal descriptions must not return as separate experiments. The replacements broaden layout review, but must exclude the measured full-B packing and 272-byte scratch-padding sources.\n\nAssembly_audit and scratch_lifetime examine the supplied assembly, register ownership, and moving-SP packing cursor. Panel_packing, a_transpose, transpose_fusion, and vector_access examine distinct changes to Llibxsmm_78 and Lpanel32_70, including packing stores and transpose consumption. Cache_blocking, loop_order, b_panel_layout, and cache_conflict_layout coordinate producer layout, consumer strides, rewinds, allocation bounds, and traversal. Address_generation and k_loop_schedule examine distinct control changes in Llibxsmm_478, Llibxsmm_70c, and Lpanel32_368; fixed 256-iteration control without the historical two-step variant's unnecessary tail is available for review. Register_reuse and za_four_tile_reuse examine operand reuse within four FP32 ZA tiles. Tail_alignment checks bounds and the general-size contract.\n\nThese are advisor assignments, not a ranked experiment queue. Advisors must jointly rank distinct source changes and exclude proposals requiring unavailable generated shapes. All advice remains unverified. Preserve both complete license notices and every fixed benchmark constraint; adoption requires fresh paired gates with power settings unchanged and power-mode records separate."
+}
