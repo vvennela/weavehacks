@@ -1,15 +1,17 @@
-"""Astra implementation with fifteen independent Luna advisory calls per round."""
+"""Specialists jointly rank experiments; Astra implements and reviews results."""
 
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 from pathlib import Path
 import time
+from threading import Lock
 
 from .codex_agent import CodexJSONAgent
 from .kernel_advisor_roles import ADVISOR_ROLES, DEFAULT_ADVISOR_IDS
 from .kernel_search import KernelCandidate
-from .storage import save_json
+from .storage import content_hash, save_json
+from .kernel_swarm_plan import rank_experiments
 
 
 def object_schema(properties):
@@ -38,15 +40,23 @@ RULES = (
 class KernelAdvisoryTeam:
     """Caller owns budgets and evaluation; Astra chooses roles and implements.
 
-    Each evaluated round makes three Astra-high calls and fifteen Luna calls. Independent
-    advice goes only to the coordinator, avoiding all-to-all communication.
+    Each batch has fifteen specialist proposals and fifteen shared-board rankings.
+    A central board replaces peer conversations; its text is repeated to each voter.
     Evaluated history is supplied by kernel_search, never by an agent.
     """
 
     def __init__(self, *, work_dir, task, profile, max_rounds=6, timeout=180,
-                 agent_factory=None):
+                 agent_factory=None, batch_size=3, max_calls=108):
         if type(max_rounds) is not int or not 0 <= max_rounds <= 100:
             raise ValueError('max_rounds must be an integer from 0 to 100')
+        if type(batch_size) is not int or not 1 <= batch_size <= 15:
+            raise ValueError('batch_size must be from 1 to 15')
+        if type(max_calls) is not int or max_calls < 1:
+            raise ValueError('max_calls must be positive')
+        self.batch_size, self.max_calls = batch_size, max_calls
+        self.calls, self.proposal_count = 0, 0
+        self.call_lock = Lock()
+        self.pending, self.advisors = [], {}
         self.folder = Path(work_dir).resolve()
         self.folder.mkdir(parents=True, exist_ok=False)
         self.task, self.profile = task, json.loads(json.dumps(profile))
@@ -58,10 +68,20 @@ class KernelAdvisoryTeam:
 
     def _save(self):
         save_json(self.folder / 'state.json', dict(
-            schema_version='sera-kernel-advisory-v1', coordinator='gpt-6-astra',
+            schema_version='sera-kernel-swarm-v2', coordinator='gpt-6-astra',
             coordinator_reasoning='high', advisor_model='gpt-6-luna', advisor_count=15,
-            max_rounds=self.max_rounds, max_model_calls=self.max_rounds * 18, adjudications=self.adjudications,
+            max_rounds=self.max_rounds, max_model_calls=self.max_calls, calls=self.calls, batch_size=self.batch_size,
+            pending=list(self.pending), implementations=self.proposal_count,
+            adjudications=self.adjudications,
             profile=self.profile, rounds=self.rounds))
+
+    def _request(self, agent, prompt, schema, deadline):
+        timeout = self._remaining(deadline)
+        with self.call_lock:
+            if self.calls >= self.max_calls:
+                raise RuntimeError('Swarm model-call budget exhausted')
+            self.calls += 1
+        return agent.request(prompt, schema, timeout=timeout)
 
     def _remaining(self, deadline):
         remaining = deadline - time.monotonic()
@@ -81,25 +101,27 @@ class KernelAdvisoryTeam:
                 'name', 'hypothesis', 'source_hash', 'status', 'scores', 'control_scores',
                 'promoted', 'adjudication', 'error', 'comparison_identity')}
                 | dict(source=Path(trial['source']).read_text()))
-            for record in self.rounds:
-                if record.get('source_hash') == trial.get('source_hash'):
-                    record['measured_outcome'] = {key: trial.get(key) for key in (
-                        'status', 'scores', 'control_scores', 'promoted', 'reports',
-                        'comparison_identity', 'public_correctness')}
+            for batch in self.rounds:
+                for record in batch.get('implementations', []):
+                    if record.get('source_hash') == trial.get('source_hash'):
+                        record['measured_outcome'] = {key: trial.get(key) for key in (
+                            'status', 'scores', 'control_scores', 'promoted', 'adjudication', 'reports',
+                            'comparison_identity', 'public_correctness')}
         self._save()
         return evidence
 
     def _advise(self, role, folder, common, deadline):
         agent = self.factory(work_dir=folder / role, model='gpt-6-luna',
                              reasoning_effort='medium', timeout=self.timeout)
+        self.advisors[role] = agent
         memory = [dict(advice=next((a for a in r['advice'] if a['role'] == role), None),
-                       outcome=r.get('measured_outcome'))
+                       outcomes=[x.get('measured_outcome') for x in r.get('implementations', [])])
                   for r in self.rounds[:-1] if role in r.get('roles', [])][-4:]
-        result = agent.request(common + '\nYou advise Sera; do not implement a complete source. '
-            'Give one concrete, technically supported change, risks, and checks. '
+        result = self._request(agent, common + '\nYou advise Sera; do not implement a complete source. '
+            'Propose one distinct experiment: specify the change, hypothesis, risks, and checks. '
             'You may abstain when no legal useful change is known. Your role: ' + role + '. '
             + ADVISOR_ROLES[role] + '\nYour prior advice and joint measured outcomes:\n'
-            + json.dumps(memory), ADVICE_SCHEMA, timeout=self._remaining(deadline))
+            + json.dumps(memory), ADVICE_SCHEMA, deadline)
         if (set(result) != {'advice', 'risks', 'abstain'} or
                 type(result['abstain']) is not bool or
                 any(not isinstance(result[key], str) for key in ('advice', 'risks'))):
@@ -123,15 +145,14 @@ class KernelAdvisoryTeam:
         try:
             agent = self.factory(work_dir=self.folder / f'review-{len(self.adjudications):03d}',
                                  model='gpt-6-astra', reasoning_effort='high', timeout=self.timeout)
-            decision = agent.request(RULES + '\n' + self.task +
+            decision = self._request(agent, RULES + '\n' + self.task +
                 '\nYou are Sera. Make the final decision on this measured candidate: adopt, '
                 'reject, or revise. Base the decision on correctness, paired controls and '
                 'repeat variation. Adopt only if the fixed evaluator gates marked it eligible. '
                 'Reject discards this candidate; revise retains the incumbent and informs '
                 'your next implementation. Explain the evidence.\nCandidate under review:\n' +
                 json.dumps(dict(source_hash=trial['source_hash'], eligible=eligible)) +
-                '\nMeasured history:\n' + json.dumps(evidence), REVIEW_SCHEMA,
-                timeout=self._remaining(deadline))
+                '\nMeasured history:\n' + json.dumps(evidence), REVIEW_SCHEMA, deadline)
             if (decision.get('decision') not in {'adopt', 'reject', 'revise'} or
                     not isinstance(decision.get('reason'), str)):
                 raise ValueError('Malformed coordinator experiment review')
@@ -147,25 +168,28 @@ class KernelAdvisoryTeam:
         deadline = time.monotonic() + timeout
         self._remaining(deadline)
         evidence = self._evidence(history)
-        if len(self.rounds) >= self.max_rounds:
+        if self.proposal_count >= self.max_rounds:
             return None
-        folder = self.folder / f'round-{len(self.rounds)+1:03d}'
-        folder.mkdir()
-        record = dict(round=len(self.rounds)+1, status='planning', roles=[], advice=[])
-        self.rounds.append(record)
-        self._save()
         common = RULES + '\n' + self.task + '\nHardware profile:\n' + json.dumps(self.profile)
         common += '\nMeasured history:\n' + json.dumps(evidence)
+        if self.pending:
+            return self._implement(common, deadline)
+        folder = self.folder / f'round-{len(self.rounds)+1:03d}'
+        folder.mkdir()
+        record = dict(round=len(self.rounds)+1, status='planning', roles=[], advice=[],
+                      ballots=[], implementations=[])
+        self.rounds.append(record)
+        self._save()
         try:
             coordinator = self.factory(work_dir=folder / 'coordinator', model='gpt-6-astra',
                                        reasoning_effort='high', timeout=self.timeout)
-            plan = coordinator.request(common + '\nYou are Sera, the implementing coordinator. '
+            plan = self._request(coordinator, common + '\nYou are Sera, the implementing coordinator. '
                 'Select exactly 15 distinct relevant advisor IDs from this catalog. You may '
                 'replace any prior advisor at each round based on evidence. Role descriptions '
                 'and benchmark policies are fixed. Explain the selection.\nCatalog:\n'
                 + json.dumps(ADVISOR_ROLES) + '\nDefault roster:\n' + json.dumps(DEFAULT_ADVISOR_IDS)
                 + '\nPrior rosters:\n' + json.dumps([r['roles'] for r in self.rounds[:-1]]),
-                PLAN_SCHEMA, timeout=self._remaining(deadline))
+                PLAN_SCHEMA, deadline)
             roles = plan.get('roles')
             if (not isinstance(roles, list) or len(roles) != 15 or
                     any(not isinstance(role, str) for role in roles) or
@@ -185,19 +209,76 @@ class KernelAdvisoryTeam:
                     self._save()
             if any(advice['status'] != 'received' for advice in record['advice']):
                 raise RuntimeError('One or more Luna advisors failed; no complete advisory round')
-            record['status'] = 'implementing'
+            board = [dict(experiment_id=advice['role'], recommendation=advice['advice'],
+                          risks=advice['risks']) for advice in record['advice'] if not advice['abstain']]
+            if not board:
+                record['status'] = 'abstained'
+                self._save()
+                return None
+            ids = [item['experiment_id'] for item in board]
+            record.update(status='ranking', board=board, board_hash=content_hash(board))
             self._save()
-            response = coordinator.request(common + '\nYou are Sera. Critically review the '
-                '15 independent advisories below; they may be wrong or contradictory. Choose '
-                'one coherent improvement and implement the complete standalone C source. '
-                'Preserve all invariants. Do not claim a speedup before measurement. '
-                'Return stop=true only when no useful legal improvement remains.\nAdvisories:\n'
-                + json.dumps(record['advice']), SOURCE_SCHEMA, timeout=self._remaining(deadline))
+            vote_schema = object_schema(dict(
+                ranking=dict(type='array', items=dict(type='string', enum=ids),
+                             minItems=len(ids), maxItems=len(ids)), reason=dict(type='string')))
+            with ThreadPoolExecutor(max_workers=15) as pool:
+                votes = [(role, pool.submit(self._vote, role, common, board, record['board_hash'],
+                                           vote_schema, deadline)) for role in roles]
+                for role, future in votes:
+                    try:
+                        vote = future.result()
+                        # Validate a full permutation before accepting any ranking.
+                        rank_experiments(ids, [vote.get('ranking')], limit=1)
+                        record['ballots'].append(dict(role=role, status='received', **vote))
+                    except Exception as error:
+                        record['ballots'].append(dict(role=role, status='failed', error=type(error).__name__))
+                    self._save()
+            if any(vote['status'] != 'received' for vote in record['ballots']):
+                raise RuntimeError('One or more specialist rankings failed; batch was not selected')
+            order = rank_experiments(ids, [vote['ranking'] for vote in record['ballots']],
+                                     limit=min(self.batch_size, self.max_rounds-self.proposal_count))
+            record.update(status='selected', experiment_order=order)
+            self.pending = list(order)
+            self._save()
+            return self._implement(common, deadline)
+        except BaseException as error:
+            record.update(status='failed', error=f'{type(error).__name__}: {error}')
+            self._save()
+            raise
+
+    def _vote(self, role, common, board, board_hash, schema, deadline):
+        return self._request(self.advisors[role], common + '\nYou are the specialist ' + role + '. '
+            + ADVISOR_ROLES[role] + "\nReview the other specialists' proposals on the shared board. "
+            'Rank EVERY experiment ID exactly once in the order the swarm should test them. '
+            'Use measured evidence, expected benefit, and correctness risk. Your ranking helps '
+            'select the batch; Astra does not choose the experiment order. Explain briefly. '
+            '\nBoard hash: ' + board_hash + '\nImmutable shared board:\n' + json.dumps(board), schema, deadline)
+
+    def _implement(self, common, deadline):
+        batch = self.rounds[-1]
+        experiment = self.pending.pop(0)
+        selected = next(item for item in batch['board'] if item['experiment_id'] == experiment)
+        self.proposal_count += 1
+        record = dict(experiment_id=experiment, status='implementing')
+        batch['implementations'].append(record)
+        self._save()
+        try:
+            coordinator = self.factory(work_dir=self.folder / f'implementation-{self.proposal_count:03d}',
+                model='gpt-6-astra', reasoning_effort='high', timeout=self.timeout)
+            response = self._request(coordinator, common + '\nYou are Sera. Implement the experiment '
+                'selected by the specialist swarm below. Do not replace it with another experiment '
+                'or combine unrelated changes. Use current measured history to avoid repeating '
+                'a source. Check all hardware claims against the contract; return stop=true if '
+                'this experiment cannot be implemented legally or has already been tested. '
+                'Return complete standalone C source. No unmeasured speedup claims. '
+                '\nSwarm-selected experiment:\n' + json.dumps(selected), SOURCE_SCHEMA, deadline)
             if type(response.get('stop')) is not bool:
                 raise ValueError('Malformed coordinator response')
             if response['stop']:
-                record['status'] = 'abstained'
+                record.update(status='abstained', reason=response.get('hypothesis'))
                 self._save()
+                if self.pending and self.proposal_count < self.max_rounds:
+                    return self._implement(common, deadline)
                 return None
             candidate = KernelCandidate(response['name'], response['source'],
                                         response['hypothesis'], 'astra_coordinator')

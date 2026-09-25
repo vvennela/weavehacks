@@ -19,7 +19,7 @@ python examples/optimize_cpu_kernel.py \
   --target-gflops 1800
 ```
 
-The output directory must not exist. Connect AC power before running. The example uses an Astra coordinator (`gpt-6-astra`, high reasoning effort) and 15 Luna advisors (`gpt-6-luna`, medium reasoning effort). Each round makes one Astra call to select roles, 15 independent Luna advisory calls, one Astra implementation call, and one Astra review of the measured experiment: at most 18 calls per evaluated candidate round, or 108 calls for the default six rounds. The 1,800-second overall deadline remains in force. Plan usage is consumed; no dollar-cost guarantee is inferred from a call limit.
+The output directory must not exist. Connect AC power before running. The example uses an Astra coordinator (`gpt-6-astra`, high reasoning effort) and 15 Luna advisors (`gpt-6-luna`, medium reasoning effort). Each planning batch makes one Astra call to select roles, 15 specialist recommendation calls, and 15 specialist ranking calls. Each selected experiment adds one Astra implementation call and one Astra measured-result review. The default batch size is three and the candidate limit is six: two full batches use 74 calls. A separate hard ceiling of 108 model calls remains in force; it also covers shortened batches, abstentions, and failures. `--batch-size` and `--max-model-calls` record explicit caller limits. The 1,800-second overall deadline remains in force. Plan usage is consumed; no dollar-cost guarantee is inferred from a call limit.
 
 The old source-producing `KernelSpecialistTeam` and single `CodexKernelProposer` remain available as Python APIs, but this example uses the new `KernelAdvisoryTeam`.
 
@@ -30,7 +30,7 @@ The M4 example fixes single-thread float32 row-major `C=A@B` with `void gemm(int
 1. Sera snapshots the original source and fixes thread environment controls.
 2. Public correctness checks compile the source and verify 16 zero/small/odd/tile-edge and 512-square dimensions using seeded random, identity, and zero inputs, a float64 reference, input preservation, and output guards. These tests do not produce performance scores.
 3. The frozen hill supplies three signed baseline reports. Each report retains its original best-of-three scoring convention.
-4. Astra selects exactly 15 distinct roles from the fixed CPU advisory catalog. It may replace roles between rounds. All 15 Luna advisors receive the same measured history and their own bounded prior advice/outcomes, without peer messages. Astra receives their advice, checks it against the contract, and implements one complete candidate. Advisors do not submit kernels directly. An incomplete advisory round is recorded as a failure. Codex uses ChatGPT login, ignored user configuration, and disabled shell/image/web tools; Sera writes the returned source.
+4. Astra selects exactly 15 distinct roles from the fixed CPU advisory catalog. It may replace roles between rounds. All 15 Luna specialists receive the same measured history and their own bounded prior advice/outcomes. Each recommends an experiment. All 15 then rank the same immutable proposal board. A complete ranking gives N points to first place, then N-1 down to one; total points determine experiment order, with experiment ID breaking ties. The selected batch is capped by the remaining candidate budget. Astra implements that order with fresh measured history after each experiment. Advisors do not submit kernels directly. Incomplete advice or an invalid/incomplete ranking is recorded as a failed batch; it cannot silently select experiments. Codex uses ChatGPT login, ignored user configuration, and disabled shell/image/web tools; Sera writes the returned source.
 5. Each candidate passes correctness before timing. Three candidate reports alternate with three unchanged-control reports. Eligibility for promotion requires the candidate's slowest report to exceed the control's fastest report by at least 5%. Astra then reviews the measured experiment and records its decision to adopt, reject, or revise. Only an eligible candidate that Astra adopts replaces the incumbent.
 6. The selected artifact gets one final held-out evaluation. Correctness failure or a material final timing regression returns no accepted source. The 1,800 target requires every selected validation report and the final score to exceed 1,800.
 
@@ -46,8 +46,8 @@ Power and thermal observations are captured around every signed evaluation. AC p
 - `search/result.json`: authoritative experimental search summary, every trial, control scores, and final decision.
 - `search/trial-*/source/kernel.c`: exact source snapshots.
 - `search/trial-*/*.json`: public correctness and unedited signed hill reports.
-- `agent/state.json`: round rosters, advisory outcomes, coordinator source hashes, and measured joint outcomes.
-- `agent/round-*/`: coordinator and advisor prompts, responses, schemas, and command logs.
+- `agent/state.json`: batch rosters, shared board hashes, every ranking, selected order, source hashes, and measured outcomes.
+- `agent/round-*/`, `agent/implementation-*/`, and `agent/review-*/`: prompts, responses, schemas, and command logs.
 - `journal.md`: short run summary.
 
 Verify a hill report with `hills verify /absolute/path/to/report.json` using the evaluator's matching Hills signing home. Compare reports only within the same machine, workload, evaluator, compiler, flags, and mode. No leaderboard publication is performed.
@@ -57,3 +57,5 @@ Verify a hill report with `hills verify /absolute/path/to/report.json` using the
 The local evaluator executes generated C with the current user's privileges. Timeouts, stripped environment credentials, source snapshots, and correctness guards do not provide a security sandbox. This workflow is for supervised, trusted research; a production service needs an isolated native worker with resource and data-access limits.
 
 The baseline controls reduce avoidable variation but do not fix CPU scheduling, temperature, frequency, interrupts, or other applications. Timing spread remains visible and can prevent promotion. The supplied correctness checks cover the declared examples, not every shape, dtype, alias rule, or CPU. The journal supports inspection after failure; automatic kernel-run recovery and model integration are not implemented.
+
+The shared board avoids all-to-all agent conversations. Each of 15 voters still reads the board, so board text is repeated across calls; this is not a claim of linear token growth for arbitrarily large swarms. CPU evaluations remain serial.

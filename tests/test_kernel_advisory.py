@@ -23,6 +23,8 @@ def factory_for(calls, rosters=None, fail_advisor=False):
                 calls.append((settings, prompt))
                 if 'roles' in schema['properties']:
                     return dict(roles=next(rosters), rationale='Measured bottlenecks')
+                if 'ranking' in schema['properties']:
+                    return dict(ranking=schema['properties']['ranking']['items']['enum'], reason='Collective preference')
                 if settings['model'] == 'gpt-6-luna':
                     if fail_advisor:
                         raise RuntimeError('advisor failed')
@@ -39,13 +41,13 @@ def test_fifteen_luna_advise_one_astra_high_implementation(tmp_path):
     candidate=team.propose(history(tmp_path), timeout=60)
     assert candidate.source == 'new source'
     assert candidate.specialist_id == 'astra_coordinator'
-    assert len(calls) == 17
-    assert sum(settings['model']=='gpt-6-luna' for settings,_ in calls)==15
+    assert len(calls) == 32
+    assert sum(settings['model']=='gpt-6-luna' for settings,_ in calls)==30
     assert all(settings['reasoning_effort']=='high' for settings,_ in calls
                if settings['model']=='gpt-6-astra')
     assert 'Use fixed FP32 loop bounds' in calls[-1][1]
     assert team.propose(history(tmp_path),timeout=60) is None
-    assert len(calls)==17
+    assert len(calls)==32
 
 
 def test_coordinator_can_replace_roles_between_rounds(tmp_path):
@@ -54,7 +56,7 @@ def test_coordinator_can_replace_roles_between_rounds(tmp_path):
     second=first[:-1]+[alternate]
     calls=[]
     team=KernelAdvisoryTeam(work_dir=tmp_path/'team',task='FP32 only',profile={},
-        max_rounds=2,agent_factory=factory_for(calls,[first,second]))
+        max_rounds=2,batch_size=1,agent_factory=factory_for(calls,[first,second]))
     measured=history(tmp_path)
     team.propose(measured,timeout=60)
     team.propose(measured,timeout=60)
@@ -125,3 +127,44 @@ def test_setup_failure_is_recorded(tmp_path):
         team.propose(history(tmp_path),timeout=60)
     state=json.loads((tmp_path/'team/state.json').read_text())
     assert state['rounds'][0]['status']=='failed'
+
+
+def test_swarm_selects_batch_astra_implements_without_selecting_again(tmp_path):
+    calls=[]
+    team=KernelAdvisoryTeam(work_dir=tmp_path/'team',task='FP32',profile={},
+        max_rounds=2,batch_size=2,agent_factory=factory_for(calls))
+    measured=history(tmp_path)
+    team.propose(measured,timeout=60)
+    team.propose(measured,timeout=60)
+    state=json.loads((tmp_path/'team/state.json').read_text())
+    assert len(state['rounds'])==1
+    assert len(state['rounds'][0]['ballots'])==15
+    assert state['rounds'][0]['experiment_order']==list(DEFAULT_ADVISOR_IDS[:2])
+    assert [r['experiment_id'] for r in state['rounds'][0]['implementations']]==list(DEFAULT_ADVISOR_IDS[:2])
+    assert len(calls)==33  # one roster, 15 recommendations, 15 votes, two implementations
+    assert 'Swarm-selected experiment' in calls[-1][1]
+
+
+def test_every_specialist_ranks_the_same_board_and_calls_stay_bounded(tmp_path):
+    calls=[]
+    team=KernelAdvisoryTeam(work_dir=tmp_path/'team',task='FP32',profile={},
+        max_rounds=1,max_calls=32,agent_factory=factory_for(calls))
+    team.propose(history(tmp_path),timeout=60)
+    votes=[prompt for _,prompt in calls if 'Immutable shared board:' in prompt]
+    assert len(votes)==15
+    assert len({p.split('Immutable shared board:')[1] for p in votes})==1
+    assert team.calls==32
+    with pytest.raises(RuntimeError,match='budget'):
+        team.adjudicate(history(tmp_path),history(tmp_path)[0],eligible=False,timeout=60)
+    assert len(calls)==32
+
+
+def test_second_batch_implementation_receives_fresh_experiment_evidence(tmp_path):
+    calls=[]
+    team=KernelAdvisoryTeam(work_dir=tmp_path/'team',task='FP32',profile={},
+        max_rounds=2,batch_size=2,agent_factory=factory_for(calls))
+    measured=history(tmp_path)
+    team.propose(measured,timeout=60)
+    measured[0]['scores']=[1234.5]*3
+    team.propose(measured,timeout=60)
+    assert '1234.5' in calls[-1][1]

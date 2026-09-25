@@ -43,6 +43,8 @@ def main():
     parser.add_argument("--target-gflops", type=float, default=1800.0)
     parser.add_argument("--agent-timeout", type=float, default=180)
     parser.add_argument("--max-seconds", type=float, default=1800)
+    parser.add_argument("--max-model-calls", type=int, default=108)
+    parser.add_argument("--batch-size", type=int, default=3)
     args = parser.parse_args()
     initial_host = host_observation()
     require_ac(initial_host)
@@ -58,11 +60,11 @@ def main():
                      if key.endswith("THREADS") or key == "PYTHONHASHSEED"},
         provider="Codex CLI, ChatGPT login only", coordinator="gpt-6-astra",
         coordinator_reasoning="high", advisor_model="gpt-6-luna", advisor_count=15,
-        max_model_calls=args.max_candidates * 18, host=initial_host,
+        max_model_calls=args.max_model_calls, batch_size=args.batch_size, host=initial_host,
         implementation_hashes={name: hashlib.sha256(
             (Path(sera.__file__).parent / name).read_bytes()).hexdigest() for name in
             ("kernel_search.py", "kernel_tools.py", "kernel_advisory.py", "kernel_advisor_roles.py",
-             "codex_agent.py", "cpu_kernel_validation.py")},
+             "codex_agent.py", "kernel_swarm_plan.py", "cpu_kernel_validation.py")},
     ))
     (folder / "journal.md").write_text(
         "# Sera CPU MatMul run\n\nStatus: running.\n\n"
@@ -99,6 +101,7 @@ def main():
             capabilities.append("sme")
     proposer = KernelAdvisoryTeam(work_dir=folder / "agent", task=task,
         timeout=args.agent_timeout, max_rounds=args.max_candidates,
+        max_calls=args.max_model_calls, batch_size=args.batch_size,
         profile=dict(capabilities=capabilities))
     evaluator = HillsKernelEvaluator(workspace=args.hill_workspace)
 
