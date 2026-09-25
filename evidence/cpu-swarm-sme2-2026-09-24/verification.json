@@ -1,0 +1,202 @@
+{
+  "schema_version": "sera-cpu-sme2-block-verification-v1",
+  "block": "evidence/cpu-swarm-sme2-2026-09-24",
+  "conclusion": "one candidate measured and rejected; no accepted gain; target not met",
+  "model_calls": {
+    "total": 35,
+    "response_artifacts": 35,
+    "breakdown": {
+      "luna_proposals": 15,
+      "luna_rankings": 15,
+      "astra_high_roster_selection": 1,
+      "astra_high_implementation_attempts": 3,
+      "astra_high_measured_review": 1
+    },
+    "advisor_count": 15,
+    "valid_rankings": 15,
+    "proposal_abstentions": [],
+    "duplicate_implementation_abstentions": [
+      "vector_access",
+      "n512_fast_path"
+    ]
+  },
+  "budget": {
+    "max_model_calls": 108,
+    "calls_remaining": 73,
+    "max_implementation_attempts": 6,
+    "attempts_used": 3,
+    "attempts_remaining": 3,
+    "max_seconds": 1800
+  },
+  "candidate": {
+    "name": "compiler_codegen",
+    "source_sha256": "d0a593fe8471d23d972e4c32be09e3545fb3103327496f87a81eb50ba1a3a31e",
+    "matches_search_record": true,
+    "public_correctness_passed": true,
+    "public_correctness_cases": 48,
+    "eligible_for_promotion": false,
+    "promoted": false,
+    "adjudication": {
+      "decision": "reject",
+      "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired trials show throughput losses of 41.7%, 28.4%, and 42.7%. Candidate scores were 891.07\u20131048.92 GFLOP/s versus controls of 1464.86\u20131570.95 GFLOP/s. Every candidate result was below every control; the regression exceeds observed repeat variation. Discard this candidate and retain existing-sme. These measurements do not establish the cause of the regression."
+    },
+    "validation_gflops": [
+      891.0720258535501,
+      1048.9201535747738,
+      899.7816570625646
+    ],
+    "paired_control_gflops": [
+      1528.0925892412033,
+      1464.8592544868777,
+      1570.9462856751466
+    ],
+    "all_candidate_scores_below_all_controls": true
+  },
+  "baseline": {
+    "source_sha256": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+    "validation_gflops": [
+      1362.3260963479709,
+      998.0571551989616,
+      1546.0645606117387
+    ],
+    "min_gflops": 998.0571551989616,
+    "max_gflops": 1546.0645606117387
+  },
+  "final": {
+    "gflops": 1526.6500060339845,
+    "target_gflops": 1800,
+    "target_met": false,
+    "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-000/source/kernel.c",
+    "winner_is_baseline": true,
+    "accepted_candidate": null
+  },
+  "host_checks": {
+    "host_observation_count": 10,
+    "all_observations_ac_and_settings_unchanged": true,
+    "all_no_thermal_or_performance_warning": true
+  },
+  "hill_report_verification": {
+    "method": "hills verify --json <report>",
+    "reports_verified": 10,
+    "all_signatures_valid": true,
+    "all_official": true,
+    "all_passed": true,
+    "same_tree_hash": true,
+    "reports": [
+      {
+        "path": "search/trial-000/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1362.3260963479709,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-000/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 998.0571551989616,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-000/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1546.0645606117387,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-001/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 891.0720258535501,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:782941790023c825dedb3807e21c4e8341ed7afc764ec02f8d3716a4f922d078"
+      },
+      {
+        "path": "search/trial-001/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1048.9201535747738,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:782941790023c825dedb3807e21c4e8341ed7afc764ec02f8d3716a4f922d078"
+      },
+      {
+        "path": "search/trial-001/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 899.7816570625646,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:782941790023c825dedb3807e21c4e8341ed7afc764ec02f8d3716a4f922d078"
+      },
+      {
+        "path": "search/trial-001/control-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1528.0925892412033,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-001/control-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1464.8592544868777,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-001/control-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1570.9462856751466,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/final.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": true,
+        "gflops": 1526.6500060339845,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      }
+    ]
+  },
+  "follow_up": {
+    "control_flow_fix_commit": "9c232eb",
+    "test_count_reported_by_root": 51,
+    "independently_rerun_here": false,
+    "next_fresh_phase_planned_attempts": 3,
+    "next_fresh_phase_planned_model_calls": 73,
+    "not_part_of_this_evidence_block": true
+  },
+  "limits": [
+    "The candidate passed only a finite deterministic correctness suite.",
+    "The candidate performance regression does not establish the cause.",
+    "No candidate was promoted; the 1800 GFLOP/s target was not met.",
+    "Native evaluation is trusted local research, not a security sandbox."
+  ]
+}

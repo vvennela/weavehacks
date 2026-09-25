@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "sme_fp32_schedule",
+          "a_transpose",
+          "panel_packing",
+          "cache_blocking",
+          "vector_access",
+          "compiler_codegen",
+          "tail_alignment",
+          "scratch_lifetime",
+          "n512_fast_path",
+          "za_four_tile_reuse",
+          "transpose_fusion",
+          "k_loop_schedule",
+          "b_panel_layout",
+          "streaming_region_cost",
+          "assembly_audit"
+        ]
+      },
+      "minItems": 15,
+      "maxItems": 15
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ranking",
+    "reason"
+  ]
+}

@@ -1,0 +1,11 @@
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-000/validation-0.json True [{'name': 'gflops', 'value': 1362.3260963479709, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-000/validation-1.json True [{'name': 'gflops', 'value': 998.0571551989616, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-000/validation-2.json True [{'name': 'gflops', 'value': 1546.0645606117387, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-001/control-0.json True [{'name': 'gflops', 'value': 1528.0925892412033, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-001/validation-0.json True [{'name': 'gflops', 'value': 891.0720258535501, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-001/validation-1.json True [{'name': 'gflops', 'value': 1048.9201535747738, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-001/control-1.json True [{'name': 'gflops', 'value': 1464.8592544868777, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-001/control-2.json True [{'name': 'gflops', 'value': 1570.9462856751466, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-001/validation-2.json True [{'name': 'gflops', 'value': 899.7816570625646, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/final.json True [{'name': 'gflops', 'value': 1526.6500060339845, 'direction': 'max'}]
+RESULT {"status": "completed", "target_met": false, "final_gflops": 1526.6500060339845, "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-2026-09-24/search/trial-000/source/kernel.c", "stop_reason": "search-exhausted"}

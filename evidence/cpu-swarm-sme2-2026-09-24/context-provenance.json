@@ -1,0 +1,23 @@
+{
+  "timestamp_utc": "2026-09-25T04:22:01.404975+00:00",
+  "sysctl": {
+    "machdep.cpu.brand_string": "Apple M4 Pro",
+    "hw.optional.arm.FEAT_SME2": "1",
+    "hw.perflevel0.l1dcachesize": "131072",
+    "hw.perflevel1.l1dcachesize": "65536",
+    "hw.cachelinesize": "128"
+  },
+  "input_sha256": {
+    "evidence/cpu-swarm-sme2-2026-09-24/run.py": "f99b8c29ba6e6cc1e0e74640691b0455f6dc9db501f7db6765ac1c6d88044e04",
+    "evidence/cpu-swarm-ac-idle-2026-09-24/prior-evidence.json": "1fbf93cc18fe5972f1b0fc1b1dbb95e17dfe4940a1a372ad70ac154130013ee5",
+    "evidence/cpu-sme2-load-probe-2026-09-24/correctness.json": "b27f09a5e6117eff27d8a8f29ddae52e74333a18dba21546c5fc17dacd662491",
+    "evidence/cpu-sme2-load-probe-2026-09-24/indirect-store.c": "61c516dac7127750a04c478bb39d73891d6e7de519bdbb838c1795fac57f824a",
+    "evidence/cpu-sme2-load-probe-2026-09-24/probe.s": "14a923527f925fa84dbe3ca2947d18688a5681bffcea399cbcdd31e38c81ac9f",
+    "evidence/cpu-sme2-load-probe-2026-09-24/README.md": "47c2fba9809221ec31219500180d67cad03e1975bb46f880fada32776c818ed7",
+    "evidence/cpu-sme2-load-probe-2026-09-24/research.json": "8c1567f2e94f4e3afd33eef66b872fd2ab9c1c8c26006620d968eb155a938589",
+    "evidence/cpu-sme2-load-probe-2026-09-24/indirect-store-correctness.json": "1e86123843781cfa3e369bb002c2bea6afdb05a20a3e5ccaeaf101aa766b5e4e",
+    "evidence/cpu-sme2-load-probe-2026-09-24/indirect-store.s": "5f2f5272a8603e2a3d6ca847dbb2fc93fba66cfbf71f9976dc81fa10c3b1a8c6",
+    "evidence/cpu-sme2-load-probe-2026-09-24/probe.c": "e1266e35d7ac46ddb944a135634286f0f76e2b1332c75f9d5d750b5a51c9db75"
+  },
+  "scope": "Supplemental provenance captured after launch; no performance rules or source changed. User idle confirmation is not an OS guarantee of idle conditions."
+}

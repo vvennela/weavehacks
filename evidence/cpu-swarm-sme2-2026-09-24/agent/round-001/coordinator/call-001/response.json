@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_schedule",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "compiler_codegen",
+    "tail_alignment",
+    "scratch_lifetime",
+    "n512_fast_path",
+    "za_four_tile_reuse",
+    "transpose_fusion",
+    "k_loop_schedule",
+    "b_panel_layout",
+    "streaming_region_cost",
+    "assembly_audit"
+  ],
+  "rationale": "Select these 15 advisors around existing-sme, source hash 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Its supplied source uses full-A transpose and direct ZA output stores; its supplied reduction assembly uses four separate vector loads. The local probes establish distinct paired-load and indirect-store implementations, but no GEMM speedup. vector_access, compiler_codegen, and assembly_audit cover these changes and verify that candidate assembly differs. a_transpose, panel_packing, b_panel_layout, and transpose_fusion cover distinct ways to prepare operands. cache_blocking and scratch_lifetime assess their complete per-call costs; two 64-KiB panels leave no P-core L1D capacity margin. sme_fp32_schedule, k_loop_schedule, and za_four_tile_reuse cover new schedules within four accumulators, without repeating unchanged unrolling or per-k partial-C spills. streaming_region_cost examines valid streaming boundaries. n512_fast_path and tail_alignment preserve specialization, general sizes, bounds, and fallback behavior. Every proposal must identify its base and concrete change. These are unverified research directions. The fresh baseline spans 998.06–1546.06 GFLOP/s; promotion requires fresh paired controls under unchanged gates. Historical results cannot establish current eligibility or individual-advisor credit."
+}
