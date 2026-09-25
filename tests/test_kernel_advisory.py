@@ -224,3 +224,35 @@ def test_duplicate_batch_replans_only_with_remaining_attempts(tmp_path, attempt_
     assert team.proposal_count == attempt_budget
     assert len(team.rounds) == (2 if expected_source else 1)
     assert team.calls == (66 if expected_source else 34)
+
+
+def test_astra_can_edit_a_hash_bound_source_without_repeating_the_file(tmp_path):
+    import hashlib
+    calls = []
+    measured = history(tmp_path)
+    measured[0]['source_hash'] = hashlib.sha256(b'baseline source').hexdigest()
+    base = factory_for(calls)
+
+    def factory(**settings):
+        agent = base(**settings)
+        original = agent.request
+
+        def request(prompt, schema, *, timeout):
+            result = original(prompt, schema, timeout=timeout)
+            if Path(settings['work_dir']).name.startswith('implementation-'):
+                return dict(name='edited', hypothesis='Change the measured source', stop=False,
+                    source='', base_source_hash=measured[0]['source_hash'],
+                    edits=[dict(old='baseline source', new='modified source')])
+            return result
+
+        agent.request = request
+        return agent
+
+    team = KernelAdvisoryTeam(work_dir=tmp_path/'team', task='FP32', profile={},
+        max_rounds=1, agent_factory=factory)
+    candidate = team.propose(measured, timeout=60)
+    assert candidate.source == 'modified source'
+    assert Path(measured[0]['source']).read_text() == 'baseline source'
+    saved = json.loads((tmp_path/'team/state.json').read_text())
+    assert saved['rounds'][0]['implementations'][0]['source_hash'] == hashlib.sha256(
+        b'modified source').hexdigest()

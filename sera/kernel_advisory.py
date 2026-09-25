@@ -10,6 +10,7 @@ from threading import Lock
 from .codex_agent import CodexJSONAgent
 from .kernel_advisor_roles import ADVISOR_ROLES, DEFAULT_ADVISOR_IDS
 from .kernel_search import KernelCandidate
+from .kernel_edits import candidate_source
 from .storage import content_hash, save_json
 from .kernel_swarm_plan import rank_experiments
 
@@ -27,7 +28,9 @@ ADVICE_SCHEMA = object_schema(dict(advice=dict(type='string'), risks=dict(type='
 REVIEW_SCHEMA = object_schema(dict(
     decision=dict(type='string', enum=['adopt', 'reject', 'revise']), reason=dict(type='string')))
 SOURCE_SCHEMA = object_schema(dict(name=dict(type='string'), hypothesis=dict(type='string'),
-                                  source=dict(type='string'), stop=dict(type='boolean')))
+    source=dict(type='string'), stop=dict(type='boolean'), base_source_hash=dict(type='string'),
+    edits=dict(type='array', maxItems=64,
+               items=object_schema(dict(old=dict(type='string'), new=dict(type='string'))))))
 RULES = (
     'Use only supplied evidence. No tools, file reads, commands, services or private evaluator inputs. '
     'Preserve the fixed benchmark, FP32 arithmetic, general gemm ABI, thread count and error tolerance. '
@@ -183,7 +186,7 @@ class KernelAdvisoryTeam:
         common = RULES + '\n' + self.task + '\nHardware profile:\n' + json.dumps(self.profile)
         common += '\nMeasured history:\n' + json.dumps(evidence)
         if self.pending:
-            return self._implement(common, deadline)
+            return self._implement(common, deadline, evidence)
         folder = self.folder / f'round-{len(self.rounds)+1:03d}'
         folder.mkdir()
         record = dict(round=len(self.rounds)+1, status='planning', roles=[], advice=[],
@@ -250,7 +253,7 @@ class KernelAdvisoryTeam:
             record.update(status='selected', experiment_order=order)
             self.pending = list(order)
             self._save()
-            return self._implement(common, deadline)
+            return self._implement(common, deadline, evidence)
         except BaseException as error:
             record.update(status='failed', error=f'{type(error).__name__}: {error}')
             self._save()
@@ -278,7 +281,7 @@ class KernelAdvisoryTeam:
                     'without changing the board. Include every ID once; no duplicates or omissions. '
                     '\nExact required IDs: ' + json.dumps(ids) + '\nInvalid response: ' + json.dumps(vote))
 
-    def _implement(self, common, deadline):
+    def _implement(self, common, deadline, evidence):
         batch = self.rounds[-1]
         experiment = self.pending.pop(0)
         selected = next(item for item in batch['board'] if item['experiment_id'] == experiment)
@@ -294,7 +297,14 @@ class KernelAdvisoryTeam:
                 'or combine unrelated changes. Use current measured history to avoid repeating '
                 'a source. Check all hardware claims against the contract; return stop=true if '
                 'this experiment cannot be implemented legally or has already been tested. '
-                'Return complete standalone C source. No unmeasured speedup claims. '
+                'Prefer small guarded source edits: set source to an empty string, copy the '
+                'base_source_hash from measured history, and return edits with exact old/new '
+                'text. Each old text must match exactly once; edits apply sequentially. '
+                'Include enough surrounding text to disambiguate repeated assembly blocks. '
+                'Preserve all unchanged code and license notices. For a full rewrite instead, '
+                'return complete standalone C in source, an empty base_source_hash and no edits. '
+                'For stop=true return empty source/base_source_hash and no edits. '
+                'No unmeasured speedup claims. '
                 '\nSwarm-selected experiment:\n' + json.dumps(selected), SOURCE_SCHEMA, deadline)
             if type(response.get('stop')) is not bool:
                 raise ValueError('Malformed coordinator response')
@@ -302,9 +312,10 @@ class KernelAdvisoryTeam:
                 record.update(status='abstained', reason=response.get('hypothesis'))
                 self._save()
                 if self.pending and self.proposal_count < self.max_rounds:
-                    return self._implement(common, deadline)
+                    return self._implement(common, deadline, evidence)
                 return None
-            candidate = KernelCandidate(response['name'], response['source'],
+            source = candidate_source(response, evidence)
+            candidate = KernelCandidate(response['name'], source,
                                         response['hypothesis'], 'astra_coordinator')
             record.update(status='proposed', source_hash=hashlib.sha256(candidate.source.encode()).hexdigest(),
                           name=candidate.name, hypothesis=candidate.hypothesis)

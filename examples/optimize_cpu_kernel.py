@@ -64,7 +64,7 @@ def main():
         implementation_hashes={name: hashlib.sha256(
             (Path(sera.__file__).parent / name).read_bytes()).hexdigest() for name in
             ("kernel_search.py", "kernel_tools.py", "kernel_advisory.py", "kernel_advisor_roles.py",
-             "codex_agent.py", "kernel_swarm_plan.py", "cpu_kernel_validation.py")},
+             "codex_agent.py", "kernel_swarm_plan.py", "kernel_edits.py", "cpu_kernel_validation.py")},
     ))
     (folder / "journal.md").write_text(
         "# Sera CPU MatMul run\n\nStatus: running.\n\n"

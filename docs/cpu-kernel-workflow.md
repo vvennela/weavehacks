@@ -59,3 +59,11 @@ The local evaluator executes generated C with the current user's privileges. Tim
 The baseline controls reduce avoidable variation but do not fix CPU scheduling, temperature, frequency, interrupts, or other applications. Timing spread remains visible and can prevent promotion. The supplied correctness checks cover the declared examples, not every shape, dtype, alias rule, or CPU. The journal supports inspection after failure; automatic kernel-run recovery and model integration are not implemented.
 
 The shared board avoids all-to-all agent conversations. Each of 15 voters still reads the board, so board text is repeated across calls; this is not a claim of linear token growth for arbitrarily large swarms. CPU evaluations remain serial.
+
+Astra can return exact source edits for large kernels. Sera binds those edits to a
+source hash in measured history, requires each old span to match exactly once,
+and applies them to an in-memory copy. Unknown or changed bases and ambiguous
+spans are rejected before compilation. The saved trial still contains complete
+standalone source and follows the same correctness and performance gates.
+Full-source responses remain supported. This avoids returning an unchanged
+assembly file for each small experiment; it does not increase agent budgets.
