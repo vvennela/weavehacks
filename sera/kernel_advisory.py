@@ -317,7 +317,15 @@ class KernelAdvisoryTeam:
             source = candidate_source(response, evidence)
             candidate = KernelCandidate(response['name'], source,
                                         response['hypothesis'], 'astra_coordinator')
-            record.update(status='proposed', source_hash=hashlib.sha256(candidate.source.encode()).hexdigest(),
+            source_hash = hashlib.sha256(candidate.source.encode()).hexdigest()
+            if any(item['source_hash'] == source_hash for item in evidence):
+                record.update(status='abstained', source_hash=source_hash,
+                              reason='Generated source duplicates an already measured source')
+                self._save()
+                if self.pending and self.proposal_count < self.max_rounds:
+                    return self._implement(common, deadline, evidence)
+                return None
+            record.update(status='proposed', source_hash=source_hash,
                           name=candidate.name, hypothesis=candidate.hypothesis)
             self._save()
             return candidate

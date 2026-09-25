@@ -256,3 +256,36 @@ def test_astra_can_edit_a_hash_bound_source_without_repeating_the_file(tmp_path)
     saved = json.loads((tmp_path/'team/state.json').read_text())
     assert saved['rounds'][0]['implementations'][0]['source_hash'] == hashlib.sha256(
         b'modified source').hexdigest()
+
+
+def test_duplicate_source_response_advances_to_next_ranked_experiment(tmp_path):
+    import hashlib
+    calls = []
+    measured = history(tmp_path)
+    measured[0]['source_hash'] = hashlib.sha256(b'baseline source').hexdigest()
+    base = factory_for(calls)
+
+    def factory(**settings):
+        agent = base(**settings)
+        original = agent.request
+
+        def request(prompt, schema, *, timeout):
+            result = original(prompt, schema, timeout=timeout)
+            if Path(settings['work_dir']).name == 'implementation-001':
+                return dict(name='no-op', hypothesis='Unchanged experiment', stop=False,
+                    source='', base_source_hash=measured[0]['source_hash'],
+                    edits=[dict(old='baseline source', new='baseline source')])
+            return result
+
+        agent.request = request
+        return agent
+
+    team = KernelAdvisoryTeam(work_dir=tmp_path/'team', task='FP32', profile={},
+        max_rounds=2, batch_size=2, agent_factory=factory)
+    candidate = team.propose(measured, timeout=60)
+    assert candidate.source == 'new source'
+    records = team.rounds[0]['implementations']
+    assert [item['experiment_id'] for item in records] == list(DEFAULT_ADVISOR_IDS[:2])
+    assert [item['status'] for item in records] == ['abstained', 'proposed']
+    assert team.calls == 33
+    assert team.proposal_count == 2
