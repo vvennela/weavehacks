@@ -15,6 +15,7 @@
 
 ## Code
 
+- Commit completed, tested steps as work proceeds. Do not leave all changes for one final commit. Stage only the files for the completed step and preserve unrelated work.
 - Write only the code needed to meet the specification.
 - Write readable code. Do not write clever or compressed code when it reduces clarity.
 - Use clear, common-sense names for variables, functions, types, and files.
@@ -23,6 +24,9 @@
 - Do not reduce code size at the cost of correctness, readability, or useful structure.
 
 ## Specifications and Tests
+
+- Make every optimization baseline as deterministic as possible. Fix seeds, input data, workload, compiler/runtime versions and flags, thread count, hardware, and warmup procedure where possible. Record these controls with the results.
+- Repeat performance measurements and report their spread. Use unchanged baseline controls to detect timing drift. Do not promote a candidate based on a favorable timing sample or a gain inside the observed noise.
 
 - For each request, first establish the intended behavior, scope, constraints, and acceptance criteria.
 - Resolve material ambiguity before implementation. Make small, safe assumptions when they do not change the product intent, and state them.
