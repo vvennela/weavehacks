@@ -1,0 +1,11 @@
+{
+  "source_hash": "e1266e35d7ac46ddb944a135634286f0f76e2b1332c75f9d5d750b5a51c9db75",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "sme2_supported": "1",
+  "seed": 20260924,
+  "cases": 8,
+  "passed": true,
+  "max_absolute_error": 0,
+  "timing_claim": false,
+  "scope": "Validate paired SME2 vector load and four MOPA first-row semantics, not a GEMM benchmark"
+}

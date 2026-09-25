@@ -1,0 +1,79 @@
+{
+  "purpose": "Primary-source context for a CPU-only Sera advisory swarm. Evidence below supports experiment hypotheses; it does not establish a gain on the frozen hill.",
+  "sources": [
+    {
+      "id": "blis_m4_sme",
+      "url": "https://github.com/flame/blis/pull/921",
+      "attribution": "BLIS project pull request and associated author commits",
+      "evidence": "The M4 configuration uses a 512-bit streaming vector length and an FP32 2SVL-by-2SVL (32x32) SME microkernel. The change also adds SME packing paths. A packer commit states that it uses ZA tile read capabilities for more efficient packing; its source uses four-lane-group ZA reads, vector interleaving, and SVE stores.",
+      "source_detail_url": "https://github.com/flame/blis/commit/c8a29f8794b8cf1f433e5708499df8764e009f8c.patch",
+      "limits": "Library implementation evidence only. Its macro-kernel, pack costs, and benchmark setup differ from the frozen hill; do not treat its results as a candidate score."
+    },
+    {
+      "id": "hello_sme_gemm",
+      "url": "https://scalable.uni-jena.de/opt/sme/gemm.html",
+      "attribution": "Authors of the Hello SME tutorial and M4 GEMM implementation",
+      "evidence": "The authors describe four FP32 ZA tiles and 32x32 output tiling. They report that indirect output transfer through SVE registers was faster than direct ZA stores in their implementation. They also report no benefit from K-loop unrolling in that implementation. Their table labels 1748.0 GFLOP/s as Apple Accelerate, non-transposed B, and 1825.1 GFLOP/s as Apple Accelerate, transposed B; these are not measurements of the frozen hill or necessarily the authors' microkernel.",
+      "limits": "Their operation and timing conditions differ. The observed store result and unrolling result require revalidation under the frozen hill."
+    },
+    {
+      "id": "hello_sme_microbench",
+      "url": "https://scalable.uni-jena.de/opt/sme/micro.html",
+      "attribution": "Authors of the Hello SME microbenchmark notes",
+      "evidence": "The notes describe FP32 FMOPA accumulation into four ZA.S tiles and report microbenchmark rates for one, two, and four tiles. This supports use of up to four independent FP32 ZA tiles on this path; eight FP32 accumulator tiles are not a valid design assumption.",
+      "limits": "Microbenchmark figures are not end-to-end GEMM scores and do not transfer directly to the frozen hill."
+    },
+    {
+      "id": "local_sme2_probe",
+      "url": "file:evidence/cpu-sme2-load-probe-2026-09-24/README.md",
+      "attribution": "Local Apple clang 21 compiler and correctness probes; source and generated assembly are in this evidence directory",
+      "evidence": "On the reported M4 Pro SME2 target, the paired-vector probe compiled to two multi-vector load instructions for four FP32 operand vectors. Eight fixed-seed cases matched exact expected values with guards intact. The indirect-store probe also passed eight exact guarded cases and assembly showed ZA-to-vector transfers followed by vector stores.",
+      "limits": "Instruction/code-generation and correctness evidence only: one row per ZA tile, not a GEMM; no timing or speedup measurement. Full-vector probe accesses do not validate tail handling."
+    }
+  ],
+  "hypotheses_for_hill_candidates": [
+    {
+      "id": "pack_both_operands_as_k_major_panels",
+      "hypothesis": "For n=512 and FP32, pack a 32-wide A panel and a 32-wide B panel into contiguous K-major micro-panels so each K step can reuse both operands locally instead of reading both original transposed layouts at a 2048-byte stride. Each panel is 32*512*4 = 65536 bytes; together they equal the observed 131072-byte P-core L1D capacity, leaving no capacity margin. This is a locality hypothesis, not evidence of cache-set conflicts or a gain.",
+      "evidence_basis": [
+        "blis_m4_sme"
+      ],
+      "required_checks": [
+        "include packing in timed scope",
+        "measure on the frozen single-thread workload",
+        "check shapes, tails, and guards",
+        "compare repeated timings against unchanged baseline"
+      ]
+    },
+    {
+      "id": "store_output_via_sve_registers",
+      "hypothesis": "Read each completed ZA output row to an SVE register and store through ordinary vector stores; the local probe confirms code generation and exact first-row semantics, while the Hello SME authors report this route faster in their implementation.",
+      "evidence_basis": [
+        "hello_sme_gemm",
+        "local_sme2_probe"
+      ],
+      "required_checks": [
+        "benchmark within full GEMM",
+        "verify beta=0 overwrite semantics",
+        "verify all rows and tail paths"
+      ]
+    },
+    {
+      "id": "paired_sme2_operand_loads",
+      "hypothesis": "Test SME2 paired multi-vector loads for the two adjacent A vectors and two adjacent B vectors used by each four-tile FP32 update. This can use the current transposed-A layout or a newly packed panel: pair contiguity does not require repacking. The local compiler probe confirms two such instructions for four vectors and exact sample results; whether this improves the GEMM loop is unknown.",
+      "evidence_basis": [
+        "local_sme2_probe"
+      ],
+      "required_checks": [
+        "inspect full candidate assembly",
+        "preserve guarded tails and general-shape correctness",
+        "measure packing plus compute under the frozen hill"
+      ]
+    }
+  ],
+  "measurement_boundary": {
+    "frozen_hill": "Keep the exact signed workload, compiler flags, thread count, correctness checks, and timing procedure unchanged.",
+    "do_not_conflate": "The 1748.0/1825.1 GFLOP/s values are explicitly labeled Apple Accelerate in the Hello SME table. They are neither the authors' microkernel score nor the current frozen hill baseline.",
+    "claim_policy": "None of the sources or probes proves a performance gain for these hypotheses."
+  }
+}

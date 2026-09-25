@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "cases": 8,
+  "seed": 20260924,
+  "source_sha256": "61c516dac7127750a04c478bb39d73891d6e7de519bdbb838c1795fac57f824a",
+  "scope": "One row of each of four ZA tiles; not a full GEMM",
+  "timing_claim": false
+}
