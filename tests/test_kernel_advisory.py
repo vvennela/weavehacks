@@ -347,3 +347,18 @@ def test_implementation_timeout_consumes_attempt_and_keeps_ranked_queue(tmp_path
     assert [r['status'] for r in records] == ['failed', 'proposed']
     assert 'TimeoutExpired' in records[0]['error']
     assert team.propose(history(tmp_path), timeout=60) is None
+
+
+def test_astra_can_select_strassen_specialist_without_increasing_swarm_size(tmp_path):
+    roster = list(DEFAULT_ADVISOR_IDS[:-1]) + ['strassen_one_level']
+    calls = []
+    team = KernelAdvisoryTeam(work_dir=tmp_path/'team',
+        task='User approved one-level FP32 Strassen with unchanged gates', profile={},
+        max_rounds=1, agent_factory=factory_for(calls, [roster]))
+    candidate = team.propose(history(tmp_path), timeout=60)
+    assert candidate.source == 'new source'
+    state = json.loads((tmp_path/'team/state.json').read_text())
+    assert state['rounds'][0]['roles'] == roster
+    assert len(state['rounds'][0]['advice']) == 15
+    assert len(state['rounds'][0]['ballots']) == 15
+    assert sum(settings['model'] == 'gpt-6-luna' for settings, _ in calls) == 30

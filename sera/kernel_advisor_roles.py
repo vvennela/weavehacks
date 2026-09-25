@@ -35,6 +35,7 @@ ALTERNATE_ADVISOR_IDS = (
     "assembly_audit",
     "fp32_sve_fallback",
     "cache_conflict_layout",
+    "strassen_one_level",
 )
 
 
@@ -136,4 +137,13 @@ ADVISOR_ROLES = {
         "Study FP32 scratch stride and cache-set conflicts for the named CPU and dimensions. "
         "Padding must remain in bounds and its full allocation and traffic cost must be measured."
     ),
+    "strassen_one_level": (
+        "Advise on the user-approved single-level 512-to-256 FP32 Strassen path. "
+        "Check all seven-product equations, recombination signs, and row-major mapping "
+        "to a dense 256-square NN beta-zero helper. Keep packing, allocation, products, "
+        "and recombination inside the timed call; preserve tolerance and the general fallback. "
+        "Account for FP32 rounding risk and packing quadrants whose parent stride is 512. "
+        "Do not propose deeper recursion, Winograd, mixed precision, or policy changes."
+    ),
+
 }

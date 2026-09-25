@@ -1,0 +1,16 @@
+{
+  "upstream_commit": "10490f10e79d4511f252c33279ef970a188cfab6",
+  "static_library_sha256": "a1d0cf95526fa72b27e3ea77462ef0e8def3f31594450988af3ac6bd5e6d7ac8",
+  "exporter_sha256": "fd39ec9d8f4487f9165e7ca18bd55084315d9c759796cc4c4ed2313081cc9c51",
+  "source_sha256": "6da51812fe0381ca480ab740f511d24a6592d1b1c8c816976d743fa67c292d52",
+  "binary_sha256": "b1daeed56d4f80bc42927b85a7efe8191ffef868fa05f41c2ad42a8e769d7d28",
+  "code_bytes": 2500,
+  "byte_identical": true,
+  "no_body_relocations": true,
+  "no_external_calls_or_addresses": true,
+  "all_direct_branches_internal": true,
+  "no_x18": true,
+  "license_preserved": true,
+  "performance_measured": false,
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+}
