@@ -17,6 +17,9 @@ from .kernel_search import KernelCandidate
 from .storage import save_json
 
 
+DEFAULT_KERNEL_MODEL = "gpt-6-luna"
+
+
 def research_environment():
     """Pass local tool/auth locations, never API-key provider credentials."""
     environment = {name: os.environ[name] for name in (
@@ -101,7 +104,7 @@ class CodexKernelProposer:
         self.work_dir = Path(work_dir).resolve()
         self.work_dir.mkdir(parents=True, exist_ok=False)
         self.task = task
-        self.model = model
+        self.model = DEFAULT_KERNEL_MODEL if model is None else model
         self.timeout = timeout
         self.executable = executable
         self.calls = 0

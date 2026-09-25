@@ -80,3 +80,17 @@ def test_duplicate_source_does_not_reach_evaluator_queue(tmp_path):
         task="test", max_calls=3, agent_factory=factory)
     assert team.propose([], timeout=10).source == "same"
     assert team.propose([], timeout=10) is None
+
+
+def test_team_uses_luna_for_codex_specialists(tmp_path, monkeypatch):
+    models = []
+    class Agent:
+        def __init__(self, **kwargs):
+            models.append(kwargs["model"])
+        def propose(self, history, *, timeout):
+            return None
+    monkeypatch.setattr("sera.kernel_specialists.CodexKernelProposer", Agent)
+    team = KernelSpecialistTeam(work_dir=tmp_path / "team", profile=PROFILE,
+                               task="test", max_calls=3)
+    assert team.propose([], timeout=10) is None
+    assert models == ["gpt-6-luna"] * 3

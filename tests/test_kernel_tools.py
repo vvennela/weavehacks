@@ -42,7 +42,7 @@ def test_codex_uses_chatgpt_only_and_parses_complete_source(tmp_path, monkeypatc
     assert "--ignore-user-config" in args
     assert 'forced_login_method="chatgpt"' in args
     assert args[args.index("--sandbox") + 1] == "read-only"
-    assert "--model" not in args
+    assert args[args.index("--model") + 1] == "gpt-6-luna"
 
 
 def test_hills_verifies_signature_before_returning_report(tmp_path, monkeypatch):

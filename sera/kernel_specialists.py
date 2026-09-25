@@ -9,7 +9,7 @@ from pathlib import Path
 import time
 
 from .kernel_search import KernelCandidate
-from .kernel_tools import CodexKernelProposer
+from .kernel_tools import DEFAULT_KERNEL_MODEL, CodexKernelProposer
 from .storage import content_hash, save_json
 
 
@@ -78,7 +78,8 @@ class KernelSpecialistTeam:
         self.profile = json.loads(json.dumps(profile))
         self.profile_key = content_hash(self.profile)
         self.task, self.max_calls, self.active = task, max_calls, active
-        self.timeout, self.model = timeout, model
+        self.timeout = timeout
+        self.model = DEFAULT_KERNEL_MODEL if model is None else model
         self.factory = agent_factory or self._codex_agent
         self.calls, self.memory, self.records, self.queue = {}, {}, [], []
         self.observed, self.proposed = set(), set()

@@ -17,10 +17,10 @@ python examples/optimize_cpu_kernel.py \
   --max-candidates 6 \
   --agent-timeout 180 \
   --max-seconds 1200 \
-  --target-gflops 1780
+  --target-gflops 1800
 ```
 
-The output directory must not exist. `--model` is optional; omission uses the Codex CLI default. `--specialists 1` selects the simple single-agent proposer. Two or three selects the delegator. The candidate cap also caps total specialist calls in this example. Plan usage is consumed; no dollar-cost guarantee is inferred from a call limit.
+The output directory must not exist. `--model` defaults to `gpt-6-luna`, including when using the Python proposer or specialist team directly. `--specialists 1` selects the simple single-agent proposer. Two or three selects the delegator. The candidate cap also caps total specialist calls in this example. Plan usage is consumed; no dollar-cost guarantee is inferred from a call limit.
 
 The M4 example fixes single-thread float32 row-major `C=A@B` with `void gemm(int n, const float *A, const float *B, float *C)`. It targets Apple clang and the existing 512×512 hill with tolerance 0.002. Adapt the task and hardware profile before using this example for another CPU or operator.
 
@@ -31,7 +31,7 @@ The M4 example fixes single-thread float32 row-major `C=A@B` with `void gemm(int
 3. The frozen hill supplies three signed baseline reports. Each report retains its original best-of-three scoring convention.
 4. A deterministic router scores the reviewed specialist catalog and selects at most three relevant roles. No specialist sends messages to another specialist. Codex returns structured source under a read-only tool policy; Sera writes the candidate snapshot.
 5. Each candidate passes correctness before timing. Three candidate reports alternate with three unchanged-control reports. Promotion requires the candidate's slowest report to exceed the control's fastest report by at least 5%.
-6. The selected artifact gets one final held-out evaluation. Correctness failure or a material final timing regression returns no accepted source. The 1,780 target requires every selected validation report and the final score to exceed 1,780.
+6. The selected artifact gets one final held-out evaluation. Correctness failure or a material final timing regression returns no accepted source. The 1,800 target requires every selected validation report and the final score to exceed 1,800.
 
 Relevant MatMul specialties include SME tiles, register tiling, packing, cache blocking, instruction scheduling, memory traffic, vectorization, compiler code generation, alignment/tails, numerical semantics, prefetch/TLB behavior, and allocation lifetime. Parallelism and model-graph roles require explicit capabilities and remain inactive in this single-threaded standalone-kernel workload.
 

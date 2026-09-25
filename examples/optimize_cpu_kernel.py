@@ -12,7 +12,7 @@ import platform
 import subprocess
 
 from sera.kernel_search import KernelCandidate, optimize_kernel
-from sera.kernel_tools import CodexKernelProposer, HillsKernelEvaluator, research_environment
+from sera.kernel_tools import DEFAULT_KERNEL_MODEL, CodexKernelProposer, HillsKernelEvaluator, research_environment
 from sera.cpu_kernel_validation import validate_cpu_kernel
 from sera.kernel_specialists import KernelSpecialistTeam
 from sera.storage import save_json
@@ -25,10 +25,10 @@ def main():
     parser.add_argument("--hill-workspace", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--max-candidates", type=int, default=6)
-    parser.add_argument("--target-gflops", type=float, default=1780.0)
+    parser.add_argument("--target-gflops", type=float, default=1800.0)
     parser.add_argument("--agent-timeout", type=float, default=180)
     parser.add_argument("--max-seconds", type=float, default=1800)
-    parser.add_argument("--model", default=None, help="Optional Codex model; otherwise CLI default")
+    parser.add_argument("--model", default=DEFAULT_KERNEL_MODEL, help="Codex model (default: gpt-6-luna)")
     parser.add_argument("--specialists", type=int, choices=[1, 2, 3], default=3)
     args = parser.parse_args()
     folder = args.output.resolve()
@@ -41,14 +41,14 @@ def main():
         comparison="Three repeats; alternating unchanged control/candidate; separated ranges plus 5%",
         environment={key: value for key, value in research_environment().items()
                      if key.endswith("THREADS") or key == "PYTHONHASHSEED"},
-        provider="Codex CLI, ChatGPT login only", model=args.model or "Codex CLI default",
+        provider="Codex CLI, ChatGPT login only", model=args.model,
         implementation_hashes={name: hashlib.sha256(
             (Path(sera.__file__).parent / name).read_bytes()).hexdigest() for name in
             ("kernel_search.py", "kernel_tools.py", "kernel_specialists.py", "cpu_kernel_validation.py")},
     ))
     (folder / "journal.md").write_text(
         "# Sera CPU MatMul run\n\nStatus: running.\n\n"
-        "Goal: exceed 1,780 GFLOP/s on this M4 Pro under the unchanged single-threaded "
+        f"Goal: exceed {args.target_gflops:,.0f} GFLOP/s on this M4 Pro under the unchanged single-threaded "
         "512-square float32 hill. Three repeated official reports per source, paired "
         "with unchanged controls; one final held-out run. No best-of-repeats promotion. "
         "The hill itself retains its fixed best-of-three scoring rule.\n\n"
