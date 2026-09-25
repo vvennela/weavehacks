@@ -1,0 +1,164 @@
+{
+  "schema_version": "sera-libxsmm-reference-baseline-verification-v1",
+  "reference": "LIBXSMM AOT-generated editable FP32 GEMM reference",
+  "baseline_run_status": "completed",
+  "performance_runs_performed_by_verifier": false,
+  "hill_report_verification": {
+    "method": "hills verify --json <report>",
+    "report_count": 4,
+    "all_signatures_valid": true,
+    "all_official": true,
+    "all_passed": true,
+    "same_hill_tree": true,
+    "same_submission_hash": true,
+    "reports": [
+      {
+        "path": "baseline-run/search/trial-000/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1541.2532704114913,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:587a3d274203c4eb9f82282744d91c9720b2c4d023c35bd247db17cdba4c13e2"
+      },
+      {
+        "path": "baseline-run/search/trial-000/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1333.2842863403828,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:587a3d274203c4eb9f82282744d91c9720b2c4d023c35bd247db17cdba4c13e2"
+      },
+      {
+        "path": "baseline-run/search/trial-000/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1328.0665951598835,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:587a3d274203c4eb9f82282744d91c9720b2c4d023c35bd247db17cdba4c13e2"
+      },
+      {
+        "path": "baseline-run/search/final.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": true,
+        "gflops": 1533.1897399707996,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:587a3d274203c4eb9f82282744d91c9720b2c4d023c35bd247db17cdba4c13e2"
+      }
+    ]
+  },
+  "public_correctness": {
+    "independent_rechecks_run": true,
+    "results": [
+      {
+        "artifact": "baseline-run/search/trial-000/source/kernel.c",
+        "source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+        "source_hash_matches_recheck": true,
+        "independent_recheck_passed": true,
+        "case_count": 48,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "worst_relative_error": 1.0017720606112918e-06,
+        "timing_claim": false
+      },
+      {
+        "artifact": "source/kernel.c",
+        "source_sha256": "9cb2d2f8b0c6cba1c6feab3686ec0b787b37c9f60e09015b34d0ce20da023215",
+        "source_hash_matches_recheck": true,
+        "independent_recheck_passed": true,
+        "case_count": 48,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "worst_relative_error": 1.0017720606112918e-06,
+        "timing_claim": false
+      }
+    ],
+    "case_count_each": 48,
+    "no_timing_claim": true
+  },
+  "baseline_identity": {
+    "source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+    "saved_trial_source_matches_editable_source": true,
+    "source_provenance_upstream": "https://github.com/libxsmm/libxsmm",
+    "source_provenance_commit": "10490f10e79d4511f252c33279ef970a188cfab6",
+    "aot_source_sha256_matches_record": true,
+    "roundtrip_record_passed": true,
+    "binary_bytes": 2500,
+    "binary_hash_matches_roundtrip_and_provenance": true,
+    "roundtrip_independent_reassembly_performed": false
+  },
+  "measurement_summary": {
+    "baseline_validation_gflops": [
+      1541.2532704114913,
+      1333.2842863403828,
+      1328.0665951598835
+    ],
+    "final_baseline_gflops": 1533.1897399707996,
+    "target_gflops": 1800.0,
+    "target_met": false,
+    "candidate_count": 0,
+    "accepted_optimization": null
+  },
+  "host_checks": {
+    "observation_count": 4,
+    "all_ac_and_power_settings_unchanged": true,
+    "no_recorded_thermal_or_performance_warning": true
+  },
+  "limits": [
+    "This verifies the saved baseline and finite deterministic correctness checks; it does not establish an optimization gain.",
+    "The 48-case suite does not prove correctness for every dimension.",
+    "The binary hash and size match the saved round-trip record; independent reassembly was not performed.",
+    "The target of 1800 GFLOP/s was not met."
+  ]
+}

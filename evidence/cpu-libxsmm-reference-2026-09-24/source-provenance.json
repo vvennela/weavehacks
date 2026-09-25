@@ -1,0 +1,16 @@
+{
+  "upstream": "https://github.com/libxsmm/libxsmm",
+  "commit": "10490f10e79d4511f252c33279ef970a188cfab6",
+  "binary_sha256": "fb16a87f80b9992e9878900340900a310ec783c2dc35040dcae94097610f28e4",
+  "source_sha256": "9cb2d2f8b0c6cba1c6feab3686ec0b787b37c9f60e09015b34d0ce20da023215",
+  "export": {
+    "target": "appl_m4",
+    "code_size": 2500,
+    "nflops": 268435456,
+    "parameter_size": 176,
+    "a_offset": 32,
+    "b_offset": 80,
+    "c_offset": 128
+  },
+  "adaptation": "AOT exact generated beta-zero kernel; row-major argument swap; existing SME fallback; all generated packing remains per-call; no runtime external library"
+}

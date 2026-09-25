@@ -1,0 +1,25 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 0,
+  "max_model_calls": 1,
+  "calls": 0,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 0,
+  "adjudications": [],
+  "profile": {
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "single-thread",
+      "neon",
+      "simd",
+      "sme"
+    ]
+  },
+  "rounds": []
+}

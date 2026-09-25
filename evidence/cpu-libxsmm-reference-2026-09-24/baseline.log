@@ -1,0 +1,129 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "completed",
+  "trials": [
+    {
+      "name": "existing-sme",
+      "hypothesis": "Unchanged existing SME kernel",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/source/kernel.c",
+      "source_hash": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+      "status": "passed",
+      "scores": [
+        1541.2532704114913,
+        1333.2842863403828,
+        1328.0665951598835
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/validation-2.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 1333.2842863403828,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    }
+  ],
+  "target_gflops": 1800.0,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/source/kernel.c",
+  "policy": {
+    "max_candidates": 0,
+    "repeats": 3,
+    "min_improvement": 0.05,
+    "max_seconds": 300.0
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "candidate-budget",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/final.json",
+  "final_gflops": 1533.1897399707996,
+  "final_minimum_gflops": 1261.6632654018892
+}
