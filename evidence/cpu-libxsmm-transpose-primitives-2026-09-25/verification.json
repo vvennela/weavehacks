@@ -1,0 +1,50 @@
+{
+  "upstream_commit": "10490f10e79d4511f252c33279ef970a188cfab6",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+  "static_library_sha256": "a1d0cf95526fa72b27e3ea77462ef0e8def3f31594450988af3ac6bd5e6d7ac8",
+  "exporter_sha256": "f7583687eb92b00169ee70724984d60a97a35d5b9d3d1fd92ce11711636d33a5",
+  "reused_translation_sha256": "9864d3bd70b84c9503e6d88503666a35730e5272efcb33d1250264d728df6685",
+  "variants": [
+    {
+      "variant": "ta",
+      "code_bytes": 3216,
+      "instruction_count": 804,
+      "source_sha256": "57588f80f6c87d597ac0ba425945cd974295f0f2562301e353f61b049858a339",
+      "binary_sha256": "fa9ec229695ec285f19eff82ad432afda18f09dfad962f6cd915bcc1ce1feef0",
+      "byte_identical": true,
+      "no_body_relocations": true,
+      "no_external_calls_or_addresses": true,
+      "all_direct_branches_internal": true,
+      "no_x18": true,
+      "license_preserved": true
+    },
+    {
+      "variant": "tb",
+      "code_bytes": 1520,
+      "instruction_count": 380,
+      "source_sha256": "be098846707aa8aaebb8f23ac2f43d0697d7fc5cbecc1c9f12e5da67130ba77f",
+      "binary_sha256": "b83e9ea8639a7c73adf25c694ce38824c1622eb93c4d9897b6ae52c9a3ea201f",
+      "byte_identical": true,
+      "no_body_relocations": true,
+      "no_external_calls_or_addresses": true,
+      "all_direct_branches_internal": true,
+      "no_x18": true,
+      "license_preserved": true
+    },
+    {
+      "variant": "tt",
+      "code_bytes": 2236,
+      "instruction_count": 559,
+      "source_sha256": "3cc6a6ce315b9672ec47cb2ed32bd9704b09675874d72fd2b029d97327b6107b",
+      "binary_sha256": "f0a612575fb0bf9472f5e5fea28e051819e872c323b531b00b9c06442e8f87df",
+      "byte_identical": true,
+      "no_body_relocations": true,
+      "no_external_calls_or_addresses": true,
+      "all_direct_branches_internal": true,
+      "no_x18": true,
+      "license_preserved": true
+    }
+  ],
+  "performance_measured": false,
+  "kernel_candidate_selected": false
+}

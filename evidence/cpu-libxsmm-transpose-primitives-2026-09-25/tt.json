@@ -1,0 +1,21 @@
+{
+  "target": "appl_m4",
+  "code_size": 2236,
+  "nflops": 268435456,
+  "parameter_size": 176,
+  "a_offset": 32,
+  "b_offset": 80,
+  "c_offset": 128,
+  "variant": "tt",
+  "upstream_commit": "10490f10e79d4511f252c33279ef970a188cfab6",
+  "m": 512,
+  "n": 512,
+  "k": 512,
+  "lda": 512,
+  "ldb": 512,
+  "ldc": 512,
+  "beta": 0,
+  "trans_a": true,
+  "trans_b": true,
+  "binary_sha256": "f0a612575fb0bf9472f5e5fea28e051819e872c323b531b00b9c06442e8f87df"
+}

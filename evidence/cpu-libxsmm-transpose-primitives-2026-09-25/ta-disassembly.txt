@@ -1,0 +1,810 @@
+
+/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-transpose-primitives-ja183xzk/ta-editable.o:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000000000000 <ltmp0>:
+       0: d10303ff     	sub	sp, sp, #0xc0
+       4: 6d0b27e8     	stp	d8, d9, [sp, #0xb0]
+       8: 6d0a2fea     	stp	d10, d11, [sp, #0xa0]
+       c: 6d0937ec     	stp	d12, d13, [sp, #0x90]
+      10: 6d083fee     	stp	d14, d15, [sp, #0x80]
+      14: a90557f4     	stp	x20, x21, [sp, #0x50]
+      18: a9045ff6     	stp	x22, x23, [sp, #0x40]
+      1c: a9026ffa     	stp	x26, x27, [sp, #0x20]
+      20: a90177fc     	stp	x28, x29, [sp, #0x10]
+      24: f90003fe     	str	x30, [sp]
+      28: 8a00000a     	and	x10, x0, x0
+      2c: f9401140     	ldr	x0, [x10, #0x20]
+      30: f9402941     	ldr	x1, [x10, #0x50]
+      34: f9404142     	ldr	x2, [x10, #0x80]
+      38: 910003fd     	mov	x29, sp
+      3c: d10303ff     	sub	sp, sp, #0xc0
+      40: d29ff80a     	mov	x10, #0xffc0            ; =65472
+      44: f2bfffea     	movk	x10, #0xffff, lsl #16
+      48: f2dfffea     	movk	x10, #0xffff, lsl #32
+      4c: f2ffffea     	movk	x10, #0xffff, lsl #48
+      50: 910003e9     	mov	x9, sp
+      54: 8a0a0129     	and	x9, x9, x10
+      58: 9100013f     	mov	sp, x9
+      5c: d503477f     	smstart
+      60: d2804007     	mov	x7, #0x200              ; =512
+      64: 910003f4     	mov	x20, sp
+      68: d14083ff     	sub	sp, sp, #0x20, lsl #12  ; =0x20000
+      6c: 910003e3     	mov	x3, sp
+      70: 910003fa     	mov	x26, sp
+      74: d280040b     	mov	x11, #0x20              ; =32
+      78: 5280000c     	mov	w12, #0x0               ; =0
+      7c: 5280002d     	mov	w13, #0x1               ; =1
+      80: 5280004e     	mov	w14, #0x2               ; =2
+      84: 5280006f     	mov	w15, #0x3               ; =3
+      88: 2518e3e0     	ptrue	p0.b
+      8c: a540a020     	ld1w	{ z0.s }, p0/z, [x1]
+      90: 91200021     	add	x1, x1, #0x800
+      94: a540a021     	ld1w	{ z1.s }, p0/z, [x1]
+      98: 91200021     	add	x1, x1, #0x800
+      9c: a540a022     	ld1w	{ z2.s }, p0/z, [x1]
+      a0: 91200021     	add	x1, x1, #0x800
+      a4: a540a023     	ld1w	{ z3.s }, p0/z, [x1]
+      a8: 91200021     	add	x1, x1, #0x800
+      ac: a540a024     	ld1w	{ z4.s }, p0/z, [x1]
+      b0: 91200021     	add	x1, x1, #0x800
+      b4: a540a025     	ld1w	{ z5.s }, p0/z, [x1]
+      b8: 91200021     	add	x1, x1, #0x800
+      bc: a540a026     	ld1w	{ z6.s }, p0/z, [x1]
+      c0: 91200021     	add	x1, x1, #0x800
+      c4: a540a027     	ld1w	{ z7.s }, p0/z, [x1]
+      c8: 91200021     	add	x1, x1, #0x800
+      cc: a540a028     	ld1w	{ z8.s }, p0/z, [x1]
+      d0: 91200021     	add	x1, x1, #0x800
+      d4: a540a029     	ld1w	{ z9.s }, p0/z, [x1]
+      d8: 91200021     	add	x1, x1, #0x800
+      dc: a540a02a     	ld1w	{ z10.s }, p0/z, [x1]
+      e0: 91200021     	add	x1, x1, #0x800
+      e4: a540a02b     	ld1w	{ z11.s }, p0/z, [x1]
+      e8: 91200021     	add	x1, x1, #0x800
+      ec: a540a02c     	ld1w	{ z12.s }, p0/z, [x1]
+      f0: 91200021     	add	x1, x1, #0x800
+      f4: a540a02d     	ld1w	{ z13.s }, p0/z, [x1]
+      f8: 91200021     	add	x1, x1, #0x800
+      fc: a540a02e     	ld1w	{ z14.s }, p0/z, [x1]
+     100: 91200021     	add	x1, x1, #0x800
+     104: a540a02f     	ld1w	{ z15.s }, p0/z, [x1]
+     108: 91200021     	add	x1, x1, #0x800
+     10c: a540a030     	ld1w	{ z16.s }, p0/z, [x1]
+     110: 91200021     	add	x1, x1, #0x800
+     114: a540a031     	ld1w	{ z17.s }, p0/z, [x1]
+     118: 91200021     	add	x1, x1, #0x800
+     11c: a540a032     	ld1w	{ z18.s }, p0/z, [x1]
+     120: 91200021     	add	x1, x1, #0x800
+     124: a540a033     	ld1w	{ z19.s }, p0/z, [x1]
+     128: 91200021     	add	x1, x1, #0x800
+     12c: a540a034     	ld1w	{ z20.s }, p0/z, [x1]
+     130: 91200021     	add	x1, x1, #0x800
+     134: a540a035     	ld1w	{ z21.s }, p0/z, [x1]
+     138: 91200021     	add	x1, x1, #0x800
+     13c: a540a036     	ld1w	{ z22.s }, p0/z, [x1]
+     140: 91200021     	add	x1, x1, #0x800
+     144: a540a037     	ld1w	{ z23.s }, p0/z, [x1]
+     148: 91200021     	add	x1, x1, #0x800
+     14c: a540a038     	ld1w	{ z24.s }, p0/z, [x1]
+     150: 91200021     	add	x1, x1, #0x800
+     154: a540a039     	ld1w	{ z25.s }, p0/z, [x1]
+     158: 91200021     	add	x1, x1, #0x800
+     15c: a540a03a     	ld1w	{ z26.s }, p0/z, [x1]
+     160: 91200021     	add	x1, x1, #0x800
+     164: a540a03b     	ld1w	{ z27.s }, p0/z, [x1]
+     168: 91200021     	add	x1, x1, #0x800
+     16c: a540a03c     	ld1w	{ z28.s }, p0/z, [x1]
+     170: 91200021     	add	x1, x1, #0x800
+     174: a540a03d     	ld1w	{ z29.s }, p0/z, [x1]
+     178: 91200021     	add	x1, x1, #0x800
+     17c: a540a03e     	ld1w	{ z30.s }, p0/z, [x1]
+     180: 91200021     	add	x1, x1, #0x800
+     184: a540a03f     	ld1w	{ z31.s }, p0/z, [x1]
+     188: 91200021     	add	x1, x1, #0x800
+     18c: c0840400     	mov	za0h.s[w12, 0x0:0x3], { z0.s - z3.s }
+     190: 1100118c     	add	w12, w12, #0x4
+     194: c0840480     	mov	za0h.s[w12, 0x0:0x3], { z4.s - z7.s }
+     198: 1100118c     	add	w12, w12, #0x4
+     19c: c0840500     	mov	za0h.s[w12, 0x0:0x3], { z8.s - z11.s }
+     1a0: 1100118c     	add	w12, w12, #0x4
+     1a4: c0840580     	mov	za0h.s[w12, 0x0:0x3], { z12.s - z15.s }
+     1a8: 1100118c     	add	w12, w12, #0x4
+     1ac: c0842601     	mov	za1h.s[w13, 0x0:0x3], { z16.s - z19.s }
+     1b0: 110011ad     	add	w13, w13, #0x4
+     1b4: c0842681     	mov	za1h.s[w13, 0x0:0x3], { z20.s - z23.s }
+     1b8: 110011ad     	add	w13, w13, #0x4
+     1bc: c0842701     	mov	za1h.s[w13, 0x0:0x3], { z24.s - z27.s }
+     1c0: 110011ad     	add	w13, w13, #0x4
+     1c4: c0842781     	mov	za1h.s[w13, 0x0:0x3], { z28.s - z31.s }
+     1c8: 110011ad     	add	w13, w13, #0x4
+     1cc: a540a020     	ld1w	{ z0.s }, p0/z, [x1]
+     1d0: 91200021     	add	x1, x1, #0x800
+     1d4: a540a021     	ld1w	{ z1.s }, p0/z, [x1]
+     1d8: 91200021     	add	x1, x1, #0x800
+     1dc: a540a022     	ld1w	{ z2.s }, p0/z, [x1]
+     1e0: 91200021     	add	x1, x1, #0x800
+     1e4: a540a023     	ld1w	{ z3.s }, p0/z, [x1]
+     1e8: 91200021     	add	x1, x1, #0x800
+     1ec: a540a024     	ld1w	{ z4.s }, p0/z, [x1]
+     1f0: 91200021     	add	x1, x1, #0x800
+     1f4: a540a025     	ld1w	{ z5.s }, p0/z, [x1]
+     1f8: 91200021     	add	x1, x1, #0x800
+     1fc: a540a026     	ld1w	{ z6.s }, p0/z, [x1]
+     200: 91200021     	add	x1, x1, #0x800
+     204: a540a027     	ld1w	{ z7.s }, p0/z, [x1]
+     208: 91200021     	add	x1, x1, #0x800
+     20c: a540a028     	ld1w	{ z8.s }, p0/z, [x1]
+     210: 91200021     	add	x1, x1, #0x800
+     214: a540a029     	ld1w	{ z9.s }, p0/z, [x1]
+     218: 91200021     	add	x1, x1, #0x800
+     21c: a540a02a     	ld1w	{ z10.s }, p0/z, [x1]
+     220: 91200021     	add	x1, x1, #0x800
+     224: a540a02b     	ld1w	{ z11.s }, p0/z, [x1]
+     228: 91200021     	add	x1, x1, #0x800
+     22c: a540a02c     	ld1w	{ z12.s }, p0/z, [x1]
+     230: 91200021     	add	x1, x1, #0x800
+     234: a540a02d     	ld1w	{ z13.s }, p0/z, [x1]
+     238: 91200021     	add	x1, x1, #0x800
+     23c: a540a02e     	ld1w	{ z14.s }, p0/z, [x1]
+     240: 91200021     	add	x1, x1, #0x800
+     244: a540a02f     	ld1w	{ z15.s }, p0/z, [x1]
+     248: 91200021     	add	x1, x1, #0x800
+     24c: a540a030     	ld1w	{ z16.s }, p0/z, [x1]
+     250: 91200021     	add	x1, x1, #0x800
+     254: a540a031     	ld1w	{ z17.s }, p0/z, [x1]
+     258: 91200021     	add	x1, x1, #0x800
+     25c: a540a032     	ld1w	{ z18.s }, p0/z, [x1]
+     260: 91200021     	add	x1, x1, #0x800
+     264: a540a033     	ld1w	{ z19.s }, p0/z, [x1]
+     268: 91200021     	add	x1, x1, #0x800
+     26c: a540a034     	ld1w	{ z20.s }, p0/z, [x1]
+     270: 91200021     	add	x1, x1, #0x800
+     274: a540a035     	ld1w	{ z21.s }, p0/z, [x1]
+     278: 91200021     	add	x1, x1, #0x800
+     27c: a540a036     	ld1w	{ z22.s }, p0/z, [x1]
+     280: 91200021     	add	x1, x1, #0x800
+     284: a540a037     	ld1w	{ z23.s }, p0/z, [x1]
+     288: 91200021     	add	x1, x1, #0x800
+     28c: a540a038     	ld1w	{ z24.s }, p0/z, [x1]
+     290: 91200021     	add	x1, x1, #0x800
+     294: a540a039     	ld1w	{ z25.s }, p0/z, [x1]
+     298: 91200021     	add	x1, x1, #0x800
+     29c: a540a03a     	ld1w	{ z26.s }, p0/z, [x1]
+     2a0: 91200021     	add	x1, x1, #0x800
+     2a4: a540a03b     	ld1w	{ z27.s }, p0/z, [x1]
+     2a8: 91200021     	add	x1, x1, #0x800
+     2ac: a540a03c     	ld1w	{ z28.s }, p0/z, [x1]
+     2b0: 91200021     	add	x1, x1, #0x800
+     2b4: a540a03d     	ld1w	{ z29.s }, p0/z, [x1]
+     2b8: 91200021     	add	x1, x1, #0x800
+     2bc: a540a03e     	ld1w	{ z30.s }, p0/z, [x1]
+     2c0: 91200021     	add	x1, x1, #0x800
+     2c4: a540a03f     	ld1w	{ z31.s }, p0/z, [x1]
+     2c8: 91200021     	add	x1, x1, #0x800
+     2cc: c0844402     	mov	za2h.s[w14, 0x0:0x3], { z0.s - z3.s }
+     2d0: 110011ce     	add	w14, w14, #0x4
+     2d4: c0844482     	mov	za2h.s[w14, 0x0:0x3], { z4.s - z7.s }
+     2d8: 110011ce     	add	w14, w14, #0x4
+     2dc: c0844502     	mov	za2h.s[w14, 0x0:0x3], { z8.s - z11.s }
+     2e0: 110011ce     	add	w14, w14, #0x4
+     2e4: c0844582     	mov	za2h.s[w14, 0x0:0x3], { z12.s - z15.s }
+     2e8: 110011ce     	add	w14, w14, #0x4
+     2ec: c0846603     	mov	za3h.s[w15, 0x0:0x3], { z16.s - z19.s }
+     2f0: 110011ef     	add	w15, w15, #0x4
+     2f4: c0846683     	mov	za3h.s[w15, 0x0:0x3], { z20.s - z23.s }
+     2f8: 110011ef     	add	w15, w15, #0x4
+     2fc: c0846703     	mov	za3h.s[w15, 0x0:0x3], { z24.s - z27.s }
+     300: 110011ef     	add	w15, w15, #0x4
+     304: c0846783     	mov	za3h.s[w15, 0x0:0x3], { z28.s - z31.s }
+     308: 110011ef     	add	w15, w15, #0x4
+     30c: 5280000c     	mov	w12, #0x0               ; =0
+     310: 5280002d     	mov	w13, #0x1               ; =1
+     314: 5280004e     	mov	w14, #0x2               ; =2
+     318: 5280006f     	mov	w15, #0x3               ; =3
+     31c: d1408021     	sub	x1, x1, #0x20, lsl #12  ; =0x20000
+     320: c0868400     	mov	{ z0.s - z3.s }, za0v.s[w12, 0x0:0x3]
+     324: 1100118c     	add	w12, w12, #0x4
+     328: c086a424     	mov	{ z4.s - z7.s }, za1v.s[w13, 0x0:0x3]
+     32c: 110011ad     	add	w13, w13, #0x4
+     330: c086c448     	mov	{ z8.s - z11.s }, za2v.s[w14, 0x0:0x3]
+     334: 110011ce     	add	w14, w14, #0x4
+     338: c086e46c     	mov	{ z12.s - z15.s }, za3v.s[w15, 0x0:0x3]
+     33c: 110011ef     	add	w15, w15, #0x4
+     340: c0868410     	mov	{ z16.s - z19.s }, za0v.s[w12, 0x0:0x3]
+     344: 1100118c     	add	w12, w12, #0x4
+     348: c086a434     	mov	{ z20.s - z23.s }, za1v.s[w13, 0x0:0x3]
+     34c: 110011ad     	add	w13, w13, #0x4
+     350: c086c458     	mov	{ z24.s - z27.s }, za2v.s[w14, 0x0:0x3]
+     354: 110011ce     	add	w14, w14, #0x4
+     358: c086e47c     	mov	{ z28.s - z31.s }, za3v.s[w15, 0x0:0x3]
+     35c: 110011ef     	add	w15, w15, #0x4
+     360: d2802009     	mov	x9, #0x100              ; =256
+     364: 252967f0     	whilelt	pn8.b, xzr, x9, vlx4
+     368: a160c3e0     	st1w	{ z0.s, z4.s, z8.s, z12.s }, pn8, [sp]
+     36c: 910403ff     	add	sp, sp, #0x100
+     370: a160c3e1     	st1w	{ z1.s, z5.s, z9.s, z13.s }, pn8, [sp]
+     374: 910403ff     	add	sp, sp, #0x100
+     378: a160c3e2     	st1w	{ z2.s, z6.s, z10.s, z14.s }, pn8, [sp]
+     37c: 910403ff     	add	sp, sp, #0x100
+     380: a160c3e3     	st1w	{ z3.s, z7.s, z11.s, z15.s }, pn8, [sp]
+     384: 910403ff     	add	sp, sp, #0x100
+     388: a160c3f0     	st1w	{ z16.s, z20.s, z24.s, z28.s }, pn8, [sp]
+     38c: 910403ff     	add	sp, sp, #0x100
+     390: a160c3f1     	st1w	{ z17.s, z21.s, z25.s, z29.s }, pn8, [sp]
+     394: 910403ff     	add	sp, sp, #0x100
+     398: a160c3f2     	st1w	{ z18.s, z22.s, z26.s, z30.s }, pn8, [sp]
+     39c: 910403ff     	add	sp, sp, #0x100
+     3a0: a160c3f3     	st1w	{ z19.s, z23.s, z27.s, z31.s }, pn8, [sp]
+     3a4: 910403ff     	add	sp, sp, #0x100
+     3a8: c0868400     	mov	{ z0.s - z3.s }, za0v.s[w12, 0x0:0x3]
+     3ac: 1100118c     	add	w12, w12, #0x4
+     3b0: c086a424     	mov	{ z4.s - z7.s }, za1v.s[w13, 0x0:0x3]
+     3b4: 110011ad     	add	w13, w13, #0x4
+     3b8: c086c448     	mov	{ z8.s - z11.s }, za2v.s[w14, 0x0:0x3]
+     3bc: 110011ce     	add	w14, w14, #0x4
+     3c0: c086e46c     	mov	{ z12.s - z15.s }, za3v.s[w15, 0x0:0x3]
+     3c4: 110011ef     	add	w15, w15, #0x4
+     3c8: c0868410     	mov	{ z16.s - z19.s }, za0v.s[w12, 0x0:0x3]
+     3cc: 1100118c     	add	w12, w12, #0x4
+     3d0: c086a434     	mov	{ z20.s - z23.s }, za1v.s[w13, 0x0:0x3]
+     3d4: 110011ad     	add	w13, w13, #0x4
+     3d8: c086c458     	mov	{ z24.s - z27.s }, za2v.s[w14, 0x0:0x3]
+     3dc: 110011ce     	add	w14, w14, #0x4
+     3e0: c086e47c     	mov	{ z28.s - z31.s }, za3v.s[w15, 0x0:0x3]
+     3e4: 110011ef     	add	w15, w15, #0x4
+     3e8: a160c3e0     	st1w	{ z0.s, z4.s, z8.s, z12.s }, pn8, [sp]
+     3ec: 910403ff     	add	sp, sp, #0x100
+     3f0: a160c3e1     	st1w	{ z1.s, z5.s, z9.s, z13.s }, pn8, [sp]
+     3f4: 910403ff     	add	sp, sp, #0x100
+     3f8: a160c3e2     	st1w	{ z2.s, z6.s, z10.s, z14.s }, pn8, [sp]
+     3fc: 910403ff     	add	sp, sp, #0x100
+     400: a160c3e3     	st1w	{ z3.s, z7.s, z11.s, z15.s }, pn8, [sp]
+     404: 910403ff     	add	sp, sp, #0x100
+     408: a160c3f0     	st1w	{ z16.s, z20.s, z24.s, z28.s }, pn8, [sp]
+     40c: 910403ff     	add	sp, sp, #0x100
+     410: a160c3f1     	st1w	{ z17.s, z21.s, z25.s, z29.s }, pn8, [sp]
+     414: 910403ff     	add	sp, sp, #0x100
+     418: a160c3f2     	st1w	{ z18.s, z22.s, z26.s, z30.s }, pn8, [sp]
+     41c: 910403ff     	add	sp, sp, #0x100
+     420: a160c3f3     	st1w	{ z19.s, z23.s, z27.s, z31.s }, pn8, [sp]
+     424: 910403ff     	add	sp, sp, #0x100
+     428: 91010021     	add	x1, x1, #0x40
+     42c: d100056b     	sub	x11, x11, #0x1
+     430: b5ffe24b     	cbnz	x11, 0x78 <ltmp0+0x78>
+     434: d1200021     	sub	x1, x1, #0x800
+     438: 9100029f     	mov	sp, x20
+     43c: d2804006     	mov	x6, #0x200              ; =512
+     440: 910003fc     	mov	x28, sp
+     444: d140c3ff     	sub	sp, sp, #0x30, lsl #12  ; =0x30000
+     448: 910003fb     	mov	x27, sp
+     44c: d280040b     	mov	x11, #0x20              ; =32
+     450: 5280000c     	mov	w12, #0x0               ; =0
+     454: 5280002d     	mov	w13, #0x1               ; =1
+     458: d2800809     	mov	x9, #0x40               ; =64
+     45c: 252917e0     	whilelt	p0.b, xzr, x9
+     460: a540a000     	ld1w	{ z0.s }, p0/z, [x0]
+     464: 91200000     	add	x0, x0, #0x800
+     468: a540a001     	ld1w	{ z1.s }, p0/z, [x0]
+     46c: 91200000     	add	x0, x0, #0x800
+     470: a540a002     	ld1w	{ z2.s }, p0/z, [x0]
+     474: 91200000     	add	x0, x0, #0x800
+     478: a540a003     	ld1w	{ z3.s }, p0/z, [x0]
+     47c: 91200000     	add	x0, x0, #0x800
+     480: a540a004     	ld1w	{ z4.s }, p0/z, [x0]
+     484: 91200000     	add	x0, x0, #0x800
+     488: a540a005     	ld1w	{ z5.s }, p0/z, [x0]
+     48c: 91200000     	add	x0, x0, #0x800
+     490: a540a006     	ld1w	{ z6.s }, p0/z, [x0]
+     494: 91200000     	add	x0, x0, #0x800
+     498: a540a007     	ld1w	{ z7.s }, p0/z, [x0]
+     49c: 91200000     	add	x0, x0, #0x800
+     4a0: a540a008     	ld1w	{ z8.s }, p0/z, [x0]
+     4a4: 91200000     	add	x0, x0, #0x800
+     4a8: a540a009     	ld1w	{ z9.s }, p0/z, [x0]
+     4ac: 91200000     	add	x0, x0, #0x800
+     4b0: a540a00a     	ld1w	{ z10.s }, p0/z, [x0]
+     4b4: 91200000     	add	x0, x0, #0x800
+     4b8: a540a00b     	ld1w	{ z11.s }, p0/z, [x0]
+     4bc: 91200000     	add	x0, x0, #0x800
+     4c0: a540a00c     	ld1w	{ z12.s }, p0/z, [x0]
+     4c4: 91200000     	add	x0, x0, #0x800
+     4c8: a540a00d     	ld1w	{ z13.s }, p0/z, [x0]
+     4cc: 91200000     	add	x0, x0, #0x800
+     4d0: a540a00e     	ld1w	{ z14.s }, p0/z, [x0]
+     4d4: 91200000     	add	x0, x0, #0x800
+     4d8: a540a00f     	ld1w	{ z15.s }, p0/z, [x0]
+     4dc: 91200000     	add	x0, x0, #0x800
+     4e0: a540a010     	ld1w	{ z16.s }, p0/z, [x0]
+     4e4: 91200000     	add	x0, x0, #0x800
+     4e8: a540a011     	ld1w	{ z17.s }, p0/z, [x0]
+     4ec: 91200000     	add	x0, x0, #0x800
+     4f0: a540a012     	ld1w	{ z18.s }, p0/z, [x0]
+     4f4: 91200000     	add	x0, x0, #0x800
+     4f8: a540a013     	ld1w	{ z19.s }, p0/z, [x0]
+     4fc: 91200000     	add	x0, x0, #0x800
+     500: a540a014     	ld1w	{ z20.s }, p0/z, [x0]
+     504: 91200000     	add	x0, x0, #0x800
+     508: a540a015     	ld1w	{ z21.s }, p0/z, [x0]
+     50c: 91200000     	add	x0, x0, #0x800
+     510: a540a016     	ld1w	{ z22.s }, p0/z, [x0]
+     514: 91200000     	add	x0, x0, #0x800
+     518: a540a017     	ld1w	{ z23.s }, p0/z, [x0]
+     51c: 91200000     	add	x0, x0, #0x800
+     520: a540a018     	ld1w	{ z24.s }, p0/z, [x0]
+     524: 91200000     	add	x0, x0, #0x800
+     528: a540a019     	ld1w	{ z25.s }, p0/z, [x0]
+     52c: 91200000     	add	x0, x0, #0x800
+     530: a540a01a     	ld1w	{ z26.s }, p0/z, [x0]
+     534: 91200000     	add	x0, x0, #0x800
+     538: a540a01b     	ld1w	{ z27.s }, p0/z, [x0]
+     53c: 91200000     	add	x0, x0, #0x800
+     540: a540a01c     	ld1w	{ z28.s }, p0/z, [x0]
+     544: 91200000     	add	x0, x0, #0x800
+     548: a540a01d     	ld1w	{ z29.s }, p0/z, [x0]
+     54c: 91200000     	add	x0, x0, #0x800
+     550: a540a01e     	ld1w	{ z30.s }, p0/z, [x0]
+     554: 91200000     	add	x0, x0, #0x800
+     558: a540a01f     	ld1w	{ z31.s }, p0/z, [x0]
+     55c: 91200000     	add	x0, x0, #0x800
+     560: c0840400     	mov	za0h.s[w12, 0x0:0x3], { z0.s - z3.s }
+     564: 1100118c     	add	w12, w12, #0x4
+     568: c0840480     	mov	za0h.s[w12, 0x0:0x3], { z4.s - z7.s }
+     56c: 1100118c     	add	w12, w12, #0x4
+     570: c0840500     	mov	za0h.s[w12, 0x0:0x3], { z8.s - z11.s }
+     574: 1100118c     	add	w12, w12, #0x4
+     578: c0840580     	mov	za0h.s[w12, 0x0:0x3], { z12.s - z15.s }
+     57c: 1100118c     	add	w12, w12, #0x4
+     580: c0842601     	mov	za1h.s[w13, 0x0:0x3], { z16.s - z19.s }
+     584: 110011ad     	add	w13, w13, #0x4
+     588: c0842681     	mov	za1h.s[w13, 0x0:0x3], { z20.s - z23.s }
+     58c: 110011ad     	add	w13, w13, #0x4
+     590: c0842701     	mov	za1h.s[w13, 0x0:0x3], { z24.s - z27.s }
+     594: 110011ad     	add	w13, w13, #0x4
+     598: c0842781     	mov	za1h.s[w13, 0x0:0x3], { z28.s - z31.s }
+     59c: 110011ad     	add	w13, w13, #0x4
+     5a0: d1404000     	sub	x0, x0, #0x10, lsl #12  ; =0x10000
+     5a4: 5280000c     	mov	w12, #0x0               ; =0
+     5a8: 5280002d     	mov	w13, #0x1               ; =1
+     5ac: c0868400     	mov	{ z0.s - z3.s }, za0v.s[w12, 0x0:0x3]
+     5b0: 1100118c     	add	w12, w12, #0x4
+     5b4: c0868404     	mov	{ z4.s - z7.s }, za0v.s[w12, 0x0:0x3]
+     5b8: 1100118c     	add	w12, w12, #0x4
+     5bc: c0868408     	mov	{ z8.s - z11.s }, za0v.s[w12, 0x0:0x3]
+     5c0: 1100118c     	add	w12, w12, #0x4
+     5c4: c086840c     	mov	{ z12.s - z15.s }, za0v.s[w12, 0x0:0x3]
+     5c8: 1100118c     	add	w12, w12, #0x4
+     5cc: c086a430     	mov	{ z16.s - z19.s }, za1v.s[w13, 0x0:0x3]
+     5d0: 110011ad     	add	w13, w13, #0x4
+     5d4: c086a434     	mov	{ z20.s - z23.s }, za1v.s[w13, 0x0:0x3]
+     5d8: 110011ad     	add	w13, w13, #0x4
+     5dc: c086a438     	mov	{ z24.s - z27.s }, za1v.s[w13, 0x0:0x3]
+     5e0: 110011ad     	add	w13, w13, #0x4
+     5e4: c086a43c     	mov	{ z28.s - z31.s }, za1v.s[w13, 0x0:0x3]
+     5e8: 110011ad     	add	w13, w13, #0x4
+     5ec: 2518e3e0     	ptrue	p0.b
+     5f0: d2800809     	mov	x9, #0x40               ; =64
+     5f4: 252917e1     	whilelt	p1.b, xzr, x9
+     5f8: e540e3e0     	st1w	{ z0.s }, p0, [sp]
+     5fc: 910103ff     	add	sp, sp, #0x40
+     600: e540e7f0     	st1w	{ z16.s }, p1, [sp]
+     604: 910103ff     	add	sp, sp, #0x40
+     608: e540e3e1     	st1w	{ z1.s }, p0, [sp]
+     60c: 910103ff     	add	sp, sp, #0x40
+     610: e540e7f1     	st1w	{ z17.s }, p1, [sp]
+     614: 910103ff     	add	sp, sp, #0x40
+     618: e540e3e2     	st1w	{ z2.s }, p0, [sp]
+     61c: 910103ff     	add	sp, sp, #0x40
+     620: e540e7f2     	st1w	{ z18.s }, p1, [sp]
+     624: 910103ff     	add	sp, sp, #0x40
+     628: e540e3e3     	st1w	{ z3.s }, p0, [sp]
+     62c: 910103ff     	add	sp, sp, #0x40
+     630: e540e7f3     	st1w	{ z19.s }, p1, [sp]
+     634: 910103ff     	add	sp, sp, #0x40
+     638: e540e3e4     	st1w	{ z4.s }, p0, [sp]
+     63c: 910103ff     	add	sp, sp, #0x40
+     640: e540e7f4     	st1w	{ z20.s }, p1, [sp]
+     644: 910103ff     	add	sp, sp, #0x40
+     648: e540e3e5     	st1w	{ z5.s }, p0, [sp]
+     64c: 910103ff     	add	sp, sp, #0x40
+     650: e540e7f5     	st1w	{ z21.s }, p1, [sp]
+     654: 910103ff     	add	sp, sp, #0x40
+     658: e540e3e6     	st1w	{ z6.s }, p0, [sp]
+     65c: 910103ff     	add	sp, sp, #0x40
+     660: e540e7f6     	st1w	{ z22.s }, p1, [sp]
+     664: 910103ff     	add	sp, sp, #0x40
+     668: e540e3e7     	st1w	{ z7.s }, p0, [sp]
+     66c: 910103ff     	add	sp, sp, #0x40
+     670: e540e7f7     	st1w	{ z23.s }, p1, [sp]
+     674: 910103ff     	add	sp, sp, #0x40
+     678: e540e3e8     	st1w	{ z8.s }, p0, [sp]
+     67c: 910103ff     	add	sp, sp, #0x40
+     680: e540e7f8     	st1w	{ z24.s }, p1, [sp]
+     684: 910103ff     	add	sp, sp, #0x40
+     688: e540e3e9     	st1w	{ z9.s }, p0, [sp]
+     68c: 910103ff     	add	sp, sp, #0x40
+     690: e540e7f9     	st1w	{ z25.s }, p1, [sp]
+     694: 910103ff     	add	sp, sp, #0x40
+     698: e540e3ea     	st1w	{ z10.s }, p0, [sp]
+     69c: 910103ff     	add	sp, sp, #0x40
+     6a0: e540e7fa     	st1w	{ z26.s }, p1, [sp]
+     6a4: 910103ff     	add	sp, sp, #0x40
+     6a8: e540e3eb     	st1w	{ z11.s }, p0, [sp]
+     6ac: 910103ff     	add	sp, sp, #0x40
+     6b0: e540e7fb     	st1w	{ z27.s }, p1, [sp]
+     6b4: 910103ff     	add	sp, sp, #0x40
+     6b8: e540e3ec     	st1w	{ z12.s }, p0, [sp]
+     6bc: 910103ff     	add	sp, sp, #0x40
+     6c0: e540e7fc     	st1w	{ z28.s }, p1, [sp]
+     6c4: 910103ff     	add	sp, sp, #0x40
+     6c8: e540e3ed     	st1w	{ z13.s }, p0, [sp]
+     6cc: 910103ff     	add	sp, sp, #0x40
+     6d0: e540e7fd     	st1w	{ z29.s }, p1, [sp]
+     6d4: 910103ff     	add	sp, sp, #0x40
+     6d8: e540e3ee     	st1w	{ z14.s }, p0, [sp]
+     6dc: 910103ff     	add	sp, sp, #0x40
+     6e0: e540e7fe     	st1w	{ z30.s }, p1, [sp]
+     6e4: 910103ff     	add	sp, sp, #0x40
+     6e8: e540e3ef     	st1w	{ z15.s }, p0, [sp]
+     6ec: 910103ff     	add	sp, sp, #0x40
+     6f0: e540e7ff     	st1w	{ z31.s }, p1, [sp]
+     6f4: 910103ff     	add	sp, sp, #0x40
+     6f8: 91010000     	add	x0, x0, #0x40
+     6fc: d100056b     	sub	x11, x11, #0x1
+     700: b5ffea8b     	cbnz	x11, 0x450 <ltmp0+0x450>
+     704: d1200000     	sub	x0, x0, #0x800
+     708: aa0203f1     	mov	x17, x2
+     70c: 91402049     	add	x9, x2, #0x8, lsl #12   ; =0x8000
+     710: c00800ff     	zero	{za}
+     714: d2801009     	mov	x9, #0x80               ; =128
+     718: d280200a     	mov	x10, #0x100             ; =256
+     71c: d280100b     	mov	x11, #0x80              ; =128
+     720: 252b47f0     	whilelt	pn8.b, xzr, x11, vlx2
+     724: d280100b     	mov	x11, #0x80              ; =128
+     728: 252b47f1     	whilelt	pn9.b, xzr, x11, vlx2
+     72c: 2518e3e0     	ptrue	p0.b
+     730: 2518e3e2     	ptrue	p2.b
+     734: 2518e3e1     	ptrue	p1.b
+     738: 2518e3e3     	ptrue	p3.b
+     73c: d2804008     	mov	x8, #0x200              ; =512
+     740: a0404360     	ld1w	{ z0.s, z1.s }, pn8/z, [x27]
+     744: a0404462     	ld1w	{ z2.s, z3.s }, pn9/z, [x3]
+     748: 8b09037b     	add	x27, x27, x9
+     74c: 8b0a0063     	add	x3, x3, x10
+     750: 80800440     	fmopa	za0.s, p1/m, p0/m, z2.s, z0.s
+     754: 80814441     	fmopa	za1.s, p1/m, p2/m, z2.s, z1.s
+     758: 80800c62     	fmopa	za2.s, p3/m, p0/m, z3.s, z0.s
+     75c: 80814c63     	fmopa	za3.s, p3/m, p2/m, z3.s, z1.s
+     760: d1000508     	sub	x8, x8, #0x1
+     764: b5fffee8     	cbnz	x8, 0x740 <ltmp0+0x740>
+     768: d140437b     	sub	x27, x27, #0x10, lsl #12 ; =0x10000
+     76c: d1408063     	sub	x3, x3, #0x20, lsl #12  ; =0x20000
+     770: aa1103e2     	mov	x2, x17
+     774: 91402049     	add	x9, x2, #0x8, lsl #12   ; =0x8000
+     778: 5280000c     	mov	w12, #0x0               ; =0
+     77c: 5280002d     	mov	w13, #0x1               ; =1
+     780: 5280004e     	mov	w14, #0x2               ; =2
+     784: 5280006f     	mov	w15, #0x3               ; =3
+     788: 2518e3e0     	ptrue	p0.b
+     78c: 2518e3e2     	ptrue	p2.b
+     790: c0860400     	mov	{ z0.s - z3.s }, za0h.s[w12, 0x0:0x3]
+     794: 1100118c     	add	w12, w12, #0x4
+     798: c0860404     	mov	{ z4.s - z7.s }, za0h.s[w12, 0x0:0x3]
+     79c: 1100118c     	add	w12, w12, #0x4
+     7a0: c0860410     	mov	{ z16.s - z19.s }, za0h.s[w12, 0x0:0x3]
+     7a4: 1100118c     	add	w12, w12, #0x4
+     7a8: c0860414     	mov	{ z20.s - z23.s }, za0h.s[w12, 0x0:0x3]
+     7ac: 1100118c     	add	w12, w12, #0x4
+     7b0: c0862428     	mov	{ z8.s - z11.s }, za1h.s[w13, 0x0:0x3]
+     7b4: 110011ad     	add	w13, w13, #0x4
+     7b8: c086242c     	mov	{ z12.s - z15.s }, za1h.s[w13, 0x0:0x3]
+     7bc: 110011ad     	add	w13, w13, #0x4
+     7c0: c0862438     	mov	{ z24.s - z27.s }, za1h.s[w13, 0x0:0x3]
+     7c4: 110011ad     	add	w13, w13, #0x4
+     7c8: c086243c     	mov	{ z28.s - z31.s }, za1h.s[w13, 0x0:0x3]
+     7cc: 110011ad     	add	w13, w13, #0x4
+     7d0: e540e040     	st1w	{ z0.s }, p0, [x2]
+     7d4: e541e848     	st1w	{ z8.s }, p2, [x2, #0x1, mul vl]
+     7d8: 91200042     	add	x2, x2, #0x800
+     7dc: e540e041     	st1w	{ z1.s }, p0, [x2]
+     7e0: e541e849     	st1w	{ z9.s }, p2, [x2, #0x1, mul vl]
+     7e4: 91200042     	add	x2, x2, #0x800
+     7e8: e540e042     	st1w	{ z2.s }, p0, [x2]
+     7ec: e541e84a     	st1w	{ z10.s }, p2, [x2, #0x1, mul vl]
+     7f0: 91200042     	add	x2, x2, #0x800
+     7f4: e540e043     	st1w	{ z3.s }, p0, [x2]
+     7f8: e541e84b     	st1w	{ z11.s }, p2, [x2, #0x1, mul vl]
+     7fc: 91200042     	add	x2, x2, #0x800
+     800: e540e044     	st1w	{ z4.s }, p0, [x2]
+     804: e541e84c     	st1w	{ z12.s }, p2, [x2, #0x1, mul vl]
+     808: 91200042     	add	x2, x2, #0x800
+     80c: e540e045     	st1w	{ z5.s }, p0, [x2]
+     810: e541e84d     	st1w	{ z13.s }, p2, [x2, #0x1, mul vl]
+     814: 91200042     	add	x2, x2, #0x800
+     818: e540e046     	st1w	{ z6.s }, p0, [x2]
+     81c: e541e84e     	st1w	{ z14.s }, p2, [x2, #0x1, mul vl]
+     820: 91200042     	add	x2, x2, #0x800
+     824: e540e047     	st1w	{ z7.s }, p0, [x2]
+     828: e541e84f     	st1w	{ z15.s }, p2, [x2, #0x1, mul vl]
+     82c: 91200042     	add	x2, x2, #0x800
+     830: e540e050     	st1w	{ z16.s }, p0, [x2]
+     834: e541e858     	st1w	{ z24.s }, p2, [x2, #0x1, mul vl]
+     838: 91200042     	add	x2, x2, #0x800
+     83c: e540e051     	st1w	{ z17.s }, p0, [x2]
+     840: e541e859     	st1w	{ z25.s }, p2, [x2, #0x1, mul vl]
+     844: 91200042     	add	x2, x2, #0x800
+     848: e540e052     	st1w	{ z18.s }, p0, [x2]
+     84c: e541e85a     	st1w	{ z26.s }, p2, [x2, #0x1, mul vl]
+     850: 91200042     	add	x2, x2, #0x800
+     854: e540e053     	st1w	{ z19.s }, p0, [x2]
+     858: e541e85b     	st1w	{ z27.s }, p2, [x2, #0x1, mul vl]
+     85c: 91200042     	add	x2, x2, #0x800
+     860: e540e054     	st1w	{ z20.s }, p0, [x2]
+     864: e541e85c     	st1w	{ z28.s }, p2, [x2, #0x1, mul vl]
+     868: 91200042     	add	x2, x2, #0x800
+     86c: e540e055     	st1w	{ z21.s }, p0, [x2]
+     870: e541e85d     	st1w	{ z29.s }, p2, [x2, #0x1, mul vl]
+     874: 91200042     	add	x2, x2, #0x800
+     878: e540e056     	st1w	{ z22.s }, p0, [x2]
+     87c: e541e85e     	st1w	{ z30.s }, p2, [x2, #0x1, mul vl]
+     880: 91200042     	add	x2, x2, #0x800
+     884: e540e057     	st1w	{ z23.s }, p0, [x2]
+     888: e541e85f     	st1w	{ z31.s }, p2, [x2, #0x1, mul vl]
+     88c: 91200042     	add	x2, x2, #0x800
+     890: c0864440     	mov	{ z0.s - z3.s }, za2h.s[w14, 0x0:0x3]
+     894: 110011ce     	add	w14, w14, #0x4
+     898: c0864444     	mov	{ z4.s - z7.s }, za2h.s[w14, 0x0:0x3]
+     89c: 110011ce     	add	w14, w14, #0x4
+     8a0: c0864450     	mov	{ z16.s - z19.s }, za2h.s[w14, 0x0:0x3]
+     8a4: 110011ce     	add	w14, w14, #0x4
+     8a8: c0864454     	mov	{ z20.s - z23.s }, za2h.s[w14, 0x0:0x3]
+     8ac: 110011ce     	add	w14, w14, #0x4
+     8b0: c0866468     	mov	{ z8.s - z11.s }, za3h.s[w15, 0x0:0x3]
+     8b4: 110011ef     	add	w15, w15, #0x4
+     8b8: c086646c     	mov	{ z12.s - z15.s }, za3h.s[w15, 0x0:0x3]
+     8bc: 110011ef     	add	w15, w15, #0x4
+     8c0: c0866478     	mov	{ z24.s - z27.s }, za3h.s[w15, 0x0:0x3]
+     8c4: 110011ef     	add	w15, w15, #0x4
+     8c8: c086647c     	mov	{ z28.s - z31.s }, za3h.s[w15, 0x0:0x3]
+     8cc: 110011ef     	add	w15, w15, #0x4
+     8d0: e540e120     	st1w	{ z0.s }, p0, [x9]
+     8d4: e541e928     	st1w	{ z8.s }, p2, [x9, #0x1, mul vl]
+     8d8: 91200129     	add	x9, x9, #0x800
+     8dc: e540e121     	st1w	{ z1.s }, p0, [x9]
+     8e0: e541e929     	st1w	{ z9.s }, p2, [x9, #0x1, mul vl]
+     8e4: 91200129     	add	x9, x9, #0x800
+     8e8: e540e122     	st1w	{ z2.s }, p0, [x9]
+     8ec: e541e92a     	st1w	{ z10.s }, p2, [x9, #0x1, mul vl]
+     8f0: 91200129     	add	x9, x9, #0x800
+     8f4: e540e123     	st1w	{ z3.s }, p0, [x9]
+     8f8: e541e92b     	st1w	{ z11.s }, p2, [x9, #0x1, mul vl]
+     8fc: 91200129     	add	x9, x9, #0x800
+     900: e540e124     	st1w	{ z4.s }, p0, [x9]
+     904: e541e92c     	st1w	{ z12.s }, p2, [x9, #0x1, mul vl]
+     908: 91200129     	add	x9, x9, #0x800
+     90c: e540e125     	st1w	{ z5.s }, p0, [x9]
+     910: e541e92d     	st1w	{ z13.s }, p2, [x9, #0x1, mul vl]
+     914: 91200129     	add	x9, x9, #0x800
+     918: e540e126     	st1w	{ z6.s }, p0, [x9]
+     91c: e541e92e     	st1w	{ z14.s }, p2, [x9, #0x1, mul vl]
+     920: 91200129     	add	x9, x9, #0x800
+     924: e540e127     	st1w	{ z7.s }, p0, [x9]
+     928: e541e92f     	st1w	{ z15.s }, p2, [x9, #0x1, mul vl]
+     92c: 91200129     	add	x9, x9, #0x800
+     930: e540e130     	st1w	{ z16.s }, p0, [x9]
+     934: e541e938     	st1w	{ z24.s }, p2, [x9, #0x1, mul vl]
+     938: 91200129     	add	x9, x9, #0x800
+     93c: e540e131     	st1w	{ z17.s }, p0, [x9]
+     940: e541e939     	st1w	{ z25.s }, p2, [x9, #0x1, mul vl]
+     944: 91200129     	add	x9, x9, #0x800
+     948: e540e132     	st1w	{ z18.s }, p0, [x9]
+     94c: e541e93a     	st1w	{ z26.s }, p2, [x9, #0x1, mul vl]
+     950: 91200129     	add	x9, x9, #0x800
+     954: e540e133     	st1w	{ z19.s }, p0, [x9]
+     958: e541e93b     	st1w	{ z27.s }, p2, [x9, #0x1, mul vl]
+     95c: 91200129     	add	x9, x9, #0x800
+     960: e540e134     	st1w	{ z20.s }, p0, [x9]
+     964: e541e93c     	st1w	{ z28.s }, p2, [x9, #0x1, mul vl]
+     968: 91200129     	add	x9, x9, #0x800
+     96c: e540e135     	st1w	{ z21.s }, p0, [x9]
+     970: e541e93d     	st1w	{ z29.s }, p2, [x9, #0x1, mul vl]
+     974: 91200129     	add	x9, x9, #0x800
+     978: e540e136     	st1w	{ z22.s }, p0, [x9]
+     97c: e541e93e     	st1w	{ z30.s }, p2, [x9, #0x1, mul vl]
+     980: 91200129     	add	x9, x9, #0x800
+     984: e540e137     	st1w	{ z23.s }, p0, [x9]
+     988: e541e93f     	st1w	{ z31.s }, p2, [x9, #0x1, mul vl]
+     98c: 91200129     	add	x9, x9, #0x800
+     990: aa1103e2     	mov	x2, x17
+     994: 91404042     	add	x2, x2, #0x10, lsl #12  ; =0x10000
+     998: 91020063     	add	x3, x3, #0x80
+     99c: aa0203f1     	mov	x17, x2
+     9a0: 91402049     	add	x9, x2, #0x8, lsl #12   ; =0x8000
+     9a4: c00800ff     	zero	{za}
+     9a8: d2801009     	mov	x9, #0x80               ; =128
+     9ac: d280200a     	mov	x10, #0x100             ; =256
+     9b0: d280100b     	mov	x11, #0x80              ; =128
+     9b4: 252b47f0     	whilelt	pn8.b, xzr, x11, vlx2
+     9b8: d280100b     	mov	x11, #0x80              ; =128
+     9bc: 252b47f1     	whilelt	pn9.b, xzr, x11, vlx2
+     9c0: 2518e3e0     	ptrue	p0.b
+     9c4: 2518e3e2     	ptrue	p2.b
+     9c8: 2518e3e1     	ptrue	p1.b
+     9cc: 2518e3e3     	ptrue	p3.b
+     9d0: d2804008     	mov	x8, #0x200              ; =512
+     9d4: a0404360     	ld1w	{ z0.s, z1.s }, pn8/z, [x27]
+     9d8: a0404462     	ld1w	{ z2.s, z3.s }, pn9/z, [x3]
+     9dc: 8b09037b     	add	x27, x27, x9
+     9e0: 8b0a0063     	add	x3, x3, x10
+     9e4: 80800440     	fmopa	za0.s, p1/m, p0/m, z2.s, z0.s
+     9e8: 80814441     	fmopa	za1.s, p1/m, p2/m, z2.s, z1.s
+     9ec: 80800c62     	fmopa	za2.s, p3/m, p0/m, z3.s, z0.s
+     9f0: 80814c63     	fmopa	za3.s, p3/m, p2/m, z3.s, z1.s
+     9f4: d1000508     	sub	x8, x8, #0x1
+     9f8: b5fffee8     	cbnz	x8, 0x9d4 <ltmp0+0x9d4>
+     9fc: d140437b     	sub	x27, x27, #0x10, lsl #12 ; =0x10000
+     a00: d1408063     	sub	x3, x3, #0x20, lsl #12  ; =0x20000
+     a04: aa1103e2     	mov	x2, x17
+     a08: 91402049     	add	x9, x2, #0x8, lsl #12   ; =0x8000
+     a0c: 5280000c     	mov	w12, #0x0               ; =0
+     a10: 5280002d     	mov	w13, #0x1               ; =1
+     a14: 5280004e     	mov	w14, #0x2               ; =2
+     a18: 5280006f     	mov	w15, #0x3               ; =3
+     a1c: 2518e3e0     	ptrue	p0.b
+     a20: 2518e3e2     	ptrue	p2.b
+     a24: c0860400     	mov	{ z0.s - z3.s }, za0h.s[w12, 0x0:0x3]
+     a28: 1100118c     	add	w12, w12, #0x4
+     a2c: c0860404     	mov	{ z4.s - z7.s }, za0h.s[w12, 0x0:0x3]
+     a30: 1100118c     	add	w12, w12, #0x4
+     a34: c0860410     	mov	{ z16.s - z19.s }, za0h.s[w12, 0x0:0x3]
+     a38: 1100118c     	add	w12, w12, #0x4
+     a3c: c0860414     	mov	{ z20.s - z23.s }, za0h.s[w12, 0x0:0x3]
+     a40: 1100118c     	add	w12, w12, #0x4
+     a44: c0862428     	mov	{ z8.s - z11.s }, za1h.s[w13, 0x0:0x3]
+     a48: 110011ad     	add	w13, w13, #0x4
+     a4c: c086242c     	mov	{ z12.s - z15.s }, za1h.s[w13, 0x0:0x3]
+     a50: 110011ad     	add	w13, w13, #0x4
+     a54: c0862438     	mov	{ z24.s - z27.s }, za1h.s[w13, 0x0:0x3]
+     a58: 110011ad     	add	w13, w13, #0x4
+     a5c: c086243c     	mov	{ z28.s - z31.s }, za1h.s[w13, 0x0:0x3]
+     a60: 110011ad     	add	w13, w13, #0x4
+     a64: e540e040     	st1w	{ z0.s }, p0, [x2]
+     a68: e541e848     	st1w	{ z8.s }, p2, [x2, #0x1, mul vl]
+     a6c: 91200042     	add	x2, x2, #0x800
+     a70: e540e041     	st1w	{ z1.s }, p0, [x2]
+     a74: e541e849     	st1w	{ z9.s }, p2, [x2, #0x1, mul vl]
+     a78: 91200042     	add	x2, x2, #0x800
+     a7c: e540e042     	st1w	{ z2.s }, p0, [x2]
+     a80: e541e84a     	st1w	{ z10.s }, p2, [x2, #0x1, mul vl]
+     a84: 91200042     	add	x2, x2, #0x800
+     a88: e540e043     	st1w	{ z3.s }, p0, [x2]
+     a8c: e541e84b     	st1w	{ z11.s }, p2, [x2, #0x1, mul vl]
+     a90: 91200042     	add	x2, x2, #0x800
+     a94: e540e044     	st1w	{ z4.s }, p0, [x2]
+     a98: e541e84c     	st1w	{ z12.s }, p2, [x2, #0x1, mul vl]
+     a9c: 91200042     	add	x2, x2, #0x800
+     aa0: e540e045     	st1w	{ z5.s }, p0, [x2]
+     aa4: e541e84d     	st1w	{ z13.s }, p2, [x2, #0x1, mul vl]
+     aa8: 91200042     	add	x2, x2, #0x800
+     aac: e540e046     	st1w	{ z6.s }, p0, [x2]
+     ab0: e541e84e     	st1w	{ z14.s }, p2, [x2, #0x1, mul vl]
+     ab4: 91200042     	add	x2, x2, #0x800
+     ab8: e540e047     	st1w	{ z7.s }, p0, [x2]
+     abc: e541e84f     	st1w	{ z15.s }, p2, [x2, #0x1, mul vl]
+     ac0: 91200042     	add	x2, x2, #0x800
+     ac4: e540e050     	st1w	{ z16.s }, p0, [x2]
+     ac8: e541e858     	st1w	{ z24.s }, p2, [x2, #0x1, mul vl]
+     acc: 91200042     	add	x2, x2, #0x800
+     ad0: e540e051     	st1w	{ z17.s }, p0, [x2]
+     ad4: e541e859     	st1w	{ z25.s }, p2, [x2, #0x1, mul vl]
+     ad8: 91200042     	add	x2, x2, #0x800
+     adc: e540e052     	st1w	{ z18.s }, p0, [x2]
+     ae0: e541e85a     	st1w	{ z26.s }, p2, [x2, #0x1, mul vl]
+     ae4: 91200042     	add	x2, x2, #0x800
+     ae8: e540e053     	st1w	{ z19.s }, p0, [x2]
+     aec: e541e85b     	st1w	{ z27.s }, p2, [x2, #0x1, mul vl]
+     af0: 91200042     	add	x2, x2, #0x800
+     af4: e540e054     	st1w	{ z20.s }, p0, [x2]
+     af8: e541e85c     	st1w	{ z28.s }, p2, [x2, #0x1, mul vl]
+     afc: 91200042     	add	x2, x2, #0x800
+     b00: e540e055     	st1w	{ z21.s }, p0, [x2]
+     b04: e541e85d     	st1w	{ z29.s }, p2, [x2, #0x1, mul vl]
+     b08: 91200042     	add	x2, x2, #0x800
+     b0c: e540e056     	st1w	{ z22.s }, p0, [x2]
+     b10: e541e85e     	st1w	{ z30.s }, p2, [x2, #0x1, mul vl]
+     b14: 91200042     	add	x2, x2, #0x800
+     b18: e540e057     	st1w	{ z23.s }, p0, [x2]
+     b1c: e541e85f     	st1w	{ z31.s }, p2, [x2, #0x1, mul vl]
+     b20: 91200042     	add	x2, x2, #0x800
+     b24: c0864440     	mov	{ z0.s - z3.s }, za2h.s[w14, 0x0:0x3]
+     b28: 110011ce     	add	w14, w14, #0x4
+     b2c: c0864444     	mov	{ z4.s - z7.s }, za2h.s[w14, 0x0:0x3]
+     b30: 110011ce     	add	w14, w14, #0x4
+     b34: c0864450     	mov	{ z16.s - z19.s }, za2h.s[w14, 0x0:0x3]
+     b38: 110011ce     	add	w14, w14, #0x4
+     b3c: c0864454     	mov	{ z20.s - z23.s }, za2h.s[w14, 0x0:0x3]
+     b40: 110011ce     	add	w14, w14, #0x4
+     b44: c0866468     	mov	{ z8.s - z11.s }, za3h.s[w15, 0x0:0x3]
+     b48: 110011ef     	add	w15, w15, #0x4
+     b4c: c086646c     	mov	{ z12.s - z15.s }, za3h.s[w15, 0x0:0x3]
+     b50: 110011ef     	add	w15, w15, #0x4
+     b54: c0866478     	mov	{ z24.s - z27.s }, za3h.s[w15, 0x0:0x3]
+     b58: 110011ef     	add	w15, w15, #0x4
+     b5c: c086647c     	mov	{ z28.s - z31.s }, za3h.s[w15, 0x0:0x3]
+     b60: 110011ef     	add	w15, w15, #0x4
+     b64: e540e120     	st1w	{ z0.s }, p0, [x9]
+     b68: e541e928     	st1w	{ z8.s }, p2, [x9, #0x1, mul vl]
+     b6c: 91200129     	add	x9, x9, #0x800
+     b70: e540e121     	st1w	{ z1.s }, p0, [x9]
+     b74: e541e929     	st1w	{ z9.s }, p2, [x9, #0x1, mul vl]
+     b78: 91200129     	add	x9, x9, #0x800
+     b7c: e540e122     	st1w	{ z2.s }, p0, [x9]
+     b80: e541e92a     	st1w	{ z10.s }, p2, [x9, #0x1, mul vl]
+     b84: 91200129     	add	x9, x9, #0x800
+     b88: e540e123     	st1w	{ z3.s }, p0, [x9]
+     b8c: e541e92b     	st1w	{ z11.s }, p2, [x9, #0x1, mul vl]
+     b90: 91200129     	add	x9, x9, #0x800
+     b94: e540e124     	st1w	{ z4.s }, p0, [x9]
+     b98: e541e92c     	st1w	{ z12.s }, p2, [x9, #0x1, mul vl]
+     b9c: 91200129     	add	x9, x9, #0x800
+     ba0: e540e125     	st1w	{ z5.s }, p0, [x9]
+     ba4: e541e92d     	st1w	{ z13.s }, p2, [x9, #0x1, mul vl]
+     ba8: 91200129     	add	x9, x9, #0x800
+     bac: e540e126     	st1w	{ z6.s }, p0, [x9]
+     bb0: e541e92e     	st1w	{ z14.s }, p2, [x9, #0x1, mul vl]
+     bb4: 91200129     	add	x9, x9, #0x800
+     bb8: e540e127     	st1w	{ z7.s }, p0, [x9]
+     bbc: e541e92f     	st1w	{ z15.s }, p2, [x9, #0x1, mul vl]
+     bc0: 91200129     	add	x9, x9, #0x800
+     bc4: e540e130     	st1w	{ z16.s }, p0, [x9]
+     bc8: e541e938     	st1w	{ z24.s }, p2, [x9, #0x1, mul vl]
+     bcc: 91200129     	add	x9, x9, #0x800
+     bd0: e540e131     	st1w	{ z17.s }, p0, [x9]
+     bd4: e541e939     	st1w	{ z25.s }, p2, [x9, #0x1, mul vl]
+     bd8: 91200129     	add	x9, x9, #0x800
+     bdc: e540e132     	st1w	{ z18.s }, p0, [x9]
+     be0: e541e93a     	st1w	{ z26.s }, p2, [x9, #0x1, mul vl]
+     be4: 91200129     	add	x9, x9, #0x800
+     be8: e540e133     	st1w	{ z19.s }, p0, [x9]
+     bec: e541e93b     	st1w	{ z27.s }, p2, [x9, #0x1, mul vl]
+     bf0: 91200129     	add	x9, x9, #0x800
+     bf4: e540e134     	st1w	{ z20.s }, p0, [x9]
+     bf8: e541e93c     	st1w	{ z28.s }, p2, [x9, #0x1, mul vl]
+     bfc: 91200129     	add	x9, x9, #0x800
+     c00: e540e135     	st1w	{ z21.s }, p0, [x9]
+     c04: e541e93d     	st1w	{ z29.s }, p2, [x9, #0x1, mul vl]
+     c08: 91200129     	add	x9, x9, #0x800
+     c0c: e540e136     	st1w	{ z22.s }, p0, [x9]
+     c10: e541e93e     	st1w	{ z30.s }, p2, [x9, #0x1, mul vl]
+     c14: 91200129     	add	x9, x9, #0x800
+     c18: e540e137     	st1w	{ z23.s }, p0, [x9]
+     c1c: e541e93f     	st1w	{ z31.s }, p2, [x9, #0x1, mul vl]
+     c20: 91200129     	add	x9, x9, #0x800
+     c24: aa1103e2     	mov	x2, x17
+     c28: d13e0042     	sub	x2, x2, #0xf80
+     c2c: d1403c42     	sub	x2, x2, #0xf, lsl #12   ; =0xf000
+     c30: 91000343     	add	x3, x26, #0x0
+     c34: 91404000     	add	x0, x0, #0x10, lsl #12  ; =0x10000
+     c38: 9100039f     	mov	sp, x28
+     c3c: d10080c6     	sub	x6, x6, #0x20
+     c40: b5ffc006     	cbnz	x6, 0x440 <ltmp0+0x440>
+     c44: d1440000     	sub	x0, x0, #0x100, lsl #12 ; =0x100000
+     c48: 91408021     	add	x1, x1, #0x20, lsl #12  ; =0x20000
+     c4c: 91200042     	add	x2, x2, #0x800
+     c50: 91407c42     	add	x2, x2, #0x1f, lsl #12  ; =0x1f000
+     c54: d10100e7     	sub	x7, x7, #0x40
+     c58: b5ffa067     	cbnz	x7, 0x64 <ltmp0+0x64>
+     c5c: d503467f     	smstop
+     c60: 910003bf     	mov	sp, x29
+     c64: 6d4b27e8     	ldp	d8, d9, [sp, #0xb0]
+     c68: 6d4a2fea     	ldp	d10, d11, [sp, #0xa0]
+     c6c: 6d4937ec     	ldp	d12, d13, [sp, #0x90]
+     c70: 6d483fee     	ldp	d14, d15, [sp, #0x80]
+     c74: a94557f4     	ldp	x20, x21, [sp, #0x50]
+     c78: a9445ff6     	ldp	x22, x23, [sp, #0x40]
+     c7c: a9426ffa     	ldp	x26, x27, [sp, #0x20]
+     c80: a94177fc     	ldp	x28, x29, [sp, #0x10]
+     c84: f94003fe     	ldr	x30, [sp]
+     c88: 910303ff     	add	sp, sp, #0xc0
+     c8c: d65f03c0     	ret
