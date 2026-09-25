@@ -1,0 +1,662 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "final-performance-unconfirmed",
+  "trials": [
+    {
+      "name": "libxsmm-reference-with-unused-256-primitive",
+      "hypothesis": "Unchanged full512 NN GEMM with optional unused verified panel, transpose and256 primitives",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/source/kernel.c",
+      "source_hash": "8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18",
+      "status": "passed",
+      "scores": [
+        1053.2043173189027,
+        1021.9611440910166,
+        973.9154750705726,
+        1090.460796199913,
+        905.4724621623421,
+        1070.350952778141,
+        1102.214208818538,
+        1063.814291889591,
+        1070.8889978697769,
+        1087.8843127588746
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/validation-9.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 1067.0826223338659,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06,
+        "numerical_stress": {
+          "schema_version": "sera-strassen-numerics-v1",
+          "seed": 20260924,
+          "n": 512,
+          "tolerance": 0.002,
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "timing_claim": false,
+          "source_hash": "8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18",
+          "passed": true,
+          "stage": "numerical-correctness",
+          "cases": [
+            {
+              "kind": "cancellation-0.03125",
+              "relative_error": 1.753537330935442e-05
+            },
+            {
+              "kind": "cancellation-0.0625",
+              "relative_error": 1.0921166772725823e-05
+            },
+            {
+              "kind": "scale-8",
+              "relative_error": 6.945456020528351e-07
+            },
+            {
+              "kind": "scale-12",
+              "relative_error": 4.2078779370673897e-07
+            }
+          ]
+        }
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    },
+    {
+      "name": "libxsmm-n512-one-level-strassen-three-buffers",
+      "hypothesis": "Implement the supplied swarm-selected schedule: seven dense 256-square products, three reusable FP32 buffers, and signed accumulation into zeroed stride512 output quadrants. Each helper call uses a fresh zeroed parameter array with [4]=right, [10]=left and [16]=product. All allocations, quadrant copies, sums, helper calls, recombination and frees execute within gemm. Allocation failure and n!=512 use the unchanged general fallback. Imported assembly and all BSD notices remain unchanged. This wrapper is absent from the supplied measured history. Reduced multiplication count does not establish a runtime gain; copying, allocation, transitions and recombination can erase it. FP32 cancellation and scale-separated accuracy remain unverified. No tools, compilation, tests or measurements were performed. Require the complete correctness checks, including tolerance 0.002, finite output, input preservation, full overwrite, output guards, allocation failure, general sizes, tails and n<=0, before timing. Then require ten validations and ten alternating paired controls with unchanged power settings, followed by the fixed min(candidate)>1.05*max(control) gate and held-out checking. The supplied fresh battery baseline spans 905.47–1102.21 GFLOP/s, with peak 1102.214208818538; no candidate or paired-control results exist for this wrapper. Keep historical Battery Automatic peak 1668.5964359101147, AC initial-baseline peak 1685.6230608449698 and later AC unchanged-control peak 1687.3925479742732 separate from fresh same-mode results. Comparator policy remains pending. No speedup, causal attribution or goal completion is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/source/kernel.c",
+      "source_hash": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+      "status": "passed",
+      "scores": [
+        510.81913641124714,
+        555.1922564943017,
+        567.5672222415579,
+        510.859963238441,
+        566.9678327030289,
+        545.6925755969992,
+        432.9604085978148,
+        508.5613305217991,
+        566.7176712594226,
+        561.7273461725015
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-9.json"
+      ],
+      "control_scores": [
+        1053.7211045214528,
+        1091.5737628886607,
+        1046.5319793060735,
+        812.5174649944478,
+        1077.513097378205,
+        1064.1643453045485,
+        982.5278418021171,
+        818.2984883829259,
+        784.7085451853696,
+        776.2916995860331
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/control-9.json"
+      ],
+      "median_gflops": 550.4424160456504,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.5449658796766887e-06,
+        "numerical_stress": {
+          "schema_version": "sera-strassen-numerics-v1",
+          "seed": 20260924,
+          "n": 512,
+          "tolerance": 0.002,
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "timing_claim": false,
+          "source_hash": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+          "passed": true,
+          "stage": "numerical-correctness",
+          "cases": [
+            {
+              "kind": "cancellation-0.03125",
+              "relative_error": 3.782174242624836e-05
+            },
+            {
+              "kind": "cancellation-0.0625",
+              "relative_error": 2.0420173536725636e-05
+            },
+            {
+              "kind": "scale-8",
+              "relative_error": 1.25025318677578e-06
+            },
+            {
+              "kind": "scale-12",
+              "relative_error": 7.011753696525599e-07
+            }
+          ]
+        }
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, the candidate scored 432.96–567.57 GFLOP/s versus paired controls of 776.29–1091.57. Repeat spreads were 134.61 and 315.28 GFLOP/s. It lost all ten pairs; its maximum was below every control. Its minimum of 432.96 fails the required >1146.15 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 and paired-control peak of 1091.5738 in 0/10 runs each. It also exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231, and later AC unchanged-control peak of 1687.3925 in 0/10 runs each. Keep these power-mode records separate. The ten-run goal is unmet; comparator policy remains pending. No held-out result is supplied.\n\nDiscard this three-buffer Strassen candidate and retain unchanged NN. These results show a consistent regression for the complete wrapper, without isolating allocation, packing, subproducts, transitions or recombination costs. They do not reject all one-level Strassen implementations or establish any advisor's individual effect. Preserve the board-ranked queue and fixed gates; the legacy 1800 target does not determine this decision."
+      }
+    },
+    {
+      "name": "libxsmm-full512-subs-bne-k-loop-control",
+      "hypothesis": "Replace SUB/CBNZ with SUBS/B.NE in both active NN K loops. Each counter starts at 512 and exits when its decrement reaches zero, preserving all 512 ordered FP32 updates. Instruction count remains two; performance is unknown. This change is distinct from the supplied measured candidates. Loads, pointer updates, FMOPA order, rewinds, ABI, fallback, unused helpers and all BSD notices remain unchanged. No tools or tests were run. Compilation and all fixed correctness checks, including cancellation and scale-separated cases, remain required before timing. Require ten validations and ten alternating paired controls with power settings unchanged, then min(candidate)>1.05*max(control) and held-out checking. The supplied fresh battery baseline peak is 1102.214208818538 GFLOP/s; this candidate has no measurements or paired controls. Report fresh same-mode comparisons separately from historical Battery Automatic peak 1668.5964359101147, AC initial-baseline peak 1685.6230608449698 and AC unchanged-control peak 1687.3925479742732. No speedup, causal attribution or goal completion is established; comparator policy remains pending.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/source/kernel.c",
+      "source_hash": "b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9",
+      "status": "passed",
+      "scores": [
+        1108.6647843710866,
+        1069.996818080416,
+        1055.9678192796828,
+        1066.9856778717942,
+        1086.0533364389669,
+        819.8605028338425,
+        1050.1142079064587,
+        1104.1046888984345,
+        1090.6468638255583,
+        1073.2052287938989
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-9.json"
+      ],
+      "control_scores": [
+        1048.7439954471104,
+        850.9361314703516,
+        1110.958986676531,
+        1066.277895383754,
+        1066.6295722661564,
+        1095.4671292774585,
+        763.6855101222358,
+        1104.1046888984345,
+        1087.5185470091706,
+        936.9474944400282
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/control-9.json"
+      ],
+      "median_gflops": 1071.6010234371574,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06,
+        "numerical_stress": {
+          "schema_version": "sera-strassen-numerics-v1",
+          "seed": 20260924,
+          "n": 512,
+          "tolerance": 0.002,
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "timing_claim": false,
+          "source_hash": "b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9",
+          "passed": true,
+          "stage": "numerical-correctness",
+          "cases": [
+            {
+              "kind": "cancellation-0.03125",
+              "relative_error": 1.753537330935442e-05
+            },
+            {
+              "kind": "cancellation-0.0625",
+              "relative_error": 1.0921166772725823e-05
+            },
+            {
+              "kind": "scale-8",
+              "relative_error": 6.945456020528351e-07
+            },
+            {
+              "kind": "scale-12",
+              "relative_error": 4.2078779370673897e-07
+            }
+          ]
+        }
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, candidate throughput was 819.86–1108.66 GFLOP/s versus paired controls of 763.69–1110.96. Repeat spreads were 288.80 and 347.27 GFLOP/s. The candidate won seven pairs, lost two and tied one. These overlapping results establish no consistent gain. Its minimum of 819.86 fails the required >1166.51 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 in 2/10 runs and paired-control peak of 1110.9590 in 0/10. It exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231 and later AC unchanged-control peak of 1687.3925 in 0/10 each. Keep power-mode records separate. The ten-run goal is unmet under either comparator policy; that policy remains pending. No held-out result is supplied.\n\nDiscard this candidate and retain unchanged NN. These measurements establish no causal benefit from SUBS/B.NE or individual advisor effect. Preserve the board-ranked queue and fixed gates; do not repeat this source under another name. The legacy 1800 target does not determine this decision."
+      }
+    },
+    {
+      "name": "libxsmm-strassen-three-buffers-neon-packing",
+      "hypothesis": "Replace only the measured three-buffer Strassen wrapper's packing loops with four-lane NEON FP32 loads, copies, additions, subtractions and stores. Each 256-element row uses 64 groups with no alignment assumption. Product calls, recombination, allocation, fallback and all BSD notices remain unchanged. This source change is absent from the supplied measured history. Compilation, correctness and performance are untested; the compiler may already vectorize the original loops. Require all fixed correctness checks, including cancellation, scale separation, guards and allocation failure, before ten validations and ten alternating paired controls under unchanged power settings. Promotion still requires min(candidate)>1.05*max(control), followed by held-out checking. The fresh same-mode baseline peak is 1102.214208818538 GFLOP/s; the prior Strassen wrapper's paired-control peak is 1091.5737628886607. Keep historical Battery Automatic peak 1668.5964359101147, AC initial-baseline peak 1685.6230608449698 and AC unchanged-control peak 1687.3925479742732 separate. No new measurements, speedup, causal attribution or goal completion are established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/source/kernel.c",
+      "source_hash": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+      "status": "passed",
+      "scores": [
+        454.68635446317563,
+        553.095409568517,
+        529.7196936074392,
+        530.6359289292257,
+        559.5319556178431,
+        524.2020059284085,
+        544.9082971247883,
+        532.9632251633308,
+        558.6586069661655,
+        547.4554180218447
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-9.json"
+      ],
+      "control_scores": [
+        800.8002675930537,
+        1034.2699870505353,
+        844.0251721158779,
+        1022.9346990014091,
+        1086.9680215139542,
+        958.9823154132047,
+        784.9953912726533,
+        1085.3199757780633,
+        1086.5984551385386,
+        889.1034931262603
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/control-9.json"
+      ],
+      "median_gflops": 538.9357611440596,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.5449658796766887e-06,
+        "numerical_stress": {
+          "schema_version": "sera-strassen-numerics-v1",
+          "seed": 20260924,
+          "n": 512,
+          "tolerance": 0.002,
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "timing_claim": false,
+          "source_hash": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+          "passed": true,
+          "stage": "numerical-correctness",
+          "cases": [
+            {
+              "kind": "cancellation-0.03125",
+              "relative_error": 3.782174242624836e-05
+            },
+            {
+              "kind": "cancellation-0.0625",
+              "relative_error": 2.0420173536725636e-05
+            },
+            {
+              "kind": "scale-8",
+              "relative_error": 1.25025318677578e-06
+            },
+            {
+              "kind": "scale-12",
+              "relative_error": 7.011753696525599e-07
+            }
+          ]
+        }
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, this NEON-packing Strassen candidate scored 454.69–559.53 GFLOP/s versus paired NN controls of 785.00–1086.97. Repeat spreads were 104.85 and 301.97 GFLOP/s. It lost all ten pairs; its maximum was below every control. Its minimum of 454.69 fails the required >1141.32 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 and paired-control peak of 1086.9680 in 0/10 runs each. It also exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231, and later AC unchanged-control peak of 1687.3925 in 0/10 runs each. Keep power-mode records separate. The ten-run goal is unmet under either comparator policy; that policy remains pending. No held-out result is supplied.\n\nDiscard this candidate and retain unchanged NN. These results show a consistent regression for the complete wrapper. They do not isolate NEON packing costs, establish improvement over the earlier Strassen wrapper, or identify an individual advisor's effect. Preserve the board-ranked queue and fixed gates. The legacy 1800 target does not determine this decision."
+      }
+    }
+  ],
+  "target_gflops": 1800,
+  "target_met": false,
+  "winner_source": null,
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 10,
+    "min_improvement": 0.05,
+    "max_seconds": 1800
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "search-exhausted",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/final.json",
+  "final_gflops": 848.6950436207126,
+  "final_minimum_gflops": 860.198839054225
+}

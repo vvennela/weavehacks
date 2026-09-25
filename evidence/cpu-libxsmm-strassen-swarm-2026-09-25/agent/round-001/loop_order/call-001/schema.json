@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "advice": {
+      "type": "string"
+    },
+    "risks": {
+      "type": "string"
+    },
+    "abstain": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "advice",
+    "risks",
+    "abstain"
+  ]
+}

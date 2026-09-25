@@ -1,0 +1,1420 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 71,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 6,
+  "adjudications": [
+    {
+      "source_hash": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, the candidate scored 432.96–567.57 GFLOP/s versus paired controls of 776.29–1091.57. Repeat spreads were 134.61 and 315.28 GFLOP/s. It lost all ten pairs; its maximum was below every control. Its minimum of 432.96 fails the required >1146.15 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 and paired-control peak of 1091.5738 in 0/10 runs each. It also exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231, and later AC unchanged-control peak of 1687.3925 in 0/10 runs each. Keep these power-mode records separate. The ten-run goal is unmet; comparator policy remains pending. No held-out result is supplied.\n\nDiscard this three-buffer Strassen candidate and retain unchanged NN. These results show a consistent regression for the complete wrapper, without isolating allocation, packing, subproducts, transitions or recombination costs. They do not reject all one-level Strassen implementations or establish any advisor's individual effect. Preserve the board-ranked queue and fixed gates; the legacy 1800 target does not determine this decision."
+    },
+    {
+      "source_hash": "b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, candidate throughput was 819.86–1108.66 GFLOP/s versus paired controls of 763.69–1110.96. Repeat spreads were 288.80 and 347.27 GFLOP/s. The candidate won seven pairs, lost two and tied one. These overlapping results establish no consistent gain. Its minimum of 819.86 fails the required >1166.51 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 in 2/10 runs and paired-control peak of 1110.9590 in 0/10. It exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231 and later AC unchanged-control peak of 1687.3925 in 0/10 each. Keep power-mode records separate. The ten-run goal is unmet under either comparator policy; that policy remains pending. No held-out result is supplied.\n\nDiscard this candidate and retain unchanged NN. These measurements establish no causal benefit from SUBS/B.NE or individual advisor effect. Preserve the board-ranked queue and fixed gates; do not repeat this source under another name. The legacy 1800 target does not determine this decision."
+    },
+    {
+      "source_hash": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, this NEON-packing Strassen candidate scored 454.69–559.53 GFLOP/s versus paired NN controls of 785.00–1086.97. Repeat spreads were 104.85 and 301.97 GFLOP/s. It lost all ten pairs; its maximum was below every control. Its minimum of 454.69 fails the required >1141.32 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 and paired-control peak of 1086.9680 in 0/10 runs each. It also exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231, and later AC unchanged-control peak of 1687.3925 in 0/10 runs each. Keep power-mode records separate. The ten-run goal is unmet under either comparator policy; that policy remains pending. No held-out result is supplied.\n\nDiscard this candidate and retain unchanged NN. These results show a consistent regression for the complete wrapper. They do not isolate NEON packing costs, establish improvement over the earlier Strassen wrapper, or identify an individual advisor's effect. Preserve the board-ranked queue and fixed gates. The legacy 1800 target does not determine this decision."
+    }
+  ],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "streaming_fp32_lanes": 16,
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "neon",
+      "simd",
+      "single-thread"
+    ],
+    "sme2": true,
+    "p_core_l1d_bytes": 131072,
+    "e_core_l1d_bytes": 65536,
+    "cache_line_bytes": 128
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "selected",
+      "roles": [
+        "strassen_one_level",
+        "panel_packing",
+        "scratch_lifetime",
+        "vector_access",
+        "cache_blocking",
+        "loop_order",
+        "compiler_codegen",
+        "assembly_audit",
+        "streaming_region_cost",
+        "n512_fast_path",
+        "tail_alignment",
+        "general_c_fallback",
+        "sme_fp32_tiles",
+        "sme_fp32_schedule",
+        "transpose_fusion"
+      ],
+      "advice": [
+        {
+          "role": "strassen_one_level",
+          "status": "received",
+          "advice": "Propose a Strassen candidate that replaces only the n=512 path with one decomposition level and seven calls to the verified dense 256-square NN beta-zero helper. Inside gemm, allocate three reusable dense 256-square FP32 buffers for left operand, right operand, and product. Copy each parent quadrant using its 512-element row stride while forming the seven signed operand sums. For each product, pass a zeroed 22-slot parameter array with [4]=right operand, [10]=left operand, and [16]=dense product; this mapping makes the helper compute row-major left@right. Accumulate each product into the appropriate 512-stride C quadrant using the approved signs: C11 += P1+P4-P5+P7; C12 += P3+P5; C21 += P2+P4; C22 += P1-P2+P3+P6. Zero C before accumulation. Keep allocation, copies, sums, all seven calls, accumulation, and frees inside gemm. On allocation failure and for other sizes, use the unchanged general fallback. The approved equations and signs are algebraically valid; the fewer multiply-accumulate count is not evidence of a speedup. No complete Strassen wrapper has been measured.",
+          "risks": "The 512-stride quadrants cannot be passed directly to the helper, which requires dense leading dimension 256; copying and recombination traffic may erase arithmetic savings. FP32 operand sums and changed accumulation order increase rounding error, especially for cancellation and scale-separated inputs, so the existing 0.002 tolerance may fail. Validate with existing cases plus deterministic cancellation and scale-sensitive n=512 inputs against a float64 reference computed from the actual FP32 inputs. Check finite output, full overwrite, unchanged inputs, output guards, allocation-failure fallback, general sizes, tails, and n<=0 before timing. Only then collect ten candidate validations with ten alternating paired controls under unchanged settings and gates; report historical and fresh same-mode comparisons separately.",
+          "abstain": false
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Propose a bounded A-panel layout: replace the current full512 path’s 128 KiB packed-A buffer with a 32 KiB buffer for one 32-row A panel. For each 32-row band, pack A as packed_a[k*32+r] = A[(row_base+r)*512+k], then run the existing column-panel traversal across all 16 output panels using that packed band. Advance A by 32 rows only after the sweep. This is a distinct source change from the measured 16-call panel32 wrapper, one-SME-region wrapper, and traversal variants. Hypothesis: the smaller active packed-A footprint may improve cache reuse. No speedup is established. Packing, allocation, all submatrix access, output stores, and cleanup stay inside gemm; use the existing full512 path if allocation fails. Preserve the general-size fallback and full BSD notices.",
+          "risks": "The A panel is reused across 16 output panels, but changing the current 64-row traversal may affect address generation, B reuse, or total packing cost. It may regress. No cache mechanism or performance benefit is verified.",
+          "abstain": false
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Experiment: for the approved one-level n=512 Strassen path, replace three separate 256×256 FP32 workspace allocations with one 768 KiB allocation split into left, right, and product buffers. Keep the seven products, FP32 operations, and recombination unchanged. Free the block before gemm returns; on allocation failure, use the existing correct fallback. This is a distinct, unmeasured Strassen wrapper change. Hypothesis: one allocation and free may reduce per-call allocator overhead. Do not clear the workspaces: write both operands fully before each helper call, and rely on the beta-zero helper to overwrite the full product buffer.",
+          "risks": "Allocator overhead may be small relative to packing and seven subproducts; the larger single allocation may fail where smaller allocations would succeed. Validate fresh inputs, input preservation, full output overwrite and guards, tolerance 0.002 including cancellation and scale-separated cases, allocation-failure fallback, and general sizes and tails. Then use the fixed ten-run paired-control and held-out gates. No speedup is measured or established.",
+          "abstain": false
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "Abstain. The supplied SME path already uses contiguous FP32 vector loads and stores: its K loop loads contiguous vectors from the transposed A buffer and row-major B, and its output stores write contiguous row segments. No distinct vector-access change is supported by the supplied evidence that preserves the fixed contract. Alignment of A, B, C, or allocated buffers is not established, so do not propose aligned-only accesses.",
+          "risks": "A speculative alignment assumption or altered access pattern could break the general GEMM ABI or tails. No performance claim is made.",
+          "abstain": true
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "Propose a distinct one-level Strassen workspace schedule: keep three dense 256×256 FP32 buffers for left operand, right operand, and product, and reuse them for all seven approved products. For each product, form the two operands directly from the 512-stride input quadrants into the dense buffers, call `sera_libxsmm_256` with the verified parameter slots, then immediately accumulate the dense result into its strided output quadrants using the approved signs. Initialize C once before the products. This tests whether bounded workspace and immediate recombination make the approved algorithm practical; no speedup is established. Keep the 512 NN path as the n=512 fallback if allocation fails, and leave other sizes on the existing path.",
+          "risks": "All operand gathering, sums, helper calls, recombination, allocation, and cleanup remain timed. The schedule adds substantial copying and FP32 additions, and Strassen's rounding may fail the fixed tolerance on cancellation or scale-sensitive inputs. The three buffers use 768 KiB; allocation failure must take the correct fallback. Do not attribute any eventual result to one advisor if the board selects this jointly.",
+          "abstain": false
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "advice": "Propose a new one-level Strassen schedule that orders the seven 256×256 products to reuse the three dense workspaces, with explicit sign accumulation into C. Keep each product’s operands formed from the prescribed quadrants, call the pinned 256 helper with dense buffers, and preserve full k reductions. The supplied evidence defines the legal Strassen products but does not identify an order that is distinct and useful for the current implementation. Since the workspace schedule is a board choice and no specific alternative is justified by evidence here, abstain from selecting an experiment or order.",
+          "risks": "This advice is not a measured fact. Strassen adds FP32 sums, memory traffic, allocation, recombination, and rounding error. Incorrect product ordering or signs can omit or overwrite outputs; test all 512×512 outputs, finite values, input immutability, guards, cancellation and scale-sensitive cases at tolerance 0.002, plus fallback sizes and allocation failure before timing. Any timing must include all conversion, allocation, products, recombination and cleanup and use the fixed paired-control gates.",
+          "abstain": true
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "advice": "Abstain. The timed n=512 path calls the imported full512 assembly helper. The supplied evidence says its compiled body matches the pinned bytes, so changing C fallback loops would not affect the measured path. The wrapper must also pass the specified zeroed parameter array, and no compiler output for an alternative wrapper is supplied to support a distinct code generation proposal.",
+          "risks": "A source change to the general-size fallback would not test the fixed n=512 benchmark. Changing the parameter array or imported helper would violate the supplied ABI or byte-preservation constraints. No new lowering or performance result is established.",
+          "abstain": true
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Propose a distinct experiment: replace the active NN kernel’s per-K pair of `ld1w` operations and two pointer updates with SME2 predicated pair loads that use a legal post-index form, if one exists for the required 2048-byte B stride and 256-byte packed-A stride. The supplied NN body visibly performs both pointer updates between operand loads and four `fmopa` operations in each of two 512-step loops; it does not use post-index loads. This is a concrete address-generation sequence to investigate. No speedup is established, and legality or encoding for those unequal strides is unverified. Before proposing implementation, confirm the instruction forms in the applicable architecture/compiler output. Then inspect generated assembly and verify exactly 512 ordered FP32 updates, both pointer rewinds, unchanged ABI and SME transitions, general-size fallback, and complete license notices. Run the fixed correctness checks, including cancellation and scale-separated cases, then ten alternating paired controls with the unchanged power source and settings. Compare against the fresh same-mode controls and both supplied historical peaks; apply the existing promotion and held-out gates.",
+          "risks": "The supplied evidence does not show that SME2 paired loads support post-index writeback, especially with the two different strides. If they do not, this proposal is infeasible and should be abstained rather than substituted with another experiment. Even if legal, fewer explicit pointer updates do not establish a runtime gain; instruction scheduling, load latency, and memory behavior may offset any benefit. No tools, source changes, correctness checks, or measurements were performed.",
+          "abstain": false
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not establish a distinct, legal change to SME entry, exit, or ZA setup costs. The measured one-streaming-region panel32 variant already changes region structure and showed overlapping ten-run scores against paired controls; that joint outcome cannot identify a transition-cost effect. The active full512 kernel already uses one SME region for its full GEMM call. Do not infer that splitting or combining regions will help without a new, source-specific proposal grounded in evidence.",
+          "risks": "Proposing another region-layout variant now risks repeating the measured one-region experiment or changing the approved kernel strategy without evidence. Any future proposal must preserve SME ABI boundaries, compute the full result within gemm, and time all setup, transitions, allocation, packing, and cleanup; no component speedup can be claimed separately.",
+          "abstain": true
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "advice": "Propose a one-level Strassen n=512 wrapper using the supplied 256-square LIBXSMM helper. Allocate three dense 256×256 FP32 buffers inside gemm for left operand, right operand, and product; reuse them for all seven products. Copy each 512-stride quadrant into dense buffers while forming the approved sums and differences. Call sera_libxsmm_256 with [4]=right, [10]=left, and [16]=product. Zero C, then accumulate products with the approved signs into its 512-stride quadrants. On allocation failure, use the existing full512 NN path. Keep other sizes on the general fallback. This is unmeasured advice; the arithmetic reduction does not establish a runtime gain.",
+          "risks": "Operand formation, copies, seven helper calls, output accumulation, allocation, and cleanup are timed and may outweigh the saved multiply work. FP32 sums and recombination can increase cancellation error. Before timing, check dense quadrant mapping and signs, fresh-input correctness at tolerance 0.002, cancellation and scale-separated n=512 cases, finite output, full overwrite, input preservation, output guards, and fallback behavior for general sizes, tails, n<=0, and allocation failure. Keep the benchmark and paired-control gates unchanged.",
+          "abstain": false
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "Recommend a tail-alignment experiment for the general-size SME fallback: keep the existing predicated row and column tails, but use unpredicated loads only for full 2VL tiles and add a separate edge-tile path with predicates derived from the actual remaining rows and columns. For loads, use valid in-bounds base pointers even when a predicate masks lanes; for stores, predicate every valid output lane. Leave n=512 and its measured assembly unchanged. This is a distinct, legal general-size source change. Hypothesis: removing repeated tail predicates from interior tiles may reduce overhead when dimensions are not multiples of 2VL; benefit is unverified. Check sizes below, equal to, and just above VL and 2VL; odd sizes and tails on each edge; n<=0; finite outputs, .002 tolerance, full overwrite, unchanged inputs, and guards around A, B, and C. Use fresh inputs and compare the complete changed source against same-mode controls under the existing ten-run gates.",
+          "risks": "The existing code may already handle tails correctly, so this change may add complexity without reducing meaningful work. Edge-path pointer or predicate errors could cause out-of-bounds access or skipped stores. Keep masked load addresses in bounds and do not benchmark or claim a gain before validation.",
+          "abstain": false
+        },
+        {
+          "role": "general_c_fallback",
+          "status": "received",
+          "advice": "Propose a portable C fallback change: use a cache-blocked i-k-j loop with fixed 32×32 output tiles. For each tile, zero its C elements, then accumulate across k while traversing contiguous B rows and C rows. Keep all work in the existing fallback call; preserve single-threaded FP32 arithmetic, general shapes, tails, n<=0 behavior, and the gemm ABI. This is a distinct fallback-only experiment; it does not affect the n=512 timing path unless dispatch or compiler layout changes it. Hypothesis: contiguous B and C access may improve fallback locality. No speedup is established. Check odd sizes and tile boundaries, deterministic cancellation and scale cases where applicable, fresh inputs, input preservation, complete output overwrite, finite results, and output guards against a float64 reference at the fixed tolerance.",
+          "risks": "The i-k-j order changes FP32 accumulation order and can change rounding; the fixed tolerance may reject it on cancellation-sensitive inputs. Initializing C and then updating it adds output traffic. A fixed tile may perform poorly for small or irregular shapes. No tools, source changes, tests, or measurements were made, per instruction.",
+          "abstain": false
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "advice": "Propose one distinct tile-mapping experiment: swap the ownership of ZA1 and ZA2 in both full512 K loops. ZA0 and ZA3 keep the top-left and bottom-right quadrants. Route the top-right FMOPA updates to ZA2 and the bottom-left updates to ZA1, then swap their extraction and stores so each result returns to its original C quadrant. Keep all four FP32 accumulators, operands, predicates, K order, loop schedule, and tail fallback unchanged. This is an unverified test of whether changing the cross-quadrant tile assignment affects instruction scheduling. Check fresh-input correctness, input preservation, full output overwrite and guards, general shapes and tails, n<=0, plus the deterministic cancellation and scale-separated cases at n=512 before timing. If correct, use the existing ten-run paired-control gate and unchanged power settings.",
+          "risks": "The mapping still uses exactly four ZA.S tiles; it does not assume eight FP32 accumulators. This only permutes the two off-diagonal outputs, so it may compile to equivalent machine behavior and has no evidence-based reason to improve speed. Preserve both output destinations exactly. No performance or correctness result for this proposed change is supplied.",
+          "abstain": false
+        },
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "advice": "Test a distinct FMOPA issue order in both full512 reduction loops, `Llibxsmm_478` and `Llibxsmm_70c`: change the order from ZA0, ZA1, ZA2, ZA3 to ZA0, ZA2, ZA1, ZA3. Keep the loads, pointer updates, operands, predicates, loop count, and every tile’s K order unchanged. This interleaves the two row groups while preserving each output accumulator’s FP32 reduction sequence. The supplied history does not list this order as tested. Validate the full GEMM against the existing tolerance and cancellation/scale cases, then use the fixed ten-run paired-control and held-out gates. This is an unmeasured schedule proposal, not a performance result.",
+          "risks": "The four tiles have independent accumulator dependencies, but this instruction order may have no effect or may reduce throughput. Prior FMOPA order 0,1,3,2 measurements did not promote; they do not predict this order’s outcome. Keep the complete source and license text otherwise unchanged, and do not attribute any joint result to this schedule alone.",
+          "abstain": false
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Test a fused 4-by-4 A transpose and MOPA path for n=512. For each 32-row output block, process K in groups of four: load four adjacent FP32 values from each of four A rows, transpose that 4-by-4 tile in vector registers, then feed its four K vectors directly to the existing four ordered FP32 MOPA updates. Load the matching B vectors for each K step. Keep the output accumulators live across all 512 K steps; store the completed C block as before. This removes the 128 KiB packed-A scratch and its full-scratch write/read, while all tile loads, register transposes, dispatch, and stores stay inside gemm. The conversion repeats for each 32-row output block: 16 blocks × 128 K groups × 8 four-row tiles = 16,384 small transposes. This is a proposal, not a measured speedup.",
+          "risks": "Repeated tile conversion and address work may cost more than the removed scratch traffic. Vector-register pressure, added loop nesting, or an incorrect K-vector mapping may regress performance or output correctness. Preserve the general fallback, ABI, FP32 arithmetic, thread count, tolerance, licenses, and all benchmark rules.",
+          "abstain": false
+        }
+      ],
+      "ballots": [
+        {
+          "role": "strassen_one_level",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "panel_packing",
+            "transpose_fusion",
+            "sme_fp32_tiles",
+            "sme_fp32_schedule",
+            "assembly_audit",
+            "general_c_fallback",
+            "tail_alignment"
+          ],
+          "reason": "Test the complete Strassen path first: the approved equations are valid, the dense 256 helper and row-major mapping are verified, and no wrapper has been measured. The three-buffer schedule is bounded and reusable; the single-allocation variant is a lower-risk follow-up, though it may fail where separate allocations would succeed. Strassen's FP32 sums and changed reduction order require cancellation and scale-sensitive checks before timing. The remaining proposals have unverified benefit; rank A-panel reuse next, then fused transpose, with tile-schedule permutations and general-fallback changes later. Prior timing rejects do not establish causes or predict these distinct changes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "panel_packing",
+            "strassen_one_level",
+            "scratch_lifetime",
+            "cache_blocking",
+            "transpose_fusion",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "assembly_audit",
+            "n512_fast_path",
+            "tail_alignment",
+            "general_c_fallback"
+          ],
+          "reason": "Test the bounded A-panel change first: it directly targets the requested reuse question and is distinct from the measured panel wrappers and traversals, though its cache benefit is unverified. Next test one Strassen wrapper using the verified 256 helper; it has no complete-wrapper measurements and carries numerical risk. The scratch_lifetime and cache_blocking proposals largely describe the same three-buffer Strassen schedule, so test the base schedule before the one-allocation variant. Then try the distinct fused transpose and SME mapping or issue-order changes; their expected benefits are uncertain, and prior related schedule changes did not promote. The paired-load proposal has unresolved instruction legality. The remaining proposals either duplicate the proposed Strassen wrapper or affect only general-size paths outside the n=512 timing workload.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "scratch_lifetime",
+            "n512_fast_path",
+            "transpose_fusion",
+            "panel_packing",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "general_c_fallback",
+            "tail_alignment",
+            "assembly_audit"
+          ],
+          "reason": "Strassen has the largest potential change to n=512 work, but its FP32 accuracy and timed data-movement costs are unverified. Rank its shared-workspace schedule next; combining three allocations into one may save little beside seven subproducts. The one-level fast-path proposal overlaps that same Strassen design. Fused transpose and smaller-panel packing could reduce scratch traffic, with substantial implementation and correctness risk. The remaining proposals have limited evidence for n=512: prior schedule and scratch-lifetime candidates did not promote, tail and C fallback changes target other sizes, and SME tile reassignment may compile to equivalent behavior. The paired-load proposal has unresolved instruction legality, so it ranks last.",
+          "format_repairs": 0
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "scratch_lifetime",
+            "panel_packing",
+            "transpose_fusion",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "tail_alignment",
+            "general_c_fallback",
+            "n512_fast_path",
+            "assembly_audit"
+          ],
+          "reason": "Prior measurements show no repeatable gain for the tested classical variants, so I rank the approved, unmeasured Strassen path first: it reduces the subproduct MAC count, though timed packing, recombination, and FP32 error are major risks. The two Strassen workspace proposals are close behind; they share the same algorithm, and their effects should not be credited separately if tested jointly. A smaller A panel and fused transpose have plausible data-movement benefits but substantial unverified costs. The ZA mapping permutation has little evidence for a speedup. Tail handling and the C fallback affect general sizes rather than the fixed n=512 timing path. The n512_fast_path proposal duplicates the main Strassen recommendation. I rank assembly_audit last because the supplied evidence says the proposed SME2 post-index load form is unverified and a related direct-gather proposal failed compilation; do not treat either as a performance result.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "panel_packing",
+            "transpose_fusion",
+            "strassen_one_level",
+            "cache_blocking",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "assembly_audit",
+            "tail_alignment",
+            "general_c_fallback"
+          ],
+          "reason": "Prior n=512 measurements show no promotion for panel calls, traversal changes, padding, transpose wrappers, or loop scheduling; noisy scores do not identify a cache cause. I rank the distinct smaller A-panel layout first because it targets the measured path and may reduce its active scratch footprint, while treating that benefit as unverified. Fusing transpose with compute could remove scratch traffic, but its repeated register transposes raise correctness and performance risk. One-level Strassen is approved and saves arithmetic by count, but timed copies, recombination, seven calls, and FP32 error risk are substantial. The two Strassen workspace proposals overlap; test the bounded schedule before its allocation-only variation. Assembly audit ranks low because the supplied evidence already questions legal post-index loads with unequal strides. The remaining proposals affect general sizes or perform a mapping/schedule permutation with no evidence of n=512 benefit.",
+          "format_repairs": 0
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "n512_fast_path",
+            "cache_blocking",
+            "scratch_lifetime",
+            "panel_packing",
+            "transpose_fusion",
+            "sme_fp32_tiles",
+            "sme_fp32_schedule",
+            "tail_alignment",
+            "general_c_fallback",
+            "assembly_audit"
+          ],
+          "reason": "Prior evidence favors testing the approved Strassen path first: its 256-square primitive passed checks, but the complete wrapper is unmeasured and carries accuracy and data-movement risks. The next two proposals use nearly the same Strassen schedule, so their results may not isolate individual choices. Panel packing and fused transpose have plausible locality benefits, but are unmeasured; prior panel and traversal variants did not promote. Tile remapping and FMOPA scheduling have low expected upside given prior non-promotions. Tail alignment and the C fallback do not target the fixed n=512 path. Assembly audit ranks last because legal post-index loads for the required unequal strides are unverified, and prior evidence says the proposed form is unavailable.",
+          "format_repairs": 0
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "panel_packing",
+            "transpose_fusion",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "tail_alignment",
+            "general_c_fallback",
+            "scratch_lifetime",
+            "cache_blocking",
+            "n512_fast_path",
+            "assembly_audit"
+          ],
+          "reason": "Test one-level Strassen first: it is approved and has the clearest potential to change n=512 arithmetic, though its FP32 accuracy and timed packing costs are unverified. Next test A-panel packing, then fused transpose/MOPA; both target the active path but add data movement or conversion work. The two instruction-order and tile-mapping proposals have uncertain compiler effects; the prior 0,1,3,2 order did not promote. Tail alignment and the C fallback affect general sizes rather than the fixed n=512 timing path. The three-buffer Strassen schedules overlap the first proposal, and n512_fast_path repeats its seven-product approach. Rank the paired-load proposal last because supplied history says the required unequal-stride post-index form is unavailable.",
+          "format_repairs": 0
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "panel_packing",
+            "cache_blocking",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "assembly_audit",
+            "tail_alignment",
+            "general_c_fallback",
+            "n512_fast_path"
+          ],
+          "reason": "Compiler output shows each active 512-step K loop loads A and B, advances both pointers, then issues four independent FMOPA updates; the two loops repeat this schedule. This exposes a concrete address-update sequence, but the proposed paired post-index form has no supplied legality evidence, and fewer instructions would not establish a speedup. I rank bounded Strassen first because its verified 256 helper enables the approved seven-product path, while its dense copies and FP32 error risk need strict checks. Panel packing is the strongest classical alternative because it targets the active packed-A workspace; benefit is unverified. The Strassen workspace proposals overlap substantially, so their measured outcomes must not be attributed to one advisor. Tile-order changes have little evidence of benefit, and the fallback-only proposals do not target the timed n=512 path.",
+          "format_repairs": 0
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "panel_packing",
+            "transpose_fusion",
+            "tail_alignment",
+            "general_c_fallback",
+            "assembly_audit"
+          ],
+          "reason": "The Strassen proposals have the clearest potential to reduce arithmetic, but all seven 256-square helper calls pay their SME setup and exit costs, and timed packing, recombination, and FP32 error make the net result uncertain. The three workspace proposals largely describe the same candidate, so test that implementation once rather than treating aliases as independent evidence. Next rank the lower-risk tile mapping and FMOPA schedule changes; prior FMOPA-order results did not promote, and do not predict this different order. Panel packing has an unverified cache hypothesis; previous panel layouts did not promote. Transpose fusion may remove scratch traffic but adds repeated register transposes. Tail alignment and the C fallback affect general sizes, not the fixed n=512 timing path. The proposed paired-load post-index change has unverified instruction legality, so confirm the encoding before implementation or abstain. No recommendation here is a measured speedup.",
+          "format_repairs": 0
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "panel_packing",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "general_c_fallback",
+            "tail_alignment",
+            "assembly_audit"
+          ],
+          "reason": "The Strassen proposals offer the clearest unmeasured route to reducing n=512 arithmetic, using the verified 256 helper, but copying, recombination, and FP32 error create substantial risk. The three Strassen workspace proposals overlap heavily; test one shared implementation and do not attribute its result to a single advisor. Fused transpose could remove packed-A scratch, but its repeated conversion work is unmeasured. Prior panel, schedule, and cache variants did not promote, which lowers their priority without proving these distinct variants will fail. Fallback and tail changes have limited impact on the fixed n=512 workload. The proposed SME2 post-index load form is unverified, and prior evidence says paired post-index loads cannot satisfy the required unequal strides.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "scratch_lifetime",
+            "panel_packing",
+            "transpose_fusion",
+            "n512_fast_path",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "tail_alignment",
+            "general_c_fallback",
+            "assembly_audit"
+          ],
+          "reason": "Strassen ranks first because it is approved and is the only proposal that reduces the main 512-square multiply work. Its 12.5% MAC reduction is arithmetic evidence only; timed copying and recombination plus FP32 accuracy risk make validation essential. The cache_blocking and n512_fast_path proposals substantially duplicate its three-buffer schedule, so treat them as overlapping advice rather than independent gains. Panel packing tests a distinct, bounded workspace change on the timed path. Transpose fusion may remove scratch traffic, but repeats conversion across output blocks. The remaining proposals have weaker relevance to the fixed n=512 goal: general-size tail handling and the C fallback do not change that path; tile mapping and FMOPA order have limited evidence of benefit. The assembly proposal depends on an unverified legal post-index form and should be checked before implementation.",
+          "format_repairs": 0
+        },
+        {
+          "role": "general_c_fallback",
+          "status": "received",
+          "ranking": [
+            "general_c_fallback",
+            "strassen_one_level",
+            "panel_packing",
+            "transpose_fusion",
+            "tail_alignment",
+            "scratch_lifetime",
+            "cache_blocking",
+            "n512_fast_path",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "assembly_audit"
+          ],
+          "reason": "The C fallback is this specialist’s direct scope and changes only unsupported hardware and edge shapes; it does not affect the fixed n=512 timing path. Strassen and the smaller A panel are distinct, plausible experiments, but neither has measured support, and Strassen adds numerical risk and timed work. Transpose fusion could remove packed-A traffic, but its repeated conversions and mapping raise implementation risk. The remaining proposals have narrower expected impact or weak justification: tail alignment affects edge tiles, workspace allocation only affects Strassen setup, and several SME instruction changes resemble prior unpromoted experiments. The supplied noisy results do not establish causality or rule out new variants.",
+          "format_repairs": 0
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "panel_packing",
+            "transpose_fusion",
+            "sme_fp32_tiles",
+            "sme_fp32_schedule",
+            "assembly_audit",
+            "tail_alignment",
+            "general_c_fallback"
+          ],
+          "reason": "Strassen ranks first because the user approved it and the supplied 256-square helper has primitive checks, but no complete wrapper has been measured. The first four proposals overlap on the same three-buffer Strassen design, so treat them as competing descriptions of one experiment, not independent gains. Panel packing is distinct; prior panel layouts did not promote, so its benefit is uncertain. Transpose fusion and the ZA tile or schedule changes have no supporting performance evidence; a prior FMOPA order change also failed promotion. The paired-load proposal has unresolved instruction legality and should be checked before implementation. Tail alignment and the C fallback do not target the timed n=512 path.",
+          "format_repairs": 0
+        },
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "cache_blocking",
+            "scratch_lifetime",
+            "n512_fast_path",
+            "panel_packing",
+            "transpose_fusion",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "general_c_fallback",
+            "tail_alignment",
+            "assembly_audit"
+          ],
+          "reason": "Prioritize the approved Strassen path: it is the only proposal with a stated reduction in arithmetic, though copying, recombination, and FP32 error make its net benefit uncertain. The Strassen workspace variants follow; they share the same unmeasured algorithm, so their order reflects bounded reuse and allocation simplicity, not measured gains. A-panel packing and transpose fusion could reduce scratch traffic but add substantial data movement. Tile scheduling and ownership changes have lower expected impact; earlier FMOPA reordering did not promote. Fallback-only proposals do not affect the fixed n=512 timing path. The paired-load proposal has unverified instruction legality and should be last. No proposal has measured performance evidence.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "transpose_fusion",
+            "panel_packing",
+            "scratch_lifetime",
+            "cache_blocking",
+            "n512_fast_path",
+            "general_c_fallback",
+            "tail_alignment",
+            "sme_fp32_schedule",
+            "sme_fp32_tiles",
+            "assembly_audit"
+          ],
+          "reason": "Rank one-level Strassen first because it tests the approved new algorithm and the supplied 256 helper is verified, though no full wrapper is measured and FP32 error plus data movement are major risks. Fused transpose and smaller A-panel packing target scratch traffic in distinct ways, but both may add enough work to lose. The three Strassen workspace/wrapper proposals overlap in their core approach. General fallback ideas do not affect the timed n=512 path. The ZA remapping may compile equivalently; prior FMOPA reordering did not promote. Rank paired loads last because legality is unverified and prior evidence says the proposed SME2 post-index form is unavailable. All proposals remain unmeasured advice.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "strassen_one_level",
+          "status": "proposed",
+          "source_hash": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+          "name": "libxsmm-n512-one-level-strassen-three-buffers",
+          "hypothesis": "Implement the supplied swarm-selected schedule: seven dense 256-square products, three reusable FP32 buffers, and signed accumulation into zeroed stride512 output quadrants. Each helper call uses a fresh zeroed parameter array with [4]=right, [10]=left and [16]=product. All allocations, quadrant copies, sums, helper calls, recombination and frees execute within gemm. Allocation failure and n!=512 use the unchanged general fallback. Imported assembly and all BSD notices remain unchanged. This wrapper is absent from the supplied measured history. Reduced multiplication count does not establish a runtime gain; copying, allocation, transitions and recombination can erase it. FP32 cancellation and scale-separated accuracy remain unverified. No tools, compilation, tests or measurements were performed. Require the complete correctness checks, including tolerance 0.002, finite output, input preservation, full overwrite, output guards, allocation failure, general sizes, tails and n<=0, before timing. Then require ten validations and ten alternating paired controls with unchanged power settings, followed by the fixed min(candidate)>1.05*max(control) gate and held-out checking. The supplied fresh battery baseline spans 905.47–1102.21 GFLOP/s, with peak 1102.214208818538; no candidate or paired-control results exist for this wrapper. Keep historical Battery Automatic peak 1668.5964359101147, AC initial-baseline peak 1685.6230608449698 and later AC unchanged-control peak 1687.3925479742732 separate from fresh same-mode results. Comparator policy remains pending. No speedup, causal attribution or goal completion is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              510.81913641124714,
+              555.1922564943017,
+              567.5672222415579,
+              510.859963238441,
+              566.9678327030289,
+              545.6925755969992,
+              432.9604085978148,
+              508.5613305217991,
+              566.7176712594226,
+              561.7273461725015
+            ],
+            "control_scores": [
+              1053.7211045214528,
+              1091.5737628886607,
+              1046.5319793060735,
+              812.5174649944478,
+              1077.513097378205,
+              1064.1643453045485,
+              982.5278418021171,
+              818.2984883829259,
+              784.7085451853696,
+              776.2916995860331
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, the candidate scored 432.96–567.57 GFLOP/s versus paired controls of 776.29–1091.57. Repeat spreads were 134.61 and 315.28 GFLOP/s. It lost all ten pairs; its maximum was below every control. Its minimum of 432.96 fails the required >1146.15 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 and paired-control peak of 1091.5738 in 0/10 runs each. It also exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231, and later AC unchanged-control peak of 1687.3925 in 0/10 runs each. Keep these power-mode records separate. The ten-run goal is unmet; comparator policy remains pending. No held-out result is supplied.\n\nDiscard this three-buffer Strassen candidate and retain unchanged NN. These results show a consistent regression for the complete wrapper, without isolating allocation, packing, subproducts, transitions or recombination costs. They do not reject all one-level Strassen implementations or establish any advisor's individual effect. Preserve the board-ranked queue and fixed gates; the legacy 1800 target does not determine this decision."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-001/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.5449658796766887e-06,
+              "numerical_stress": {
+                "schema_version": "sera-strassen-numerics-v1",
+                "seed": 20260924,
+                "n": 512,
+                "tolerance": 0.002,
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "timing_claim": false,
+                "source_hash": "ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1",
+                "passed": true,
+                "stage": "numerical-correctness",
+                "cases": [
+                  {
+                    "kind": "cancellation-0.03125",
+                    "relative_error": 3.782174242624836e-05
+                  },
+                  {
+                    "kind": "cancellation-0.0625",
+                    "relative_error": 2.0420173536725636e-05
+                  },
+                  {
+                    "kind": "scale-8",
+                    "relative_error": 1.25025318677578e-06
+                  },
+                  {
+                    "kind": "scale-12",
+                    "relative_error": 7.011753696525599e-07
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "experiment_id": "cache_blocking",
+          "status": "abstained",
+          "reason": "Stop: the selected workspace schedule was already measured as libxsmm-n512-one-level-strassen-three-buffers, source ec4b06039d12d06ab3475c871c3a898aee6cb971be8d781f29b7a5d688c5d8f1. It already uses three reusable dense buffers, seven approved products, immediate signed recombination and one initial C zeroing. Correctness passed, but it lost all ten pairs: 432.96–567.57 GFLOP/s versus controls of 776.29–1091.57, and was rejected. Changing only allocation-failure dispatch from the general fallback to full512 NN does not create a distinct workspace experiment. No edits, tools, tests or new measurements were performed."
+        },
+        {
+          "experiment_id": "panel_packing",
+          "status": "abstained",
+          "reason": "Cannot implement the selected layout as specified. A dense 32-row panel across K=512 requires 512*32*4 = 65536 bytes (64 KiB), twice the requested 32 KiB. The specified packed_a[k*32+r] accesses float index 16383, beyond a 32 KiB allocation. A 32 KiB buffer would require changing the panel dimensions or splitting K, which changes the selected experiment. The prior measured one-SME-region panel32 candidate already uses a 64 KiB buffer and sixteen 32-row bands; it failed promotion. No substitute, source edits, tests or measurements were performed."
+        }
+      ],
+      "rationale": "Select these 15 as an unordered roster; experiment selection and order remain with the board. Strassen covers the approved seven products, signs, dense-256 mapping and FP32 rounding risks. Packing, scratch, vector access, cache blocking and loop order cover timed operand formation, workspace reuse and recombination. Compiler, assembly and streaming specialists review instruction legality, generated code and SME call boundaries without claiming component speedups. Tile, schedule and transpose-fusion specialists retain classical alternatives and must identify changes distinct from prior measured sources. Fast-path, tail and fallback specialists protect dispatch, allocation failure, bounds and the general ABI. Numerical review must include cancellation, scale separation, finite output, input preservation, full overwrite and guards.\n\nThe fresh Battery baseline peak is 1102.214208818538 GFLOP/s; this phase supplies no paired-control peak yet. Historical peaks remain separate: Battery Automatic 1668.5964359101147, AC initial baseline 1685.6230608449698 and later AC unchanged control 1687.3925479742732. No Strassen wrapper has been measured. Advice remains unverified. Preserve all fixed rules, budgets, power settings, ten alternating pairs, the min(candidate)>1.05*max(control) gate and held-out checking. The historical-versus-fresh goal definition remains pending.",
+      "board": [
+        {
+          "experiment_id": "strassen_one_level",
+          "recommendation": "Propose a Strassen candidate that replaces only the n=512 path with one decomposition level and seven calls to the verified dense 256-square NN beta-zero helper. Inside gemm, allocate three reusable dense 256-square FP32 buffers for left operand, right operand, and product. Copy each parent quadrant using its 512-element row stride while forming the seven signed operand sums. For each product, pass a zeroed 22-slot parameter array with [4]=right operand, [10]=left operand, and [16]=dense product; this mapping makes the helper compute row-major left@right. Accumulate each product into the appropriate 512-stride C quadrant using the approved signs: C11 += P1+P4-P5+P7; C12 += P3+P5; C21 += P2+P4; C22 += P1-P2+P3+P6. Zero C before accumulation. Keep allocation, copies, sums, all seven calls, accumulation, and frees inside gemm. On allocation failure and for other sizes, use the unchanged general fallback. The approved equations and signs are algebraically valid; the fewer multiply-accumulate count is not evidence of a speedup. No complete Strassen wrapper has been measured.",
+          "risks": "The 512-stride quadrants cannot be passed directly to the helper, which requires dense leading dimension 256; copying and recombination traffic may erase arithmetic savings. FP32 operand sums and changed accumulation order increase rounding error, especially for cancellation and scale-separated inputs, so the existing 0.002 tolerance may fail. Validate with existing cases plus deterministic cancellation and scale-sensitive n=512 inputs against a float64 reference computed from the actual FP32 inputs. Check finite output, full overwrite, unchanged inputs, output guards, allocation-failure fallback, general sizes, tails, and n<=0 before timing. Only then collect ten candidate validations with ten alternating paired controls under unchanged settings and gates; report historical and fresh same-mode comparisons separately."
+        },
+        {
+          "experiment_id": "panel_packing",
+          "recommendation": "Propose a bounded A-panel layout: replace the current full512 path’s 128 KiB packed-A buffer with a 32 KiB buffer for one 32-row A panel. For each 32-row band, pack A as packed_a[k*32+r] = A[(row_base+r)*512+k], then run the existing column-panel traversal across all 16 output panels using that packed band. Advance A by 32 rows only after the sweep. This is a distinct source change from the measured 16-call panel32 wrapper, one-SME-region wrapper, and traversal variants. Hypothesis: the smaller active packed-A footprint may improve cache reuse. No speedup is established. Packing, allocation, all submatrix access, output stores, and cleanup stay inside gemm; use the existing full512 path if allocation fails. Preserve the general-size fallback and full BSD notices.",
+          "risks": "The A panel is reused across 16 output panels, but changing the current 64-row traversal may affect address generation, B reuse, or total packing cost. It may regress. No cache mechanism or performance benefit is verified."
+        },
+        {
+          "experiment_id": "scratch_lifetime",
+          "recommendation": "Experiment: for the approved one-level n=512 Strassen path, replace three separate 256×256 FP32 workspace allocations with one 768 KiB allocation split into left, right, and product buffers. Keep the seven products, FP32 operations, and recombination unchanged. Free the block before gemm returns; on allocation failure, use the existing correct fallback. This is a distinct, unmeasured Strassen wrapper change. Hypothesis: one allocation and free may reduce per-call allocator overhead. Do not clear the workspaces: write both operands fully before each helper call, and rely on the beta-zero helper to overwrite the full product buffer.",
+          "risks": "Allocator overhead may be small relative to packing and seven subproducts; the larger single allocation may fail where smaller allocations would succeed. Validate fresh inputs, input preservation, full output overwrite and guards, tolerance 0.002 including cancellation and scale-separated cases, allocation-failure fallback, and general sizes and tails. Then use the fixed ten-run paired-control and held-out gates. No speedup is measured or established."
+        },
+        {
+          "experiment_id": "cache_blocking",
+          "recommendation": "Propose a distinct one-level Strassen workspace schedule: keep three dense 256×256 FP32 buffers for left operand, right operand, and product, and reuse them for all seven approved products. For each product, form the two operands directly from the 512-stride input quadrants into the dense buffers, call `sera_libxsmm_256` with the verified parameter slots, then immediately accumulate the dense result into its strided output quadrants using the approved signs. Initialize C once before the products. This tests whether bounded workspace and immediate recombination make the approved algorithm practical; no speedup is established. Keep the 512 NN path as the n=512 fallback if allocation fails, and leave other sizes on the existing path.",
+          "risks": "All operand gathering, sums, helper calls, recombination, allocation, and cleanup remain timed. The schedule adds substantial copying and FP32 additions, and Strassen's rounding may fail the fixed tolerance on cancellation or scale-sensitive inputs. The three buffers use 768 KiB; allocation failure must take the correct fallback. Do not attribute any eventual result to one advisor if the board selects this jointly."
+        },
+        {
+          "experiment_id": "assembly_audit",
+          "recommendation": "Propose a distinct experiment: replace the active NN kernel’s per-K pair of `ld1w` operations and two pointer updates with SME2 predicated pair loads that use a legal post-index form, if one exists for the required 2048-byte B stride and 256-byte packed-A stride. The supplied NN body visibly performs both pointer updates between operand loads and four `fmopa` operations in each of two 512-step loops; it does not use post-index loads. This is a concrete address-generation sequence to investigate. No speedup is established, and legality or encoding for those unequal strides is unverified. Before proposing implementation, confirm the instruction forms in the applicable architecture/compiler output. Then inspect generated assembly and verify exactly 512 ordered FP32 updates, both pointer rewinds, unchanged ABI and SME transitions, general-size fallback, and complete license notices. Run the fixed correctness checks, including cancellation and scale-separated cases, then ten alternating paired controls with the unchanged power source and settings. Compare against the fresh same-mode controls and both supplied historical peaks; apply the existing promotion and held-out gates.",
+          "risks": "The supplied evidence does not show that SME2 paired loads support post-index writeback, especially with the two different strides. If they do not, this proposal is infeasible and should be abstained rather than substituted with another experiment. Even if legal, fewer explicit pointer updates do not establish a runtime gain; instruction scheduling, load latency, and memory behavior may offset any benefit. No tools, source changes, correctness checks, or measurements were performed."
+        },
+        {
+          "experiment_id": "n512_fast_path",
+          "recommendation": "Propose a one-level Strassen n=512 wrapper using the supplied 256-square LIBXSMM helper. Allocate three dense 256×256 FP32 buffers inside gemm for left operand, right operand, and product; reuse them for all seven products. Copy each 512-stride quadrant into dense buffers while forming the approved sums and differences. Call sera_libxsmm_256 with [4]=right, [10]=left, and [16]=product. Zero C, then accumulate products with the approved signs into its 512-stride quadrants. On allocation failure, use the existing full512 NN path. Keep other sizes on the general fallback. This is unmeasured advice; the arithmetic reduction does not establish a runtime gain.",
+          "risks": "Operand formation, copies, seven helper calls, output accumulation, allocation, and cleanup are timed and may outweigh the saved multiply work. FP32 sums and recombination can increase cancellation error. Before timing, check dense quadrant mapping and signs, fresh-input correctness at tolerance 0.002, cancellation and scale-separated n=512 cases, finite output, full overwrite, input preservation, output guards, and fallback behavior for general sizes, tails, n<=0, and allocation failure. Keep the benchmark and paired-control gates unchanged."
+        },
+        {
+          "experiment_id": "tail_alignment",
+          "recommendation": "Recommend a tail-alignment experiment for the general-size SME fallback: keep the existing predicated row and column tails, but use unpredicated loads only for full 2VL tiles and add a separate edge-tile path with predicates derived from the actual remaining rows and columns. For loads, use valid in-bounds base pointers even when a predicate masks lanes; for stores, predicate every valid output lane. Leave n=512 and its measured assembly unchanged. This is a distinct, legal general-size source change. Hypothesis: removing repeated tail predicates from interior tiles may reduce overhead when dimensions are not multiples of 2VL; benefit is unverified. Check sizes below, equal to, and just above VL and 2VL; odd sizes and tails on each edge; n<=0; finite outputs, .002 tolerance, full overwrite, unchanged inputs, and guards around A, B, and C. Use fresh inputs and compare the complete changed source against same-mode controls under the existing ten-run gates.",
+          "risks": "The existing code may already handle tails correctly, so this change may add complexity without reducing meaningful work. Edge-path pointer or predicate errors could cause out-of-bounds access or skipped stores. Keep masked load addresses in bounds and do not benchmark or claim a gain before validation."
+        },
+        {
+          "experiment_id": "general_c_fallback",
+          "recommendation": "Propose a portable C fallback change: use a cache-blocked i-k-j loop with fixed 32×32 output tiles. For each tile, zero its C elements, then accumulate across k while traversing contiguous B rows and C rows. Keep all work in the existing fallback call; preserve single-threaded FP32 arithmetic, general shapes, tails, n<=0 behavior, and the gemm ABI. This is a distinct fallback-only experiment; it does not affect the n=512 timing path unless dispatch or compiler layout changes it. Hypothesis: contiguous B and C access may improve fallback locality. No speedup is established. Check odd sizes and tile boundaries, deterministic cancellation and scale cases where applicable, fresh inputs, input preservation, complete output overwrite, finite results, and output guards against a float64 reference at the fixed tolerance.",
+          "risks": "The i-k-j order changes FP32 accumulation order and can change rounding; the fixed tolerance may reject it on cancellation-sensitive inputs. Initializing C and then updating it adds output traffic. A fixed tile may perform poorly for small or irregular shapes. No tools, source changes, tests, or measurements were made, per instruction."
+        },
+        {
+          "experiment_id": "sme_fp32_tiles",
+          "recommendation": "Propose one distinct tile-mapping experiment: swap the ownership of ZA1 and ZA2 in both full512 K loops. ZA0 and ZA3 keep the top-left and bottom-right quadrants. Route the top-right FMOPA updates to ZA2 and the bottom-left updates to ZA1, then swap their extraction and stores so each result returns to its original C quadrant. Keep all four FP32 accumulators, operands, predicates, K order, loop schedule, and tail fallback unchanged. This is an unverified test of whether changing the cross-quadrant tile assignment affects instruction scheduling. Check fresh-input correctness, input preservation, full output overwrite and guards, general shapes and tails, n<=0, plus the deterministic cancellation and scale-separated cases at n=512 before timing. If correct, use the existing ten-run paired-control gate and unchanged power settings.",
+          "risks": "The mapping still uses exactly four ZA.S tiles; it does not assume eight FP32 accumulators. This only permutes the two off-diagonal outputs, so it may compile to equivalent machine behavior and has no evidence-based reason to improve speed. Preserve both output destinations exactly. No performance or correctness result for this proposed change is supplied."
+        },
+        {
+          "experiment_id": "sme_fp32_schedule",
+          "recommendation": "Test a distinct FMOPA issue order in both full512 reduction loops, `Llibxsmm_478` and `Llibxsmm_70c`: change the order from ZA0, ZA1, ZA2, ZA3 to ZA0, ZA2, ZA1, ZA3. Keep the loads, pointer updates, operands, predicates, loop count, and every tile’s K order unchanged. This interleaves the two row groups while preserving each output accumulator’s FP32 reduction sequence. The supplied history does not list this order as tested. Validate the full GEMM against the existing tolerance and cancellation/scale cases, then use the fixed ten-run paired-control and held-out gates. This is an unmeasured schedule proposal, not a performance result.",
+          "risks": "The four tiles have independent accumulator dependencies, but this instruction order may have no effect or may reduce throughput. Prior FMOPA order 0,1,3,2 measurements did not promote; they do not predict this order’s outcome. Keep the complete source and license text otherwise unchanged, and do not attribute any joint result to this schedule alone."
+        },
+        {
+          "experiment_id": "transpose_fusion",
+          "recommendation": "Test a fused 4-by-4 A transpose and MOPA path for n=512. For each 32-row output block, process K in groups of four: load four adjacent FP32 values from each of four A rows, transpose that 4-by-4 tile in vector registers, then feed its four K vectors directly to the existing four ordered FP32 MOPA updates. Load the matching B vectors for each K step. Keep the output accumulators live across all 512 K steps; store the completed C block as before. This removes the 128 KiB packed-A scratch and its full-scratch write/read, while all tile loads, register transposes, dispatch, and stores stay inside gemm. The conversion repeats for each 32-row output block: 16 blocks × 128 K groups × 8 four-row tiles = 16,384 small transposes. This is a proposal, not a measured speedup.",
+          "risks": "Repeated tile conversion and address work may cost more than the removed scratch traffic. Vector-register pressure, added loop nesting, or an incorrect K-vector mapping may regress performance or output correctness. Preserve the general fallback, ABI, FP32 arithmetic, thread count, tolerance, licenses, and all benchmark rules."
+        }
+      ],
+      "board_hash": "f79249fb19427ac16aa884fca037f340a71503a2961a59c9407f588c91af3138",
+      "experiment_order": [
+        "strassen_one_level",
+        "cache_blocking",
+        "panel_packing"
+      ]
+    },
+    {
+      "round": 2,
+      "status": "selected",
+      "roles": [
+        "strassen_one_level",
+        "panel_packing",
+        "scratch_lifetime",
+        "vector_access",
+        "cache_blocking",
+        "loop_order",
+        "compiler_codegen",
+        "assembly_audit",
+        "streaming_region_cost",
+        "n512_fast_path",
+        "tail_alignment",
+        "sme_fp32_tiles",
+        "register_reuse",
+        "transpose_fusion",
+        "b_panel_layout"
+      ],
+      "advice": [
+        {
+          "role": "strassen_one_level",
+          "status": "received",
+          "advice": "Propose a distinct one-level Strassen variant that removes the separate full-output zeroing pass. Keep the same three dense 256×256 FP32 work buffers, seven approved products, and helper mapping: zeroed 22-slot parameters with [4]=right, [10]=left, [16]=dense product. Pack each 512-stride parent quadrant into dense operands before calling the helper. On P1, store its values to C11 and C22 as their initial values. On P2, store C21 and subtract from C22. On P3, store C12 and add to C22. Apply the remaining contributions in order: P4 adds to C11 and C21; P5 subtracts from C11 and adds to C12; P6 adds to C22; P7 adds to C11. This preserves C11=P1+P4−P5+P7, C12=P3+P5, C21=P2+P4, and C22=P1−P2+P3+P6 while avoiding the separate zero-fill and first read-modify-write for each output element. Keep all packing, allocation, helper calls, accumulation, and frees inside gemm. Other sizes and allocation failure use the unchanged general fallback. This is a proposal, not a measured speedup.",
+          "risks": "The change must initialize every C element exactly once before later accumulation; incorrect first-store handling can leave outputs unwritten or use stale C. The three-buffer Strassen wrapper was rejected after losing all ten measured pairs, so this smaller store-traffic change may not address its main costs. FP32 product sums and accumulation order retain the same cancellation and scale-sensitive accuracy risks. Before timing, check all seven operand equations and signs, dense helper mapping, public shapes and tails, n<=0, allocation failure, full overwrite, guards, finite results, unchanged inputs, and the existing 0.002 tolerance including deterministic cancellation and scale-separated cases. If correct, use the unchanged ten validations, ten alternating paired controls, promotion gate, and held-out check.",
+          "abstain": false
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "No distinct, useful panel-layout change is established from the supplied evidence. The correctly sized 64 KiB A panel reused across 16 column panels matches the measured one-streaming-region layout; the 32 KiB version is too small. The supplied full B-panel packing and column-panel-first traversal were also measured and rejected. I abstain rather than relabel a measured layout.",
+          "risks": "A new panel schedule could change packing cost, traversal, or SME transitions together, so its results may not isolate reuse. Any distinct candidate would need all allocation, packing, tail handling, and cleanup inside gemm, plus the fixed correctness checks and ten paired runs.",
+          "abstain": true
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Experiment: in the n=512 Strassen path, replace the three dense 256×256 workspaces with one 768 KiB allocation, then divide it into left, right, and product buffers. Keep the seven products, FP32 arithmetic, accumulation order, and recombination unchanged. Fully write both operands before each helper call; the beta-zero helper overwrites the full product buffer, so no workspace clearing is needed. Free the block before gemm returns. If allocation fails, use the correct existing fallback. This differs from the measured three-allocation Strassen source. Hypothesis: one allocation and free may reduce allocator overhead; benefit is unknown.",
+          "risks": "The measured three-buffer Strassen wrapper lost all ten paired comparisons against its controls, but those joint results do not identify allocation as the cause. This change retains its arithmetic and packing work, so it may not improve total time. One 768 KiB allocation may fail where three smaller allocations would succeed. Before timing, check fresh inputs, input preservation, full output overwrite and guards, tolerance 0.002 including cancellation and scale-separated cases, allocation-failure fallback, general sizes, tails, and n<=0. If correct, collect ten candidate validations and ten alternating paired controls under unchanged settings, then apply the fixed promotion and held-out gates. No speedup is established.",
+          "abstain": false
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "Propose vectorizing only `sera_strassen_pack_256` with four-lane NEON FP32 loads, arithmetic, and stores. Each row copies 256 contiguous FP32 values from each source quadrant into a dense destination; process 64 groups of four values per row. Use ordinary NEON loads and stores without alignment assumptions. Preserve the existing copy, add, and subtract behavior and leave the product calls and output recombination unchanged. This is a distinct change to the measured three-buffer Strassen source. It may reduce packing cost, but the whole Strassen candidate was much slower than controls; this change has no measured result.",
+          "risks": "The compiler may already vectorize these loops, so explicit NEON may add no benefit or regress. This targets packing only and cannot establish that packing caused the Strassen regression. Check all seven products, dense and strided quadrant boundaries, cancellation and scale-separated cases, tolerance 0.002, finite output, input preservation, full overwrite, guards, allocation failure, general sizes, tails, and n<=0. Then apply the unchanged ten-run validation, paired-control, promotion, and held-out gates with power settings unchanged. Do not infer causality from noisy scores or attribute a joint outcome to this advisor.",
+          "abstain": false
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "For the classical n=512 path, change the packed-A row block from 64 rows to 32 rows. Allocate 64 KiB of scratch, pack one 32-row band as packed_a[k*32+r] = A[(row_base+r)*512+k], and run the existing 32x32 output-tile compute across all 16 column panels before advancing to the next row band. Adapt the compute body to accumulate and store only that 32-row band; keep one SME region for the full call. This is a distinct source change from the measured row-half-first traversal, which kept 128 KiB scratch, and from the measured panel32 wrapper, which used sixteen helper calls. The hypothesis is that a smaller active packed-A working set may help. No cache bottleneck or speedup is established.",
+          "risks": "The current full512 compute body handles two 32-row halves per packed band. Removing the second half requires correct changes to ZA setup, packed-A addressing, stores, row-band advances, and final pointer rewinds. A bug can omit or overwrite rows. One SME region with a 32-row band has not been measured. The smaller scratch allocation may not improve runtime, and the changed body may regress. Keep the ABI, FP32 arithmetic, thread count, tolerance, general fallback, allocation-failure behavior, and license text unchanged; keep packing and allocation inside gemm.",
+          "abstain": false
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not establish a distinct, useful legal loop order for the seven-product Strassen path. The measured three-buffer candidate already uses immediate signed recombination and loses all ten paired controls; changing only product order has no supported basis for addressing that regression. No experiment order is selected.",
+          "risks": "Advice is unverified, not a measured fact. Any future loop-order change must still compute all seven products and fully overwrite all 512×512 outputs, preserve the gemm ABI and full k reductions, and keep packing, allocation, recombination, and cleanup timed. Check FP32 tolerance 0.002, finite output, input immutability, output guards, cancellation and scale-sensitive cases, plus fallback sizes, tails, n<=0, and allocation failure before paired timing. Do not attribute joint outcomes to one advisor.",
+          "abstain": true
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "advice": "Abstain. The supplied compiler evidence covers the pinned LIBXSMM assembly, not Clang’s lowering of the measured Strassen wrapper. The wrapper’s ten-run results show a regression for the complete implementation, but do not identify a compiler cause. I cannot propose a distinct compiler-codegen change from this evidence alone.",
+          "risks": "Any source change now would be a codegen hypothesis without supporting compiler output and could repeat part of the rejected wrapper. Do not treat the Strassen scores as evidence against or for a specific compiler transformation. A distinct proposal needs compiler output for the measured wrapper and a source change that preserves the fixed contract; it would still require the full correctness and paired measurement gates.",
+          "abstain": true
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Select these 15 specialists: strassen_one_level, assembly_audit, cache_blocking, panel_packing, loop_order, b_panel_layout, za_four_tile_reuse, prefetch_locality, address_generation, sme_fp32_schedule, sme_fp32_tiles, scratch_lifetime, a_transpose, n512_fast_path, streaming_region_cost. No experiment order is selected. Proposed distinct experiment: in both active NN K loops, replace `sub x8, x8, #1` plus `cbnz x8, loop` with `subs x8, x8, #1` plus `b.ne loop`. This tests condition-code loop control; the supplied assembly shows this decrement-and-branch pair on each 512-step loop. Preserve loads, pointer updates, all four ordered FP32 FMOPAs, iteration count, rewinds, ABI, fallback and licenses. No timing benefit is established. Validate the exact compiled bodies and all fixed correctness checks, including cancellation and scale-separated cases, then use ten alternating paired controls and the unchanged promotion and held-out gates. Report historical peaks and fresh same-mode controls separately.",
+          "risks": "This changes only loop control, and the evidence does not show whether it is a bottleneck or whether the new branch form performs better. The instruction count remains two; do not infer a speedup from the rewrite. Keep the power source and settings unchanged, preserve FP32 arithmetic and tolerance, and do not attribute any joint result to one advisor.",
+          "abstain": false
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "advice": "Abstain. The measured full512 path already uses one SME streaming region for the GEMM call. The verified 256 helper owns its SME entry and exit, so the seven-call Strassen wrapper crosses that boundary seven times. The supplied results measure complete paths and do not isolate transition or ZA setup cost. Avoid proposing a fused region without a valid helper ABI change supported by evidence.",
+          "risks": "A fused-region variant would change the generated helper’s SME boundary and could violate its streaming or ZA state contract. Its result would also include the existing Strassen packing, arithmetic, and recombination costs; do not attribute a joint outcome to transition savings. Any future candidate must preserve correctness and time all work inside gemm, then pass the unchanged ten-run paired-control and held-out gates.",
+          "abstain": true
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "advice": "Abstain from proposing another n=512 fast path. The only supplied fast-path proposal for this role, three-buffer one-level Strassen with the verified 256-square helper, has already been measured and rejected. A variant that only changes allocation-failure dispatch would not be a distinct experiment. Retain the current n=512 NN path and general fallback; reconsider this role only with a distinct board-ranked change.",
+          "risks": "The measured Strassen wrapper passed the supplied correctness and numerical stress checks, but scored 432.96–567.57 GFLOP/s and lost all ten paired controls (776.29–1091.57 GFLOP/s). This rejects that complete wrapper, not all Strassen schedules. Do not interpret the joint result as evidence for or against an individual advisor.",
+          "abstain": true
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "Propose a distinct general-size SME fallback change: split output tiles into fully interior tiles and boundary tiles. Use the existing unpredicated load and store pattern only when both tile dimensions are complete; route every partial row or column tile through the current predicated path. Compute each interior and edge bound from the actual remaining rows and columns, and keep all masked-load base addresses within the input buffers. Leave n=512 and its assembly path unchanged. Hypothesis: avoiding repeated tail predicates on full tiles may reduce overhead for general dimensions; benefit is unverified. This is advice only and has not been implemented or measured.",
+          "risks": "The current fallback already uses predicates, so dispatch and a second path may add overhead without a gain. Incorrect edge classification, pointer formation, or store predicates could access outside buffers or leave output elements unwritten. Preserve the fixed ABI, FP32 arithmetic, thread count, tolerance, and allocation behavior.",
+          "abstain": false
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "advice": "I abstain. The supplied source uses the four FP32 ZA.S tiles for the natural 2×2 output tile: ZA0 top-left, ZA1 top-right, ZA2 bottom-left, ZA3 bottom-right. The only distinct tile remapping identified here is the ZA1/ZA2 ownership swap from my prior advice. The supplied measurements do not test that mapping independently, and I cannot identify another useful mapping change from the supplied evidence without proposing a speculative alias.",
+          "risks": "No new source change, correctness result, or performance claim is supplied. The joint Strassen regression cannot be attributed to an individual advisor or used to judge the untested ZA1/ZA2 remapping.",
+          "abstain": true
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "advice": "Abstain. In the current SME tile, each of the four loaded FP32 vectors is already used by two FMOPA operations: z0/z1 each pair with z2/z3. Reusing the B vectors for the next row block would require keeping another four output accumulators live; the supplied kernel provides only four ZA.S tiles. No distinct reuse change is known that preserves this tile and avoids added loads or accumulator traffic.",
+          "risks": "Trying to extend reuse across row blocks without more ZA capacity would require spills, extra loads, or a different accumulation schedule. Their correctness and performance are unverified; the supplied evidence does not justify proposing one.",
+          "abstain": true
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Propose a distinct n=512 experiment: fuse A transpose tiles directly into the existing MOPA loop, without writing the full 128 KiB packed-A scratch. For each 64-row band, 32-column output panel, and 16-step K group, load four contiguous 16×16 FP32 A tiles from the two 32-row halves, transpose each tile in registers, and feed its 16 K vectors to the existing ordered FP32 MOPA updates. Keep output accumulators live across all 512 K steps and store each C tile as before. This repeats 16,384 small transposes per GEMM (8 row bands × 16 column panels × 32 K groups × 4 tiles). It rereads each A element 16 times: 4 MiB of A loads versus 256 KiB for one pass, while avoiding the full-scratch write and read. All loads, transposes, MOPA work, and stores remain timed. This is an unverified hypothesis, not a measured speedup.",
+          "risks": "Repeated A loads, transpose instructions, and added loop control may cost more than the removed scratch traffic. Register pressure or an incorrect mapping from transposed tiles to K vectors may cause regressions or incorrect output. Preserve the ABI, general fallback, FP32 arithmetic, thread count, tolerance, licenses, and benchmark rules. Before timing, check fresh inputs, full overwrite, input preservation, output guards, general sizes, tails, n<=0, deterministic cancellation and scale-separated n=512 cases against the float64 reference. If correct, use ten validations and ten alternating paired controls under unchanged power settings and the existing promotion and held-out gates.",
+          "abstain": false
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Propose a distinct Strassen workspace schedule that keeps all seven 256×256 products in one dense product buffer. After each helper call, scatter its result directly into the required C quadrants and signs, reusing the existing dense left and right buffers. This removes no arithmetic and adds no new algorithm; it tests whether immediate output accumulation with a single product buffer can reduce workspace traffic and allocation cost versus the measured three-buffer Strassen wrapper. Use the verified helper mapping [4]=right, [10]=left, [16]=product, with all packing, calls, recombination, allocation and cleanup inside gemm. Keep the unchanged NN path for allocation failure and other sizes. This source change is distinct from the measured wrapper, but its complete performance effect is unknown.",
+          "risks": "The prior Strassen wrapper lost all ten paired runs, and this schedule retains its seven products, operand packing and FP32 rounding risks; reducing one 256×256 buffer may not offset those costs. Cancellation or scale-separated inputs may fail the fixed 0.002 tolerance. Before timing, check all required public and deterministic numerical cases, finite output, input preservation, complete overwrite, output guards, general sizes, tails, n<=0 and allocation-failure fallback. If correct, collect ten candidate validations and ten alternating paired controls under unchanged power settings, then apply the fixed promotion gate and held-out check. Do not claim a speedup or attribute a joint outcome to this role.",
+          "abstain": false
+        }
+      ],
+      "ballots": [
+        {
+          "role": "strassen_one_level",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "cache_blocking",
+            "strassen_one_level",
+            "scratch_lifetime",
+            "b_panel_layout",
+            "vector_access",
+            "transpose_fusion",
+            "tail_alignment"
+          ],
+          "reason": "The only Strassen wrapper measured lost all 10 paired runs (433–568 GFLOP/s versus controls of 776–1,092), so its variants rank below the lower-risk classical loop-control and panel experiments. Among Strassen changes, removing the output zero pass is a distinct, limited change; one allocation or one product buffer may save overhead, while explicit NEON may duplicate compiler vectorization. Transpose fusion rereads A 16 times and adds complex mapping work. Tail handling does not affect the fixed n=512 timing path. The seven products and recombination signs are algebraically valid: C11=P1+P4−P5+P7, C12=P3+P5, C21=P2+P4, C22=P1−P2+P3+P6. For row-major P=X@Y, the dense 256 helper requires [4]=Y, [10]=X, [16]=P; parent quadrants must be packed from stride 512 to stride 256. FP32 cancellation and scale-sensitive accuracy remain key correctness risks under tolerance 0.002. Rankings are recommendations, not performance findings.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "cache_blocking",
+            "strassen_one_level",
+            "scratch_lifetime",
+            "vector_access",
+            "b_panel_layout",
+            "assembly_audit",
+            "tail_alignment",
+            "transpose_fusion"
+          ],
+          "reason": "Select these 15 specialists: strassen_one_level, assembly_audit, cache_blocking, panel_packing, loop_order, b_panel_layout, za_four_tile_reuse, prefetch_locality, address_generation, sme_fp32_schedule, sme_fp32_tiles, scratch_lifetime, a_transpose, n512_fast_path, streaming_region_cost. Rank the distinct 32-row A-panel design first: its 64 KiB buffer is correctly sized for 512×32 FP32 values, and one SME region avoids repeating the measured sixteen-call wrapper. The prior panel and traversal candidates did not promote, so the reuse benefit remains unverified and the altered compute and store path needs careful correctness checks. Next, the Strassen first-store change removes a C zero-fill pass while retaining the measured wrapper’s costly seven products and packing; it is a bounded test, not evidence the algorithm will recover. The single-allocation and vector-pack changes target overhead within that same rejected wrapper, but their benefit is uncertain. A Strassen single-product-buffer schedule may reduce workspace. The loop-control rewrite has little expected effect without evidence loop control is limiting. Tail splitting targets fallback shapes rather than the fixed n=512 timing. Transpose fusion ranks last because it rereads A sixteen times and adds substantial transpose work.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "cache_blocking",
+            "assembly_audit",
+            "strassen_one_level",
+            "vector_access",
+            "scratch_lifetime",
+            "b_panel_layout",
+            "transpose_fusion",
+            "tail_alignment"
+          ],
+          "reason": "The 32-row classical scratch proposal targets per-call scratch use in the timed n=512 path, though changing the compute body creates correctness risk and no gain is measured. The loop-control rewrite is small and preserves FP32 accumulation, but its benefit is unknown. The Strassen proposals rank lower because the measured three-buffer wrapper lost all ten paired runs; removing the output zero pass is a bounded change, while vectorizing packing may duplicate compiler optimization. Single-allocation and single-product-buffer variants retain most Strassen work. Fused transpose adds repeated A reads and substantial mapping complexity. Tail splitting does not affect the fixed n=512 timing.",
+          "format_repairs": 0
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "ranking": [
+            "strassen_one_level",
+            "vector_access",
+            "scratch_lifetime",
+            "assembly_audit",
+            "cache_blocking",
+            "b_panel_layout",
+            "transpose_fusion",
+            "tail_alignment"
+          ],
+          "reason": "The three-buffer Strassen wrapper lost all ten paired runs, so its variants have weak evidence for promotion. Removing the output zeroing pass is a bounded change; explicit NEON packing is also bounded and makes no alignment assumption, though the compiler may already vectorize those loops. Combining allocations is small in scope but may not address the measured regression. The loop-control rewrite is low risk but has no evidence of a bottleneck. The classical 32-row path and single-product-buffer schedule require broader changes with uncertain payoff. Transpose fusion adds repeated loads and transposes. Tail splitting does not affect the timed n=512 path.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "cache_blocking",
+            "vector_access",
+            "scratch_lifetime",
+            "strassen_one_level",
+            "b_panel_layout",
+            "transpose_fusion",
+            "tail_alignment"
+          ],
+          "reason": "The loop-control rewrite is a small, distinct change in the measured active path, though no bottleneck or benefit is established. The 32-row classical block is the most direct cache-layout test, but changing the two-half compute and stores raises correctness risk; the supplied evidence does not show a cache bottleneck. Vectorizing Strassen packing and consolidating its allocation are bounded changes, but the measured three-buffer Strassen wrapper lost all ten pairs, which does not isolate either cost. The single-product-buffer Strassen variant has the same uncertainty. Transpose fusion rereads each A value 16 times and has substantial implementation risk. Tail handling does not affect the fixed n=512 path, so it ranks last.",
+          "format_repairs": 0
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "ranking": [
+            "cache_blocking",
+            "assembly_audit",
+            "strassen_one_level",
+            "vector_access",
+            "scratch_lifetime",
+            "tail_alignment",
+            "b_panel_layout",
+            "transpose_fusion"
+          ],
+          "reason": "Rank the 32-row classical panel first: it is a distinct change to the active n=512 path and tests a bounded working-set hypothesis, though its compute and pointer changes carry correctness risk. The fused decrement and branch is a small, low-risk change to the measured hot loop, but no evidence shows loop control limits performance. The Strassen zero-fill removal is a distinct, limited attempt to reduce overhead, yet the measured three-buffer Strassen wrapper lost all ten paired runs; that result does not isolate the cause. Explicit NEON packing may help only if the compiler does not already vectorize those loops. A single workspace allocation has uncertain benefit and may fail where separate allocations succeed. Tail splitting affects the general fallback rather than the fixed n=512 timing and adds edge-handling risk. The product-buffer proposal appears to repeat the existing reusable-product schedule, so it may not produce a distinct source change. Transpose fusion rereads A sixteen times and adds repeated transpose work; its expected costs make it the weakest proposal. All predicted effects remain unverified.",
+          "format_repairs": 0
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "scratch_lifetime",
+            "vector_access",
+            "strassen_one_level",
+            "cache_blocking",
+            "b_panel_layout",
+            "transpose_fusion",
+            "tail_alignment"
+          ],
+          "reason": "The loop-control rewrite is a small, measurable compiler experiment, but no evidence shows loop control is a bottleneck or that it will help. Combining the Strassen allocations is also a small change, though it retains the measured wrapper’s dominant work; explicit NEON packing may duplicate compiler vectorization. Removing Strassen’s output zero pass is a distinct, low-cost variant, but the measured three-buffer wrapper lost all ten pairs. The 32-row classical path has more upside potential, with meaningful correctness and code-generation risk. The proposed Strassen product-buffer layout appears to match the already measured three-buffer schedule, so verify that it is distinct before implementation. Fused transpose repeats A loads many times and has high implementation risk. Tail splitting does not affect the timed n=512 path.",
+          "format_repairs": 0
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "cache_blocking",
+            "vector_access",
+            "strassen_one_level",
+            "scratch_lifetime",
+            "b_panel_layout",
+            "assembly_audit",
+            "transpose_fusion",
+            "tail_alignment"
+          ],
+          "reason": "The active NN assembly spends substantial work packing A: its packing loop loads many vectors, moves them through ZA, then stores the packed data. A 32-row panel directly targets that work, though its assembly changes carry correctness risk. Vectorizing Strassen packing is a smaller, testable target, but the compiler may already vectorize it. The measured three-buffer Strassen wrapper lost all ten paired runs, so removing its output-zero pass ranks ahead of allocation or product-buffer changes only as a limited follow-up; none addresses the whole regression. The K-loop decrement and branch are visible, but replacing them with flag-setting decrement and conditional branch does not reduce instruction count, so benefit is uncertain. Transpose fusion rereads A sixteen times, and tail handling does not affect n=512 timing. These are unverified rankings, not performance predictions. The supplied board contains eight experiment IDs; each is listed once.",
+          "format_repairs": 0
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "ranking": [
+            "cache_blocking",
+            "assembly_audit",
+            "strassen_one_level",
+            "scratch_lifetime",
+            "vector_access",
+            "b_panel_layout",
+            "transpose_fusion",
+            "tail_alignment"
+          ],
+          "reason": "Prior full512 measurements show no promoted optimization, so I rank the 32-row A panel first: it keeps one SME region and targets the active packed-A footprint, though its ZA, store, and pointer changes raise correctness risk. The fused loop decrement and branch is a small, low-risk change, but no benefit is measured. Removing Strassen’s output zero pass is a bounded test after the three-buffer Strassen wrapper lost all ten pairs; it may not address the main costs. One Strassen allocation and vectorized packing are lower-cost hypotheses, with no evidence that allocation or packing caused the regression. A single product buffer saves workspace but retains Strassen’s arithmetic and numerical risks. Transpose fusion rereads A sixteen times and adds substantial complexity. Tail alignment does not affect the fixed n=512 path.",
+          "format_repairs": 0
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "ranking": [
+            "cache_blocking",
+            "strassen_one_level",
+            "vector_access",
+            "scratch_lifetime",
+            "b_panel_layout",
+            "assembly_audit",
+            "tail_alignment",
+            "transpose_fusion"
+          ],
+          "reason": "Prioritize the classical 32-row packed-A path because it targets the measured n=512 workload and changes the active scratch footprint. The Strassen store change may remove a zeroing pass, but the measured three-buffer Strassen wrapper lost all ten paired runs, so its chance of clearing that regression is uncertain. Vectorizing packing and consolidating allocations target costs in that wrapper, but neither cost is isolated by the measurements; the compiler may already vectorize the loops, and one larger allocation may fail where three smaller ones succeed. The branch rewrite has low correctness risk but no evidence that loop control limits performance. Tail splitting targets general sizes rather than the fixed n=512 timing. Transpose fusion rereads A sixteen times and adds transposes and loop work, giving it the weakest supplied benefit case. All outcomes remain unverified until measured under the fixed gates.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "strassen_one_level",
+            "vector_access",
+            "cache_blocking",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "b_panel_layout",
+            "tail_alignment"
+          ],
+          "reason": "The loop-control rewrite is a small, distinct change on the timed n=512 path, with low correctness risk and no claim that it will help. The Strassen variant removes an output pass, but the measured three-buffer wrapper lost all ten pairs; this limited change may not address its larger costs. Vectorizing packing may help, though clang may already do so. The 32-row classical layout has a plausible working-set benefit but needs major pointer, tile, and store changes. One allocation has uncertain benefit and retains the rejected Strassen arithmetic. Transpose fusion rereads A sixteen times and adds substantial mapping and register risk. The single-product-buffer Strassen variant retains the measured wrapper's main costs. Tail splitting affects only the general fallback, not the fixed n=512 timing path, and adds boundary-access risk.",
+          "format_repairs": 0
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "cache_blocking",
+            "vector_access",
+            "scratch_lifetime",
+            "strassen_one_level",
+            "b_panel_layout",
+            "tail_alignment",
+            "transpose_fusion"
+          ],
+          "reason": "Prior K-loop changes showed no repeatable gain, so the fused decrement-and-branch proposal ranks first as a small, distinct change with low correctness risk. The 32-row classical block could reduce scratch use, but changing ZA mapping and row coverage raises correctness risk. NEON packing and one-allocation Strassen are bounded changes, though compiler vectorization and the rejected three-buffer Strassen result limit expected benefit. The other Strassen proposals retain its seven products and packing costs; tail splitting does not affect the fixed n=512 timing. Transpose fusion rereads A 16 times and adds many small transposes, so it ranks last. None has measured performance evidence.",
+          "format_repairs": 0
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "cache_blocking",
+            "scratch_lifetime",
+            "vector_access",
+            "strassen_one_level",
+            "b_panel_layout",
+            "tail_alignment",
+            "transpose_fusion"
+          ],
+          "reason": "The loop-control rewrite is small and keeps the FP32 operations unchanged, though prior loop-schedule trials do not establish a benefit. The 32-row classical path has a plausible smaller working set but carries substantial addressing and correctness risk. One allocation may reduce overhead, and explicit NEON may reduce packing cost, but both target a Strassen wrapper that lost all ten measured pairs; neither isolates the cause. Removing Strassen's zeroing pass is a distinct, bounded change, but its likely savings must be weighed against that regression. The single-product-buffer schedule also retains Strassen's seven products and packing. Tail splitting does not affect the fixed n=512 timed path. Transpose fusion rereads A 16 times and adds transposes and register pressure, so it has the weakest expected tradeoff.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "cache_blocking",
+            "transpose_fusion",
+            "tail_alignment",
+            "vector_access",
+            "scratch_lifetime",
+            "b_panel_layout",
+            "strassen_one_level"
+          ],
+          "reason": "The assembly rewrite is a small, low-risk change to the active path, though no speedup is established. The 32-row classical blocking proposal also targets the active path and may reduce its packed-A footprint, but it changes traversal and stores, so correctness risk is higher. Transpose fusion could remove scratch traffic, but its stated schedule repeats 16,384 transposes and rereads A 16 times; that cost and the register mapping make it uncertain. Tail splitting affects only the general fallback, not the timed n=512 path. Explicit NEON packing may help Strassen, but the compiler may already vectorize it. The Strassen workspace proposals follow a wrapper that lost all ten paired runs: one allocation or one fewer buffer may reduce overhead but does not address the measured regression's unknown cause. Removing Strassen's zero-fill pass is similarly unlikely to resolve the full-path regression.",
+          "format_repairs": 0
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "ranking": [
+            "cache_blocking",
+            "assembly_audit",
+            "scratch_lifetime",
+            "vector_access",
+            "transpose_fusion",
+            "tail_alignment",
+            "strassen_one_level",
+            "b_panel_layout"
+          ],
+          "reason": "Prior measurements show the three-buffer Strassen wrapper lost all ten paired runs, so its variants rank low; they retain its seven products and FP32 rounding risks. The 32-row classical panel is a directly testable change to the active path, though its ZA and store changes raise correctness risk. The loop-control rewrite is narrower and lower risk but may not affect a bottleneck. One-allocation and vectorized-packing changes target limited costs with no evidence those costs caused prior regressions. Fused transpose could remove scratch traffic but rereads A 16 times and adds complex register work. Tail splitting targets general sizes, not the fixed n=512 timing.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "cache_blocking",
+          "status": "abstained",
+          "reason": "Stop: the selected experiment repeats libxsmm-n512-panel32-one-streaming-region, source eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf. That measured implementation already packs sixteen 32-row bands into one reusable 64 KiB scratch buffer, computes all sixteen column panels per band, and uses one SME region for the full call. The claim that this structure is unmeasured contradicts the supplied history. Moving the same schedule into the full512 body does not define a new experiment.\n\nRecorded correctness passed, but promotion failed on Battery Low Power and AC Automatic. Across ten AC runs, candidate scores were 1251.20–1701.65 GFLOP/s versus paired controls of 1225.26–1673.37; only 5/10 pairs improved. It exceeded the historical Battery Automatic peak 1668.5964 in 3/10 runs and that block's fresh AC baseline peak 1685.6231 in 1/10. The later historical AC unchanged-control peak is 1687.3925. The current prepared battery baseline peak is 1102.2142; no new candidate or paired-control measurements were made. Keep power modes separate. No causal benefit or goal completion is established. No edits, tools or tests were performed."
+        },
+        {
+          "experiment_id": "assembly_audit",
+          "status": "proposed",
+          "source_hash": "b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9",
+          "name": "libxsmm-full512-subs-bne-k-loop-control",
+          "hypothesis": "Replace SUB/CBNZ with SUBS/B.NE in both active NN K loops. Each counter starts at 512 and exits when its decrement reaches zero, preserving all 512 ordered FP32 updates. Instruction count remains two; performance is unknown. This change is distinct from the supplied measured candidates. Loads, pointer updates, FMOPA order, rewinds, ABI, fallback, unused helpers and all BSD notices remain unchanged. No tools or tests were run. Compilation and all fixed correctness checks, including cancellation and scale-separated cases, remain required before timing. Require ten validations and ten alternating paired controls with power settings unchanged, then min(candidate)>1.05*max(control) and held-out checking. The supplied fresh battery baseline peak is 1102.214208818538 GFLOP/s; this candidate has no measurements or paired controls. Report fresh same-mode comparisons separately from historical Battery Automatic peak 1668.5964359101147, AC initial-baseline peak 1685.6230608449698 and AC unchanged-control peak 1687.3925479742732. No speedup, causal attribution or goal completion is established; comparator policy remains pending.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1108.6647843710866,
+              1069.996818080416,
+              1055.9678192796828,
+              1066.9856778717942,
+              1086.0533364389669,
+              819.8605028338425,
+              1050.1142079064587,
+              1104.1046888984345,
+              1090.6468638255583,
+              1073.2052287938989
+            ],
+            "control_scores": [
+              1048.7439954471104,
+              850.9361314703516,
+              1110.958986676531,
+              1066.277895383754,
+              1066.6295722661564,
+              1095.4671292774585,
+              763.6855101222358,
+              1104.1046888984345,
+              1087.5185470091706,
+              936.9474944400282
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, candidate throughput was 819.86–1108.66 GFLOP/s versus paired controls of 763.69–1110.96. Repeat spreads were 288.80 and 347.27 GFLOP/s. The candidate won seven pairs, lost two and tied one. These overlapping results establish no consistent gain. Its minimum of 819.86 fails the required >1166.51 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 in 2/10 runs and paired-control peak of 1110.9590 in 0/10. It exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231 and later AC unchanged-control peak of 1687.3925 in 0/10 each. Keep power-mode records separate. The ten-run goal is unmet under either comparator policy; that policy remains pending. No held-out result is supplied.\n\nDiscard this candidate and retain unchanged NN. These measurements establish no causal benefit from SUBS/B.NE or individual advisor effect. Preserve the board-ranked queue and fixed gates; do not repeat this source under another name. The legacy 1800 target does not determine this decision."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-002/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06,
+              "numerical_stress": {
+                "schema_version": "sera-strassen-numerics-v1",
+                "seed": 20260924,
+                "n": 512,
+                "tolerance": 0.002,
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "timing_claim": false,
+                "source_hash": "b8dc2f35cc95da3c11ebbbf037cbee47be2d9a891849a579050006c95726f0c9",
+                "passed": true,
+                "stage": "numerical-correctness",
+                "cases": [
+                  {
+                    "kind": "cancellation-0.03125",
+                    "relative_error": 1.753537330935442e-05
+                  },
+                  {
+                    "kind": "cancellation-0.0625",
+                    "relative_error": 1.0921166772725823e-05
+                  },
+                  {
+                    "kind": "scale-8",
+                    "relative_error": 6.945456020528351e-07
+                  },
+                  {
+                    "kind": "scale-12",
+                    "relative_error": 4.2078779370673897e-07
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "experiment_id": "vector_access",
+          "status": "proposed",
+          "source_hash": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+          "name": "libxsmm-strassen-three-buffers-neon-packing",
+          "hypothesis": "Replace only the measured three-buffer Strassen wrapper's packing loops with four-lane NEON FP32 loads, copies, additions, subtractions and stores. Each 256-element row uses 64 groups with no alignment assumption. Product calls, recombination, allocation, fallback and all BSD notices remain unchanged. This source change is absent from the supplied measured history. Compilation, correctness and performance are untested; the compiler may already vectorize the original loops. Require all fixed correctness checks, including cancellation, scale separation, guards and allocation failure, before ten validations and ten alternating paired controls under unchanged power settings. Promotion still requires min(candidate)>1.05*max(control), followed by held-out checking. The fresh same-mode baseline peak is 1102.214208818538 GFLOP/s; the prior Strassen wrapper's paired-control peak is 1091.5737628886607. Keep historical Battery Automatic peak 1668.5964359101147, AC initial-baseline peak 1685.6230608449698 and AC unchanged-control peak 1687.3925479742732 separate. No new measurements, speedup, causal attribution or goal completion are established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              454.68635446317563,
+              553.095409568517,
+              529.7196936074392,
+              530.6359289292257,
+              559.5319556178431,
+              524.2020059284085,
+              544.9082971247883,
+              532.9632251633308,
+              558.6586069661655,
+              547.4554180218447
+            ],
+            "control_scores": [
+              800.8002675930537,
+              1034.2699870505353,
+              844.0251721158779,
+              1022.9346990014091,
+              1086.9680215139542,
+              958.9823154132047,
+              784.9953912726533,
+              1085.3199757780633,
+              1086.5984551385386,
+              889.1034931262603
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten runs, this NEON-packing Strassen candidate scored 454.69–559.53 GFLOP/s versus paired NN controls of 785.00–1086.97. Repeat spreads were 104.85 and 301.97 GFLOP/s. It lost all ten pairs; its maximum was below every control. Its minimum of 454.69 fails the required >1141.32 GFLOP/s threshold (1.05 × maximum control).\n\nIt exceeded the fresh same-mode baseline peak of 1102.2142 and paired-control peak of 1086.9680 in 0/10 runs each. It also exceeded the historical Battery Automatic peak of 1668.5964, AC initial-baseline peak of 1685.6231, and later AC unchanged-control peak of 1687.3925 in 0/10 runs each. Keep power-mode records separate. The ten-run goal is unmet under either comparator policy; that policy remains pending. No held-out result is supplied.\n\nDiscard this candidate and retain unchanged NN. These results show a consistent regression for the complete wrapper. They do not isolate NEON packing costs, establish improvement over the earlier Strassen wrapper, or identify an individual advisor's effect. Preserve the board-ranked queue and fixed gates. The legacy 1800 target does not determine this decision."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/search/trial-003/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.5449658796766887e-06,
+              "numerical_stress": {
+                "schema_version": "sera-strassen-numerics-v1",
+                "seed": 20260924,
+                "n": 512,
+                "tolerance": 0.002,
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "timing_claim": false,
+                "source_hash": "c905f5852b983554b3a6b1800f3277bc54dcb307fcd026e3efedd68fa1fb0745",
+                "passed": true,
+                "stage": "numerical-correctness",
+                "cases": [
+                  {
+                    "kind": "cancellation-0.03125",
+                    "relative_error": 3.782174242624836e-05
+                  },
+                  {
+                    "kind": "cancellation-0.0625",
+                    "relative_error": 2.0420173536725636e-05
+                  },
+                  {
+                    "kind": "scale-8",
+                    "relative_error": 1.25025318677578e-06
+                  },
+                  {
+                    "kind": "scale-12",
+                    "relative_error": 7.011753696525599e-07
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "rationale": "This is an unranked roster of 15 distinct advisors, not an experiment selection. Retain strassen_one_level to review distinct legal schedules and FP32 rounding risks. The measured three-buffer wrapper passed correctness but lost all ten pairs; its rejection does not establish which component caused the regression or reject the entire algorithm family. Packing, scratch, vector-access, cache and loop advisors cover dense256 conversion, workspace, recombination and classical alternatives. Compiler, assembly and streaming advisors cover code generation and valid SME boundaries without claiming component speedups. Tile, register-reuse and transpose-fusion advisors cover the four available ZA.S tiles. Fast-path and tail advisors cover dispatch, allocation failure, general shapes and bounds.\n\nReplace sme_fp32_schedule and general_c_fallback with register_reuse and b_panel_layout to broaden n512 proposals while retaining fallback review. Require distinct source changes: no repeats of the rejected three-buffer schedule, panel32 wrappers, full-B packing, or unchanged unrolls. A 32-row panel across K512 requires 64 KiB, not 32 KiB.\n\nFresh battery baseline peak: 1102.214208818538 GFLOP/s; paired-control peak for the rejected Strassen wrapper: 1091.5737628886607. Historical peaks remain separate: Battery Automatic 1668.5964359101147; AC initial baseline 1685.6230608449698; later AC unchanged control 1687.3925479742732. No goal completion is established. Advice remains unverified. The board jointly ranks proposals; all fixed correctness, timing, power, budget, ten-pair promotion and held-out gates remain unchanged.",
+      "board": [
+        {
+          "experiment_id": "strassen_one_level",
+          "recommendation": "Propose a distinct one-level Strassen variant that removes the separate full-output zeroing pass. Keep the same three dense 256×256 FP32 work buffers, seven approved products, and helper mapping: zeroed 22-slot parameters with [4]=right, [10]=left, [16]=dense product. Pack each 512-stride parent quadrant into dense operands before calling the helper. On P1, store its values to C11 and C22 as their initial values. On P2, store C21 and subtract from C22. On P3, store C12 and add to C22. Apply the remaining contributions in order: P4 adds to C11 and C21; P5 subtracts from C11 and adds to C12; P6 adds to C22; P7 adds to C11. This preserves C11=P1+P4−P5+P7, C12=P3+P5, C21=P2+P4, and C22=P1−P2+P3+P6 while avoiding the separate zero-fill and first read-modify-write for each output element. Keep all packing, allocation, helper calls, accumulation, and frees inside gemm. Other sizes and allocation failure use the unchanged general fallback. This is a proposal, not a measured speedup.",
+          "risks": "The change must initialize every C element exactly once before later accumulation; incorrect first-store handling can leave outputs unwritten or use stale C. The three-buffer Strassen wrapper was rejected after losing all ten measured pairs, so this smaller store-traffic change may not address its main costs. FP32 product sums and accumulation order retain the same cancellation and scale-sensitive accuracy risks. Before timing, check all seven operand equations and signs, dense helper mapping, public shapes and tails, n<=0, allocation failure, full overwrite, guards, finite results, unchanged inputs, and the existing 0.002 tolerance including deterministic cancellation and scale-separated cases. If correct, use the unchanged ten validations, ten alternating paired controls, promotion gate, and held-out check."
+        },
+        {
+          "experiment_id": "scratch_lifetime",
+          "recommendation": "Experiment: in the n=512 Strassen path, replace the three dense 256×256 workspaces with one 768 KiB allocation, then divide it into left, right, and product buffers. Keep the seven products, FP32 arithmetic, accumulation order, and recombination unchanged. Fully write both operands before each helper call; the beta-zero helper overwrites the full product buffer, so no workspace clearing is needed. Free the block before gemm returns. If allocation fails, use the correct existing fallback. This differs from the measured three-allocation Strassen source. Hypothesis: one allocation and free may reduce allocator overhead; benefit is unknown.",
+          "risks": "The measured three-buffer Strassen wrapper lost all ten paired comparisons against its controls, but those joint results do not identify allocation as the cause. This change retains its arithmetic and packing work, so it may not improve total time. One 768 KiB allocation may fail where three smaller allocations would succeed. Before timing, check fresh inputs, input preservation, full output overwrite and guards, tolerance 0.002 including cancellation and scale-separated cases, allocation-failure fallback, general sizes, tails, and n<=0. If correct, collect ten candidate validations and ten alternating paired controls under unchanged settings, then apply the fixed promotion and held-out gates. No speedup is established."
+        },
+        {
+          "experiment_id": "vector_access",
+          "recommendation": "Propose vectorizing only `sera_strassen_pack_256` with four-lane NEON FP32 loads, arithmetic, and stores. Each row copies 256 contiguous FP32 values from each source quadrant into a dense destination; process 64 groups of four values per row. Use ordinary NEON loads and stores without alignment assumptions. Preserve the existing copy, add, and subtract behavior and leave the product calls and output recombination unchanged. This is a distinct change to the measured three-buffer Strassen source. It may reduce packing cost, but the whole Strassen candidate was much slower than controls; this change has no measured result.",
+          "risks": "The compiler may already vectorize these loops, so explicit NEON may add no benefit or regress. This targets packing only and cannot establish that packing caused the Strassen regression. Check all seven products, dense and strided quadrant boundaries, cancellation and scale-separated cases, tolerance 0.002, finite output, input preservation, full overwrite, guards, allocation failure, general sizes, tails, and n<=0. Then apply the unchanged ten-run validation, paired-control, promotion, and held-out gates with power settings unchanged. Do not infer causality from noisy scores or attribute a joint outcome to this advisor."
+        },
+        {
+          "experiment_id": "cache_blocking",
+          "recommendation": "For the classical n=512 path, change the packed-A row block from 64 rows to 32 rows. Allocate 64 KiB of scratch, pack one 32-row band as packed_a[k*32+r] = A[(row_base+r)*512+k], and run the existing 32x32 output-tile compute across all 16 column panels before advancing to the next row band. Adapt the compute body to accumulate and store only that 32-row band; keep one SME region for the full call. This is a distinct source change from the measured row-half-first traversal, which kept 128 KiB scratch, and from the measured panel32 wrapper, which used sixteen helper calls. The hypothesis is that a smaller active packed-A working set may help. No cache bottleneck or speedup is established.",
+          "risks": "The current full512 compute body handles two 32-row halves per packed band. Removing the second half requires correct changes to ZA setup, packed-A addressing, stores, row-band advances, and final pointer rewinds. A bug can omit or overwrite rows. One SME region with a 32-row band has not been measured. The smaller scratch allocation may not improve runtime, and the changed body may regress. Keep the ABI, FP32 arithmetic, thread count, tolerance, general fallback, allocation-failure behavior, and license text unchanged; keep packing and allocation inside gemm."
+        },
+        {
+          "experiment_id": "assembly_audit",
+          "recommendation": "Select these 15 specialists: strassen_one_level, assembly_audit, cache_blocking, panel_packing, loop_order, b_panel_layout, za_four_tile_reuse, prefetch_locality, address_generation, sme_fp32_schedule, sme_fp32_tiles, scratch_lifetime, a_transpose, n512_fast_path, streaming_region_cost. No experiment order is selected. Proposed distinct experiment: in both active NN K loops, replace `sub x8, x8, #1` plus `cbnz x8, loop` with `subs x8, x8, #1` plus `b.ne loop`. This tests condition-code loop control; the supplied assembly shows this decrement-and-branch pair on each 512-step loop. Preserve loads, pointer updates, all four ordered FP32 FMOPAs, iteration count, rewinds, ABI, fallback and licenses. No timing benefit is established. Validate the exact compiled bodies and all fixed correctness checks, including cancellation and scale-separated cases, then use ten alternating paired controls and the unchanged promotion and held-out gates. Report historical peaks and fresh same-mode controls separately.",
+          "risks": "This changes only loop control, and the evidence does not show whether it is a bottleneck or whether the new branch form performs better. The instruction count remains two; do not infer a speedup from the rewrite. Keep the power source and settings unchanged, preserve FP32 arithmetic and tolerance, and do not attribute any joint result to one advisor."
+        },
+        {
+          "experiment_id": "tail_alignment",
+          "recommendation": "Propose a distinct general-size SME fallback change: split output tiles into fully interior tiles and boundary tiles. Use the existing unpredicated load and store pattern only when both tile dimensions are complete; route every partial row or column tile through the current predicated path. Compute each interior and edge bound from the actual remaining rows and columns, and keep all masked-load base addresses within the input buffers. Leave n=512 and its assembly path unchanged. Hypothesis: avoiding repeated tail predicates on full tiles may reduce overhead for general dimensions; benefit is unverified. This is advice only and has not been implemented or measured.",
+          "risks": "The current fallback already uses predicates, so dispatch and a second path may add overhead without a gain. Incorrect edge classification, pointer formation, or store predicates could access outside buffers or leave output elements unwritten. Preserve the fixed ABI, FP32 arithmetic, thread count, tolerance, and allocation behavior."
+        },
+        {
+          "experiment_id": "transpose_fusion",
+          "recommendation": "Propose a distinct n=512 experiment: fuse A transpose tiles directly into the existing MOPA loop, without writing the full 128 KiB packed-A scratch. For each 64-row band, 32-column output panel, and 16-step K group, load four contiguous 16×16 FP32 A tiles from the two 32-row halves, transpose each tile in registers, and feed its 16 K vectors to the existing ordered FP32 MOPA updates. Keep output accumulators live across all 512 K steps and store each C tile as before. This repeats 16,384 small transposes per GEMM (8 row bands × 16 column panels × 32 K groups × 4 tiles). It rereads each A element 16 times: 4 MiB of A loads versus 256 KiB for one pass, while avoiding the full-scratch write and read. All loads, transposes, MOPA work, and stores remain timed. This is an unverified hypothesis, not a measured speedup.",
+          "risks": "Repeated A loads, transpose instructions, and added loop control may cost more than the removed scratch traffic. Register pressure or an incorrect mapping from transposed tiles to K vectors may cause regressions or incorrect output. Preserve the ABI, general fallback, FP32 arithmetic, thread count, tolerance, licenses, and benchmark rules. Before timing, check fresh inputs, full overwrite, input preservation, output guards, general sizes, tails, n<=0, deterministic cancellation and scale-separated n=512 cases against the float64 reference. If correct, use ten validations and ten alternating paired controls under unchanged power settings and the existing promotion and held-out gates."
+        },
+        {
+          "experiment_id": "b_panel_layout",
+          "recommendation": "Propose a distinct Strassen workspace schedule that keeps all seven 256×256 products in one dense product buffer. After each helper call, scatter its result directly into the required C quadrants and signs, reusing the existing dense left and right buffers. This removes no arithmetic and adds no new algorithm; it tests whether immediate output accumulation with a single product buffer can reduce workspace traffic and allocation cost versus the measured three-buffer Strassen wrapper. Use the verified helper mapping [4]=right, [10]=left, [16]=product, with all packing, calls, recombination, allocation and cleanup inside gemm. Keep the unchanged NN path for allocation failure and other sizes. This source change is distinct from the measured wrapper, but its complete performance effect is unknown.",
+          "risks": "The prior Strassen wrapper lost all ten paired runs, and this schedule retains its seven products, operand packing and FP32 rounding risks; reducing one 256×256 buffer may not offset those costs. Cancellation or scale-separated inputs may fail the fixed 0.002 tolerance. Before timing, check all required public and deterministic numerical cases, finite output, input preservation, complete overwrite, output guards, general sizes, tails, n<=0 and allocation-failure fallback. If correct, collect ten candidate validations and ten alternating paired controls under unchanged power settings, then apply the fixed promotion gate and held-out check. Do not claim a speedup or attribute a joint outcome to this role."
+        }
+      ],
+      "board_hash": "cb9db3b92bef13022c0dbb6b70834f0ce945dcba3863ab773b17f24343f0a1c7",
+      "experiment_order": [
+        "cache_blocking",
+        "assembly_audit",
+        "vector_access"
+      ]
+    }
+  ]
+}

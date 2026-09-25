@@ -1,41 +1,30 @@
 # One-level Strassen and classical-method swarm
 
-Status: prepared; no performance result yet.
+Status: measurement block complete; the unchanged baseline failed held-out confirmation. No candidate was promoted, and the optimization goal is not met.
 
-The user approved one-level FP32 Strassen alongside current methods. Astra-high can
-select the new `strassen_one_level` role among exactly 15 Luna specialists. They
-propose and rank experiments together; Astra implements their queue and reviews
-measured outcomes. No kernel experiment or order is selected by the root agent.
-Only Codex agents through ChatGPT login are used.
+The search used the pinned full512 NN source with the unused LIBXSMM256 primitive (`8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18`). It made 71 Codex calls and 6 implementation attempts. Three changed kernels were measured, each with ten validations and ten alternating paired controls, on Battery Power with the original low-power settings. All packing and workspace remained inside the timed call. The verifier checked 71 signed reports, all source hashes, power boundaries, ballots, rankings, and the saved correctness records.
 
-The prepared baseline retains the active full512 NN kernel and existing unused
-helpers, and adds the exact pinned, unused LIBXSMM256 primitive. Source SHA256:
-`8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18`.
-All five compiled NN/TA/TB/TT/n256 bodies match the exported bytes. Baseline passed
-48 existing correctness cases and four deterministic cancellation/scale cases.
-Adding unused code changes binary layout, so fresh baseline measurements are required.
-No preparation result is a speedup claim.
+Each measured source passed the 48 standard correctness cases and four extra cancellation/scale stress cases at tolerance 0.002. This verifies only these recorded cases and does not prove accuracy for all inputs.
 
-The new numerical checks use two cancellation cases (opposite 256-square blocks
-with seeded FP32 perturbations of .03125 and .0625) and two scale cases (signed
-powers of two with exponent ranges ±8 and ±12 and small mantissa perturbations).
-They retain the .002 max-absolute-error/max-reference check using float64 reference
-from actual FP32 inputs, finite outputs, untouched inputs, output guards and nonzero
-initial C. These are correctness-only checks before timing; the official hill is
-unchanged. They do not prove accuracy on all inputs.
+| Candidate | Validation GFLOP/s | Paired-control GFLOP/s | Candidate pair wins | Gate |
+| --- | ---: | ---: | ---: | --- |
+| One-level Strassen, three buffers | 432.96–567.57 | 776.29–1091.57 | 0/10 | Failed |
+| Full512 `subs`/`b.ne` loop control | 819.86–1108.66 | 763.69–1110.96 | 7/10 | Failed |
+| Strassen with NEON packing | 454.69–559.53 | 785.00–1086.97 | 0/10 | Failed |
 
-Caps and rules are unchanged: six implementation attempts, 108 calls, 180 seconds
-per agent call, 1800 seconds total, ten validations and ten alternating paired
-controls per candidate, min(candidate)>1.05*max(control), then held-out confirmation.
-Source and power settings remain fixed during the block. AC and battery evidence
-are separate. All packing, sums, workspace, products and recombination are timed.
-No deeper recursion, Winograd schedule, mixed precision or external runtime.
+None passed the fixed gate `min(candidate) > 1.05 × max(paired control)`. The classical loop-control candidate won 7/10 pairs, but its ranges overlap and it was not promoted. Both Strassen candidates lost all ten pairs; these results do not establish a cause beyond the measured complete implementations.
 
-Goal comparisons include both the historical imported peaks and fresh same-mode
-controls; the legacy1800 target flag is not the new goal definition. Historical-vs-
-fresh comparator remains awaiting user adjudication. No imported primitive or
-unchanged baseline can be counted as a Sera improvement.
+The fresh baseline ranged from 905.47 to 1102.21 GFLOP/s, with a 1067.08 median. The final unchanged-baseline holdout scored 848.695 GFLOP/s, below the required 860.199 GFLOP/s floor. The result is `final-performance-unconfirmed`; there is no winner and no target success.
 
-Preparation and driver tests: 9 passed. Relevant prompt/advisory/search/edit/ranking
-tests: 64 passed. `prepare.py` checks exact imported source and compiled bytes;
-`numerics.py` contains the extra correctness cases; `run.py` runs the frozen search.
+Keep power-mode comparisons separate. This phase measured Battery Power only. Saved historical peaks are 1668.596 GFLOP/s on Battery Automatic, 1685.623 GFLOP/s for the prior AC initial baseline, and 1687.393 GFLOP/s for the prior AC unchanged control. None is pooled with this phase's battery measurements. The 1800-GFLOP/s field remains a legacy target flag, not the goal definition.
+
+Both 15-specialist ballots and the selected attempt order are checked in `verification.json`. The record includes report hashes, source hashes, correctness evidence, power observations, candidate ranges, and final holdout status. Re-run `PYTHONPATH=. /tmp/sera-audit-venv/bin/python evidence/cpu-libxsmm-strassen-swarm-2026-09-25/verify.py` to verify saved evidence only; it does not run a benchmark.
+
+Preparation and driver tests plus the relevant core suite passed73 tests. The extra
+checks use seed20260924, cancellation perturbations.03125/.0625, and signed powers
+of two with exponent ranges±8/±12 plus small mantissa perturbations. Input preservation,
+finite output, output guards and full overwrite are checked. `preparation.json`
+records exact imported NN/TA/TB/TT/n256 compiled bytes; `source-audit-luna.md` records
+Luna's Strassen source audit and the root follow-up checks. The saved limits remain
+six implementation attempts,108 calls,180seconds per call and1800seconds per block.
+No deeper recursion, Winograd schedule, external runtime or power-setting change was used.

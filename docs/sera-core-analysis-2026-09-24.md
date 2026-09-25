@@ -168,3 +168,38 @@ It is available for the same15-specialist board; no Strassen performance claim
 exists yet. Benchmark rules, ten-run checks, power separation and budgets remain
 unchanged. Evidence: `evidence/cpu-libxsmm-compiler-board-2026-09-25` and
 `evidence/cpu-libxsmm-256-primitive-2026-09-25`.
+
+
+## Approved one-level Strassen results, 2026-09-25
+
+The prepared baseline preserves the active full512 NN source and adds an unused,
+byte-verified256-square primitive. Its source is8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18.
+All imported bodies match their exports. The new deterministic correctness suite
+adds two cancellation and two scale-separated cases while preserving all48 existing
+cases and tolerance.002. Preparation, driver and core tests pass73 checks.
+
+Two15-specialist boards used71 Codex calls and six implementation attempts. Three
+produced distinct measured sources, all passing52 correctness cases:
+
+| Candidate | Ten-run GFLOP/s range | Median | Paired wins | Promotion |
+| --- | ---: | ---: | ---: | --- |
+| One-level Strassen, three reusable buffers | 432.96–567.57 | 550.44 | 0/10 | Rejected |
+| Classical NN condition-code K loop | 819.86–1108.66 | 1071.60 | 7/10 | Rejected |
+| Strassen with explicit NEON operand packing | 454.69–559.53 | 538.94 | 0/10 | Rejected |
+
+This block is Battery Low Power. The fresh baseline range is905.47–1102.21,
+median1067.08. The two Strassen sources were consistently slower than every paired
+control. Their arithmetic reduction did not yield a full-call improvement; these
+measurements do not isolate which component caused the regression. Neither Strassen
+source has AC or Battery Automatic evidence yet. Scores are not pooled across modes.
+The unchanged baseline's final848.70GFLOP/s was below the860.20confirmation floor,
+so the terminal status is `final-performance-unconfirmed`, with no winner.
+
+Astra rejected two duplicate schedules and one infeasible32KiB request for a64KiB
+panel. The15 specialists still proposed and ranked those errors despite supplied
+history. Guarded review prevented invalid promotion, but experiment selection remains
+unreliable. The prompt compaction fix handled both boards and all reviews without
+another size-limit failure. Production readiness remains unproven; no model-workflow
+integration, native-code isolation or broad accuracy guarantee follows from this run.
+The ten-run improvement goal is still unmet. Evidence and independent source audit:
+`evidence/cpu-libxsmm-strassen-swarm-2026-09-25`.

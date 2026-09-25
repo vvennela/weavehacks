@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "strassen_one_level",
+          "scratch_lifetime",
+          "vector_access",
+          "cache_blocking",
+          "assembly_audit",
+          "tail_alignment",
+          "transpose_fusion",
+          "b_panel_layout"
+        ]
+      },
+      "minItems": 8,
+      "maxItems": 8
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ranking",
+    "reason"
+  ]
+}

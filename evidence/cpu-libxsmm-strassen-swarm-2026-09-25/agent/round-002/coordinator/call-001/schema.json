@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "sme_fp32_tiles",
+          "sme_fp32_schedule",
+          "register_reuse",
+          "a_transpose",
+          "panel_packing",
+          "cache_blocking",
+          "vector_access",
+          "loop_order",
+          "address_generation",
+          "compiler_codegen",
+          "tail_alignment",
+          "scratch_lifetime",
+          "prefetch_locality",
+          "n512_fast_path",
+          "general_c_fallback",
+          "za_four_tile_reuse",
+          "transpose_fusion",
+          "k_loop_schedule",
+          "b_panel_layout",
+          "constant_shape_512",
+          "streaming_region_cost",
+          "assembly_audit",
+          "fp32_sve_fallback",
+          "cache_conflict_layout",
+          "strassen_one_level"
+        ]
+      },
+      "minItems": 15,
+      "maxItems": 15
+    },
+    "rationale": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "roles",
+    "rationale"
+  ]
+}

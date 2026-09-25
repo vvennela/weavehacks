@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "strassen_one_level",
+    "panel_packing",
+    "scratch_lifetime",
+    "vector_access",
+    "cache_blocking",
+    "loop_order",
+    "compiler_codegen",
+    "assembly_audit",
+    "streaming_region_cost",
+    "n512_fast_path",
+    "tail_alignment",
+    "sme_fp32_tiles",
+    "register_reuse",
+    "transpose_fusion",
+    "b_panel_layout"
+  ],
+  "rationale": "This is an unranked roster of 15 distinct advisors, not an experiment selection. Retain strassen_one_level to review distinct legal schedules and FP32 rounding risks. The measured three-buffer wrapper passed correctness but lost all ten pairs; its rejection does not establish which component caused the regression or reject the entire algorithm family. Packing, scratch, vector-access, cache and loop advisors cover dense256 conversion, workspace, recombination and classical alternatives. Compiler, assembly and streaming advisors cover code generation and valid SME boundaries without claiming component speedups. Tile, register-reuse and transpose-fusion advisors cover the four available ZA.S tiles. Fast-path and tail advisors cover dispatch, allocation failure, general shapes and bounds.\n\nReplace sme_fp32_schedule and general_c_fallback with register_reuse and b_panel_layout to broaden n512 proposals while retaining fallback review. Require distinct source changes: no repeats of the rejected three-buffer schedule, panel32 wrappers, full-B packing, or unchanged unrolls. A 32-row panel across K512 requires 64 KiB, not 32 KiB.\n\nFresh battery baseline peak: 1102.214208818538 GFLOP/s; paired-control peak for the rejected Strassen wrapper: 1091.5737628886607. Historical peaks remain separate: Battery Automatic 1668.5964359101147; AC initial baseline 1685.6230608449698; later AC unchanged control 1687.3925479742732. No goal completion is established. Advice remains unverified. The board jointly ranks proposals; all fixed correctness, timing, power, budget, ten-pair promotion and held-out gates remain unchanged."
+}

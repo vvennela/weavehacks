@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "strassen_one_level",
+    "panel_packing",
+    "scratch_lifetime",
+    "vector_access",
+    "cache_blocking",
+    "loop_order",
+    "compiler_codegen",
+    "assembly_audit",
+    "streaming_region_cost",
+    "n512_fast_path",
+    "tail_alignment",
+    "general_c_fallback",
+    "sme_fp32_tiles",
+    "sme_fp32_schedule",
+    "transpose_fusion"
+  ],
+  "rationale": "Select these 15 as an unordered roster; experiment selection and order remain with the board. Strassen covers the approved seven products, signs, dense-256 mapping and FP32 rounding risks. Packing, scratch, vector access, cache blocking and loop order cover timed operand formation, workspace reuse and recombination. Compiler, assembly and streaming specialists review instruction legality, generated code and SME call boundaries without claiming component speedups. Tile, schedule and transpose-fusion specialists retain classical alternatives and must identify changes distinct from prior measured sources. Fast-path, tail and fallback specialists protect dispatch, allocation failure, bounds and the general ABI. Numerical review must include cancellation, scale separation, finite output, input preservation, full overwrite and guards.\n\nThe fresh Battery baseline peak is 1102.214208818538 GFLOP/s; this phase supplies no paired-control peak yet. Historical peaks remain separate: Battery Automatic 1668.5964359101147, AC initial baseline 1685.6230608449698 and later AC unchanged control 1687.3925479742732. No Strassen wrapper has been measured. Advice remains unverified. Preserve all fixed rules, budgets, power settings, ten alternating pairs, the min(candidate)>1.05*max(control) gate and held-out checking. The historical-versus-fresh goal definition remains pending."
+}
