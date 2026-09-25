@@ -15,6 +15,7 @@
 
 ## Code
 
+- Use GPT-6 Luna subagents for breadth work, such as exploration, inventories, alternatives, and broad audits. The primary agent owns depth work, integration, hard technical decisions, and final validation. Delegate only concrete independent tasks.
 - Commit completed, tested steps as work proceeds. Do not leave all changes for one final commit. Stage only the files for the completed step and preserve unrelated work.
 - Write only the code needed to meet the specification.
 - Write readable code. Do not write clever or compressed code when it reduces clarity.
