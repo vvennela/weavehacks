@@ -1,0 +1,894 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 3,
+  "max_model_calls": 73,
+  "calls": 37,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 3,
+  "adjudications": [
+    {
+      "source_hash": "37c96546290228e6f970a0e9827c4f11927f5bc0ca716c0f1ef9a0d54bbca086",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired throughput changes were +15.3%, −36.8%, and +58.4%. Candidate scores ranged from 978.95–1596.24 GFLOP/s; paired controls ranged from 1007.89–1549.78 GFLOP/s. Mixed results and large repeat variation do not establish a stable gain or show that MOPA issue order caused an improvement. Retain existing-sme and use this inconclusive result to inform the next jointly selected experiment under unchanged gates."
+    },
+    {
+      "source_hash": "e0f2cf87408dbf6596efc97797bbebe4d26b205bd7a98b5e2e60bf949df0262b",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired gains were 1.7%, 38.5%, and 51.3%. Candidate scores ranged from 1440.30–1533.92 GFLOP/s; controls ranged from 1013.60–1440.30 GFLOP/s. All pairs improved, but the large gains coincided with much lower controls. Repeat variation prevents a stable gain or causal conclusion. Retain existing-sme and carry this lead into the next jointly selected experiment under unchanged gates."
+    },
+    {
+      "source_hash": "f8aea714987d2fb7f06a95edbb5a92518cb88ad18c81c37d19effdedb0080f39",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired throughput changes were −5.8%, +27.2%, and −0.6%. Candidate scores ranged from 1468.87–1573.63 GFLOP/s; controls ranged from 1237.50–1559.54 GFLOP/s. Two losses and one gain, with the gain paired against the lowest control, do not establish a stable improvement. These results do not establish that tile traversal improved B reuse or throughput. Retain existing-sme and use this inconclusive result to inform the next jointly selected experiment under unchanged gates."
+    }
+  ],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "AC",
+    "user_idle_requested": true,
+    "streaming_fp32_lanes": 16,
+    "sme2": true,
+    "p_core_l1d_bytes": 131072,
+    "e_core_l1d_bytes": 65536,
+    "cache_line_bytes": 128,
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "neon",
+      "simd",
+      "single-thread"
+    ]
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "selected",
+      "roles": [
+        "sme_fp32_schedule",
+        "a_transpose",
+        "panel_packing",
+        "cache_blocking",
+        "vector_access",
+        "loop_order",
+        "compiler_codegen",
+        "tail_alignment",
+        "scratch_lifetime",
+        "transpose_fusion",
+        "b_panel_layout",
+        "constant_shape_512",
+        "streaming_region_cost",
+        "assembly_audit",
+        "cache_conflict_layout"
+      ],
+      "advice": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "advice": "Experiment: change the order of the four MOPAs inside each k iteration to issue independent tile updates consecutively by input pair: za0(a0,b0), za2(a1,b0), za1(a0,b1), za3(a1,b1). Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. The supplied assembly issues za0, za1, za2, za3, so this changes the MOPA schedule rather than repeating the rejected paired-load experiment. Hypothesis: interleaving updates across the four independent ZA accumulators may reduce stalls from accumulator dependencies. No speedup is established. Keep the same four tiles, operand loads, reduction order, predicates, stores, transpose, and fallback. Check candidate assembly under the fixed flags, full-GEMM correctness at tolerance 0.002 including odd tails and n<=0, and fresh repeated paired AC timings against unchanged controls. Use only results from the current AC block for eligibility.",
+          "risks": "Compiler may restore the original order, or the new order may not improve scheduling and could regress throughput. The historical scores are noisy and do not establish this schedule's effect. Do not attribute any joint outcome to this proposal alone.",
+          "abstain": false
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "advice": "Proposal: start from `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Replace the full `n×n` transpose with a blocked transpose-and-pack in `gemm`: for each 32-row output panel, pack A directly into contiguous K-major panels, `packed_a[k][row]`, with panel width at most 32. Update the SME kernel to consume those panels and use the existing general tail handling. Allocate and free the packed buffer inside `gemm`; retain the fallback and all other benchmark settings. This removes a separate full-matrix transpose pass and may improve A locality during consumption. It is a falsifiable locality hypothesis, not a speed claim. Measure the complete timed `gemm` path, including allocation, packing, and consumption, for n=512 and all supported sizes.",
+          "risks": "Packing adds writes and allocation, and panel access may cost more than the current transpose. The reported 32-wide panel is 64 KiB; A and B panels together equal the reported 128 KiB P-core L1D capacity, with no margin. Preserve FP32 MOPA order, selectors 0–3, general odd tails, n<=0 behavior, ABI, and tolerance. Check output and guard correctness across sizes, inspect candidate assembly for unexpected spills or redundant work, then compare repeated fresh AC measurements against unchanged paired controls. Do not infer a gain from instruction counts or attribute a joint result to this proposal alone.",
+          "abstain": false
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Experiment: starting from `existing-sme` (SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`), change only the n=512 full-tile path to pack B into K-major panels of 32 output columns. For each 32-column j tile, store B[k*32 + local_j] contiguously across k, then consume it in the existing four-MOPA update with the corresponding predicates and selector mapping. Keep A transpose, ZA stores, FP32 arithmetic, and the general-size path unchanged. Allocate, pack, compute, and free inside gemm. Hypothesis: the current B loads advance by 512 floats between reduction steps; the panel makes successive B values contiguous and may improve cache locality. This is an unverified locality hypothesis, not evidence of a gain. Include allocation and packing in timing.",
+          "risks": "At n=512, one B panel is 32*512*4 = 64 KiB; packing all panels uses 1 MiB. Packing cost may exceed compute savings. Check partial j tiles and reduction tails, n<=0, allocation failure fallback, full overwrite of C, guards, and tolerance 0.002. Inspect candidate assembly and spills; then compare fresh repeated AC runs against unchanged paired controls. Do not infer a gain from instruction count or attribute a joint result to this proposal alone.",
+          "abstain": false
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "Experiment: pack only B into K-major 32×32 panels inside gemm, then read each panel contiguously during the existing four-tile MOPA reduction. Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. For each output-column block, pack B[k, j:j+32] for all k into a contiguous panel; keep the transposed A layout, ZA accumulators, increasing-k FP32 updates, selectors 0–3, stores, and general-size fallback. The proposed change is new versus the supplied source: it changes B's compute-time access from a 2048-byte row stride at n=512 to contiguous panel reads. Hypothesis: improved B locality may help. This is unverified; the supplied 131072-byte L1D capacity and panel dimensions do not prove a cache bottleneck or a gain. Include packing time in the benchmark. Check all n, odd tails, n<=0, guards, and tolerance 0.002; inspect compiler output and spills; then run fresh repeated paired AC trials against unchanged controls. Do not combine this with paired loads or attribute any joint result to a different change.",
+          "risks": "Packing adds allocation, copy traffic, and work inside gemm; panel lifetime and addressing may increase overhead. Packing B alone can change numerical results only if it changes reduction order or FP32 arithmetic, which must remain unchanged. Performance impact is unknown.",
+          "abstain": false
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "Experiment: Starting from `existing-sme` (SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`), change only the completed-tile output path in `sme_gemm`: read each ZA row to an SVE vector with `svread_hor_za32_f32_m`, then store with `svst1_f32`. Keep direct ZA stores for partial tiles unless predicates and row bounds are proven safe. Hypothesis: vector-mediated stores may improve full GEMM throughput; the supplied tutorial reports this result for its implementation, and the local probe confirms code generation and one-row semantics, but neither establishes a gain here. Preserve overwrite behavior, FP32 arithmetic, all four ZA selectors, tile mapping, and the general fallback. Check full GEMM correctness at tolerance 0.002, odd and small sizes, guards, and generated assembly; then measure repeated fresh paired AC trials against unchanged controls. Accept only under the fixed gates.",
+          "risks": "No alignment assumption is needed: use existing predicates and scalar row addresses. Probe evidence covers only one row per tile, not complete tiles or tails. The transfer may add instructions or stores and regress performance. Existing direct stores are emitted; the proposed indirect path is not present in the supplied GEMM assembly. Do not infer a cause from noisy scores.",
+          "abstain": false
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "advice": "Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Experiment: change only the SME compute tile order from i-then-j to j-then-i, keeping k innermost and each tile’s full increasing-k reduction intact. Recompute predicates for the current tile; preserve the transpose, four ZA accumulators (selectors 0–3), FP32 MOPAs, direct stores, allocation inside gemm, and general-size fallback. Hypothesis: visiting all row tiles for one column tile may improve reuse of B’s current 32-row panel across row tiles. This reuse is uncertain because the panel may not remain in cache, and the current tile order may already perform well. The supplied assembly shows k as the inner reduction loop; it does not establish whether this alternative tile order helps. Check generated assembly for the candidate, correctness at tolerance 0.002 for n=512 plus odd sizes, tails, n<=0 and guards, then run fresh repeated paired AC trials against unchanged existing-sme controls. Include all packing and allocation costs in timing; adopt only if the fixed gates pass.",
+          "risks": "Changing tile order changes C traversal and B reuse, and may worsen cache behavior or interact with set conflicts. Results must come from fresh paired controls; historical scores are context only. Do not attribute any joint outcome to this proposal alone.",
+          "abstain": false
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "advice": "Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Experiment: for the full n=512 path, replace the four direct `svst1_hor_za32` row stores with `svread_hor_za32_f32_m` into SVE vectors followed by `svst1_f32` to C. Keep the existing direct-store path for all other sizes and partial tiles. This is distinct from the rejected paired-load-only change. Hypothesis: indirect ZA-to-vector output transfer may improve the output phase; the supplied tutorial reports this in its implementation, and the local probe confirms code generation and exact one-row semantics, but neither establishes a GEMM gain. Inspect the compiled full-GEMM output for transfer/store instructions and spills; run correctness, tail and guard checks, then compare repeated fresh AC timings with unchanged controls.",
+          "risks": "The tutorial result is from different conditions. SVE register transfers and stores may cost more than direct ZA stores, especially across all output rows. Verify overwrite behavior, every row, odd and partial tiles, general n, and n<=0. Do not infer a gain from instruction counts or the probe; the supplied fresh baseline scores vary widely (878–1390 GFLOP/s), so require the fixed repeated-control gate.",
+          "abstain": false
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "Experiment: add a full-tile fast path for output stores at n=512, with the existing predicated ZA row stores retained for all other shapes. In the fast path, all four 16-row ZA tile halves and both 16-column halves are in bounds, so use unpredicated row stores (or equivalent full-vector stores) and remove per-row and second-half bounds checks. Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. The supplied compiler output shows predicated ZA stores and scalar row-bound checks in the store loops; this change targets that work and is distinct from the rejected paired-load-only experiment. Hypothesis: simplifying the full-tile output path may reduce store-loop overhead. This is unverified and may not improve full-GEMM timing. Keep the original stores as the general and tail fallback. Check generated assembly and spill behavior, overwrite semantics, correctness at tolerance 0.002 for n=512 and odd/tail shapes, n<=0, and buffer guards; then measure fresh repeated paired AC trials against unchanged controls.",
+          "risks": "Unpredicated stores are safe only when the fast-path condition proves both tile halves fully inside C; an incorrect condition can write beyond the buffer. Store instruction cost or extra path checks may erase any benefit. Historical scores are noisy and do not establish causality; do not use them as current paired controls or infer a gain before fresh measurements.",
+          "abstain": false
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Proposal: from `existing-sme` (SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`), replace the single `n*n` transpose buffer with two `n*VL` FP32 scratch panels allocated inside `gemm`. For each 32-row output panel, transpose that A panel into K-major form, then compute all column tiles for those rows before reusing the panel for the next rows. Keep four ZA accumulators, FP32 MOPAs in increasing-k order, the general GEMM ABI, and current tail predicates. This reduces transpose scratch from 1 MiB to 128 KiB at n=512 and may reduce allocation and scratch initialization/cache traffic. It also changes loop order and panel reuse, so any speed effect must be measured; no gain is established.",
+          "risks": "The smaller buffer may reduce scratch footprint, but repeated panel preparation or the changed traversal may increase total work or hurt locality. At n=512, two panels total 128 KiB, equal to the supplied P-core L1D capacity, leaving no capacity margin. Preserve allocation failure fallback, n<=0 behavior, arbitrary sizes and odd tails, output overwrite semantics, and reentrancy. Check allocation-size arithmetic, guard regions, and correctness within tolerance 0.002 for small, odd, and full-size cases. Inspect the generated hot-loop assembly for spills and unexpected extra work. Measure full GEMM including packing against unchanged fresh paired AC controls; do not infer a gain from instruction counts or historical scores.",
+          "abstain": false
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Proposal: fuse A transposition with GEMM tile consumption. Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. For the n=512 full-tile path, load each 32×32 A tile into ZA as in `sme_transpose`, then read its transposed vectors from ZA into SVE registers and use them as the A operands for the four MOPAs across the relevant output-column tiles. Do not write those A values to the full `at` scratch in this path. Keep B access, FP32 arithmetic, MOPA selectors 0–3, increasing-k order, and the general-size fallback unchanged. This removes full-matrix transpose scratch traffic, but repeats tile loading/transposition for each output-column tile: 16 repetitions for n=512. Hypothesis: saved scratch writes and reads may offset repeated transpose work; measure the whole timed `gemm` call, including allocation and all data movement.",
+          "risks": "This is unverified. Repeated A tile loads and ZA-to-SVE extraction may cost more than the removed scratch traffic. Fusing may also increase live state or spills, and ZA tile read semantics and edge handling need full-path validation. Do not claim a gain or infer its cause from noisy scores.",
+          "abstain": false
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. For n=512 only, pack B inside `gemm` into K-major panels, one 32-column panel per output-column tile, with values laid out so each reduction step loads the panel’s two 16-float halves contiguously. Keep A transpose, four FP32 ZA accumulators, MOPA selectors 0–3, reduction order, stores, and general-size path unchanged. Include allocation and packing in timing. Hypothesis: contiguous panel access may improve B locality enough to offset panel packing; the 64 KiB B panel plus the 64 KiB A tile footprint reaches the reported 128 KiB P-core L1D capacity, so cache pressure may erase any benefit. This is an unverified experiment, not a measured gain.",
+          "risks": "Panel layout or address calculations could mishandle edges; packing adds allocation and copy cost. Preserve the general GEMM ABI, FP32 values, tolerance 0.002, and all non-512 behavior.",
+          "abstain": false
+        },
+        {
+          "role": "constant_shape_512",
+          "status": "received",
+          "advice": "Propose: Base on `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Add an n=512-only path that packs both operands into 32-wide K-major panels inside `gemm`, then computes each 32×32 output tile from those panels. Keep the existing transpose-and-compute path as the general fallback. Each pair of panels is 131072 bytes, equal to the reported P-core L1D capacity; whether this layout improves locality after packing costs is unknown. This is distinct from the rejected paired-load-only change. Check generated assembly and spills, correctness at tolerance 0.002 including tails, guards, and n<=0, and fresh repeated paired AC measurements with packing inside the timed call. The measured history shows large baseline variation (1389.66, 933.69, 878.32 GFLOP/s); use unchanged controls and do not claim a gain from the hypothesis or instruction counts.",
+          "risks": "Packing may cost more than any locality benefit, and the combined panels leave no L1D capacity margin. The proposal is unverified; no causal speedup claim is supported. Preserve FP32 arithmetic, ABI, thread count, flags, and all benchmark gates.",
+          "abstain": false
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "advice": "Experiment: Starting from existing-sme (SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258), combine the transpose and GEMM helpers into one SME-targeted, locally streaming helper that performs the transpose, then GEMM, within a single streaming region. Keep the same transpose layout and work order, four ZA accumulators, selectors 0–3, FP32 arithmetic, direct stores, and general-size tail handling. Keep allocation and freeing in gemm. This removes the streaming-region boundary between the two helpers while preserving entry and exit at the internal helper boundary, within the gemm call. Hypothesis: reducing SME streaming setup and teardown may improve complete-call time. The full-call effect is unverified; no supplied measurement isolates this cost. Inspect the candidate assembly to confirm one streaming-region entry/exit and unchanged ZA behavior, then check n<=0, small sizes, odd tails, guards, and tolerance 0.002. Measure complete gemm calls with fresh repeated paired AC controls under the frozen benchmark. Do not infer a gain from instruction counts or compare against historical AC scores.",
+          "risks": "Combining the helpers may increase register pressure or change compiler code generation, including spills or transpose scheduling. Streaming-region overhead may be small relative to transpose and GEMM work, and the merged code may regress. Preserve the ABI and all frozen benchmark rules; accept only if correctness passes and repeated paired measurements meet the existing gates.",
+          "abstain": false
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Experiment: for full 32×32 output tiles, replace direct ZA horizontal stores with ZA-row reads into SVE vectors followed by ordinary predicated vector stores. Keep the current direct-store path for partial tiles. The supplied SME2 assembly shows row-by-row ZA stores with loop branches and bounds checks; the local probe confirms the indirect transfer sequence compiles and passes its limited correctness cases. This is a store-path hypothesis, not evidence of a GEMM speedup. Check full assembly for the n=512 store path and spills, verify overwrite semantics, general and odd-size tails plus guards at tolerance 0.002, and measure full GEMM including transpose and allocation in fresh repeated paired AC trials against unchanged controls.",
+          "risks": "The added ZA-to-vector transfers and vector stores may cost more than direct ZA stores; the local probe tested only one row per ZA tile, not full GEMM rows or tails. Do not infer a gain from instruction counts or attribute any joint outcome to an individual advisor.",
+          "abstain": false
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "advice": "Experiment: pad the transposed A scratch rows. Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Use a scratch row stride of `n + 16` floats; update the transpose stores and GEMM loads to use that stride. Allocate `n * (n + 16)` floats inside `gemm`, and keep the existing fallback behavior. For n=512, this changes the row stride from 2048 to 2112 bytes and adds 3.125% to scratch allocation. Hypothesis: changing the repeated row spacing may reduce cache-set aliasing during the reduction loop. This is unverified; the supplied evidence does not establish cache-set conflicts or a speedup.",
+          "risks": "The larger scratch footprint and padding traffic may cost more than any locality benefit. Keep every padded-row access within the new allocation. Check general n, odd tails, n<=0, output guards, and tolerance 0.002. Inspect generated code to confirm all scratch indexing uses the padded stride. Measure full GEMM, including allocation and packing, with fresh repeated AC trials paired against the unchanged baseline. Do not infer cause from noisy scores or treat this advice as measured evidence.",
+          "abstain": false
+        }
+      ],
+      "ballots": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_schedule",
+            "streaming_region_cost",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "tail_alignment",
+            "loop_order",
+            "cache_blocking",
+            "panel_packing",
+            "b_panel_layout",
+            "a_transpose",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "constant_shape_512",
+            "cache_conflict_layout"
+          ],
+          "reason": "Test the schedule proposal first: it changes only the order of updates to the four independent ZA accumulators, preserving loads, reduction order, and stores. The fresh incumbent scores vary widely, and the paired-load candidate regressed in all three fresh pairs, so neither supports attributing a cause or predicting this schedule’s result. Next test streaming-region cost and the three equivalent vector-store proposals as one distinct store-path hypothesis; local assembly and the tutorial support investigating it, but only at probe or different-implementation scope. Test the full-tile store simplification and tile-order change next. The remaining proposals change packing, scratch layout, or transpose work and carry greater copy, cache-capacity, and correctness risk. Every proposal remains unmeasured on this hill; this order is a testing priority, not a prediction of gains.",
+          "format_repairs": 0
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "ranking": [
+            "transpose_fusion",
+            "scratch_lifetime",
+            "a_transpose",
+            "streaming_region_cost",
+            "cache_conflict_layout",
+            "b_panel_layout",
+            "panel_packing",
+            "cache_blocking",
+            "constant_shape_512",
+            "loop_order",
+            "sme_fp32_schedule",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "tail_alignment"
+          ],
+          "reason": "Prioritize experiments that may reduce A transpose cost or scratch traffic across the full call. transpose_fusion avoids writing and rereading the full A scratch, but repeats tile preparation across 16 column tiles; scratch_lifetime reuses a smaller panel but changes traversal and packing cost. a_transpose directly tests replacing the full transpose with panel packing. These are unverified and have meaningful correctness and locality risks. The fresh baseline varies widely (878–1390 GFLOP/s), so use only new paired controls for decisions. B packing and loop-order experiments follow because their locality benefits are uncertain and packing is timed. Schedule and store experiments target compute or output rather than A preparation. The paired-load-only change is excluded as already tested and rejected.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "b_panel_layout",
+            "panel_packing",
+            "cache_blocking",
+            "a_transpose",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "loop_order",
+            "transpose_fusion",
+            "constant_shape_512",
+            "sme_fp32_schedule",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "tail_alignment",
+            "streaming_region_cost"
+          ],
+          "reason": "Rank B-only K-major panel packing first: it directly targets the supplied 2048-byte B row stride while preserving the current A transpose and compute structure, so its outcome is easier to interpret than joint A-and-B packing. The panel_packing and cache_blocking entries test essentially the same B-packing hypothesis; keep them adjacent and treat as alternatives rather than distinct cumulative gains. The new paired-load implementation regressed in all three fresh pairs, while current baseline scores vary widely; those results justify cautious measurement, not a claim about cause. A-only and scratch-panel layouts follow, then traversal, fusion, schedule, and store hypotheses. The three store proposals overlap substantially, so test at most one before considering another. All proposed gains remain unmeasured.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "loop_order",
+            "cache_conflict_layout",
+            "cache_blocking",
+            "panel_packing",
+            "b_panel_layout",
+            "a_transpose",
+            "constant_shape_512",
+            "sme_fp32_schedule",
+            "tail_alignment",
+            "streaming_region_cost",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit"
+          ],
+          "reason": "I rank loop_order first because it tests B reuse through traversal with no packing cost and preserves each tile’s reduction order. Cache conflict padding is a small, distinct layout probe, though the supplied evidence does not show a conflict. The B packing proposals test contiguous access but add packing and allocation inside gemm; cache_blocking, panel_packing, and b_panel_layout overlap heavily, so I would test one representative first. A transpose packing and the combined two-operand packing add more work and have uncertain locality payoff; scratch_lifetime and transpose_fusion also alter traversal or repeat data movement. The fresh baseline varies widely (878–1390 GFLOP/s), and the paired-load-only experiment regressed in every fresh pair, so none of this supports a performance claim. I rank the independent MOPA schedule and full-tile store simplification ahead of output-transfer variants because their changes are narrower; the supplied probes and tutorial are not hill measurements. Repeated store-path proposals are ranked later because they substantially duplicate one another.",
+          "format_repairs": 0
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "ranking": [
+            "tail_alignment",
+            "vector_access",
+            "assembly_audit",
+            "compiler_codegen",
+            "cache_conflict_layout",
+            "streaming_region_cost",
+            "sme_fp32_schedule",
+            "loop_order",
+            "a_transpose",
+            "transpose_fusion",
+            "scratch_lifetime",
+            "panel_packing",
+            "cache_blocking",
+            "b_panel_layout",
+            "constant_shape_512"
+          ],
+          "reason": "The source and hot-loop assembly show predicated ZA row stores and scalar bounds checks on full n=512 tiles. `tail_alignment` has the lowest-risk load/store change: its full-tile condition proves all four tile halves are in bounds, so unpredicated stores are safe there. The indirect-store proposals (`vector_access`, `assembly_audit`, and `compiler_codegen`) are equivalent store-path experiments; rank them next because code generation and limited row correctness are supplied, and an independent implementation reports a benefit, though the paired-load-only candidate's all-pair regression argues for caution rather than proving anything about stores. `cache_conflict_layout` changes scratch alignment/layout with modest, explicit allocation cost. Remaining proposals alter scheduling, traversal, or packing and have less direct evidence; packing variants add copy/allocation work, with panels reaching the stated L1D capacity. The new current-block baseline varies widely, and historical AC measurements are not current controls, so none of these hypotheses has an established speedup. I rank duplicate store proposals separately as requested; their joint result cannot identify which proposal caused an outcome.",
+          "format_repairs": 0
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "ranking": [
+            "loop_order",
+            "sme_fp32_schedule",
+            "tail_alignment",
+            "streaming_region_cost",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "a_transpose",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "panel_packing",
+            "cache_blocking",
+            "b_panel_layout",
+            "cache_conflict_layout",
+            "constant_shape_512"
+          ],
+          "reason": "Test the tile-order change first: keeping j fixed while advancing i may reuse the same B panel across row tiles, while preserving each tile’s full increasing-k reduction. Next test MOPA scheduling, then the full-tile store-bound simplification. These are distinct changes that target reuse or work visible in the supplied source and compiler output; none has a measured gain. The recent paired-load candidate regressed in all three fresh pairs, so paired-load-only work is excluded. The three indirect-store proposals are duplicates, as are the three B-panel proposals; rank each group’s representative before the redundant variants. Packing and transpose changes add work or alter traversal, so they rank lower. The supplied baseline varies from 878 to 1390 GFLOP/s, so only fresh paired measurements can establish outcomes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "ranking": [
+            "tail_alignment",
+            "sme_fp32_schedule",
+            "streaming_region_cost",
+            "vector_access",
+            "cache_conflict_layout",
+            "loop_order",
+            "panel_packing",
+            "b_panel_layout",
+            "a_transpose",
+            "scratch_lifetime",
+            "constant_shape_512",
+            "transpose_fusion",
+            "assembly_audit",
+            "compiler_codegen",
+            "cache_blocking"
+          ],
+          "reason": "The fixed assembly shows the full-tile output path still uses predicated ZA row stores with per-row bounds checks, so tail_alignment offers a concrete way to remove work on n=512 with a guarded fast path. The MOPA order change is also small and directly targets four independent accumulators without changing data movement. Merging streaming regions is a low-risk structural hypothesis, though its likely effect is limited relative to GEMM work. The indirect-store proposals are backed by probe code generation and tutorial context, but duplicate each other and the candidate assembly adds ZA-to-vector transfers and vector stores; rank them low, test only one representative if selected. Packing and transpose/scratch alternatives may improve locality, but add timed work and introduce layout or tail risk; combined A/B packing also uses the full stated L1D capacity. The paired-load-only variant is excluded because fresh trials regressed in all three pairs; the earlier pointer, unroll, and cache-blocking measurements do not show accepted gains. Historical baseline scores vary widely, so none of that evidence establishes causality or promotion.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "tail_alignment",
+            "sme_fp32_schedule",
+            "streaming_region_cost",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "loop_order",
+            "cache_conflict_layout",
+            "panel_packing",
+            "cache_blocking",
+            "b_panel_layout",
+            "a_transpose",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "constant_shape_512"
+          ],
+          "reason": "The current source handles tails with predicates and bounds checks. For n=512, each 32×32 tile is full, so the tail specialist’s guarded fast path can remove checks while retaining the existing safe fallback. The supplied compiler output confirms those checks are present; the possible gain is unmeasured and likely limited to the store phase. Next, test distinct low-overhead changes. The three ZA-row-read store proposals overlap, so keep them adjacent and avoid treating them as independent evidence. Packing and transpose changes add timed work and carry broader correctness and locality risks. The fresh baseline varies widely, and the paired-load experiment regressed in every trial; neither supports claims about these untested changes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "scratch_lifetime",
+            "streaming_region_cost",
+            "a_transpose",
+            "loop_order",
+            "cache_conflict_layout",
+            "tail_alignment",
+            "sme_fp32_schedule",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "transpose_fusion",
+            "panel_packing",
+            "cache_blocking",
+            "b_panel_layout",
+            "constant_shape_512"
+          ],
+          "reason": "The current baseline varies widely (878–1390 GFLOP/s), and the paired-load candidate lost in all three fresh comparisons. No proposal has a measured gain, so this order favors bounded changes that could reduce full-call work or scratch cost, then tests with larger locality or code-generation risks. `scratch_lifetime` directly targets allocation and scratch footprint, but its changed traversal also needs measurement. `streaming_region_cost` preserves the work order. Packing proposals rank lower because their copy and allocation costs may outweigh locality gains; the evidence gives no basis to assume they will help. Do not treat this ranking as a speed prediction or attribute a future joint result to one proposal.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "transpose_fusion",
+            "scratch_lifetime",
+            "a_transpose",
+            "streaming_region_cost",
+            "sme_fp32_schedule",
+            "cache_conflict_layout",
+            "loop_order",
+            "tail_alignment",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "cache_blocking",
+            "panel_packing",
+            "b_panel_layout",
+            "constant_shape_512"
+          ],
+          "reason": "Transpose fusion best matches this role and offers a distinct, testable tradeoff: it removes full-matrix scratch writes and reads but repeats A tile preparation 16 times at n=512. Existing fresh baseline scores vary widely (878–1390 GFLOP/s); the paired-load candidate regressed in all three trials, but that does not establish the effect of fusion. Next, scratch lifetime and blocked A transpose test related ways to reduce full-matrix scratch traffic. Streaming-region cost, MOPA schedule, cache layout, and tile order are smaller or less direct hypotheses. The three direct-store proposals overlap, so they rank together; their external and probe evidence is not a hill measurement. B packing proposals overlap and add packing traffic; combined packing has the largest cost and cache-capacity risk. This ordering is an experiment priority, not a speed claim.",
+          "format_repairs": 0
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "ranking": [
+            "b_panel_layout",
+            "sme_fp32_schedule",
+            "tail_alignment",
+            "loop_order",
+            "streaming_region_cost",
+            "cache_conflict_layout",
+            "a_transpose",
+            "scratch_lifetime",
+            "panel_packing",
+            "cache_blocking",
+            "constant_shape_512",
+            "transpose_fusion",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit"
+          ],
+          "reason": "Prioritize the assigned B-panel test: it changes B's 2048-byte reduction stride to contiguous panel reads, but packing 1 MiB inside gemm may cost more than that locality benefit. It is a falsifiable experiment, not a predicted gain. Next are distinct compute scheduling, store, and tile-order tests. Fresh baseline scores vary widely, and the paired-load candidate regressed in all three current-block pairs; neither supports claims about these other changes. The other B-packing proposals substantially duplicate the top experiment, and the three indirect-store proposals also overlap, so rank those lower to avoid spending the batch on repeated variants. All candidates still need full correctness checks and fresh paired measurements with packing costs included.",
+          "format_repairs": 0
+        },
+        {
+          "role": "constant_shape_512",
+          "status": "received",
+          "ranking": [
+            "streaming_region_cost",
+            "tail_alignment",
+            "sme_fp32_schedule",
+            "cache_conflict_layout",
+            "loop_order",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "cache_blocking",
+            "panel_packing",
+            "b_panel_layout",
+            "constant_shape_512",
+            "a_transpose",
+            "scratch_lifetime",
+            "transpose_fusion"
+          ],
+          "reason": "The current baseline varies widely (878–1390 GFLOP/s), so the supplied scores do not support attributing effects to any candidate. I rank low-overhead changes to existing work first: merging streaming regions, simplifying proven full-tile store bounds, and changing MOPA scheduling. Next are layout and traversal experiments with plausible reuse or conflict benefits but uncertain locality. Store-through-SVE proposals have limited probe support, but no full GEMM timing, so I rank them below simpler changes. Packing, scratch redesign, and transpose fusion add substantial data movement, allocation, or repeated work; the combined-panel proposal also fills the reported L1D capacity before other data. Paired-load-only was rejected after losses in all three fresh pairs and is not repeated here.",
+          "format_repairs": 0
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "ranking": [
+            "streaming_region_cost",
+            "sme_fp32_schedule",
+            "tail_alignment",
+            "loop_order",
+            "cache_conflict_layout",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "a_transpose",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "panel_packing",
+            "cache_blocking",
+            "b_panel_layout",
+            "constant_shape_512"
+          ],
+          "reason": "Prioritize the role-specific merge first: separate SME helpers each carry streaming entry/exit boundaries, and merging them may remove one boundary per call, but its cost is not isolated and code-generation risk needs checking. The other early experiments target the repeated hot loop or output path without adding packing. Schedule interleaving, store simplification, tile traversal, and padded scratch are plausible tests, not established gains; baseline scores vary widely. The indirect-store proposals are duplicate variants, so they should not all consume separate experiments. Packing proposals also overlap heavily and add timed work; the combined A/B panels equal the reported 128 KiB L1D capacity. The rejected paired-load-only change is excluded. No ranking implies a measured gain or causal attribution.",
+          "format_repairs": 0
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "tail_alignment",
+            "sme_fp32_schedule",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "loop_order",
+            "cache_conflict_layout",
+            "panel_packing",
+            "cache_blocking",
+            "b_panel_layout",
+            "a_transpose",
+            "scratch_lifetime",
+            "constant_shape_512",
+            "streaming_region_cost",
+            "transpose_fusion"
+          ],
+          "reason": "The supplied hot-loop assembly shows four operand loads and four MOPAs per reduction step. The output path also has row-store loops with bounds checks and branches; `tail_alignment` targets that visible work with a narrow n=512 full-tile path. The independent MOPA schedule is a distinct experiment that preserves loads and reduction order. Three store proposals are near-duplicates, so they rank together; the indirect-store probe confirms code generation and limited correctness, not a GEMM gain. Packing proposals may improve locality, but add work, and the proposed panels can consume the reported L1D capacity. The current baseline scores vary widely, and the paired-load experiment regressed in all three trials, so none of the unmeasured proposals has an established speedup.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "ranking": [
+            "cache_conflict_layout",
+            "loop_order",
+            "sme_fp32_schedule",
+            "tail_alignment",
+            "streaming_region_cost",
+            "vector_access",
+            "compiler_codegen",
+            "assembly_audit",
+            "a_transpose",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "panel_packing",
+            "cache_blocking",
+            "b_panel_layout",
+            "constant_shape_512"
+          ],
+          "reason": "The named cache-conflict experiment is my role: padding transposed-A rows changes the 2048-byte spacing at n=512 by a bounded 3.125% scratch increase. The supplied evidence does not prove set conflicts, so test it early and treat timing as the only performance evidence. Next are compute scheduling and full-tile store-path changes, which avoid packing cost and have concrete compiler or primary-source motivation; store proposals overlap heavily and should be treated as alternatives. Then test changes with broader memory traffic or structural scope. The B-panel proposals substantially duplicate one another, and the combined two-panel proposal uses the full stated L1D capacity before other data; packing cost is unknown. Historical paired-load results are a clear regression, while current baseline scores vary widely, so no proposal earns a promotion claim from them. Rank is experiment priority, not a claim that any change will win.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "sme_fp32_schedule",
+          "status": "proposed",
+          "source_hash": "37c96546290228e6f970a0e9827c4f11927f5bc0ca716c0f1ef9a0d54bbca086",
+          "name": "sme_fp32_schedule",
+          "hypothesis": "Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Change only the MOPA issue order from ZA0, ZA1, ZA2, ZA3 to ZA0, ZA2, ZA1, ZA3. The supplied source and assembly use the original order; this variant is absent from the supplied measured history. Both schedules update four independent accumulators and preserve each output's increasing-k reduction order. Any scheduling benefit is unverified. Candidate compilation, emitted instruction order, full-GEMM correctness including tails and n<=0, and fresh repeated paired AC measurements remain pending. Retain the incumbent under the unchanged acceptance gates. No tools were used.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1508.064465455758,
+              978.9483164004404,
+              1596.2433870725902
+            ],
+            "control_scores": [
+              1308.1140270962524,
+              1549.7777397605503,
+              1007.8941093686307
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "revise",
+              "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired throughput changes were +15.3%, −36.8%, and +58.4%. Candidate scores ranged from 978.95–1596.24 GFLOP/s; paired controls ranged from 1007.89–1549.78 GFLOP/s. Mixed results and large repeat variation do not establish a stable gain or show that MOPA issue order caused an improvement. Retain existing-sme and use this inconclusive result to inform the next jointly selected experiment under unchanged gates."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-001/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-001/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-001/validation-2.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "37c96546290228e6f970a0e9827c4f11927f5bc0ca716c0f1ef9a0d54bbca086",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "tail_alignment",
+          "status": "proposed",
+          "source_hash": "e0f2cf87408dbf6596efc97797bbebe4d26b205bd7a98b5e2e60bf949df0262b",
+          "name": "tail_alignment",
+          "hypothesis": "Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Add only a full-tile output-store path for n=512. Its guard proves both row and column halves are in bounds. Direct ZA stores use an all-true predicate to write full vectors, with no per-row bounds checks or second-half checks. Other shapes retain the original stores. The supplied source and compiler output retain those checks; this variant is absent from the supplied measured history. Reduced store-loop overhead is an unverified hypothesis. No tools were used. Candidate compilation, assembly and spill inspection, overwrite and guard checks, correctness at tolerance 0.002, and fresh repeated paired AC measurements remain pending. Retain the incumbent until the unchanged acceptance gates pass.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1464.1960385998093,
+              1440.297491785502,
+              1533.916818571432
+            ],
+            "control_scores": [
+              1440.2976042420428,
+              1039.7744803836893,
+              1013.5989131043257
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "revise",
+              "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired gains were 1.7%, 38.5%, and 51.3%. Candidate scores ranged from 1440.30–1533.92 GFLOP/s; controls ranged from 1013.60–1440.30 GFLOP/s. All pairs improved, but the large gains coincided with much lower controls. Repeat variation prevents a stable gain or causal conclusion. Retain existing-sme and carry this lead into the next jointly selected experiment under unchanged gates."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-002/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-002/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-002/validation-2.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "e0f2cf87408dbf6596efc97797bbebe4d26b205bd7a98b5e2e60bf949df0262b",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "loop_order",
+          "status": "proposed",
+          "source_hash": "f8aea714987d2fb7f06a95edbb5a92518cb88ad18c81c37d19effdedb0080f39",
+          "name": "loop_order",
+          "hypothesis": "Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Change only the compute tile traversal to j-then-i, with k innermost. Visiting row tiles for one column tile may improve reuse of B's current column panel. This is unverified. The supplied source and compiler output retain full increasing-k reductions; no tested source in the supplied history implements this tile-order change. Preserve four FP32 ZA accumulators, selectors 0–3, direct stores, transpose, allocation, and general-size handling. No tools were used. Candidate compilation, generated assembly inspection, correctness at tolerance 0.002 including odd sizes, tails, n<=0 and guards, and fresh repeated paired AC measurements remain pending. Retain existing-sme until the unchanged acceptance gates pass.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1468.8669910191836,
+              1573.6262546731557,
+              1546.8040342830222
+            ],
+            "control_scores": [
+              1559.5378619239514,
+              1237.5030598359883,
+              1555.7778228464722
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "revise",
+              "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired throughput changes were −5.8%, +27.2%, and −0.6%. Candidate scores ranged from 1468.87–1573.63 GFLOP/s; controls ranged from 1237.50–1559.54 GFLOP/s. Two losses and one gain, with the gain paired against the lowest control, do not establish a stable improvement. These results do not establish that tile traversal improved B reuse or throughput. Retain existing-sme and use this inconclusive result to inform the next jointly selected experiment under unchanged gates."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-003/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-003/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-sme2-followup-2026-09-24/search/trial-003/validation-2.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "f8aea714987d2fb7f06a95edbb5a92518cb88ad18c81c37d19effdedb0080f39",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        }
+      ],
+      "rationale": "Use existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258, as the reference. This roster covers distinct questions beyond operand loads. vector_access examines indirect output stores, supported by the supplied instruction probe but unverified in full GEMM. a_transpose, transpose_fusion, panel_packing and b_panel_layout examine transpose cost, direct tile consumption, bounded packing and B layout. cache_blocking, loop_order and cache_conflict_layout examine working-set size, traversal and scratch stride; two 64-KiB panels leave no capacity margin in the reported P-core L1D, but cache conflicts are not established. scratch_lifetime accounts for all per-call storage costs. streaming_region_cost examines the separate entry and exit sequences visible in the supplied assembly. constant_shape_512 examines whole-kernel specialization with a general fallback. sme_fp32_schedule studies four-accumulator scheduling. compiler_codegen checks source lowering; assembly_audit checks emitted changes, spills and duplication. tail_alignment protects odd sizes, bounds and partial vectors. Do not repeat paired-load-only changes, unchanged unrolling, or per-k partial-C spills. All proposed gains remain hypotheses. The current baseline spans 878.32–1389.66 GFLOP/s; promotion requires fresh paired measurements under unchanged gates, without historical controls.",
+      "board": [
+        {
+          "experiment_id": "sme_fp32_schedule",
+          "recommendation": "Experiment: change the order of the four MOPAs inside each k iteration to issue independent tile updates consecutively by input pair: za0(a0,b0), za2(a1,b0), za1(a0,b1), za3(a1,b1). Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. The supplied assembly issues za0, za1, za2, za3, so this changes the MOPA schedule rather than repeating the rejected paired-load experiment. Hypothesis: interleaving updates across the four independent ZA accumulators may reduce stalls from accumulator dependencies. No speedup is established. Keep the same four tiles, operand loads, reduction order, predicates, stores, transpose, and fallback. Check candidate assembly under the fixed flags, full-GEMM correctness at tolerance 0.002 including odd tails and n<=0, and fresh repeated paired AC timings against unchanged controls. Use only results from the current AC block for eligibility.",
+          "risks": "Compiler may restore the original order, or the new order may not improve scheduling and could regress throughput. The historical scores are noisy and do not establish this schedule's effect. Do not attribute any joint outcome to this proposal alone."
+        },
+        {
+          "experiment_id": "a_transpose",
+          "recommendation": "Proposal: start from `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Replace the full `n×n` transpose with a blocked transpose-and-pack in `gemm`: for each 32-row output panel, pack A directly into contiguous K-major panels, `packed_a[k][row]`, with panel width at most 32. Update the SME kernel to consume those panels and use the existing general tail handling. Allocate and free the packed buffer inside `gemm`; retain the fallback and all other benchmark settings. This removes a separate full-matrix transpose pass and may improve A locality during consumption. It is a falsifiable locality hypothesis, not a speed claim. Measure the complete timed `gemm` path, including allocation, packing, and consumption, for n=512 and all supported sizes.",
+          "risks": "Packing adds writes and allocation, and panel access may cost more than the current transpose. The reported 32-wide panel is 64 KiB; A and B panels together equal the reported 128 KiB P-core L1D capacity, with no margin. Preserve FP32 MOPA order, selectors 0–3, general odd tails, n<=0 behavior, ABI, and tolerance. Check output and guard correctness across sizes, inspect candidate assembly for unexpected spills or redundant work, then compare repeated fresh AC measurements against unchanged paired controls. Do not infer a gain from instruction counts or attribute a joint result to this proposal alone."
+        },
+        {
+          "experiment_id": "panel_packing",
+          "recommendation": "Experiment: starting from `existing-sme` (SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`), change only the n=512 full-tile path to pack B into K-major panels of 32 output columns. For each 32-column j tile, store B[k*32 + local_j] contiguously across k, then consume it in the existing four-MOPA update with the corresponding predicates and selector mapping. Keep A transpose, ZA stores, FP32 arithmetic, and the general-size path unchanged. Allocate, pack, compute, and free inside gemm. Hypothesis: the current B loads advance by 512 floats between reduction steps; the panel makes successive B values contiguous and may improve cache locality. This is an unverified locality hypothesis, not evidence of a gain. Include allocation and packing in timing.",
+          "risks": "At n=512, one B panel is 32*512*4 = 64 KiB; packing all panels uses 1 MiB. Packing cost may exceed compute savings. Check partial j tiles and reduction tails, n<=0, allocation failure fallback, full overwrite of C, guards, and tolerance 0.002. Inspect candidate assembly and spills; then compare fresh repeated AC runs against unchanged paired controls. Do not infer a gain from instruction count or attribute a joint result to this proposal alone."
+        },
+        {
+          "experiment_id": "cache_blocking",
+          "recommendation": "Experiment: pack only B into K-major 32×32 panels inside gemm, then read each panel contiguously during the existing four-tile MOPA reduction. Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. For each output-column block, pack B[k, j:j+32] for all k into a contiguous panel; keep the transposed A layout, ZA accumulators, increasing-k FP32 updates, selectors 0–3, stores, and general-size fallback. The proposed change is new versus the supplied source: it changes B's compute-time access from a 2048-byte row stride at n=512 to contiguous panel reads. Hypothesis: improved B locality may help. This is unverified; the supplied 131072-byte L1D capacity and panel dimensions do not prove a cache bottleneck or a gain. Include packing time in the benchmark. Check all n, odd tails, n<=0, guards, and tolerance 0.002; inspect compiler output and spills; then run fresh repeated paired AC trials against unchanged controls. Do not combine this with paired loads or attribute any joint result to a different change.",
+          "risks": "Packing adds allocation, copy traffic, and work inside gemm; panel lifetime and addressing may increase overhead. Packing B alone can change numerical results only if it changes reduction order or FP32 arithmetic, which must remain unchanged. Performance impact is unknown."
+        },
+        {
+          "experiment_id": "vector_access",
+          "recommendation": "Experiment: Starting from `existing-sme` (SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`), change only the completed-tile output path in `sme_gemm`: read each ZA row to an SVE vector with `svread_hor_za32_f32_m`, then store with `svst1_f32`. Keep direct ZA stores for partial tiles unless predicates and row bounds are proven safe. Hypothesis: vector-mediated stores may improve full GEMM throughput; the supplied tutorial reports this result for its implementation, and the local probe confirms code generation and one-row semantics, but neither establishes a gain here. Preserve overwrite behavior, FP32 arithmetic, all four ZA selectors, tile mapping, and the general fallback. Check full GEMM correctness at tolerance 0.002, odd and small sizes, guards, and generated assembly; then measure repeated fresh paired AC trials against unchanged controls. Accept only under the fixed gates.",
+          "risks": "No alignment assumption is needed: use existing predicates and scalar row addresses. Probe evidence covers only one row per tile, not complete tiles or tails. The transfer may add instructions or stores and regress performance. Existing direct stores are emitted; the proposed indirect path is not present in the supplied GEMM assembly. Do not infer a cause from noisy scores."
+        },
+        {
+          "experiment_id": "loop_order",
+          "recommendation": "Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Experiment: change only the SME compute tile order from i-then-j to j-then-i, keeping k innermost and each tile’s full increasing-k reduction intact. Recompute predicates for the current tile; preserve the transpose, four ZA accumulators (selectors 0–3), FP32 MOPAs, direct stores, allocation inside gemm, and general-size fallback. Hypothesis: visiting all row tiles for one column tile may improve reuse of B’s current 32-row panel across row tiles. This reuse is uncertain because the panel may not remain in cache, and the current tile order may already perform well. The supplied assembly shows k as the inner reduction loop; it does not establish whether this alternative tile order helps. Check generated assembly for the candidate, correctness at tolerance 0.002 for n=512 plus odd sizes, tails, n<=0 and guards, then run fresh repeated paired AC trials against unchanged existing-sme controls. Include all packing and allocation costs in timing; adopt only if the fixed gates pass.",
+          "risks": "Changing tile order changes C traversal and B reuse, and may worsen cache behavior or interact with set conflicts. Results must come from fresh paired controls; historical scores are context only. Do not attribute any joint outcome to this proposal alone."
+        },
+        {
+          "experiment_id": "compiler_codegen",
+          "recommendation": "Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Experiment: for the full n=512 path, replace the four direct `svst1_hor_za32` row stores with `svread_hor_za32_f32_m` into SVE vectors followed by `svst1_f32` to C. Keep the existing direct-store path for all other sizes and partial tiles. This is distinct from the rejected paired-load-only change. Hypothesis: indirect ZA-to-vector output transfer may improve the output phase; the supplied tutorial reports this in its implementation, and the local probe confirms code generation and exact one-row semantics, but neither establishes a GEMM gain. Inspect the compiled full-GEMM output for transfer/store instructions and spills; run correctness, tail and guard checks, then compare repeated fresh AC timings with unchanged controls.",
+          "risks": "The tutorial result is from different conditions. SVE register transfers and stores may cost more than direct ZA stores, especially across all output rows. Verify overwrite behavior, every row, odd and partial tiles, general n, and n<=0. Do not infer a gain from instruction counts or the probe; the supplied fresh baseline scores vary widely (878–1390 GFLOP/s), so require the fixed repeated-control gate."
+        },
+        {
+          "experiment_id": "tail_alignment",
+          "recommendation": "Experiment: add a full-tile fast path for output stores at n=512, with the existing predicated ZA row stores retained for all other shapes. In the fast path, all four 16-row ZA tile halves and both 16-column halves are in bounds, so use unpredicated row stores (or equivalent full-vector stores) and remove per-row and second-half bounds checks. Base: existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. The supplied compiler output shows predicated ZA stores and scalar row-bound checks in the store loops; this change targets that work and is distinct from the rejected paired-load-only experiment. Hypothesis: simplifying the full-tile output path may reduce store-loop overhead. This is unverified and may not improve full-GEMM timing. Keep the original stores as the general and tail fallback. Check generated assembly and spill behavior, overwrite semantics, correctness at tolerance 0.002 for n=512 and odd/tail shapes, n<=0, and buffer guards; then measure fresh repeated paired AC trials against unchanged controls.",
+          "risks": "Unpredicated stores are safe only when the fast-path condition proves both tile halves fully inside C; an incorrect condition can write beyond the buffer. Store instruction cost or extra path checks may erase any benefit. Historical scores are noisy and do not establish causality; do not use them as current paired controls or infer a gain before fresh measurements."
+        },
+        {
+          "experiment_id": "scratch_lifetime",
+          "recommendation": "Proposal: from `existing-sme` (SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`), replace the single `n*n` transpose buffer with two `n*VL` FP32 scratch panels allocated inside `gemm`. For each 32-row output panel, transpose that A panel into K-major form, then compute all column tiles for those rows before reusing the panel for the next rows. Keep four ZA accumulators, FP32 MOPAs in increasing-k order, the general GEMM ABI, and current tail predicates. This reduces transpose scratch from 1 MiB to 128 KiB at n=512 and may reduce allocation and scratch initialization/cache traffic. It also changes loop order and panel reuse, so any speed effect must be measured; no gain is established.",
+          "risks": "The smaller buffer may reduce scratch footprint, but repeated panel preparation or the changed traversal may increase total work or hurt locality. At n=512, two panels total 128 KiB, equal to the supplied P-core L1D capacity, leaving no capacity margin. Preserve allocation failure fallback, n<=0 behavior, arbitrary sizes and odd tails, output overwrite semantics, and reentrancy. Check allocation-size arithmetic, guard regions, and correctness within tolerance 0.002 for small, odd, and full-size cases. Inspect the generated hot-loop assembly for spills and unexpected extra work. Measure full GEMM including packing against unchanged fresh paired AC controls; do not infer a gain from instruction counts or historical scores."
+        },
+        {
+          "experiment_id": "transpose_fusion",
+          "recommendation": "Proposal: fuse A transposition with GEMM tile consumption. Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. For the n=512 full-tile path, load each 32×32 A tile into ZA as in `sme_transpose`, then read its transposed vectors from ZA into SVE registers and use them as the A operands for the four MOPAs across the relevant output-column tiles. Do not write those A values to the full `at` scratch in this path. Keep B access, FP32 arithmetic, MOPA selectors 0–3, increasing-k order, and the general-size fallback unchanged. This removes full-matrix transpose scratch traffic, but repeats tile loading/transposition for each output-column tile: 16 repetitions for n=512. Hypothesis: saved scratch writes and reads may offset repeated transpose work; measure the whole timed `gemm` call, including allocation and all data movement.",
+          "risks": "This is unverified. Repeated A tile loads and ZA-to-SVE extraction may cost more than the removed scratch traffic. Fusing may also increase live state or spills, and ZA tile read semantics and edge handling need full-path validation. Do not claim a gain or infer its cause from noisy scores."
+        },
+        {
+          "experiment_id": "b_panel_layout",
+          "recommendation": "Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. For n=512 only, pack B inside `gemm` into K-major panels, one 32-column panel per output-column tile, with values laid out so each reduction step loads the panel’s two 16-float halves contiguously. Keep A transpose, four FP32 ZA accumulators, MOPA selectors 0–3, reduction order, stores, and general-size path unchanged. Include allocation and packing in timing. Hypothesis: contiguous panel access may improve B locality enough to offset panel packing; the 64 KiB B panel plus the 64 KiB A tile footprint reaches the reported 128 KiB P-core L1D capacity, so cache pressure may erase any benefit. This is an unverified experiment, not a measured gain.",
+          "risks": "Panel layout or address calculations could mishandle edges; packing adds allocation and copy cost. Preserve the general GEMM ABI, FP32 values, tolerance 0.002, and all non-512 behavior."
+        },
+        {
+          "experiment_id": "constant_shape_512",
+          "recommendation": "Propose: Base on `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Add an n=512-only path that packs both operands into 32-wide K-major panels inside `gemm`, then computes each 32×32 output tile from those panels. Keep the existing transpose-and-compute path as the general fallback. Each pair of panels is 131072 bytes, equal to the reported P-core L1D capacity; whether this layout improves locality after packing costs is unknown. This is distinct from the rejected paired-load-only change. Check generated assembly and spills, correctness at tolerance 0.002 including tails, guards, and n<=0, and fresh repeated paired AC measurements with packing inside the timed call. The measured history shows large baseline variation (1389.66, 933.69, 878.32 GFLOP/s); use unchanged controls and do not claim a gain from the hypothesis or instruction counts.",
+          "risks": "Packing may cost more than any locality benefit, and the combined panels leave no L1D capacity margin. The proposal is unverified; no causal speedup claim is supported. Preserve FP32 arithmetic, ABI, thread count, flags, and all benchmark gates."
+        },
+        {
+          "experiment_id": "streaming_region_cost",
+          "recommendation": "Experiment: Starting from existing-sme (SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258), combine the transpose and GEMM helpers into one SME-targeted, locally streaming helper that performs the transpose, then GEMM, within a single streaming region. Keep the same transpose layout and work order, four ZA accumulators, selectors 0–3, FP32 arithmetic, direct stores, and general-size tail handling. Keep allocation and freeing in gemm. This removes the streaming-region boundary between the two helpers while preserving entry and exit at the internal helper boundary, within the gemm call. Hypothesis: reducing SME streaming setup and teardown may improve complete-call time. The full-call effect is unverified; no supplied measurement isolates this cost. Inspect the candidate assembly to confirm one streaming-region entry/exit and unchanged ZA behavior, then check n<=0, small sizes, odd tails, guards, and tolerance 0.002. Measure complete gemm calls with fresh repeated paired AC controls under the frozen benchmark. Do not infer a gain from instruction counts or compare against historical AC scores.",
+          "risks": "Combining the helpers may increase register pressure or change compiler code generation, including spills or transpose scheduling. Streaming-region overhead may be small relative to transpose and GEMM work, and the merged code may regress. Preserve the ABI and all frozen benchmark rules; accept only if correctness passes and repeated paired measurements meet the existing gates."
+        },
+        {
+          "experiment_id": "assembly_audit",
+          "recommendation": "Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Experiment: for full 32×32 output tiles, replace direct ZA horizontal stores with ZA-row reads into SVE vectors followed by ordinary predicated vector stores. Keep the current direct-store path for partial tiles. The supplied SME2 assembly shows row-by-row ZA stores with loop branches and bounds checks; the local probe confirms the indirect transfer sequence compiles and passes its limited correctness cases. This is a store-path hypothesis, not evidence of a GEMM speedup. Check full assembly for the n=512 store path and spills, verify overwrite semantics, general and odd-size tails plus guards at tolerance 0.002, and measure full GEMM including transpose and allocation in fresh repeated paired AC trials against unchanged controls.",
+          "risks": "The added ZA-to-vector transfers and vector stores may cost more than direct ZA stores; the local probe tested only one row per ZA tile, not full GEMM rows or tails. Do not infer a gain from instruction counts or attribute any joint outcome to an individual advisor."
+        },
+        {
+          "experiment_id": "cache_conflict_layout",
+          "recommendation": "Experiment: pad the transposed A scratch rows. Base: `existing-sme`, SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Use a scratch row stride of `n + 16` floats; update the transpose stores and GEMM loads to use that stride. Allocate `n * (n + 16)` floats inside `gemm`, and keep the existing fallback behavior. For n=512, this changes the row stride from 2048 to 2112 bytes and adds 3.125% to scratch allocation. Hypothesis: changing the repeated row spacing may reduce cache-set aliasing during the reduction loop. This is unverified; the supplied evidence does not establish cache-set conflicts or a speedup.",
+          "risks": "The larger scratch footprint and padding traffic may cost more than any locality benefit. Keep every padded-row access within the new allocation. Check general n, odd tails, n<=0, output guards, and tolerance 0.002. Inspect generated code to confirm all scratch indexing uses the padded stride. Measure full GEMM, including allocation and packing, with fresh repeated AC trials paired against the unchanged baseline. Do not infer cause from noisy scores or treat this advice as measured evidence."
+        }
+      ],
+      "board_hash": "944088daa72da5f8c73fa1065ea540101486608f481ff56ea5877231d62340f0",
+      "experiment_order": [
+        "sme_fp32_schedule",
+        "tail_alignment",
+        "loop_order"
+      ]
+    }
+  ]
+}

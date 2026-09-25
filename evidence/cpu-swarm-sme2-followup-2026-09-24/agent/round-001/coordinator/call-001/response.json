@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_schedule",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "loop_order",
+    "compiler_codegen",
+    "tail_alignment",
+    "scratch_lifetime",
+    "transpose_fusion",
+    "b_panel_layout",
+    "constant_shape_512",
+    "streaming_region_cost",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Use existing-sme, SHA-256 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258, as the reference. This roster covers distinct questions beyond operand loads. vector_access examines indirect output stores, supported by the supplied instruction probe but unverified in full GEMM. a_transpose, transpose_fusion, panel_packing and b_panel_layout examine transpose cost, direct tile consumption, bounded packing and B layout. cache_blocking, loop_order and cache_conflict_layout examine working-set size, traversal and scratch stride; two 64-KiB panels leave no capacity margin in the reported P-core L1D, but cache conflicts are not established. scratch_lifetime accounts for all per-call storage costs. streaming_region_cost examines the separate entry and exit sequences visible in the supplied assembly. constant_shape_512 examines whole-kernel specialization with a general fallback. sme_fp32_schedule studies four-accumulator scheduling. compiler_codegen checks source lowering; assembly_audit checks emitted changes, spills and duplication. tail_alignment protects odd sizes, bounds and partial vectors. Do not repeat paired-load-only changes, unchanged unrolling, or per-k partial-C spills. All proposed gains remain hypotheses. The current baseline spans 878.32–1389.66 GFLOP/s; promotion requires fresh paired measurements under unchanged gates, without historical controls."
+}

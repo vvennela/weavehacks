@@ -1,0 +1,440 @@
+{
+  "schema_version": "sera-cpu-sme2-followup-verification-v1",
+  "block": "evidence/cpu-swarm-sme2-followup-2026-09-24",
+  "conclusion": "phase closed; no candidate accepted; 1800 GFLOP/s target unmet",
+  "model_calls": {
+    "total": 37,
+    "response_artifacts": 37,
+    "breakdown": {
+      "luna_proposals": 15,
+      "luna_rankings": 15,
+      "astra_high_roster_selection": 1,
+      "astra_high_implementation_calls": 3,
+      "astra_high_measured_reviews": 3
+    },
+    "budget_max_model_calls": 73,
+    "budget_calls_remaining": 36,
+    "specialist_roles": 15,
+    "proposal_responses": 15,
+    "valid_complete_rankings": 15
+  },
+  "search": {
+    "status": "completed",
+    "stop_reason": "candidate-budget",
+    "max_candidate_attempts": 3,
+    "candidate_count": 3,
+    "candidates": [
+      {
+        "trial": "001",
+        "candidate_name": "sme_fp32_schedule",
+        "specialist_id": "astra_coordinator",
+        "source_sha256": "37c96546290228e6f970a0e9827c4f11927f5bc0ca716c0f1ef9a0d54bbca086",
+        "source_hash_matches_record": true,
+        "correctness_passed": true,
+        "correctness_cases": 48,
+        "correctness_sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "correctness_input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "worst_relative_error": 1.0017720606112918e-06,
+        "validation_gflops": [
+          1508.064465455758,
+          978.9483164004404,
+          1596.2433870725902
+        ],
+        "paired_control_gflops": [
+          1308.1140270962524,
+          1549.7777397605503,
+          1007.8941093686307
+        ],
+        "eligible_for_promotion": false,
+        "promoted": false,
+        "adjudication": {
+          "decision": "revise",
+          "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired throughput changes were +15.3%, \u221236.8%, and +58.4%. Candidate scores ranged from 978.95\u20131596.24 GFLOP/s; paired controls ranged from 1007.89\u20131549.78 GFLOP/s. Mixed results and large repeat variation do not establish a stable gain or show that MOPA issue order caused an improvement. Retain existing-sme and use this inconclusive result to inform the next jointly selected experiment under unchanged gates."
+        }
+      },
+      {
+        "trial": "002",
+        "candidate_name": "tail_alignment",
+        "specialist_id": "astra_coordinator",
+        "source_sha256": "e0f2cf87408dbf6596efc97797bbebe4d26b205bd7a98b5e2e60bf949df0262b",
+        "source_hash_matches_record": true,
+        "correctness_passed": true,
+        "correctness_cases": 48,
+        "correctness_sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "correctness_input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "worst_relative_error": 1.0017720606112918e-06,
+        "validation_gflops": [
+          1464.1960385998093,
+          1440.297491785502,
+          1533.916818571432
+        ],
+        "paired_control_gflops": [
+          1440.2976042420428,
+          1039.7744803836893,
+          1013.5989131043257
+        ],
+        "eligible_for_promotion": false,
+        "promoted": false,
+        "adjudication": {
+          "decision": "revise",
+          "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired gains were 1.7%, 38.5%, and 51.3%. Candidate scores ranged from 1440.30\u20131533.92 GFLOP/s; controls ranged from 1013.60\u20131440.30 GFLOP/s. All pairs improved, but the large gains coincided with much lower controls. Repeat variation prevents a stable gain or causal conclusion. Retain existing-sme and carry this lead into the next jointly selected experiment under unchanged gates."
+        }
+      },
+      {
+        "trial": "003",
+        "candidate_name": "loop_order",
+        "specialist_id": "astra_coordinator",
+        "source_sha256": "f8aea714987d2fb7f06a95edbb5a92518cb88ad18c81c37d19effdedb0080f39",
+        "source_hash_matches_record": true,
+        "correctness_passed": true,
+        "correctness_cases": 48,
+        "correctness_sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "correctness_input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "worst_relative_error": 1.0017720606112918e-06,
+        "validation_gflops": [
+          1468.8669910191836,
+          1573.6262546731557,
+          1546.8040342830222
+        ],
+        "paired_control_gflops": [
+          1559.5378619239514,
+          1237.5030598359883,
+          1555.7778228464722
+        ],
+        "eligible_for_promotion": false,
+        "promoted": false,
+        "adjudication": {
+          "decision": "revise",
+          "reason": "The candidate passed the supplied correctness checks, but eligible=false blocks adoption. Fresh paired throughput changes were \u22125.8%, +27.2%, and \u22120.6%. Candidate scores ranged from 1468.87\u20131573.63 GFLOP/s; controls ranged from 1237.50\u20131559.54 GFLOP/s. Two losses and one gain, with the gain paired against the lowest control, do not establish a stable improvement. These results do not establish that tile traversal improved B reuse or throughput. Retain existing-sme and use this inconclusive result to inform the next jointly selected experiment under unchanged gates."
+        }
+      }
+    ],
+    "baseline_validation_gflops": [
+      1389.6619733285124,
+      933.6885691493391,
+      878.3164236884255
+    ],
+    "final_baseline_gflops": 1575.9357562298082,
+    "target_gflops": 1800,
+    "target_met": false,
+    "winner_is_baseline": true,
+    "accepted_candidate": null
+  },
+  "correctness": {
+    "baseline_passed": true,
+    "baseline_case_count": 48,
+    "candidate_case_count_each": 48,
+    "tolerance": 0.002,
+    "scope": "Finite deterministic test cases; not a proof across all dimensions."
+  },
+  "host_checks": {
+    "observation_count": 22,
+    "all_ac_and_power_settings_unchanged": true,
+    "no_recorded_thermal_or_performance_warning": true
+  },
+  "hill_report_verification": {
+    "method": "hills verify --json <report>",
+    "signed_report_count": 22,
+    "all_signatures_valid": true,
+    "all_official": true,
+    "all_passed": true,
+    "same_hill_tree": true,
+    "same_submission_hash": false,
+    "reports": [
+      {
+        "path": "search/trial-000/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1389.6619733285124,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-000/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 933.6885691493391,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-000/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 878.3164236884255,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-001/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1508.064465455758,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:3295aa871869227c96e6255fb05f8c304c0e9d534643a0c57a6ed6180416d076"
+      },
+      {
+        "path": "search/trial-001/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 978.9483164004404,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:3295aa871869227c96e6255fb05f8c304c0e9d534643a0c57a6ed6180416d076"
+      },
+      {
+        "path": "search/trial-001/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1596.2433870725902,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:3295aa871869227c96e6255fb05f8c304c0e9d534643a0c57a6ed6180416d076"
+      },
+      {
+        "path": "search/trial-002/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1464.1960385998093,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:39eb9b1ff9da73fb0223fe194b0746b44da00c23bbd4f33c0c27c406f87341f9"
+      },
+      {
+        "path": "search/trial-002/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1440.297491785502,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:39eb9b1ff9da73fb0223fe194b0746b44da00c23bbd4f33c0c27c406f87341f9"
+      },
+      {
+        "path": "search/trial-002/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1533.916818571432,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:39eb9b1ff9da73fb0223fe194b0746b44da00c23bbd4f33c0c27c406f87341f9"
+      },
+      {
+        "path": "search/trial-003/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1468.8669910191836,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:02799f87e81486d09ef5be482e6a8345c34a3aa7c07f756a5a1ee69d24219e6c"
+      },
+      {
+        "path": "search/trial-003/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1573.6262546731557,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:02799f87e81486d09ef5be482e6a8345c34a3aa7c07f756a5a1ee69d24219e6c"
+      },
+      {
+        "path": "search/trial-003/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1546.8040342830222,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:02799f87e81486d09ef5be482e6a8345c34a3aa7c07f756a5a1ee69d24219e6c"
+      },
+      {
+        "path": "search/trial-001/control-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1308.1140270962524,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-001/control-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1549.7777397605503,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-001/control-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1007.8941093686307,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-002/control-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1440.2976042420428,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-002/control-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1039.7744803836893,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-002/control-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1013.5989131043257,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-003/control-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1559.5378619239514,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-003/control-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1237.5030598359883,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/trial-003/control-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1555.7778228464722,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      },
+      {
+        "path": "search/final.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": true,
+        "gflops": 1575.9357562298082,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:0b4bee858aebc065624ff6b753997635a248882fe679e85d9e349cb14a24aefa"
+      }
+    ]
+  },
+  "next_direction": {
+    "status": "current SME2 follow-up is closed",
+    "approach": "Start from a proven LIBXSMM reference implementation.",
+    "part_of_this_evidence": false
+  },
+  "limits": [
+    "No candidate was promoted; performance gains were not established.",
+    "Candidate results and Astra reviews are measured evidence for this fixed hill only.",
+    "The public correctness check covers a finite input set.",
+    "Native candidate execution is trusted local research, not a sandbox."
+  ]
+}
