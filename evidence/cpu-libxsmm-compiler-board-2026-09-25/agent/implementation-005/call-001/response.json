@@ -1,0 +1,21 @@
+{
+  "name": "libxsmm-general-size-sme-direct-a-gather",
+  "hypothesis": "Implement the selected general-size path with direct row-major A gathers. For each 2VL-by-2VL output tile and K step, gather A[(i+lane)*n+k], load contiguous B[k*n+j+lane], and perform the existing four FP32 outer products. Predicates cover row and column tails. A guarded scalar path handles dimensions that exceed the gather index range or safe signed tile increments. The general path no longer allocates or materializes a transpose. The n=512 wrapper still calls unchanged NN with [4]=B, [10]=A and [16]=C. This change is absent from the supplied measured history. Avoiding conversion and allocation may reduce general-size call cost; repeated strided gathers may increase it. The effect is unverified. Frozen n=512 timing does not measure the new gather path, although compiler layout can change. All generated assembly and complete BSD notices remain unchanged. No tools, compilation, tests or measurements were performed. Validate fresh inputs, input preservation, full overwrite, tolerance 0.002, sizes around vector and tile boundaries, odd tails, n<=0 and the large-dimension guard. Retain ten n=512 validation reports and ten fresh alternating paired controls, best-of-three timing, unchanged power settings, separate historical and fresh same-mode comparisons, the fixed promotion gate and held-out check. No gain or goal completion is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "67da75dd729b153a2129f8b1a71dd77b4d01609a94b6d2909ae69d99974fbdae",
+  "edits": [
+    {
+      "old": "static void sme_gemm(int n,const float *at,const float *b,float *c) {\n    const int vl=(int)svcntsw();",
+      "new": "static void sme_gemm(int n,const float *a,const float *b,float *c) {\n    if (n <= 0) return;\n    const int vl=(int)svcntsw();\n    /* Gather indices count floats. Guard index and tile-counter overflow. */\n    if ((size_t)n * (size_t)(vl - 1) > 4294967295ULL ||\n        n > 2147483647 - 2 * vl) {\n        for (int i = 0; i < n; ++i) {\n            for (int j = 0; j < n; ++j) {\n                float sum = 0.0f;\n                for (int k = 0; k < n; ++k)\n                    sum += a[(size_t)i*n+k] * b[(size_t)k*n+j];\n                c[(size_t)i*n+j] = sum;\n            }\n        }\n        return;\n    }\n    const svuint32_t row_indices = svindex_u32(0, n);"
+    },
+    {
+      "old": "                svfloat32_t a0=svld1_f32(pi0,at+(size_t)k*n+i);\n                svfloat32_t a1=svld1_f32(pi1,at+(size_t)k*n+(i+vl<n?i+vl:i));",
+      "new": "                svfloat32_t a0=svld1_gather_u32index_f32(\n                    pi0, a+(size_t)i*n+k, row_indices);\n                svfloat32_t a1=svld1_gather_u32index_f32(\n                    pi1, a+(size_t)(i+vl<n?i+vl:i)*n+k, row_indices);"
+    },
+    {
+      "old": "static void fallback_gemm(int n,const float *restrict A,const float *restrict B,float *restrict C) {\n    if(n<=0)return;\n    float *at=malloc((size_t)n*n*sizeof(float));\n    if(!at) {\n        for(int i=0;i<n;i++)for(int j=0;j<n;j++) {\n            float x=0;for(int k=0;k<n;k++)x+=A[(size_t)i*n+k]*B[(size_t)k*n+j];\n            C[(size_t)i*n+j]=x;\n        }\n        return;\n    }\n    sme_transpose(n, A, at);\n    sme_gemm(n,at,B,C);\n    free(at);\n}",
+      "new": "static void fallback_gemm(int n,const float *restrict A,const float *restrict B,float *restrict C) {\n    if(n<=0)return;\n    sme_gemm(n,A,B,C);\n}"
+    }
+  ]
+}

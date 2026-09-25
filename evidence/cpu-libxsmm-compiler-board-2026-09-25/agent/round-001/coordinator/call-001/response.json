@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "assembly_audit",
+    "compiler_codegen",
+    "n512_fast_path",
+    "a_transpose",
+    "panel_packing",
+    "b_panel_layout",
+    "cache_blocking",
+    "loop_order",
+    "vector_access",
+    "scratch_lifetime",
+    "streaming_region_cost",
+    "transpose_fusion",
+    "cache_conflict_layout",
+    "sme_fp32_tiles",
+    "tail_alignment"
+  ],
+  "rationale": "Select these 15 roles to cover the supplied compiler evidence, descriptor mappings, timed conversions, memory layouts, and correctness. assembly_audit and compiler_codegen examine the supplied machine code against its source hashes. n512_fast_path reviews the unmeasured TA and TT wrappers: TA requires transpose(B) and original A; TT requires both physical transposes. The exact TB wrapper has now failed promotion on AC and battery; its results do not measure TA or TT or isolate component costs. a_transpose, panel_packing, b_panel_layout, and transpose_fusion cover distinct conversion and packing designs. cache_blocking, loop_order, and cache_conflict_layout cover traversal and storage hypotheses without assuming a cache cause. vector_access and sme_fp32_tiles cover operand access and the four available ZA.S tiles; the existing ZA0/ZA1-before-ZA2/ZA3 stores are not new. scratch_lifetime and streaming_region_cost cover timed temporary storage and valid SME boundaries. tail_alignment checks bounds and general-size correctness. Omit dedicated counter, pointer, prefetch, and K-schedule roles this round because many prior variants already exist. Each advisor must identify a distinct source change or abstain. This roster selects no experiment; joint board ranking remains required. Advice remains unverified. Preserve all fixed constraints, ten alternating candidate/control pairs, best-of-three reports, the 5% separated-ranges gate, and held-out validation. Report historical and fresh same-mode comparisons separately."
+}

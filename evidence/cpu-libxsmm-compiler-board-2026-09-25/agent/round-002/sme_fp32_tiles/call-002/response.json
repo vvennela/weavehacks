@@ -1,0 +1,1 @@
+{"ranking":["n512_fast_path","a_transpose"],"reason":"TA is unmeasured on the fixed n=512 workload and could change its full-call path, though its timed transpose and added A packing create substantial regression risk. The unmaterialized-A proposal keeps NN for n=512, so it cannot improve the scored workload; its possible benefit applies only to general sizes."}

@@ -1,0 +1,813 @@
+{
+  "phase": "cpu-libxsmm-compiler-board-2026-09-25",
+  "status": "failed_final_review",
+  "source_hashes_verified": true,
+  "baseline_sha256": "67da75dd729b153a2129f8b1a71dd77b4d01609a94b6d2909ae69d99974fbdae",
+  "signed_report_count": 110,
+  "baseline_score_count": 10,
+  "candidate_validation_score_count": 50,
+  "paired_control_score_count": 50,
+  "all_validation_and_control_scores": 110,
+  "signature_verification": "hills verify passed for every listed report",
+  "power_source": "Battery Power",
+  "power_settings_unchanged": true,
+  "performance_runs_executed_by_verifier": false,
+  "calls": 73,
+  "implementation_attempts": 5,
+  "trials": 7,
+  "rejected_unscored_trials": 1,
+  "board_rounds": [
+    {
+      "round": 1,
+      "ballot_count": 15,
+      "board_ids": [
+        "assembly_audit",
+        "n512_fast_path",
+        "a_transpose",
+        "scratch_lifetime",
+        "transpose_fusion",
+        "cache_conflict_layout",
+        "sme_fp32_tiles"
+      ],
+      "ranked_order": [
+        "a_transpose",
+        "assembly_audit",
+        "cache_conflict_layout"
+      ],
+      "order_matches": true
+    },
+    {
+      "round": 2,
+      "ballot_count": 15,
+      "board_ids": [
+        "n512_fast_path",
+        "a_transpose"
+      ],
+      "ranked_order": [
+        "n512_fast_path",
+        "a_transpose"
+      ],
+      "order_matches": true
+    }
+  ],
+  "trial_summaries": [
+    {
+      "trial": 0,
+      "name": "libxsmm-reference-with-unused-transpose-primitives",
+      "source_sha256": "67da75dd729b153a2129f8b1a71dd77b4d01609a94b6d2909ae69d99974fbdae",
+      "score_count": 10,
+      "control_count": 0,
+      "score_min": 1001.778107426596,
+      "score_max": 1113.4565675720366,
+      "control_min": null,
+      "control_max": null,
+      "eligible": null,
+      "promoted": null
+    },
+    {
+      "trial": 1,
+      "name": "libxsmm-n512-tb-with-timed-sme-a-transpose",
+      "source_sha256": "b675c9702c7fe13049d35a15b7e432519b44c69bfe523f0eaebabbb628b6ec9b",
+      "score_count": 10,
+      "control_count": 10,
+      "score_min": 625.5414159877457,
+      "score_max": 1069.996818080416,
+      "control_min": 984.332901433359,
+      "control_max": 1106.1884974295049,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "trial": 2,
+      "name": "libxsmm-n512-tb-with-timed-neon-a-transpose",
+      "source_sha256": "8d0f6fa6445416d0eda41ae5f6e2b06c0d836d1d68de52259ea0e40c6ab203fb",
+      "score_count": 10,
+      "control_count": 10,
+      "score_min": 600.0233700329317,
+      "score_max": 962.8555116118192,
+      "control_min": 800.8026315463463,
+      "control_max": 1093.4234161298493,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "trial": 3,
+      "name": "libxsmm-full512-four-step-k-loop-unroll",
+      "source_sha256": "d91b41bd7bbe47c6630c8f3e4e6720904acd27814cbf4e24fc7834b1938d38ac",
+      "score_count": 10,
+      "control_count": 10,
+      "score_min": 792.9185793544706,
+      "score_max": 1102.404309429142,
+      "control_min": 822.8940754065302,
+      "control_max": 1083.130403247496,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "trial": 4,
+      "name": "libxsmm-full512-padded-288-byte-a-slices",
+      "source_sha256": "f31c0016cb2bfafd9203b633ecd4268f3be3dd9c59e0f101bcb9ed9af6078ee4",
+      "score_count": 10,
+      "control_count": 10,
+      "score_min": 841.9312150732358,
+      "score_max": 1094.3506278593577,
+      "control_min": 810.7799261567576,
+      "control_max": 1088.9876521071883,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "trial": 5,
+      "name": "libxsmm-n512-ta-with-timed-sme-b-transpose",
+      "source_sha256": "6e229a14f522dcece739b3cf7feaefa1a924de3619c73629c24972ac32688b21",
+      "score_count": 10,
+      "control_count": 10,
+      "score_min": 588.9429001515639,
+      "score_max": 785.185980977845,
+      "control_min": 795.2653345687437,
+      "control_max": 1105.8103218973295,
+      "eligible": false,
+      "promoted": false
+    },
+    {
+      "trial": 6,
+      "name": "libxsmm-general-size-sme-direct-a-gather",
+      "source_sha256": "80316af82b4447ecf4c115107301f17362174f005361dd285145ae9055dbc6d1",
+      "status": "rejected_before_scoring",
+      "score_count": 0,
+      "control_count": 0,
+      "error_type": "recorded_error"
+    }
+  ],
+  "final_review": {
+    "failed": true,
+    "original_input_characters": 1108459,
+    "configured_limit_characters": 1048576,
+    "exceeded_by_characters": 59883,
+    "holdout_report_present": false,
+    "promoted_candidate": false
+  },
+  "no_candidate_promoted": true,
+  "reports": [
+    {
+      "path": "search/trial-000/validation-0.json",
+      "sha256": "2546cd5f8b7cf9a8e11004c0f3fff6190f3357dfbd01239e432af225f67ea3a1",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-1.json",
+      "sha256": "a200862657420633068e3733034c3f8cf8de5a06b6e44a3f19c7d5c9d586b87f",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-2.json",
+      "sha256": "4b515b855cf2931e720c8872dfc2612319bec755479eb9d9b07a9c05c186e99c",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-3.json",
+      "sha256": "d49fda397c0efcd24158210798b699cd95cec299f99319cd273e946c5e38ac00",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-4.json",
+      "sha256": "1bd42b304e9b712bff0ac3db94140cd7ed4db0b1a45fc88a48a2805107f5bfb4",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-5.json",
+      "sha256": "3c1fdb06c21535f1bd84cfc4ef6c99b0d3d25d0bef0fba8148ccb6286b8d8cac",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-6.json",
+      "sha256": "e651a3a4b4641ed12da77c5176dfa94d06ca451f43a64ceae94351df3cc3f850",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-7.json",
+      "sha256": "5f64ccc61cae6035bd46518b95a784fb009ba53a42c77b5523b0040685867dfa",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-8.json",
+      "sha256": "855e6da4dd40524377bf1bb3b7b8671d395e81474453115d83ff9ccde8fde110",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-000/validation-9.json",
+      "sha256": "42ed21148b0dce00c9f94b9b15efb9325918a7ff03c5cf6f631d2c3c65a6801e",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-0.json",
+      "sha256": "370a8f2bb983ad30cc2f31a7a5a109712edfc1e9a622250978a06c45ec40facf",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-1.json",
+      "sha256": "a4637c7143c567e9629907904b5e280e25eff4fe3403c78dbbe41a6e0f8d244d",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-2.json",
+      "sha256": "595f8b09616e3735f3de84a2eafcdd556896396a49dad804a749340bd12538ed",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-3.json",
+      "sha256": "29d86418e4b0a79aa42f9c572d559c5fef4cf555c6420cb60156d949646ab080",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-4.json",
+      "sha256": "b64e17acb123c7a61b9c545f5056bd675b8a8747dd718a7458252c9aee9a5182",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-5.json",
+      "sha256": "4d71d9bab0ee8790f1c660db37c4ae1790164e54f64a89635779f7050acbe274",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-6.json",
+      "sha256": "516efc4a2936bca7ca2847354ffff73000a5e7ba06225d132bfcc89deb4c6a7f",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-7.json",
+      "sha256": "a5cbc16a8ae634dfa5a2e55aeb1a5c0293793c43ef732152c41f76ab99afb098",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-8.json",
+      "sha256": "5b3e9242e320f2877415be7c25209886645f8c3c96e1fabd0c1d909454484f33",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/validation-9.json",
+      "sha256": "80da6246fbdf3a693ba892426f3069daaaf68b19a9656d60aa7c3a6e734d9f4c",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-0.json",
+      "sha256": "08fc23235f0f18d43979a6e3dc22439a8e673b4f8671a371ad4e97d00aba758d",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-1.json",
+      "sha256": "0767e095dbd225c855b0c532da2c35e857af6dcc06cab3300470e4c791ca7149",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-2.json",
+      "sha256": "480bf8ad612da0d511ae9d8e02bf8f5e9dd8f2e343bc45962cfdcff034f6e876",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-3.json",
+      "sha256": "611eea4e6369e70d87a9771081b85552f078066b242f71fb50e2a287057984ca",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-4.json",
+      "sha256": "a45db9435ce8d7239de14070d0722d1102ce4783f44d52df5d159fed9b470ebe",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-5.json",
+      "sha256": "e30f32bcc3dad25694d2e992cf0fbd7ed4cd1bdb63c7d78e73a233a689d9f0c7",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-6.json",
+      "sha256": "66d62d08802de056aa8e50d393a480f2801ca2fd4b135076a75b94b5bb472561",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-7.json",
+      "sha256": "dcf50e0211cd8fcc46de55fd709744e3b1480394d4e956fae422369f20d31bf1",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-8.json",
+      "sha256": "9c5228d302f4c378474e2c025d814c3ec61094f05ffb4dd21d50cdc0ca4e37e5",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-001/control-9.json",
+      "sha256": "20dffb23171847819139fee73159b715e3119db5a747b52c25493562201b3707",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-0.json",
+      "sha256": "a6a764a88805b63b4a068b422793c51aeda92fe2c1f2745727c57b8ad516ce62",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-1.json",
+      "sha256": "22035e803d47fcc3ea6a0a7dd9d06324d966ed98983f027ac6d913784a7d890f",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-2.json",
+      "sha256": "52068cded88a09dd9059ff93fa40ddfdb2a3c04c7322627efff3038268225997",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-3.json",
+      "sha256": "78a8be7629450bc2c95a7e057af8c7e6307c076159a3281b15ca52b8e671cdf6",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-4.json",
+      "sha256": "c09b3e6885d7542e33424fbfde535884c0c6d791bcf98e4ba529e358f08515e3",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-5.json",
+      "sha256": "7db0367d87e560d7b7065f23d714caba4f7621b77d85c7b24627cfe20a35fe0b",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-6.json",
+      "sha256": "433dda2b519523a34fa8b6e370e0c8c974b7463bf17d24fcd9131064902a5d2b",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-7.json",
+      "sha256": "ac07e58769bf4840161db7b4fd84ef55320f8bc3f549462a5b08575cf29a1548",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-8.json",
+      "sha256": "af2679d95b1cc99b5ceffa35ec206076a4cca9ece1167f38730e6004d2d9c49e",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/validation-9.json",
+      "sha256": "8fde77f5e05375b8577f48b11362e9c6d3fe46e661af72662cd8df957fd3c2b2",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-0.json",
+      "sha256": "7d90d3bdf01f14a57b9ca5255c5e0b23f5310764cd0e177673088bd8919676a4",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-1.json",
+      "sha256": "1013a464919916667a05729445596c7a528cd60f3f6ac06de37c86d1f506f80e",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-2.json",
+      "sha256": "a11aaf33308732b80abe9155298536f687f989a35ad4c206c2ffa8c14cc8fed6",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-3.json",
+      "sha256": "712c6e72e34b25f24d6c6db054a058ea5b2a1dd622b08e511c001d720a625b1d",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-4.json",
+      "sha256": "3804e0ab4279b1e3d9d8789a656f91e535c2a616cd2d9002da7a64ba7a8bdf46",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-5.json",
+      "sha256": "7fdbd1756df2a639e79eb6f4c9417d57cea464829eb91de4df7e5e9f187d1a8a",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-6.json",
+      "sha256": "93f1b8ed3ed0db0e176b2e0c114f1e9f32bdcea6406b628a228b5345a9cbedc0",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-7.json",
+      "sha256": "315a1f37a1ae30de487a4a59202b0f3514042d3f90fd78ac8053cfa2f2caba22",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-8.json",
+      "sha256": "320312eee10547dc221beb117f812eade3564fded507804824e4c3220fdd5e33",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-002/control-9.json",
+      "sha256": "b046fb2b558a12d3e3327b50d12670615779760653d257d09028f55f3fde6c32",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-0.json",
+      "sha256": "66459a9415fae356db30d9b662cead5b592f8e0c9cae705454da76860a5bffa7",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-1.json",
+      "sha256": "4ae014e61daffaa4c711d4ba15f881c7b81ffb84f5fd0f5042e7eea68f634771",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-2.json",
+      "sha256": "110e4e392395a28b8d1caec2b1cf69acf6e9935728bebabc6da7d4bbe75be064",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-3.json",
+      "sha256": "a88252dbdfc1902f5b8315586bf2c8fd574d178bbc09203300505898a79cc763",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-4.json",
+      "sha256": "7061c2ee88acf642c1cd94b0a16daf7f27addafce2e13a837b2c16e55b7a8cff",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-5.json",
+      "sha256": "29785752e37457a652c145d06b9eaca4a65124ef7e08e225d4b71b7fe659162a",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-6.json",
+      "sha256": "186c3296436904ae57e4c6556c72bcaad9270015489bf78c3bc64209bcb4bd81",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-7.json",
+      "sha256": "7d6c8dc12fc7016963211ff6303311018003a9e7d0a89fefca68fa1b1785fba2",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-8.json",
+      "sha256": "da8f6686e171ebf278af5a1c63d621568d0b9a69f76efcad2ca64959329cd82a",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/validation-9.json",
+      "sha256": "2522e477c18829e410902fdfb17d081ff7a7f680d7fb8bb0a0b67341c0e148ef",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-0.json",
+      "sha256": "b8d899d1cbfe62c10e8b5c75b9371cd53feac9cc53204c49a81adaa1e67599a5",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-1.json",
+      "sha256": "f0a3547d8d5f3694d30715570fde81dc1242da2df6463e10c2b5523309bfc850",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-2.json",
+      "sha256": "482411628204eb581361e8485e8d4ce8a52de392143641bf4797c234763aaa63",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-3.json",
+      "sha256": "0afbc4451e65c19856233fce6b23dd074b1ca6e531c2b3296c9fc8f1c029cb78",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-4.json",
+      "sha256": "47bd19f5e494a687c3539abe6408b017fc1af4b848c8fbc7e0bd31fb909ec153",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-5.json",
+      "sha256": "0ef91091ff5e2a1a4c33271bee2db8156c4cd93eb2849d3b4bc8f78d4d091508",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-6.json",
+      "sha256": "a0de9b24db20fcc05b42edd99a0e59a3aa390215881d8355da050ffc8b1e0e7c",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-7.json",
+      "sha256": "ce1f30fcad82ba20d21b1e04d47cd31e0c34cf399a6eb95696a40abf50d4208d",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-8.json",
+      "sha256": "dc0b90d40a7bc63576f72fa29bf2998ce11d59570173bb534c22e558c17651e8",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-003/control-9.json",
+      "sha256": "d88b2b22687e9ce171e568ab27b60b3b310b6761a4219c602f6be77c88290c3c",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-0.json",
+      "sha256": "bd17061237e86d1ad603cfd491aa88f66fd0159bad359deea11ebcee21908871",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-1.json",
+      "sha256": "21e2a6f1c80ea66f300a3570be19e784810ee2953a9f6d17ec0032a69b59cfca",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-2.json",
+      "sha256": "009d5faa676651c34c41e5bec3cca5fa80de9f47cd9e1943fc09295d73c1db23",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-3.json",
+      "sha256": "bef86083fdab5b3c9c323b9921c4d9ba87aa062027c959a75d99d9d54a275c82",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-4.json",
+      "sha256": "f8d8d2ab240dfafa7803b1407935bbb1b899abcf9da1d651f15066360efce3a6",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-5.json",
+      "sha256": "3b30600b55fe953508a75e6203f22fa886814790240baf454f8d0d3d339e1e0f",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-6.json",
+      "sha256": "8a48c4db2119842fb1532b9377c7e0c1c647b5c96c26d0ea328c5a7697f9e346",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-7.json",
+      "sha256": "f929794f6324eb91e4bf0a4e8e96fa12fd8c5c1462b2390e760288890e7c1d67",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-8.json",
+      "sha256": "eb6962c4ab76cf25c437789255719eda15fd2d6027aa2fd8177a1c5e97570081",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/validation-9.json",
+      "sha256": "b39c37f26f119a3f4b008d136e752122ad22e4ea3dacc715dc4afa10da1430f4",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-0.json",
+      "sha256": "a30b82f8b5fecd34e8b835aa85c634453c25824b7e7208604036aafbf5b7842c",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-1.json",
+      "sha256": "082e9730ab2e39d65b371bf76db34b05513088d53937ec7868bccc220ec5bc01",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-2.json",
+      "sha256": "73ea1fb3bda718884588f705507f485e205a50a703b6458963f30f11ea2d3aed",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-3.json",
+      "sha256": "1e012e4c3f89afee128491147880a947efc5b7951503eb98b4da3763f74bb6ee",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-4.json",
+      "sha256": "5899bc97384f65812de04b7e47bfc9007bc56fb056777dfc9455d7268fa4813a",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-5.json",
+      "sha256": "85b4577d2e4e21fdbdee146950f81494ffeb8864bc4569c0687fdac1d6a01be0",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-6.json",
+      "sha256": "f73240e97712d9effcc7a01244faba720cc2abe29fece4ce665e441eec921ac3",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-7.json",
+      "sha256": "8b16d3ade07279b7c8a8806ab1fa2d5242a5cf20618ffd793d3279de65ca6c57",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-8.json",
+      "sha256": "246582eef1e479be7dcde33e2d7cd4f0c9e07f40c8a2da3b49d0e97d08970248",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-004/control-9.json",
+      "sha256": "530513c8725416366245ea93def4b487deebef380be34ccb84b94040eb1d633f",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-0.json",
+      "sha256": "1606f28cbbc40bdc817d20c0ddaa8bc50d3fcfccfac6701c7f89af3147900b77",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-1.json",
+      "sha256": "5a30fcb728997101c64ab867f278ea84bd280b4e4c7888ddaa35860860a9cad2",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-2.json",
+      "sha256": "6819c3ca0560a26019c1912b0887e7e9cf3202b5533c34100e149a2210ac0ba4",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-3.json",
+      "sha256": "f23529709212149e0e107d6eea625b911d9a4d344ac299a113cd846f4e11789a",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-4.json",
+      "sha256": "2aa45ab15607dae2a4ce986ef98609ae081cc02f2e91de481486accf4fb3f66c",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-5.json",
+      "sha256": "72b59984f4267956ca2cceda7ef946d571475fab12924388425e7772cb12334a",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-6.json",
+      "sha256": "4363c42c7d6379aae0879ee12f977240d5ae17a3437da9a5b9009750ed12cba8",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-7.json",
+      "sha256": "6f75e9632fcb8208ace489b727799da46f3bb1796683293a6a97dd0dda614418",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-8.json",
+      "sha256": "03e61a4660c601b32bef0bc314c017ff3592016ab2bd1f877172bebc0aa09614",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/validation-9.json",
+      "sha256": "1ed97e952b1e23dfbcded5ca8fba6b6843c5e231062aee32585cd78a9e7f9458",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-0.json",
+      "sha256": "d917706448959e17db1d027038ffe3b44ba9df2a01f8ae37596442afa25a14a9",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-1.json",
+      "sha256": "5f7ceed799c9a6bd64e881a42de94bd06b4f88a524c970c13b10a6a44c432f39",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-2.json",
+      "sha256": "5a748552b4b651e9c00509e4c96920875e6963e82a586db26b69812b83fe75a3",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-3.json",
+      "sha256": "7ff865b9a312077b5fe93d933899fe95c5677c82132b1a989d4d0fbab5337d55",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-4.json",
+      "sha256": "6089ec146e6d0a80b064939a4e70bdbdcaca7c9197ee3627c5ef455bcdced5f7",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-5.json",
+      "sha256": "0fe0441e62a742ca73c9b6a72a7edbfaef305ef3a9439cf75c597072596896e9",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-6.json",
+      "sha256": "425851068fa3b9bc2ff971986b5175d5c3f8a52642fd2dadf3b9f54370140c6f",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-7.json",
+      "sha256": "ea7b79e99be05d0639c11f73a2633b3963113a4c874e5d5f81a7f47648017f2d",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-8.json",
+      "sha256": "99b1e1a2c3390ceecd08af8f4518fe8103a2c74df65906070cd4fe81dc1b15f4",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    },
+    {
+      "path": "search/trial-005/control-9.json",
+      "sha256": "626d8e92f667ea3c02e490aa47f75dc2d26b4f5e216da71641a36090e48b4694",
+      "signature_verified": true,
+      "power_source": "Battery Power"
+    }
+  ]
+}

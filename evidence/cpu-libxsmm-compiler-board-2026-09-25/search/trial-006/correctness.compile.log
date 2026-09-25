@@ -1,0 +1,11 @@
+/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-006/source/kernel.c:750:32: error: builtin can only be called from a non-streaming function
+  750 |                 svfloat32_t a0=svld1_gather_u32index_f32(
+      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+  751 |                     pi0, a+(size_t)i*n+k, row_indices);
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-006/source/kernel.c:752:32: error: builtin can only be called from a non-streaming function
+  752 |                 svfloat32_t a1=svld1_gather_u32index_f32(
+      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+  753 |                     pi1, a+(size_t)(i+vl<n?i+vl:i)*n+k, row_indices);
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors generated.

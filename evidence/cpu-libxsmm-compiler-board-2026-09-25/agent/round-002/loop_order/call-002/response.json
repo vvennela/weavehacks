@@ -1,0 +1,1 @@
+{"ranking":["n512_fast_path","a_transpose"],"reason":"TA targets the measured n=512 workload, though its timed B transpose and added generated A packing make any gain uncertain. The unmaterialized-A proposal leaves the n=512 path unchanged, so it cannot improve the fixed benchmark; its strided gathers also add locality and tail-correctness risks."}

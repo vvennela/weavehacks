@@ -1,0 +1,821 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "failed",
+  "trials": [
+    {
+      "name": "libxsmm-reference-with-unused-transpose-primitives",
+      "hypothesis": "Original full512 NN GEMM with optional unused verified panel and transpose primitives",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/source/kernel.c",
+      "source_hash": "67da75dd729b153a2129f8b1a71dd77b4d01609a94b6d2909ae69d99974fbdae",
+      "status": "passed",
+      "scores": [
+        1001.778107426596,
+        1041.4566748808284,
+        1113.4565675720366,
+        1105.2411923367176,
+        1056.832509443394,
+        1088.9876521071883,
+        1091.7558167392897,
+        1012.1695265480519,
+        1055.967758831727,
+        1101.6533135285138
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-000/validation-9.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 1072.9100807752911,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "67da75dd729b153a2129f8b1a71dd77b4d01609a94b6d2909ae69d99974fbdae",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    },
+    {
+      "name": "libxsmm-n512-tb-with-timed-sme-a-transpose",
+      "hypothesis": "Implement the selected TRANS_B descriptor and physical A transpose using the supplied sme_transpose and sera_libxsmm_tb. The conversion writes at[k*512+i]=A[i*512+k] into a fresh 1 MiB FP32 buffer. Slots [4]=B, [10]=at and [16]=C preserve row-major C=A@B. Correction to the recommendation: the supplied TB path skips generated B-stack packing and does not add A-stack packing. This tests whether the complete changed path offsets allocation, conversion, cleanup and different memory access costs; the net performance effect is unknown. Other sizes retain the existing general fallback; allocation failure calls unchanged full512 NN. All assembly and complete BSD notices remain unchanged. This descriptor-and-layout change is absent from the supplied measured history and differs from the prior C SME compute path. No tools or tests were run. Compilation, fresh-input correctness, full overwrite, tolerance 0.002, tails, n<=0 and allocation-failure checks remain required. Measure ten validation reports and ten fresh alternating paired controls on unchanged AC Automatic, preserving best-of-three timing. Report spread and comparisons against historical AC peak 1685.6230608449698 and fresh same-mode peak; retain Battery Automatic history separately. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No gain, causal effect or goal completion is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/source/kernel.c",
+      "source_hash": "b675c9702c7fe13049d35a15b7e432519b44c69bfe523f0eaebabbb628b6ec9b",
+      "status": "passed",
+      "scores": [
+        1069.996818080416,
+        911.7525768456192,
+        808.9474448189305,
+        992.2135982917764,
+        625.5414159877457,
+        844.8007953295727,
+        736.1959772224084,
+        1046.874849004045,
+        1004.2779488006342,
+        1013.4420458918961
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/validation-9.json"
+      ],
+      "control_scores": [
+        1045.8510638953478,
+        1090.2791739550196,
+        984.332901433359,
+        1096.585911223374,
+        1096.5903440043105,
+        1066.9856778717942,
+        1037.0950363016157,
+        1076.7912840343354,
+        993.5908848909261,
+        1106.1884974295049
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-001/control-9.json"
+      ],
+      "median_gflops": 951.9830875686978,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "b675c9702c7fe13049d35a15b7e432519b44c69bfe523f0eaebabbb628b6ec9b",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, candidate scores were 625.54–1070.00 GFLOP/s versus paired controls of 984.33–1106.19. Repeat spreads were 444.46 and 121.86 GFLOP/s. The candidate won only 2/10 pairs. Its minimum of 625.54 fails the required >1161.50 GFLOP/s threshold (1.05 × maximum paired control). It exceeded the fresh baseline peak of 1113.46 and paired-control peak of 1106.19 in 0/10 reports. It also exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. Neither comparator establishes goal completion; comparator policy remains pending. No held-out result is supplied. Discard this TB wrapper and retain the unchanged NN incumbent. Preserve this replay separately from prior AC measurements. These results do not isolate transpose, allocation, packing or compute costs. TA and TT full-call wrappers remain unmeasured. Preserve the swarm-ranked queue and fixed gates; the legacy 1800 setting does not determine this decision."
+      }
+    },
+    {
+      "name": "libxsmm-n512-tb-with-timed-neon-a-transpose",
+      "hypothesis": "Implement the swarm-selected conversion change: replace only the n=512 TB wrapper's SME transpose with NEON 4x4 FP32 microtiles inside 32x32 tiles. Four row loads, register transposes, and four contiguous stores produce at[k*512+i]=A[i*512+k]. Slots [4]=original B, [10]=at, and [16]=original C remain unchanged. This differs from the measured SME-transpose TB source. The hypothesis is lower conversion cost; the complete timed performance effect is unknown. NEON conversion can regress, and prior TB measurements do not isolate conversion cost. Allocation, conversion, dispatch, and free remain inside gemm. Allocation failure retains NN; other sizes retain the existing fallback. All assembly, FP32 accumulation, ABI, thread count, compiler flags, tolerance, and complete BSD notices remain unchanged. No tools or tests were run. Require compilation and correctness checks for fresh inputs, full overwrite, unchanged inputs, general sizes, tails, n<=0, and allocation failure. Measure ten reports and ten fresh alternating NN paired controls with power source and settings unchanged, preserving best-of-three timing. Report spread and comparisons against fresh same-mode peaks and the historical AC Automatic peak 1685.6230608449698; retain the Battery Automatic peak 1668.5964359101147 as separate historical context. Comparator policy remains pending. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup or goal completion is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/source/kernel.c",
+      "source_hash": "8d0f6fa6445416d0eda41ae5f6e2b06c0d836d1d68de52259ea0e40c6ab203fb",
+      "status": "passed",
+      "scores": [
+        924.8422313533212,
+        600.0233700329317,
+        683.6211184714585,
+        764.7733895179424,
+        690.1399594114687,
+        962.8555116118192,
+        883.0113653669279,
+        959.8396256094588,
+        696.1049158930257,
+        784.3256537789443
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-9.json"
+      ],
+      "control_scores": [
+        983.1287748527419,
+        1076.2516886107835,
+        1093.4234161298493,
+        1063.637266332398,
+        945.1952382091855,
+        1011.8528394233884,
+        810.5742886113172,
+        800.8026315463463,
+        1025.8666960805672,
+        1016.1581732822739
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/control-9.json"
+      ],
+      "median_gflops": 774.5495216484434,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "8d0f6fa6445416d0eda41ae5f6e2b06c0d836d1d68de52259ea0e40c6ab203fb",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, this NEON-transpose TB candidate scored 600.02–962.86 GFLOP/s versus paired NN controls of 800.80–1093.42. Repeat spreads were 362.83 and 292.62 GFLOP/s; the candidate won only 2/10 pairs. Its minimum of 600.02 fails the required >1148.09 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 and fresh paired-control peak of 1093.42 in 0/10 reports each. It also exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These results establish no repeatable gain and do not isolate conversion, allocation, compute, or cache costs, or establish NEON versus SME transpose performance. Keep power-mode records separate. TA and TT full-call wrappers remain unmeasured. Preserve the swarm-ranked queue and fixed gates; the legacy 1800 setting does not determine this decision."
+      }
+    },
+    {
+      "name": "libxsmm-full512-four-step-k-loop-unroll",
+      "hypothesis": "Implement the swarm-selected four-step unroll in Llibxsmm_478 and Llibxsmm_70c. Each group repeats the existing two loads, two pointer advances and four FP32 FMOPAs four times, then decrements X8 by four. Both counters start at 512, so each loop executes 128 groups and preserves all 512 updates in the original accumulation order. No cleanup is needed: these loops serve only the fixed full512 primitive; other sizes retain the unchanged fallback. Parameter mapping remains [4]=original B, [10]=original A, [16]=original C, with unchanged internal packing. This differs from the historical two-step unroll. Fewer loop-control instructions may improve throughput, but larger code and scheduling pressure may cause a regression. The measured effect is unknown. ABI, thread count, compiler flags, tolerance, stores, SME transitions, allocation-failure behavior and complete BSD notices remain unchanged. No tools or tests were run. Compilation and correctness validation remain required, including fresh inputs, input preservation, full overwrite, general sizes, tails and n<=0. Measure ten reports and ten fresh alternating paired controls with unchanged power source/settings and best-of-three timing. Report spread and comparisons against historical peaks and fresh same-mode peaks separately, without choosing comparator policy. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup, causal attribution or goal completion is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/source/kernel.c",
+      "source_hash": "d91b41bd7bbe47c6630c8f3e4e6720904acd27814cbf4e24fc7834b1938d38ac",
+      "status": "passed",
+      "scores": [
+        1047.2097393565439,
+        792.9185793544706,
+        1034.9318947191177,
+        994.2053775205765,
+        1090.2791739550196,
+        800.4038771425506,
+        935.5890270022921,
+        825.1098483801958,
+        1102.404309429142,
+        1040.447503752028
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-9.json"
+      ],
+      "control_scores": [
+        1034.5968021956367,
+        1040.1128771679143,
+        969.8092704952953,
+        992.0632800545,
+        1083.130403247496,
+        997.4378395278604,
+        1057.0030978642221,
+        822.8940754065302,
+        934.0946530838439,
+        868.8412573259095
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/control-9.json"
+      ],
+      "median_gflops": 1014.568636119847,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "d91b41bd7bbe47c6630c8f3e4e6720904acd27814cbf4e24fc7834b1938d38ac",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, the four-step unroll scored 792.92–1102.40 GFLOP/s versus paired controls of 822.89–1083.13. Repeat spreads were 309.49 and 260.24 GFLOP/s. It won 7/10 pairs, but the overlapping ranges establish no consistent gain. Its minimum of 792.92 fails the required >1137.29 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 in 0/10 reports and its paired-control peak of 1083.13 in 2/10. It exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These measurements establish no causal benefit from reduced loop control. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. Do not repeat this source under another name. The legacy 1800 setting does not determine this decision."
+      }
+    },
+    {
+      "name": "libxsmm-full512-padded-288-byte-a-slices",
+      "hypothesis": "Implement only the swarm-selected 288-byte packed-A K-slice layout in the unchanged NN baseline. Allocate 147456 bytes and pack 512 slices, each containing 256 data bytes followed by 32 unused bytes. Both scratch consumers advance by 288 bytes and rewind by 147456 bytes. The second row half remains at offset 128; the final data byte is at offset 147423, within the allocation. Parameter slots remain [4]=original B, [10]=original A, [16]=original C. This differs from the measured 272-byte layout. The hypothesis is that a different scratch address pattern changes cache conflicts; cache-set geometry and performance benefit are unverified. The extra 16 KiB can cause a regression. FP32 accumulation order, input preservation, output stores, SME transitions, general-size fallback, allocation-failure behavior, ABI and complete BSD notices remain unchanged. All packing remains inside the timed gemm call. No tools or tests were run. Require compilation and correctness checks at tolerance 0.002, including both row halves, fresh inputs, full overwrite, general sizes, tails and n<=0. Measure ten validation reports and ten fresh alternating paired controls with the initial power source and settings unchanged, preserving best-of-three timing. Report spread and comparisons against fresh same-mode peaks and the historical AC Automatic peak 1685.6230608449698; retain Battery Automatic peak 1668.5964359101147 separately. Comparator policy remains pending. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup, causal effect or goal completion is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/source/kernel.c",
+      "source_hash": "f31c0016cb2bfafd9203b633ecd4268f3be3dd9c59e0f101bcb9ed9af6078ee4",
+      "status": "passed",
+      "scores": [
+        1089.5401614676123,
+        915.5120612687192,
+        974.5023639529999,
+        866.6197093727466,
+        841.9312150732358,
+        1075.7125082549735,
+        1012.326055594333,
+        992.826494863708,
+        1094.3506278593577,
+        1091.019189636549
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-9.json"
+      ],
+      "control_scores": [
+        1022.9386130557521,
+        1046.8707496332781,
+        810.7799261567576,
+        931.1234709823614,
+        1088.9876521071883,
+        973.9155264894788,
+        895.9047436941847,
+        1063.8100587822496,
+        969.6621465448887,
+        815.0882215316337
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/control-9.json"
+      ],
+      "median_gflops": 1002.5762752290204,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "f31c0016cb2bfafd9203b633ecd4268f3be3dd9c59e0f101bcb9ed9af6078ee4",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, the 288-byte padding candidate scored 841.93–1094.35 GFLOP/s versus paired controls of 810.78–1088.99. Repeat spreads were 252.42 and 278.21 GFLOP/s. It won 6/10 pairs; the overlapping ranges establish no consistent gain. Its minimum of 841.93 fails the required >1143.44 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 in 0/10 reports and its paired-control peak of 1088.99 in 3/10. It exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These results do not establish a cache-conflict cause or isolate padding costs. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. Do not repeat this source under another name. The legacy 1800 setting does not determine this decision."
+      }
+    },
+    {
+      "name": "libxsmm-n512-ta-with-timed-sme-b-transpose",
+      "hypothesis": "Implement only the swarm-selected TA full-call wrapper. The supplied sme_transpose writes bt[k*512+j]=B[j*512+k] into a fresh 1 MiB FP32 buffer inside gemm. Parameter slots are [4]=bt, [10]=original A and [16]=original C; all other slots remain zero. TA retains generated B-stack packing and adds generated A-stack packing. Its different packing and memory access pattern may improve total time, but allocation, conversion and cleanup can outweigh that effect. Performance is unknown. This wrapper is absent from the supplied measured history; the measured TB wrappers do not measure TA. Allocation failure calls unchanged NN with original inputs; n!=512 retains the existing fallback. All assembly, complete BSD notices, ABI, FP32 arithmetic, thread count, compiler flags and tolerance remain unchanged. No tools or tests were run. Require compilation and correctness checks for fresh inputs, full overwrite, input preservation, general sizes, tails, n<=0 and allocation failure at tolerance 0.002. Then collect ten validation reports and ten fresh alternating paired controls with power source and settings unchanged, preserving best-of-three timing. Report spread and comparisons against fresh same-mode peaks and historical AC Automatic peak 1685.6230608449698; keep historical Battery Automatic peak 1668.5964359101147 separate. Comparator policy remains pending. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup, causal effect or goal completion is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/source/kernel.c",
+      "source_hash": "6e229a14f522dcece739b3cf7feaefa1a924de3619c73629c24972ac32688b21",
+      "status": "passed",
+      "scores": [
+        752.7993396767996,
+        779.6760554137518,
+        764.6818643320042,
+        727.467358011839,
+        769.9833668307898,
+        588.9429001515639,
+        630.3758319468445,
+        617.328579467292,
+        738.1353145091299,
+        785.185980977845
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-9.json"
+      ],
+      "control_scores": [
+        1043.8217155677105,
+        1007.7351491779309,
+        993.745360286824,
+        795.2653345687437,
+        992.6759374591788,
+        1105.8103218973295,
+        1051.6569926816014,
+        1059.7907376158284,
+        1051.3151780119256,
+        976.7184966167833
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-2.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-3.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-4.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-5.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-6.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-7.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-8.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/control-9.json"
+      ],
+      "median_gflops": 745.4673270929648,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "6e229a14f522dcece739b3cf7feaefa1a924de3619c73629c24972ac32688b21",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, this TA wrapper scored 588.94–785.19 GFLOP/s versus paired NN controls of 795.27–1105.81. Repeat spreads were 196.24 and 310.54 GFLOP/s. It lost all ten pairs; even its maximum was below the minimum control. Its minimum of 588.94 fails the required >1161.10 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46, paired-control peak of 1105.81, historical AC Automatic peak of 1685.6231, and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. This complete TA wrapper is now measured; TT remains unmeasured. These results do not isolate transpose, allocation, internal packing, or compute costs. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. The legacy 1800 setting does not determine this decision."
+      }
+    },
+    {
+      "name": "libxsmm-general-size-sme-direct-a-gather",
+      "hypothesis": "Implement the selected general-size path with direct row-major A gathers. For each 2VL-by-2VL output tile and K step, gather A[(i+lane)*n+k], load contiguous B[k*n+j+lane], and perform the existing four FP32 outer products. Predicates cover row and column tails. A guarded scalar path handles dimensions that exceed the gather index range or safe signed tile increments. The general path no longer allocates or materializes a transpose. The n=512 wrapper still calls unchanged NN with [4]=B, [10]=A and [16]=C. This change is absent from the supplied measured history. Avoiding conversion and allocation may reduce general-size call cost; repeated strided gathers may increase it. The effect is unverified. Frozen n=512 timing does not measure the new gather path, although compiler layout can change. All generated assembly and complete BSD notices remain unchanged. No tools, compilation, tests or measurements were performed. Validate fresh inputs, input preservation, full overwrite, tolerance 0.002, sizes around vector and tile boundaries, odd tails, n<=0 and the large-dimension guard. Retain ten n=512 validation reports and ten fresh alternating paired controls, best-of-three timing, unchanged power settings, separate historical and fresh same-mode comparisons, the fixed promotion gate and held-out check. No gain or goal completion is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-006/source/kernel.c",
+      "source_hash": "80316af82b4447ecf4c115107301f17362174f005361dd285145ae9055dbc6d1",
+      "status": "rejected",
+      "scores": [],
+      "reports": [],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": null,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "80316af82b4447ecf4c115107301f17362174f005361dd285145ae9055dbc6d1",
+        "passed": false,
+        "stage": "compile",
+        "error": "CalledProcessError"
+      },
+      "error": "CalledProcessError",
+      "eligible_for_promotion": false,
+      "promoted": false
+    }
+  ],
+  "target_gflops": 1800,
+  "target_met": false,
+  "winner_source": null,
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 10,
+    "min_improvement": 0.05,
+    "max_seconds": 1800
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "error": "CalledProcessError: Command '['codex', 'exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method=\"chatgpt\"', '-c', 'model_provider=\"openai\"', '-c', 'model_reasoning_effort=\"high\"', '--disable', 'shell_tool', '--disable', 'view_image', '--disable', 'image_generation', '-c', 'web_search=\"disabled\"', '--model', 'gpt-6-astra', '--output-schema', '/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/agent/review-006/call-001/schema.json', '--output-last-message', '/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/agent/review-006/call-001/response.json', '--color', 'never', '-']' returned non-zero exit status 1."
+}

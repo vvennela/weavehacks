@@ -1,0 +1,1286 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 73,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 5,
+  "adjudications": [
+    {
+      "source_hash": "b675c9702c7fe13049d35a15b7e432519b44c69bfe523f0eaebabbb628b6ec9b",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, candidate scores were 625.54–1070.00 GFLOP/s versus paired controls of 984.33–1106.19. Repeat spreads were 444.46 and 121.86 GFLOP/s. The candidate won only 2/10 pairs. Its minimum of 625.54 fails the required >1161.50 GFLOP/s threshold (1.05 × maximum paired control). It exceeded the fresh baseline peak of 1113.46 and paired-control peak of 1106.19 in 0/10 reports. It also exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. Neither comparator establishes goal completion; comparator policy remains pending. No held-out result is supplied. Discard this TB wrapper and retain the unchanged NN incumbent. Preserve this replay separately from prior AC measurements. These results do not isolate transpose, allocation, packing or compute costs. TA and TT full-call wrappers remain unmeasured. Preserve the swarm-ranked queue and fixed gates; the legacy 1800 setting does not determine this decision."
+    },
+    {
+      "source_hash": "8d0f6fa6445416d0eda41ae5f6e2b06c0d836d1d68de52259ea0e40c6ab203fb",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, this NEON-transpose TB candidate scored 600.02–962.86 GFLOP/s versus paired NN controls of 800.80–1093.42. Repeat spreads were 362.83 and 292.62 GFLOP/s; the candidate won only 2/10 pairs. Its minimum of 600.02 fails the required >1148.09 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 and fresh paired-control peak of 1093.42 in 0/10 reports each. It also exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These results establish no repeatable gain and do not isolate conversion, allocation, compute, or cache costs, or establish NEON versus SME transpose performance. Keep power-mode records separate. TA and TT full-call wrappers remain unmeasured. Preserve the swarm-ranked queue and fixed gates; the legacy 1800 setting does not determine this decision."
+    },
+    {
+      "source_hash": "d91b41bd7bbe47c6630c8f3e4e6720904acd27814cbf4e24fc7834b1938d38ac",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, the four-step unroll scored 792.92–1102.40 GFLOP/s versus paired controls of 822.89–1083.13. Repeat spreads were 309.49 and 260.24 GFLOP/s. It won 7/10 pairs, but the overlapping ranges establish no consistent gain. Its minimum of 792.92 fails the required >1137.29 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 in 0/10 reports and its paired-control peak of 1083.13 in 2/10. It exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These measurements establish no causal benefit from reduced loop control. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. Do not repeat this source under another name. The legacy 1800 setting does not determine this decision."
+    },
+    {
+      "source_hash": "f31c0016cb2bfafd9203b633ecd4268f3be3dd9c59e0f101bcb9ed9af6078ee4",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, the 288-byte padding candidate scored 841.93–1094.35 GFLOP/s versus paired controls of 810.78–1088.99. Repeat spreads were 252.42 and 278.21 GFLOP/s. It won 6/10 pairs; the overlapping ranges establish no consistent gain. Its minimum of 841.93 fails the required >1143.44 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 in 0/10 reports and its paired-control peak of 1088.99 in 3/10. It exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These results do not establish a cache-conflict cause or isolate padding costs. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. Do not repeat this source under another name. The legacy 1800 setting does not determine this decision."
+    },
+    {
+      "source_hash": "6e229a14f522dcece739b3cf7feaefa1a924de3619c73629c24972ac32688b21",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, this TA wrapper scored 588.94–785.19 GFLOP/s versus paired NN controls of 795.27–1105.81. Repeat spreads were 196.24 and 310.54 GFLOP/s. It lost all ten pairs; even its maximum was below the minimum control. Its minimum of 588.94 fails the required >1161.10 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46, paired-control peak of 1105.81, historical AC Automatic peak of 1685.6231, and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. This complete TA wrapper is now measured; TT remains unmeasured. These results do not isolate transpose, allocation, internal packing, or compute costs. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. The legacy 1800 setting does not determine this decision."
+    },
+    {
+      "source_hash": "80316af82b4447ecf4c115107301f17362174f005361dd285145ae9055dbc6d1",
+      "eligible": false,
+      "status": "failed",
+      "error": "CalledProcessError: Command '['codex', 'exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method=\"chatgpt\"', '-c', 'model_provider=\"openai\"', '-c', 'model_reasoning_effort=\"high\"', '--disable', 'shell_tool', '--disable', 'view_image', '--disable', 'image_generation', '-c', 'web_search=\"disabled\"', '--model', 'gpt-6-astra', '--output-schema', '/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/agent/review-006/call-001/schema.json', '--output-last-message', '/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/agent/review-006/call-001/response.json', '--color', 'never', '-']' returned non-zero exit status 1."
+    }
+  ],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "streaming_fp32_lanes": 16,
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "neon",
+      "simd",
+      "single-thread"
+    ],
+    "sme2": true,
+    "p_core_l1d_bytes": 131072,
+    "e_core_l1d_bytes": 65536,
+    "cache_line_bytes": 128
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "selected",
+      "roles": [
+        "assembly_audit",
+        "compiler_codegen",
+        "n512_fast_path",
+        "a_transpose",
+        "panel_packing",
+        "b_panel_layout",
+        "cache_blocking",
+        "loop_order",
+        "vector_access",
+        "scratch_lifetime",
+        "streaming_region_cost",
+        "transpose_fusion",
+        "cache_conflict_layout",
+        "sme_fp32_tiles",
+        "tail_alignment"
+      ],
+      "advice": [
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Propose a four-step K-loop unroll in both full512 compute loops. Repeat the existing paired LD1W, pointer advances, and four FMOPA operations four times in order, then decrement the counter by four and branch. Keep each ZA tile’s FP32 accumulation order and total of 512 K steps unchanged; retain a cleanup path if the loop must support other counts. In the supplied instructions, each K step includes two loads, two pointer updates, four FMOPAs, and loop control. The hypothesis is that fewer loop-control instructions per K step may help. This is unverified advice, not a measured effect. Check full512 correctness and fresh inputs, general sizes and tails, n<=0, full output overwrite, ABI, tolerance 0.002, allocation-failure fallback, and license notices. Then use ten validation reports and ten fresh alternating paired controls with unchanged settings; preserve best-of-three timing and apply the existing promotion and held-out gates.",
+          "risks": "This extends the previously tested two-step unroll and may increase code size or instruction scheduling pressure. The supplied history does not establish that loop control limits throughput, and instruction count alone does not predict timing. Preserve the fixed FP32 arithmetic and all 512 ordered updates; do not attribute any joint score change to this proposal alone.",
+          "abstain": false
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "advice": "Abstain. The timed n=512 compute path is hand-written inline assembly, and the supplied compiler output confirms it emits the same instructions. The C compiler has little room to improve that kernel. The wrapper's parameter setup is small beside the full GEMM, and the evidence does not support a distinct compiler-focused source change likely to help.",
+          "risks": "A speculative wrapper or alignment edit could change binary layout without improving the kernel. Any resulting score change would need fresh paired measurements and could not establish the proposed cause.",
+          "abstain": true
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "advice": "Propose a full-call TA wrapper for n=512. Allocate a fresh 1 MiB buffer inside gemm and physically transpose B with bt[k*512+j] = B[j*512+k]. Set params[4]=bt, params[10]=original A, params[16]=C; leave other parameter slots zero and call sera_libxsmm_ta. This matches the row-major mapping and keeps FP32 arithmetic, ABI, thread count, tolerance, and the n!=512 fallback unchanged. The experiment is unmeasured. Validate fresh-input correctness and full overwrite at n=512, then validate general sizes, tails, n<=0, and allocation-failure fallback. If allocation fails, call the unchanged NN primitive. Measure ten reports and ten fresh alternating paired controls, retaining each report's best-of-three timing; compare against both the historical and fresh same-mode peaks. Apply the existing promotion and held-out gates.",
+          "risks": "TA retains generated B-stack packing and adds generated A-stack packing. This wrapper also adds a timed B transpose, allocation, and free. The complete path may regress; source facts do not predict its measured effect. Preserve all LIBXSMM BSD notices. Do not attribute any joint result to this proposal alone.",
+          "abstain": false
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "advice": "Propose one new experiment: keep the full-size TB call and parameter mapping, but replace `sme_transpose` in the n=512 path with a NEON tiled physical transpose. Process 4×4 FP32 microtiles inside 32×32 tiles: load four contiguous values from each of four A rows, transpose those vectors in registers, and store contiguous vectors so `at[k*512+i] = A[i*512+k]`. Pass original B, `at`, and C in slots [4], [10], and [16]. This tests whether a lower-cost conversion improves the complete timed TB call; no gain is established. Keep the current fallback for other sizes and allocation failure. Measure ten reports with ten fresh alternating paired controls on the unchanged power mode, preserving the best-of-three rule and reporting both historical and fresh same-mode peak comparisons. Run correctness checks with fresh inputs, full C overwrite, tolerance 0.002, general sizes, tails, n<=0, and allocation failure.",
+          "risks": "The existing SME transpose may outperform NEON; tile loads, register shuffles, stores, allocation, and TB consumption all contribute to timed cost. The prior TB result was poor, but it does not isolate transpose cost or establish that conversion caused the result. Keep the candidate only if it passes the unchanged promotion gate and held-out check. Preserve the LIBXSMM notices and keep all allocation, conversion, dispatch, and free inside gemm.",
+          "abstain": false
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not identify a distinct bounded A or B panel layout with a clear reuse path. The existing NN kernel already packs A into scratch for its row bands. Splitting work into 32-row panels has been measured and did not promote; packing all of B into column panels regressed. The supplied TA and TT primitives change descriptor behavior but do not establish a useful bounded-panel layout. I do not recommend renaming or reshaping those experiments without a distinct, supported layout hypothesis.",
+          "risks": "Choosing a new panel size or traversal would require unsupported changes to the supplied assembly and could add timed packing, allocation, and cleanup costs. No performance effect can be inferred from the prior noisy scores or attributed to an advisor.",
+          "abstain": true
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Propose one B-layout experiment: within gemm, allocate a 1 MiB FP32 buffer and pack B in 16 contiguous 32-column panels using packed_b[p*16384 + k*32 + c] = B[k*512 + p*32 + c], for p=0..15, k=0..511, c=0..31. Keep the original A packing, row traversal, ZA operations, stores, ABI, SME transitions, fallback, and complete BSD notices unchanged. In both K loops, read the B panel contiguously and advance its pointer 128 bytes per K step; rewind 65,536 bytes after each row block and advance 65,536 bytes to the next column panel. Include allocation, packing, and free in gemm timing. Hypothesis: contiguous B-panel reads may improve the SME consumer enough to offset packing and allocation; effect is unknown. Check panel indexing and bounds, fresh-input full overwrite, correctness within 0.002 for n=512 and general sizes/tails and n<=0, allocation-failure fallback, and unchanged compiler flags and thread count. Then use ten validation reports and ten alternating paired controls at unchanged power settings, retaining each report's best-of-three timing and spread. Compare with both the applicable historical peak and fresh same-mode baseline; require the existing promotion gate and held-out check.",
+          "risks": "Packing adds a full 1 MiB allocation and conversion inside the timed call. The changed access pattern may not improve total time; source layout or traversal errors could misindex panels. No performance gain is established. The supplied history records a prior packed-B experiment with this formula that lost promotion, so this recommendation would repeat that source change and must be abstained from unless the swarm specifies a genuinely different layout and hypothesis.",
+          "abstain": true
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "Abstain. The supplied source facts show that the current NN kernel already traverses 64-row by 32-column output blocks, with 32-row halves and K loops. The distinct transpose-descriptor options TA and TT require timed physical input conversion, but the supplied evidence does not establish that a new cache-blocking experiment would be useful. Keep TA and TT as swarm options for ranking; do not treat their lower prior ranking or the measured TB result as evidence about their performance. No new block size or traversal is proposed.",
+          "risks": "Choosing another block size or traversal without evidence would be a new unranked experiment. The existing TB measurements include transpose and compute together, so they do not identify a cache bottleneck or predict TA or TT results.",
+          "abstain": true
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "advice": "Propose a distinct full512 traversal that makes each 32-column B panel outermost and processes all eight 64-row blocks before advancing to the next panel. For each block, pack the current 64 A rows once, then run the existing two 32-row compute blocks in order. Keep each block's original ascending k=0..511 reductions, FP32 FMOPA sequence, stores, and full C coverage. This tests whether retaining one B panel for the complete row sweep offsets packing A 128 times instead of 8 times per GEMM. Expected measured effect is unknown; any benefit is only a hypothesis. This is a complete loop-order change, distinct from the measured row-half-first traversal and packed-B layout. The supplied prior column-panel-first proposal also describes this ordering and was measured at 621.6–642.8 GFLOP/s versus controls at 1071.6–1076.6; therefore abstain from submitting this experiment as new. The supplied evidence identifies no distinct useful loop-order change that avoids repeating a measured or prohibited variant.",
+          "risks": "The described column-panel-first traversal is already measured and showed a large, consistent regression for the complete changed path; do not relabel or rerun it. Other loop interchanges may change A packing frequency, B reuse, cache traversal, and scratch lifetime, so source structure alone cannot predict performance. Any genuinely distinct proposal must first verify pointer offsets and complete, non-overlapping C coverage; preserve all 512 reduction steps in ascending order; retain n!=512 fallback, tails, n<=0 behavior, allocation safety, and license notices; then pass fresh-input correctness at tolerance 0.002 and the required ten validation reports, ten alternating paired controls, promotion gate, and held-out check. No implementation or new measurement is supplied.",
+          "abstain": true
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "Abstain. The source evidence does not support a distinct vector-access change that fits this role: the NN kernel already uses contiguous paired FP32 `LD1W` loads for both operands and contiguous predicated FP32 output stores. The supplied SME transpose also uses contiguous row loads and column stores. A different access layout would require a separately ranked traversal or packing experiment.",
+          "risks": "Proposing wider or differently aligned accesses would assume alignment not established by the profile or source and could violate bounds for general sizes and tails. Any change to pointer strides or predicates risks incorrect results. No performance effect is measured.",
+          "abstain": true
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Propose a 64 KiB scratch buffer with half-band packing. For each 64-row band, pack 32 rows into scratch, process those rows across all 16 column panels, then pack the next 32 rows and process the same panels. Use a 128-byte scratch stride per K step, rewind 64 KiB after each reduction, and remove the second-half `scratch+128` address. This keeps all allocation and packing inside `gemm` and changes the measured 128 KiB scratch lifetime and traversal together. Hypothesis: halving scratch capacity may reduce stack-space pressure; the added packing pass and changed traversal may offset that benefit. No net gain is established. Check pointer resets and bounds, full output coverage, fresh-input correctness at tolerance 0.002, general sizes, tails, n<=0, and allocation-failure fallback. Then use the unchanged ten-report validation and ten fresh alternating paired controls, best-of-three rule, promotion gate, and held-out check. Compare against both the historical and fresh same-mode peaks without choosing the pending comparator policy.",
+          "risks": "The traversal resembles the previously measured row-half-first experiment, which was not promoted; the smaller scratch and repacking make this a distinct combined change, but prior results do not predict its effect. More packing work may outweigh reduced scratch use. The complete timed path must be measured; do not attribute any joint outcome to scratch size alone.",
+          "abstain": false
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "advice": "Abstain. The supplied NN body already uses one `smstart` and one `smstop` around the full 512³ call. It zeros ZA before each independent output tile; removing those clears would break beta-zero accumulation. The supplied evidence gives no distinct legal change to streaming-region entry, exit, or ZA setup that is likely to help. These are source facts, not measured component costs.",
+          "risks": "Splitting the call into more streaming regions would add transitions and would measure a broader control-flow change. Keeping ZA live across tiles would require a different accumulation layout and could overwrite or mix independent outputs. Neither change has evidence of benefit. A useful cost comparison would need full-call measurements with the fixed benchmark and fresh paired controls; component costs cannot be inferred from the supplied disassembly.",
+          "abstain": true
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Propose a fused 16×16 A-tile transpose and compute path for n=512. For each 32-row output band and 32-column B panel, take A tiles with `a_tile[q,i] = A[(r+i)*512 + k+q]` for `i,q=0..15`. Load the row-major tile into SVE vectors, transpose it with vector zip/unzip operations, then feed its 16 column vectors and the matching B values to the existing FP32 MOPA accumulator. Keep the output accumulator in ZA across all 512 K values; do not use ZA for the input transpose. Write C with the existing stores. Use original A and B, keep the NN ABI and fallback, and do not add persistent storage. The hypothesis is that removing full A-stack packing and its later reads may offset the repeated small-tile transpose work. This is unverified. There are 16 column panels, so this recomputes the transpose of every A element 16 times: 4,194,304 FP32 elements (16 MiB read and 16 MiB of transposed values produced) versus one full A pass of 262,144 elements (1 MiB) in the existing packing path. Count all tile loads, vector shuffles, allocation, and stores in the timed call.",
+          "risks": "The 16-fold repeated transpose work may cost more than the removed full-buffer packing. SVE transpose shuffles and register pressure may also slow the MOPA loop or require spills; spills could erase the expected benefit. Preserve each output's K accumulation order and FP32 arithmetic. Validate fresh inputs against the frozen tolerance, full C overwrite, n=512, general sizes and tails, n<=0, and allocation-failure behavior. Inspect compiler output for unintended spills and verify that no external library or state persists between calls. If measured, use ten validation reports and ten fresh alternating paired controls, retain each report's best-of-three timing, report spread and both historical and fresh same-mode peak comparisons, and apply the unchanged adoption gate and held-out check. Do not infer an isolated transpose cost or causal benefit from whole-call scores.",
+          "abstain": false
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "advice": "Propose one full512 scratch-layout experiment: change each packed-A K-slice stride from 256 to 288 bytes. Keep the 256 data bytes at the start of each slice and leave 32 bytes unused. Allocate 512×288 = 147,456 bytes. Update both K-loop scratch advances to 288 bytes and their rewinds to 147,456 bytes; keep the second row half at offset 128 bytes. This tests whether a different scratch address pattern affects cache conflicts. It is a distinct layout from the measured 272-byte stride. The effect is unknown and must be measured with the complete timed GEMM.",
+          "risks": "The extra padding increases scratch allocation by 16 KiB over the current 128 KiB layout. Cache-set geometry is not supplied, so the stride has no established cache benefit. Before performance runs, check all 512 slices: the final data byte is at offset 147,423, within the allocation; verify both row halves, pointer rewinds, full C overwrite, fresh-input correctness at tolerance 0.002, general sizes, tails, n<=0, and allocation-failure fallback. Preserve the ABI, FP32 arithmetic, thread count, compiler flags, license notices, and benchmark. Then use ten validation reports and ten fresh alternating paired controls, applying the unchanged promotion gate and held-out check. This is unverified advice, not a measured result.",
+          "abstain": false
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "advice": "Propose a distinct four-tile K-pair unroll for the full512 NN kernel. Keep the same 32×32 output block, ZA0.S–ZA3.S accumulators, operand loads, pointer strides, and FP32 accumulation order. In both K loops, process K in pairs: load A/B operands for k and k+1 into separate vector registers, then issue the four FMOPA instructions for k followed by the four for k+1. Use a one-step cleanup only if the loop supports odd K; the generated 512 path has an even K extent. Preserve the existing row-major mapping, packing, stores, SME transitions, fallback, ABI, and license notices. The hypothesis is that fewer loop-control operations may improve throughput; any gain is unverified. This is distinct from the measured two-step unroll, which changed the same loop schedule but was described with a different load/compute order. The source review must confirm that this proposal changes the actual instruction schedule rather than merely renaming that prior experiment. Checks: verify each ZA tile receives k values in ascending order; inspect compiler output for register pressure or spills; check full overwrite and numerical tolerance on fresh inputs, general sizes, tails, and n≤0; then run ten validation reports and ten fresh alternating paired controls with unchanged settings and the frozen best-of-three rule. Report both historical and fresh same-mode peak comparisons. Do not promote without the existing paired threshold and held-out check.",
+          "risks": "The prior measured two-step K-loop unroll had mixed paired results and was not promoted. This proposal may therefore be a redundant alias unless its source-level load and FMOPA schedule is demonstrably different. Additional live vectors may increase register pressure, and any reduction in loop-control cost may be offset by scheduling or code-layout effects. No performance benefit is established by the supplied evidence.",
+          "abstain": false
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "I abstain. The supplied generic fallback already handles tails with `svwhilelt` predicates and bounds checks in `sme_transpose` and `sme_gemm`. The measured n=512 path uses the full-shape LIBXSMM kernel. The supplied evidence does not identify a distinct tail or alignment change that improves this benchmark while preserving its contract.",
+          "risks": "Changing the fallback would not affect the n=512 timed path. Changing the full-shape kernel to add tail handling would add unneeded work for n=512, with no supplied evidence of a benefit. No experiment or speedup is established.",
+          "abstain": true
+        }
+      ],
+      "ballots": [
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "assembly_audit",
+            "n512_fast_path",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "transpose_fusion",
+            "sme_fp32_tiles"
+          ],
+          "reason": "The NN K loop has a visible address dependency: each iteration loads from x0 and x3, advances both pointers, issues four ordered FMOPAs, then decrements and branches. This makes pointer generation and loop control candidates for investigation, but the assembly does not show which limits throughput. Rank the NEON transpose first because it changes the timed conversion in the previously measured, non-promoted TB path; those whole-call results do not show that transpose caused the regression. Four-step unrolling targets visible loop control, but prior unroll results do not establish a gain. TA adds a timed transpose while retaining generated B packing and adding A packing, so its complete path has substantial added work. Padding has no supplied cache-geometry evidence; half-band packing adds packing work and resembles an unpromoted traversal; fused transpose repeats A-tile conversion across 16 panels. The K-pair proposal appears to repeat the measured two-step unroll's load-two-then-compute-two schedule, so it ranks last pending proof of a distinct instruction schedule.",
+          "format_repairs": 0
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "ranking": [
+            "sme_fp32_tiles",
+            "a_transpose",
+            "assembly_audit",
+            "n512_fast_path",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "transpose_fusion"
+          ],
+          "reason": "The supplied loops execute four FMOPA operations per K step, so the distinct paired schedule is the strongest direct code change to test. Its benefit is still uncertain: the earlier two-step unroll was not promoted, and more live operands may add register pressure. The NEON transpose is next because it tests a different conversion implementation in the previously measured TB path; those whole-call results were poor but do not isolate transpose cost. Four-step unrolling also targets loop control, but the earlier loop-schedule experiments provide no repeatable gain, and this expands the loop body. TA is correctly mapped but adds a timed B transpose while retaining B packing and adding A packing. The 288-byte scratch stride has no established cache benefit; prior 272-byte padding was not promoted. Half-band packing adds work and resembles an unpromoted traversal. Fused transpose repeats the A-tile transpose across 16 column panels, making its expected work high. All predicted effects remain unverified; use the unchanged paired and held-out gates.",
+          "format_repairs": 0
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "n512_fast_path",
+            "assembly_audit",
+            "transpose_fusion",
+            "sme_fp32_tiles"
+          ],
+          "reason": "The NEON transpose proposal is first because it changes the timed conversion in the measured TB path, which scored below controls; those results do not isolate transpose cost, so any benefit remains unverified. The 288-byte scratch layout is distinct from the rejected 272-byte layout, but cache geometry and benefit are unknown. Half-band packing has substantial traversal and repacking risk, and TA adds a timed transpose while retaining generated B packing and adding A packing. Four-step unrolling extends the unpromoted two-step experiment. The fused transpose repeats A-tile conversion across 16 column panels. The proposed K-pair schedule appears to duplicate the measured two-step unroll, so it ranks last pending proof of a distinct instruction schedule.",
+          "format_repairs": 0
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "assembly_audit",
+            "sme_fp32_tiles",
+            "transpose_fusion"
+          ],
+          "reason": "Recommend the tiled NEON transpose first: it changes only the timed A conversion in the already-tested TB path, so it directly tests whether that conversion can be cheaper. The TB path’s poor scores do not isolate transpose cost or predict this result. TA adds a timed B transpose while retaining B packing and adding A packing, so its full-call cost is uncertain and its correctness mapping carries more risk. Half-band packing and 288-byte scratch stride are distinct changes, but the former adds packing and changes traversal, while the latter follows an unpromoted padded-scratch trial with no established cache cause. The four-step unroll extends an unpromoted two-step trial; the proposed K-pair schedule may alias that trial unless its instruction schedule differs. Fused transpose recomputes A’s transpose across 16 column panels, making it the least attractive full-call hypothesis. All advice is unverified; none establishes a gain.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "scratch_lifetime",
+            "a_transpose",
+            "cache_conflict_layout",
+            "n512_fast_path",
+            "assembly_audit",
+            "sme_fp32_tiles",
+            "transpose_fusion"
+          ],
+          "reason": "The 64 KiB half-band layout is a distinct panel and traversal change, though added packing and the previously unpromoted row-half-first traversal make its benefit uncertain. The NEON transpose tests conversion cost in the previously poor TB path; the whole-call result does not isolate that cost. The 288-byte scratch stride is valid by the supplied bounds, but cache benefit is unknown and the prior 272-byte layout was not promoted. TA is legal but adds timed B conversion while retaining generated B packing and adding A packing. The K-loop proposals have limited support: prior two-step unroll was not promoted, and extra unrolling may add pressure. The fused path repeats A transpose work across 16 panels, making it the weakest expected tradeoff. These are unverified rankings, not measured effects.",
+          "format_repairs": 0
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "cache_conflict_layout",
+            "assembly_audit",
+            "scratch_lifetime",
+            "n512_fast_path",
+            "transpose_fusion",
+            "sme_fp32_tiles"
+          ],
+          "reason": "The NEON transpose is a distinct way to revisit the measured TB path, which lost all ten comparisons to its paired controls; it tests whether conversion method changes that result, but the whole-call evidence does not isolate transpose cost. The 288-byte scratch layout is simple to validate, though the prior 272-byte layout was not promoted and no cache benefit is established. Four-step unrolling extends the measured two-step unroll, which was not promoted. Half-band packing changes traversal and adds packing work; its earlier row-half-first analogue was not promoted. TA is correctly mapped but adds a timed B transpose while retaining B packing and adding A packing. Fused transpose recomputes each A element across 16 panels, a substantial cost risk. The four-tile K-pair proposal may alias the previously measured two-step schedule; require source-level distinction before implementation. All effects remain unverified; preserve the fixed correctness and performance gates.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "n512_fast_path",
+            "assembly_audit",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "sme_fp32_tiles",
+            "transpose_fusion"
+          ],
+          "reason": "No proposal has measured results. Rank the NEON transpose first because it tests a distinct conversion method on the already measured TB path; the poor TB scores do not show that transpose caused the regression. TA is valid but adds a timed B transpose while retaining generated B packing and adding A packing. The four-step unroll is distinct from the measured two-step version, though that version gives no evidence that further unrolling will help. Scratch repacking changes traversal and resembles an unpromoted row-half-first experiment. The 288-byte scratch stride has no cache-geometry evidence and adds 16 KiB. The paired K-loop proposal may duplicate the measured two-step schedule unless its actual instruction order differs. Fused transpose recomputes each A element 16 times, so its stated work increase makes it the weakest proposal.",
+          "format_repairs": 0
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "assembly_audit",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "sme_fp32_tiles",
+            "transpose_fusion",
+            "n512_fast_path"
+          ],
+          "reason": "This board has no newly measured candidate. Rank the NEON transpose first as a targeted alternative for the previously measured TB path, while treating its poor whole-call results only as a reason for caution, not proof that transpose caused them. Four-step unrolling is a distinct extension, but may increase code and register pressure; padding to 288 bytes has no established cache benefit and follows a rejected 272-byte layout. Half-band packing adds repacking to a traversal with no prior promotion. The K-pair proposal may alias the measured two-step unroll unless its actual instruction schedule differs. Fused transpose repeats A-tile work across column panels. TA adds both timed conversion and generated A packing while retaining B packing. These are priority judgments from the supplied evidence, not predictions of measured gains.",
+          "format_repairs": 0
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "assembly_audit",
+            "sme_fp32_tiles",
+            "cache_conflict_layout",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "transpose_fusion"
+          ],
+          "reason": "The tiled NEON transpose directly tests a different way to perform the required timed A conversion, though the prior TB wrapper was rejected and its conversion cost was not isolated. The four-step unroll and K-pair schedule are distinct schedule proposals, but prior unroll evidence did not pass promotion. The 288-byte padding proposal has no cache evidence; prior 272-byte padding was not promoted. TA adds a timed B transpose while retaining both generated packing paths. Half-band scratch repeats a traversal pattern that was not promoted and adds packing work. Fusion repeats the A transpose across 16 panels. These are rankings of unverified proposals, not measured speedups.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "cache_conflict_layout",
+            "scratch_lifetime",
+            "sme_fp32_tiles",
+            "a_transpose",
+            "n512_fast_path",
+            "transpose_fusion"
+          ],
+          "reason": "Four-step unrolling tests a new loop schedule, but the prior two-step unroll was not promoted, so expected benefit is limited and unverified. The 288-byte scratch stride is distinct from the rejected 272-byte layout; cache benefit is unknown. Half-band packing is distinct from row-half-first traversal, but it adds packing work and changes traversal; the similar prior traversal was not promoted. The K-pair proposal may alias the measured two-step unroll and needs source-level distinction. The NEON transpose could reduce conversion cost, but the prior TB call lost badly and did not isolate conversion. TA adds a timed transpose while retaining generated B packing and adding A packing. Fused transpose recomputes each A element across 16 panels, making its expected cost and implementation risk highest. None has measured evidence of a gain.",
+          "format_repairs": 0
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "ranking": [
+            "assembly_audit",
+            "a_transpose",
+            "scratch_lifetime",
+            "cache_conflict_layout",
+            "n512_fast_path",
+            "transpose_fusion",
+            "sme_fp32_tiles"
+          ],
+          "reason": "Rank the four-step K-loop unroll first: it is distinct from the measured two-step version, and fewer loop branches are a testable hypothesis, though added code and scheduling pressure are risks. Next, try the tiled NEON transpose with TB. It changes the timed conversion after the TB call lost all but two paired runs, but those results do not show that transpose cost caused the loss. The 64 KiB scratch proposal adds packing and changes traversal; its likely costs and similarity to an unpromoted traversal lower its priority. The 288-byte scratch stride is distinct from the rejected 272-byte layout, but cache benefit is unknown and it adds 16 KiB. TA adds a timed B transpose while retaining both generated packing operations, so its expected costs are substantial. Fused transpose repeats the A transpose across 16 column panels, making its stated 16-fold work a significant risk. Rank the four-tile K-pair proposal last: it appears to alias the already measured two-step unroll unless its actual instruction schedule differs. No proposal has measured evidence of a gain in this batch; ranking expresses test priority, not selection or performance fact.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "cache_conflict_layout",
+            "a_transpose",
+            "assembly_audit",
+            "sme_fp32_tiles",
+            "scratch_lifetime",
+            "n512_fast_path",
+            "transpose_fusion"
+          ],
+          "reason": "The 288-byte scratch stride is a small, distinct layout change, but cache benefit is unknown and the 272-byte variant was not promoted. The tiled NEON transpose could reduce conversion cost in the previously measured TB path, though TB lost and its conversion cost was not isolated. Four-step and K-pair unrolling have uncertain benefit and risk code growth or register pressure; the K-pair proposal may overlap prior unrolling. Half-band packing adds work and resembles an unpromoted traversal. TA adds a timed B transpose while retaining both generated packing paths. Fusion repeats the A transpose across 16 column panels, producing 16 MiB of transposed values instead of 1 MiB in the full-buffer path, so its cost risk is highest. These are evidence-based priorities, not predicted gains.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "cache_conflict_layout",
+            "assembly_audit",
+            "sme_fp32_tiles",
+            "scratch_lifetime",
+            "n512_fast_path",
+            "transpose_fusion"
+          ],
+          "reason": "The NEON transpose is a distinct way to reduce conversion work in the measured TB path, but the poor TB scores do not show that conversion caused the regression. The 288-byte scratch stride is in bounds and tests a distinct layout; the prior 272-byte layout was not promoted, and neither cache benefit nor causality is established. Four-step unrolling is a distinct extension of the unpromoted two-step result; the paired evidence for that result was mixed. The proposed K-pair tile schedule may alias the earlier unpromoted two-step unroll, so require a clearly different instruction schedule before implementation. Half-band scratch adds packing and changes traversal, which resembles an unpromoted traversal. TA adds a timed transpose while retaining generated packing and adds A packing. Fused transpose repeats A-tile conversion across all 16 column panels, making it the highest-work, highest-risk proposal.",
+          "format_repairs": 0
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "scratch_lifetime",
+            "assembly_audit",
+            "n512_fast_path",
+            "cache_conflict_layout",
+            "transpose_fusion",
+            "sme_fp32_tiles"
+          ],
+          "reason": "The NEON transpose tests a distinct timed conversion for the correctly mapped TB call. The prior TB replay regressed, but whole-call scores do not isolate transpose cost, so this remains uncertain. Half-band packing and four-step unrolling test distinct changes, with risks from extra packing and register or scheduling pressure. TA adds a timed B transpose while retaining generated B packing and adding generated A packing, so its expected benefit is low. The 288-byte scratch stride has no cache evidence and increases scratch use; fused transpose repeats A-tile transpose work across 16 column panels. The four-tile K-pair proposal appears to alias the measured two-step unroll's load-then-compute schedule; it should be treated as an abstention, not a new experiment. None has established a speedup; retain the ten-report paired-control and held-out gates.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "assembly_audit",
+            "cache_conflict_layout",
+            "sme_fp32_tiles",
+            "n512_fast_path",
+            "scratch_lifetime",
+            "transpose_fusion"
+          ],
+          "reason": "Prior TB runs were slow, but they do not isolate transpose cost. A tiled NEON transpose is a distinct, correctness-checkable way to test whether conversion affects the full call. Four-step unrolling has a clear loop-control hypothesis, though earlier two-step unroll results did not promote and do not establish that unrolling helps. The 288-byte scratch stride is distinct from the measured 272-byte layout, but has no supplied cache evidence and adds 16 KiB. The proposed K-pair schedule may overlap the previously measured two-step unroll, so verify the instruction schedule before testing. TA has correct pointer mapping but adds timed conversion while retaining both generated packing paths. Half-band packing adds traversal and repacking complexity and resembles a prior unpromoted traversal. Fused transpose repeats A-tile transpose work across 16 column panels, making it the weakest proposal. All options require full correctness checks, including tails and bounds; no proposal has measured benefit in this board.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "a_transpose",
+          "status": "proposed",
+          "source_hash": "8d0f6fa6445416d0eda41ae5f6e2b06c0d836d1d68de52259ea0e40c6ab203fb",
+          "name": "libxsmm-n512-tb-with-timed-neon-a-transpose",
+          "hypothesis": "Implement the swarm-selected conversion change: replace only the n=512 TB wrapper's SME transpose with NEON 4x4 FP32 microtiles inside 32x32 tiles. Four row loads, register transposes, and four contiguous stores produce at[k*512+i]=A[i*512+k]. Slots [4]=original B, [10]=at, and [16]=original C remain unchanged. This differs from the measured SME-transpose TB source. The hypothesis is lower conversion cost; the complete timed performance effect is unknown. NEON conversion can regress, and prior TB measurements do not isolate conversion cost. Allocation, conversion, dispatch, and free remain inside gemm. Allocation failure retains NN; other sizes retain the existing fallback. All assembly, FP32 accumulation, ABI, thread count, compiler flags, tolerance, and complete BSD notices remain unchanged. No tools or tests were run. Require compilation and correctness checks for fresh inputs, full overwrite, unchanged inputs, general sizes, tails, n<=0, and allocation failure. Measure ten reports and ten fresh alternating NN paired controls with power source and settings unchanged, preserving best-of-three timing. Report spread and comparisons against fresh same-mode peaks and the historical AC Automatic peak 1685.6230608449698; retain the Battery Automatic peak 1668.5964359101147 as separate historical context. Comparator policy remains pending. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup or goal completion is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              924.8422313533212,
+              600.0233700329317,
+              683.6211184714585,
+              764.7733895179424,
+              690.1399594114687,
+              962.8555116118192,
+              883.0113653669279,
+              959.8396256094588,
+              696.1049158930257,
+              784.3256537789443
+            ],
+            "control_scores": [
+              983.1287748527419,
+              1076.2516886107835,
+              1093.4234161298493,
+              1063.637266332398,
+              945.1952382091855,
+              1011.8528394233884,
+              810.5742886113172,
+              800.8026315463463,
+              1025.8666960805672,
+              1016.1581732822739
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, this NEON-transpose TB candidate scored 600.02–962.86 GFLOP/s versus paired NN controls of 800.80–1093.42. Repeat spreads were 362.83 and 292.62 GFLOP/s; the candidate won only 2/10 pairs. Its minimum of 600.02 fails the required >1148.09 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 and fresh paired-control peak of 1093.42 in 0/10 reports each. It also exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These results establish no repeatable gain and do not isolate conversion, allocation, compute, or cache costs, or establish NEON versus SME transpose performance. Keep power-mode records separate. TA and TT full-call wrappers remain unmeasured. Preserve the swarm-ranked queue and fixed gates; the legacy 1800 setting does not determine this decision."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-002/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "8d0f6fa6445416d0eda41ae5f6e2b06c0d836d1d68de52259ea0e40c6ab203fb",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "assembly_audit",
+          "status": "proposed",
+          "source_hash": "d91b41bd7bbe47c6630c8f3e4e6720904acd27814cbf4e24fc7834b1938d38ac",
+          "name": "libxsmm-full512-four-step-k-loop-unroll",
+          "hypothesis": "Implement the swarm-selected four-step unroll in Llibxsmm_478 and Llibxsmm_70c. Each group repeats the existing two loads, two pointer advances and four FP32 FMOPAs four times, then decrements X8 by four. Both counters start at 512, so each loop executes 128 groups and preserves all 512 updates in the original accumulation order. No cleanup is needed: these loops serve only the fixed full512 primitive; other sizes retain the unchanged fallback. Parameter mapping remains [4]=original B, [10]=original A, [16]=original C, with unchanged internal packing. This differs from the historical two-step unroll. Fewer loop-control instructions may improve throughput, but larger code and scheduling pressure may cause a regression. The measured effect is unknown. ABI, thread count, compiler flags, tolerance, stores, SME transitions, allocation-failure behavior and complete BSD notices remain unchanged. No tools or tests were run. Compilation and correctness validation remain required, including fresh inputs, input preservation, full overwrite, general sizes, tails and n<=0. Measure ten reports and ten fresh alternating paired controls with unchanged power source/settings and best-of-three timing. Report spread and comparisons against historical peaks and fresh same-mode peaks separately, without choosing comparator policy. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup, causal attribution or goal completion is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1047.2097393565439,
+              792.9185793544706,
+              1034.9318947191177,
+              994.2053775205765,
+              1090.2791739550196,
+              800.4038771425506,
+              935.5890270022921,
+              825.1098483801958,
+              1102.404309429142,
+              1040.447503752028
+            ],
+            "control_scores": [
+              1034.5968021956367,
+              1040.1128771679143,
+              969.8092704952953,
+              992.0632800545,
+              1083.130403247496,
+              997.4378395278604,
+              1057.0030978642221,
+              822.8940754065302,
+              934.0946530838439,
+              868.8412573259095
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, the four-step unroll scored 792.92–1102.40 GFLOP/s versus paired controls of 822.89–1083.13. Repeat spreads were 309.49 and 260.24 GFLOP/s. It won 7/10 pairs, but the overlapping ranges establish no consistent gain. Its minimum of 792.92 fails the required >1137.29 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 in 0/10 reports and its paired-control peak of 1083.13 in 2/10. It exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These measurements establish no causal benefit from reduced loop control. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. Do not repeat this source under another name. The legacy 1800 setting does not determine this decision."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-003/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "d91b41bd7bbe47c6630c8f3e4e6720904acd27814cbf4e24fc7834b1938d38ac",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "cache_conflict_layout",
+          "status": "proposed",
+          "source_hash": "f31c0016cb2bfafd9203b633ecd4268f3be3dd9c59e0f101bcb9ed9af6078ee4",
+          "name": "libxsmm-full512-padded-288-byte-a-slices",
+          "hypothesis": "Implement only the swarm-selected 288-byte packed-A K-slice layout in the unchanged NN baseline. Allocate 147456 bytes and pack 512 slices, each containing 256 data bytes followed by 32 unused bytes. Both scratch consumers advance by 288 bytes and rewind by 147456 bytes. The second row half remains at offset 128; the final data byte is at offset 147423, within the allocation. Parameter slots remain [4]=original B, [10]=original A, [16]=original C. This differs from the measured 272-byte layout. The hypothesis is that a different scratch address pattern changes cache conflicts; cache-set geometry and performance benefit are unverified. The extra 16 KiB can cause a regression. FP32 accumulation order, input preservation, output stores, SME transitions, general-size fallback, allocation-failure behavior, ABI and complete BSD notices remain unchanged. All packing remains inside the timed gemm call. No tools or tests were run. Require compilation and correctness checks at tolerance 0.002, including both row halves, fresh inputs, full overwrite, general sizes, tails and n<=0. Measure ten validation reports and ten fresh alternating paired controls with the initial power source and settings unchanged, preserving best-of-three timing. Report spread and comparisons against fresh same-mode peaks and the historical AC Automatic peak 1685.6230608449698; retain Battery Automatic peak 1668.5964359101147 separately. Comparator policy remains pending. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup, causal effect or goal completion is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              1089.5401614676123,
+              915.5120612687192,
+              974.5023639529999,
+              866.6197093727466,
+              841.9312150732358,
+              1075.7125082549735,
+              1012.326055594333,
+              992.826494863708,
+              1094.3506278593577,
+              1091.019189636549
+            ],
+            "control_scores": [
+              1022.9386130557521,
+              1046.8707496332781,
+              810.7799261567576,
+              931.1234709823614,
+              1088.9876521071883,
+              973.9155264894788,
+              895.9047436941847,
+              1063.8100587822496,
+              969.6621465448887,
+              815.0882215316337
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, the 288-byte padding candidate scored 841.93–1094.35 GFLOP/s versus paired controls of 810.78–1088.99. Repeat spreads were 252.42 and 278.21 GFLOP/s. It won 6/10 pairs; the overlapping ranges establish no consistent gain. Its minimum of 841.93 fails the required >1143.44 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46 in 0/10 reports and its paired-control peak of 1088.99 in 3/10. It exceeded the historical AC Automatic peak of 1685.6231 and separate Battery Automatic peak of 1668.5964 in 0/10 each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. These results do not establish a cache-conflict cause or isolate padding costs. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. Do not repeat this source under another name. The legacy 1800 setting does not determine this decision."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-004/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "f31c0016cb2bfafd9203b633ecd4268f3be3dd9c59e0f101bcb9ed9af6078ee4",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        }
+      ],
+      "rationale": "Select these 15 roles to cover the supplied compiler evidence, descriptor mappings, timed conversions, memory layouts, and correctness. assembly_audit and compiler_codegen examine the supplied machine code against its source hashes. n512_fast_path reviews the unmeasured TA and TT wrappers: TA requires transpose(B) and original A; TT requires both physical transposes. The exact TB wrapper has now failed promotion on AC and battery; its results do not measure TA or TT or isolate component costs. a_transpose, panel_packing, b_panel_layout, and transpose_fusion cover distinct conversion and packing designs. cache_blocking, loop_order, and cache_conflict_layout cover traversal and storage hypotheses without assuming a cache cause. vector_access and sme_fp32_tiles cover operand access and the four available ZA.S tiles; the existing ZA0/ZA1-before-ZA2/ZA3 stores are not new. scratch_lifetime and streaming_region_cost cover timed temporary storage and valid SME boundaries. tail_alignment checks bounds and general-size correctness. Omit dedicated counter, pointer, prefetch, and K-schedule roles this round because many prior variants already exist. Each advisor must identify a distinct source change or abstain. This roster selects no experiment; joint board ranking remains required. Advice remains unverified. Preserve all fixed constraints, ten alternating candidate/control pairs, best-of-three reports, the 5% separated-ranges gate, and held-out validation. Report historical and fresh same-mode comparisons separately.",
+      "board": [
+        {
+          "experiment_id": "assembly_audit",
+          "recommendation": "Propose a four-step K-loop unroll in both full512 compute loops. Repeat the existing paired LD1W, pointer advances, and four FMOPA operations four times in order, then decrement the counter by four and branch. Keep each ZA tile’s FP32 accumulation order and total of 512 K steps unchanged; retain a cleanup path if the loop must support other counts. In the supplied instructions, each K step includes two loads, two pointer updates, four FMOPAs, and loop control. The hypothesis is that fewer loop-control instructions per K step may help. This is unverified advice, not a measured effect. Check full512 correctness and fresh inputs, general sizes and tails, n<=0, full output overwrite, ABI, tolerance 0.002, allocation-failure fallback, and license notices. Then use ten validation reports and ten fresh alternating paired controls with unchanged settings; preserve best-of-three timing and apply the existing promotion and held-out gates.",
+          "risks": "This extends the previously tested two-step unroll and may increase code size or instruction scheduling pressure. The supplied history does not establish that loop control limits throughput, and instruction count alone does not predict timing. Preserve the fixed FP32 arithmetic and all 512 ordered updates; do not attribute any joint score change to this proposal alone."
+        },
+        {
+          "experiment_id": "n512_fast_path",
+          "recommendation": "Propose a full-call TA wrapper for n=512. Allocate a fresh 1 MiB buffer inside gemm and physically transpose B with bt[k*512+j] = B[j*512+k]. Set params[4]=bt, params[10]=original A, params[16]=C; leave other parameter slots zero and call sera_libxsmm_ta. This matches the row-major mapping and keeps FP32 arithmetic, ABI, thread count, tolerance, and the n!=512 fallback unchanged. The experiment is unmeasured. Validate fresh-input correctness and full overwrite at n=512, then validate general sizes, tails, n<=0, and allocation-failure fallback. If allocation fails, call the unchanged NN primitive. Measure ten reports and ten fresh alternating paired controls, retaining each report's best-of-three timing; compare against both the historical and fresh same-mode peaks. Apply the existing promotion and held-out gates.",
+          "risks": "TA retains generated B-stack packing and adds generated A-stack packing. This wrapper also adds a timed B transpose, allocation, and free. The complete path may regress; source facts do not predict its measured effect. Preserve all LIBXSMM BSD notices. Do not attribute any joint result to this proposal alone."
+        },
+        {
+          "experiment_id": "a_transpose",
+          "recommendation": "Propose one new experiment: keep the full-size TB call and parameter mapping, but replace `sme_transpose` in the n=512 path with a NEON tiled physical transpose. Process 4×4 FP32 microtiles inside 32×32 tiles: load four contiguous values from each of four A rows, transpose those vectors in registers, and store contiguous vectors so `at[k*512+i] = A[i*512+k]`. Pass original B, `at`, and C in slots [4], [10], and [16]. This tests whether a lower-cost conversion improves the complete timed TB call; no gain is established. Keep the current fallback for other sizes and allocation failure. Measure ten reports with ten fresh alternating paired controls on the unchanged power mode, preserving the best-of-three rule and reporting both historical and fresh same-mode peak comparisons. Run correctness checks with fresh inputs, full C overwrite, tolerance 0.002, general sizes, tails, n<=0, and allocation failure.",
+          "risks": "The existing SME transpose may outperform NEON; tile loads, register shuffles, stores, allocation, and TB consumption all contribute to timed cost. The prior TB result was poor, but it does not isolate transpose cost or establish that conversion caused the result. Keep the candidate only if it passes the unchanged promotion gate and held-out check. Preserve the LIBXSMM notices and keep all allocation, conversion, dispatch, and free inside gemm."
+        },
+        {
+          "experiment_id": "scratch_lifetime",
+          "recommendation": "Propose a 64 KiB scratch buffer with half-band packing. For each 64-row band, pack 32 rows into scratch, process those rows across all 16 column panels, then pack the next 32 rows and process the same panels. Use a 128-byte scratch stride per K step, rewind 64 KiB after each reduction, and remove the second-half `scratch+128` address. This keeps all allocation and packing inside `gemm` and changes the measured 128 KiB scratch lifetime and traversal together. Hypothesis: halving scratch capacity may reduce stack-space pressure; the added packing pass and changed traversal may offset that benefit. No net gain is established. Check pointer resets and bounds, full output coverage, fresh-input correctness at tolerance 0.002, general sizes, tails, n<=0, and allocation-failure fallback. Then use the unchanged ten-report validation and ten fresh alternating paired controls, best-of-three rule, promotion gate, and held-out check. Compare against both the historical and fresh same-mode peaks without choosing the pending comparator policy.",
+          "risks": "The traversal resembles the previously measured row-half-first experiment, which was not promoted; the smaller scratch and repacking make this a distinct combined change, but prior results do not predict its effect. More packing work may outweigh reduced scratch use. The complete timed path must be measured; do not attribute any joint outcome to scratch size alone."
+        },
+        {
+          "experiment_id": "transpose_fusion",
+          "recommendation": "Propose a fused 16×16 A-tile transpose and compute path for n=512. For each 32-row output band and 32-column B panel, take A tiles with `a_tile[q,i] = A[(r+i)*512 + k+q]` for `i,q=0..15`. Load the row-major tile into SVE vectors, transpose it with vector zip/unzip operations, then feed its 16 column vectors and the matching B values to the existing FP32 MOPA accumulator. Keep the output accumulator in ZA across all 512 K values; do not use ZA for the input transpose. Write C with the existing stores. Use original A and B, keep the NN ABI and fallback, and do not add persistent storage. The hypothesis is that removing full A-stack packing and its later reads may offset the repeated small-tile transpose work. This is unverified. There are 16 column panels, so this recomputes the transpose of every A element 16 times: 4,194,304 FP32 elements (16 MiB read and 16 MiB of transposed values produced) versus one full A pass of 262,144 elements (1 MiB) in the existing packing path. Count all tile loads, vector shuffles, allocation, and stores in the timed call.",
+          "risks": "The 16-fold repeated transpose work may cost more than the removed full-buffer packing. SVE transpose shuffles and register pressure may also slow the MOPA loop or require spills; spills could erase the expected benefit. Preserve each output's K accumulation order and FP32 arithmetic. Validate fresh inputs against the frozen tolerance, full C overwrite, n=512, general sizes and tails, n<=0, and allocation-failure behavior. Inspect compiler output for unintended spills and verify that no external library or state persists between calls. If measured, use ten validation reports and ten fresh alternating paired controls, retain each report's best-of-three timing, report spread and both historical and fresh same-mode peak comparisons, and apply the unchanged adoption gate and held-out check. Do not infer an isolated transpose cost or causal benefit from whole-call scores."
+        },
+        {
+          "experiment_id": "cache_conflict_layout",
+          "recommendation": "Propose one full512 scratch-layout experiment: change each packed-A K-slice stride from 256 to 288 bytes. Keep the 256 data bytes at the start of each slice and leave 32 bytes unused. Allocate 512×288 = 147,456 bytes. Update both K-loop scratch advances to 288 bytes and their rewinds to 147,456 bytes; keep the second row half at offset 128 bytes. This tests whether a different scratch address pattern affects cache conflicts. It is a distinct layout from the measured 272-byte stride. The effect is unknown and must be measured with the complete timed GEMM.",
+          "risks": "The extra padding increases scratch allocation by 16 KiB over the current 128 KiB layout. Cache-set geometry is not supplied, so the stride has no established cache benefit. Before performance runs, check all 512 slices: the final data byte is at offset 147,423, within the allocation; verify both row halves, pointer rewinds, full C overwrite, fresh-input correctness at tolerance 0.002, general sizes, tails, n<=0, and allocation-failure fallback. Preserve the ABI, FP32 arithmetic, thread count, compiler flags, license notices, and benchmark. Then use ten validation reports and ten fresh alternating paired controls, applying the unchanged promotion gate and held-out check. This is unverified advice, not a measured result."
+        },
+        {
+          "experiment_id": "sme_fp32_tiles",
+          "recommendation": "Propose a distinct four-tile K-pair unroll for the full512 NN kernel. Keep the same 32×32 output block, ZA0.S–ZA3.S accumulators, operand loads, pointer strides, and FP32 accumulation order. In both K loops, process K in pairs: load A/B operands for k and k+1 into separate vector registers, then issue the four FMOPA instructions for k followed by the four for k+1. Use a one-step cleanup only if the loop supports odd K; the generated 512 path has an even K extent. Preserve the existing row-major mapping, packing, stores, SME transitions, fallback, ABI, and license notices. The hypothesis is that fewer loop-control operations may improve throughput; any gain is unverified. This is distinct from the measured two-step unroll, which changed the same loop schedule but was described with a different load/compute order. The source review must confirm that this proposal changes the actual instruction schedule rather than merely renaming that prior experiment. Checks: verify each ZA tile receives k values in ascending order; inspect compiler output for register pressure or spills; check full overwrite and numerical tolerance on fresh inputs, general sizes, tails, and n≤0; then run ten validation reports and ten fresh alternating paired controls with unchanged settings and the frozen best-of-three rule. Report both historical and fresh same-mode peak comparisons. Do not promote without the existing paired threshold and held-out check.",
+          "risks": "The prior measured two-step K-loop unroll had mixed paired results and was not promoted. This proposal may therefore be a redundant alias unless its source-level load and FMOPA schedule is demonstrably different. Additional live vectors may increase register pressure, and any reduction in loop-control cost may be offset by scheduling or code-layout effects. No performance benefit is established by the supplied evidence."
+        }
+      ],
+      "board_hash": "5b05edfc0f9c44f34edde791e7f95f8798f4f165e6bebf9d75663c115d392265",
+      "experiment_order": [
+        "a_transpose",
+        "assembly_audit",
+        "cache_conflict_layout"
+      ]
+    },
+    {
+      "round": 2,
+      "status": "selected",
+      "roles": [
+        "assembly_audit",
+        "compiler_codegen",
+        "n512_fast_path",
+        "a_transpose",
+        "panel_packing",
+        "b_panel_layout",
+        "cache_blocking",
+        "loop_order",
+        "vector_access",
+        "scratch_lifetime",
+        "streaming_region_cost",
+        "transpose_fusion",
+        "sme_fp32_tiles",
+        "tail_alignment",
+        "register_reuse"
+      ],
+      "advice": [
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Abstain. The supplied NN assembly shows two separated costs: each 64-row band repacks B in a 32-iteration loop, while the two compute loops use paired contiguous 128-byte loads and four ordered FMOPAs per K step. No supplied evidence identifies either as the limiting cost. The concrete four-step K-loop unroll I previously advised was measured and rejected: its ten scores overlap paired controls, and it did not pass the promotion gate. I have no distinct instruction-level change with a defensible hypothesis from this evidence.",
+          "risks": "Proposing another loop schedule or unroll would repeat a measured direction without evidence that it addresses the cause; scores do not establish causality. The supplied code and results also do not isolate packing, conversion, or compute time. No source changes or measurements are proposed.",
+          "abstain": true
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "advice": "Abstain. The supplied clang 21 disassembly shows the full512 NN FP32 compute loops are emitted from inline assembly, so changing surrounding C source does not offer a clear compiler-codegen improvement to the hot loop. The prior four-step unroll and scratch-padding proposals were rejected by the fixed promotion gate; they do not identify a compiler change that merits another experiment.",
+          "risks": "A wrapper or layout edit could change binary placement or memory behavior, but the supplied evidence does not support predicting a gain or attributing any score change to compiler output. No source change or performance effect is proposed.",
+          "abstain": true
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "advice": "Propose the swarm-ranked full-call TA descriptor as one unmeasured n=512 fast path. Inside gemm, allocate a fresh 1 MiB buffer and physically transpose B using bt[k*512+j] = B[j*512+k]. Set params[4]=bt, params[10]=original A, and params[16]=C; leave other parameter slots zero and call sera_libxsmm_ta. This is distinct from the measured TB wrappers. For n!=512, retain the general fallback. If allocation fails, call the unchanged NN primitive. The hypothesis is that TA’s different packing and memory access pattern may improve total time; no effect is established. Validate fresh-input correctness, full C overwrite and input preservation at n=512; also check general sizes, tails, n<=0, and allocation-failure behavior at tolerance 0.002. Then collect ten validation reports and ten fresh alternating paired controls on unchanged power/settings, preserving each report’s best-of-three timing. Report historical and fresh same-mode peak comparisons without choosing the pending comparator policy. Apply the unchanged promotion gate and held-out check.",
+          "risks": "TA retains generated B-stack packing and adds generated A-stack packing. The timed wrapper also adds allocation, a full physical B transpose, and free. These costs may outweigh any compute-path effect; source facts do not predict performance. Preserve the complete LIBXSMM BSD notices and all fixed benchmark settings. The prior TB and NEON-transpose results do not measure or isolate TA.",
+          "abstain": false
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "advice": "Propose an unmaterialized-A SME path for every positive n. Keep the existing NN LIBXSMM call for n=512 as the control path. In the general-size path, compute 2VL×2VL output tiles with four ZA accumulators. For each K step, gather the tile’s A values from row-major A at rows i…i+2VL−1 and column k; load the matching contiguous B values at row k and columns j…j+2VL−1; then issue the four FP32 outer products and store the tile. This removes the full A transpose buffer and its allocation, conversion, and free. It is a distinct algorithm/layout change from both the existing transpose-then-SME fallback and the measured fixed-size TB wrappers. The hypothesis is that avoiding the materialized transpose can reduce total call cost; repeated strided A gathers may instead cost more. Treat the effect as unknown advice, not a measured result.",
+          "risks": "A gathers may have poor locality and repeat A reads across column tiles. Tail masks must cover partial row and column tiles, and n<=0 must remain a no-op. Preserve FP32 operations and tolerance, fresh inputs, complete C overwrite, the ABI, single-thread setting, compiler flags, and license notices. Check sizes around VL and tile boundaries, odd tails, zero and negative n, input preservation, and allocation behavior. For n=512, require ten validation reports and ten fresh alternating paired controls with the frozen best-of-three rule; report historical and fresh same-mode peaks separately. Apply the unchanged promotion gate and held-out check. Include all gather, SME, and store work in timing. No performance gain or goal completion is established.",
+          "abstain": false
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not establish a distinct bounded A or B panel layout with a credible reuse benefit. NN already packs A for its row bands. The sixteen-panel call, one-region panel loop, full packed-B layout, and row-half-first traversal have all been measured without promotion. No new panel layout is supported by the evidence provided.",
+          "risks": "A new panel width or traversal would be an unverified design choice and could add timed packing, allocation, or cleanup. The existing outcomes do not isolate reuse or packing costs, and noisy results cannot establish causality or an individual advisor’s contribution.",
+          "abstain": true
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Abstain. The proposed packed-B layout is the same source change already measured as `libxsmm-full512-packed-b-column-panels` (hash `f2104713…`), and that candidate was rejected. No distinct B-panel layout with a supported, testable hypothesis is established by the supplied evidence.",
+          "risks": "Renaming or resubmitting the measured layout would repeat a rejected experiment. Its ten-run scores were 738.47–942.57 GFLOP/s versus paired controls of 802.80–1096.40; two of ten pairs won. These joint results do not isolate packing cost or establish causality.",
+          "abstain": true
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "Abstain. The supplied source already uses a 64-row by 32-column traversal with 32-row halves and ordered K loops. The measured TB and padding outcomes do not isolate cache effects. No distinct cache-blocking change has evidence to support its usefulness.",
+          "risks": "Choosing another block size or traversal would add an unranked experiment without evidence of a cache bottleneck. The noisy joint scores cannot establish causality or predict a new layout's performance.",
+          "abstain": true
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "advice": "I abstain. The supplied evidence shows that the previously proposed column-panel-first traversal was measured and regressed consistently: 621.6–642.8 GFLOP/s versus 1071.6–1076.6 paired controls. I have no distinct legal loop order with a supported mapping that avoids repeating a measured or prohibited variant.",
+          "risks": "Another traversal interchange could change A packing frequency, B reuse, scratch lifetime, and cache behavior. The evidence does not support predicting its net effect. No new experiment or measurement is proposed.",
+          "abstain": true
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "Abstain. The supplied NN kernel already uses contiguous paired FP32 LD1W loads for both operands and contiguous predicated FP32 output stores. The transpose helper also uses contiguous row loads and column stores. No distinct legal vector-access change is supported by the evidence.",
+          "risks": "A new access layout would overlap separately ranked packing or traversal work. Wider or aligned accesses would assume alignment not established here and could break bounds for general sizes or tails. No performance effect is established.",
+          "abstain": true
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Abstain. The NN kernel needs 128 KiB of packed-A scratch to serve both 32-row halves across 512 K steps. Reducing it to 64 KiB requires changing scratch addressing and traversal; the proposed half-band approach overlaps the previously measured row-half-first traversal and has no demonstrated benefit. Reserving scratch once was also measured and not promoted. I have no distinct, legal scratch-lifetime change supported by the supplied evidence.",
+          "risks": "The scratch reservation is a stack-pointer adjustment; the supplied evidence does not show separate initialization cost that can be removed. A new scratch layout or traversal would change multiple parts of the timed kernel, and noisy joint results would not identify a scratch-lifetime effect.",
+          "abstain": true
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "advice": "Abstain. The NN kernel already uses one SME streaming region for the full call. It clears ZA before each independent output tile, which is required for beta-zero results. The supplied evidence shows no distinct legal change to streaming entry, exit, or ZA setup that supports a useful hypothesis.",
+          "risks": "Splitting the call would add streaming transitions. Removing ZA clears would mix results between output tiles. Neither change has evidence of benefit. Any future proposal must measure the complete gemm call with fresh paired controls; the supplied instruction listings do not isolate transition or ZA setup costs.",
+          "abstain": true
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Abstain. No distinct legal fusion is established from the supplied evidence. A 16×16 transpose tile computed separately for each 32-column B panel would repeat work across 16 panels: 16 MiB of A reads and 16 MiB of transposed values produced, versus one 1 MiB full A transpose. Reusing those tiles across panels would need additional buffering or a changed traversal; neither has been specified and checked here. The prior TB measurements test whole-call wrappers and do not isolate transpose cost.",
+          "risks": "The previous NEON-transpose TB candidate was rejected after 10 reports: it won 2/10 pairs, scored 600.02–962.86 GFLOP/s against controls at 800.80–1093.42, and did not pass the promotion gate. That outcome does not establish transpose as the cause. Any future fusion proposal needs exact tile and ZA mapping, repeated-work and data-movement counts, and checks for FP32 K-order, full C overwrite, fresh inputs, general sizes, tails, n≤0, and allocation failure. If measured, retain the ten-report and paired-control rules, historical and fresh peak comparisons, and held-out gate.",
+          "abstain": true
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not show a useful, distinct FP32 ZA tile-mapping change. The kernel already uses ZA0.S–ZA3.S for a 32×32 output block, and the prior four-step K unroll overlaps with a measured and rejected unroll experiment. Proposing it again would repeat a tested source change. Keep the four-tile mapping and full-output tail contract unchanged; await a genuinely different, board-ranked tile strategy.",
+          "risks": "A speculative change to tile ownership, load mapping, or stores could alter coverage or FP32 accumulation behavior without evidence of benefit. The available results are noisy and do not identify tile mapping as the cause of score differences. No new experiment or speedup is established.",
+          "abstain": true
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "I abstain. The supplied evidence identifies no distinct tail or alignment change that can improve the fixed n=512 benchmark. The general fallback already uses predicates and bounds checks for tails, while the timed n=512 path uses the full-shape LIBXSMM kernel.",
+          "risks": "Changing only the fallback cannot affect n=512 timing. Adding tail handling to the full-shape kernel adds work without supplied evidence of a benefit. No experiment or speedup is established.",
+          "abstain": true
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "advice": "Abstain. The supplied full512 kernel already loads each pair of B vectors once per K step and reuses them for the first two FMOPA operations, then loads the next pair and reuses those for the other two. The same pattern repeats in both K loops. The machine-code listing confirms this load reuse. I cannot identify a distinct legal vector-reuse change from the supplied evidence without changing the ZA tile count or risking higher register pressure.",
+          "risks": "No new experiment, implementation, or performance claim is proposed. The prior four-step unroll has measured results, but those results do not isolate vector reuse.",
+          "abstain": true
+        }
+      ],
+      "ballots": [
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "The NN K loop loads both operands, advances both pointers, then issues four ordered FP32 FMOPAs for each K step. This instruction sequence is visible, but it does not establish a timing bottleneck. TA is first because it changes the timed n=512 call: transpose B into bt[k*512+j], pass bt as params[4] and original A as params[10]. Its conversion and added A packing may outweigh any benefit; measure the full call. The unmaterialized-A proposal keeps NN for n=512, so it does not change the scored workload and ranks second.",
+          "format_repairs": 0
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "Rank TA first: it uses the supplied full-size primitive and has a precise row-major mapping, though its timed B transpose and added A packing may outweigh any benefit. Rank the unmaterialized-A path second: it is more complex, requires strided A gathers across column tiles, and keeps NN for n=512, so it offers no change to the fixed benchmark case. Neither proposal has measured performance evidence.",
+          "format_repairs": 0
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA ranks first because it changes the measured n=512 path, and its pointer mapping is verified. It remains unmeasured; TA adds a timed B transpose and retains generated packing. The TB and NEON-transpose candidates regressed, but those results do not measure TA. The unmaterialized-A SME proposal leaves n=512 on the NN control path, so it offers no fast-path gain there. Its A gathers and tail handling also add correctness and performance uncertainty for general sizes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "Rank the full-call TA path first because it changes the measured n=512 workload. Its physical B transpose and added generated A packing may outweigh any compute benefit; TA remains unmeasured. The unmaterialized-A path leaves n=512 on NN, so it cannot improve the fixed benchmark. Its strided A gathers also add locality and tail correctness risks. The poor TB results do not establish TA performance.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA is an unmeasured full-size path that can affect the n=512 benchmark, though it adds a timed B transpose and retains B packing. The measured TB and NEON-transpose paths regressed, but they do not establish TA’s result. The unmaterialized-A proposal changes only the general-size path; it leaves the n=512 benchmark on NN, so it has no expected effect on the current target measurement.",
+          "format_repairs": 0
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "Rank the full-call TA wrapper first: its mapping is specified, and TA remains unmeasured. Its timed B transpose and added packing create cost and correctness risks, so any benefit is uncertain. Rank the unmaterialized-A SME path second: it is also unmeasured, but introduces a new general-size algorithm with repeated strided A gathers and more tail risk. Prior TB and NEON-TB runs were not promoted; they do not establish outcomes for either proposal.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "a_transpose",
+            "n512_fast_path"
+          ],
+          "reason": "Recommend the unmaterialized-A SME algorithm first: it avoids a full transpose buffer and conversion, though strided A access may erase that benefit. The full-call TA descriptor adds a timed B transpose and retains generated B packing while adding A packing. Neither has measured performance evidence, so these are hypotheses, not speedup claims. The prior TB and NEON-TB results do not establish either candidate’s outcome.",
+          "format_repairs": 0
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA targets the measured n=512 workload, though its timed B transpose and added generated A packing make any gain uncertain. The unmaterialized-A proposal leaves the n=512 path unchanged, so it cannot improve the fixed benchmark; its strided gathers also add locality and tail-correctness risks.",
+          "format_repairs": 0
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA is the only proposal that changes the measured n=512 path. It adds a timed physical B transpose and generated A packing while retaining B packing, so its benefit is uncertain and correctness risk is moderate; TA has not been measured. The unmaterialized-A proposal leaves n=512 on the unchanged NN path, so it cannot improve the fixed benchmark. Its general-size gathers also add locality and tail risks.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA changes the measured n=512 path and has a supplied legal mapping, though its timed B transpose and added A packing may outweigh any benefit. The unmaterialized-A proposal keeps n=512 on NN, so it is not expected to affect the scored workload; its gather path also adds correctness risk.",
+          "format_repairs": 0
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "Rank the full-call TA path first because it changes the measured n=512 call, though its timed transpose and added A packing may outweigh any benefit. The unmaterialized-A path keeps the n=512 NN call unchanged, so it offers no expected change to the scored workload; its general-size gather path also has unverified locality and cost.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA is a legal, unmeasured n=512 experiment with a verified mapping, though its timed B transpose and retained packing make a gain uncertain. The unmaterialized-A proposal keeps the n=512 NN call unchanged, so it cannot improve the scored workload; its gather path also adds correctness and locality risk.",
+          "format_repairs": 0
+        },
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA is unmeasured on the fixed n=512 workload and could change its full-call path, though its timed transpose and added A packing create substantial regression risk. The unmaterialized-A proposal keeps NN for n=512, so it cannot improve the scored workload; its possible benefit applies only to general sizes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA targets the measured n=512 workload, so it ranks first, though its timed B transpose and added generated A packing create substantial cost and correctness risk. The unmaterialized-A proposal may reduce conversion work for general sizes, but leaves n=512 on the unchanged NN control path; its masked tail handling and gather cost also need validation. Neither proposal has measured performance evidence.",
+          "format_repairs": 0
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "ranking": [
+            "n512_fast_path",
+            "a_transpose"
+          ],
+          "reason": "TA changes the measured n=512 path, so it can test the current goal; its timed B transpose and added generated A packing create substantial unmeasured costs. The unmaterialized-A proposal keeps n=512 on the unchanged NN call, so it cannot improve the timed target case. Its gathers may also reduce locality. Supplied TB results do not predict TA performance, and no evidence shows extra ZA tiles are available for more reuse.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "n512_fast_path",
+          "status": "proposed",
+          "source_hash": "6e229a14f522dcece739b3cf7feaefa1a924de3619c73629c24972ac32688b21",
+          "name": "libxsmm-n512-ta-with-timed-sme-b-transpose",
+          "hypothesis": "Implement only the swarm-selected TA full-call wrapper. The supplied sme_transpose writes bt[k*512+j]=B[j*512+k] into a fresh 1 MiB FP32 buffer inside gemm. Parameter slots are [4]=bt, [10]=original A and [16]=original C; all other slots remain zero. TA retains generated B-stack packing and adds generated A-stack packing. Its different packing and memory access pattern may improve total time, but allocation, conversion and cleanup can outweigh that effect. Performance is unknown. This wrapper is absent from the supplied measured history; the measured TB wrappers do not measure TA. Allocation failure calls unchanged NN with original inputs; n!=512 retains the existing fallback. All assembly, complete BSD notices, ABI, FP32 arithmetic, thread count, compiler flags and tolerance remain unchanged. No tools or tests were run. Require compilation and correctness checks for fresh inputs, full overwrite, input preservation, general sizes, tails, n<=0 and allocation failure at tolerance 0.002. Then collect ten validation reports and ten fresh alternating paired controls with power source and settings unchanged, preserving best-of-three timing. Report spread and comparisons against fresh same-mode peaks and historical AC Automatic peak 1685.6230608449698; keep historical Battery Automatic peak 1668.5964359101147 separate. Comparator policy remains pending. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No speedup, causal effect or goal completion is established.",
+          "measured_outcome": {
+            "status": "passed",
+            "scores": [
+              752.7993396767996,
+              779.6760554137518,
+              764.6818643320042,
+              727.467358011839,
+              769.9833668307898,
+              588.9429001515639,
+              630.3758319468445,
+              617.328579467292,
+              738.1353145091299,
+              785.185980977845
+            ],
+            "control_scores": [
+              1043.8217155677105,
+              1007.7351491779309,
+              993.745360286824,
+              795.2653345687437,
+              992.6759374591788,
+              1105.8103218973295,
+              1051.6569926816014,
+              1059.7907376158284,
+              1051.3151780119256,
+              976.7184966167833
+            ],
+            "promoted": false,
+            "adjudication": {
+              "decision": "reject",
+              "reason": "Recorded correctness passed, but eligible=false and promoted=false prohibit adoption. Across ten reports, this TA wrapper scored 588.94–785.19 GFLOP/s versus paired NN controls of 795.27–1105.81. Repeat spreads were 196.24 and 310.54 GFLOP/s. It lost all ten pairs; even its maximum was below the minimum control. Its minimum of 588.94 fails the required >1161.10 GFLOP/s threshold (1.05 × maximum paired control).\n\nIt exceeded the fresh baseline peak of 1113.46, paired-control peak of 1105.81, historical AC Automatic peak of 1685.6231, and separate Battery Automatic peak of 1668.5964 in 0/10 reports each. The ten-run goal is unmet under either comparator policy. No held-out result is supplied.\n\nDiscard this candidate and retain the unchanged NN incumbent. This complete TA wrapper is now measured; TT remains unmeasured. These results do not isolate transpose, allocation, internal packing, or compute costs. Preserve separate power-mode records, the swarm-ranked queue, and fixed gates. The legacy 1800 setting does not determine this decision."
+            },
+            "reports": [
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-0.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-1.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-2.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-3.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-4.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-5.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-6.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-7.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-8.json",
+              "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-compiler-board-2026-09-25/search/trial-005/validation-9.json"
+            ],
+            "comparison_identity": {
+              "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+              "config": {
+                "n": 512,
+                "tolerance": 0.002,
+                "machine": "MacBook-Pro-8.local"
+              },
+              "runtime": {
+                "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+                "compiler_flags": [
+                  "-O3",
+                  "-march=native",
+                  "-ffast-math",
+                  "-shared",
+                  "-fPIC",
+                  "-lm"
+                ],
+                "architecture": "arm64",
+                "platform": "Darwin"
+              }
+            },
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "6e229a14f522dcece739b3cf7feaefa1a924de3619c73629c24972ac32688b21",
+              "passed": true,
+              "stage": "correctness",
+              "worst_relative_error": 1.0017720606112918e-06
+            }
+          }
+        },
+        {
+          "experiment_id": "a_transpose",
+          "status": "proposed",
+          "source_hash": "80316af82b4447ecf4c115107301f17362174f005361dd285145ae9055dbc6d1",
+          "name": "libxsmm-general-size-sme-direct-a-gather",
+          "hypothesis": "Implement the selected general-size path with direct row-major A gathers. For each 2VL-by-2VL output tile and K step, gather A[(i+lane)*n+k], load contiguous B[k*n+j+lane], and perform the existing four FP32 outer products. Predicates cover row and column tails. A guarded scalar path handles dimensions that exceed the gather index range or safe signed tile increments. The general path no longer allocates or materializes a transpose. The n=512 wrapper still calls unchanged NN with [4]=B, [10]=A and [16]=C. This change is absent from the supplied measured history. Avoiding conversion and allocation may reduce general-size call cost; repeated strided gathers may increase it. The effect is unverified. Frozen n=512 timing does not measure the new gather path, although compiler layout can change. All generated assembly and complete BSD notices remain unchanged. No tools, compilation, tests or measurements were performed. Validate fresh inputs, input preservation, full overwrite, tolerance 0.002, sizes around vector and tile boundaries, odd tails, n<=0 and the large-dimension guard. Retain ten n=512 validation reports and ten fresh alternating paired controls, best-of-three timing, unchanged power settings, separate historical and fresh same-mode comparisons, the fixed promotion gate and held-out check. No gain or goal completion is established.",
+          "measured_outcome": {
+            "status": "rejected",
+            "scores": [],
+            "control_scores": [],
+            "promoted": false,
+            "adjudication": null,
+            "reports": [],
+            "comparison_identity": null,
+            "public_correctness": {
+              "schema_version": "sera-cpu-correctness-v1",
+              "seed": 20260924,
+              "sizes": [
+                0,
+                1,
+                3,
+                15,
+                16,
+                17,
+                31,
+                32,
+                33,
+                63,
+                64,
+                65,
+                96,
+                127,
+                129,
+                512
+              ],
+              "input_kinds": [
+                "random",
+                "identity",
+                "zero"
+              ],
+              "tolerance": 0.002,
+              "compiler_flags": [
+                "-O3",
+                "-march=native",
+                "-ffast-math",
+                "-shared",
+                "-fPIC",
+                "-lm"
+              ],
+              "timing_claim": false,
+              "source_hash": "80316af82b4447ecf4c115107301f17362174f005361dd285145ae9055dbc6d1",
+              "passed": false,
+              "stage": "compile",
+              "error": "CalledProcessError"
+            }
+          }
+        }
+      ],
+      "rationale": "Retain 14 prior roles and replace cache_conflict_layout with register_reuse. The tested 272-byte and 288-byte padding variants established no repeatable gain; cache-set geometry remains unknown. Register reuse provides another review angle for distinct changes within four ZA.S tiles.\n\nAssembly and compiler advisors can use the supplied source and actual compiler output. Descriptor, transpose, packing, traversal, and streaming advisors cover complete conversion-and-consumption paths. Scratch and tail advisors cover timed allocation, failure safety, bounds, and general sizes.\n\nCorrected inventory: TA and TT full-call wrappers remain unmeasured. TA requires [4]=transpose(B), [10]=original A; TT requires both physical transposes. SME-transpose TB failed promotion on AC and its battery replay; NEON-transpose TB also failed on battery. These results do not isolate component costs or establish NEON versus SME transpose performance. Four-step unrolling is also measured and rejected.\n\nThis roster selects no experiment. Advisors must propose distinct legal changes, reject tested aliases, and jointly rank the batch. Advice remains unverified. Preserve all fixed constraints, budgets, power settings, ten candidate reports and ten alternating paired controls, best-of-three timing, min(candidate)>1.05*max(controls), and the held-out check. Report historical and fresh same-mode comparisons without choosing comparator policy.",
+      "board": [
+        {
+          "experiment_id": "n512_fast_path",
+          "recommendation": "Propose the swarm-ranked full-call TA descriptor as one unmeasured n=512 fast path. Inside gemm, allocate a fresh 1 MiB buffer and physically transpose B using bt[k*512+j] = B[j*512+k]. Set params[4]=bt, params[10]=original A, and params[16]=C; leave other parameter slots zero and call sera_libxsmm_ta. This is distinct from the measured TB wrappers. For n!=512, retain the general fallback. If allocation fails, call the unchanged NN primitive. The hypothesis is that TA’s different packing and memory access pattern may improve total time; no effect is established. Validate fresh-input correctness, full C overwrite and input preservation at n=512; also check general sizes, tails, n<=0, and allocation-failure behavior at tolerance 0.002. Then collect ten validation reports and ten fresh alternating paired controls on unchanged power/settings, preserving each report’s best-of-three timing. Report historical and fresh same-mode peak comparisons without choosing the pending comparator policy. Apply the unchanged promotion gate and held-out check.",
+          "risks": "TA retains generated B-stack packing and adds generated A-stack packing. The timed wrapper also adds allocation, a full physical B transpose, and free. These costs may outweigh any compute-path effect; source facts do not predict performance. Preserve the complete LIBXSMM BSD notices and all fixed benchmark settings. The prior TB and NEON-transpose results do not measure or isolate TA."
+        },
+        {
+          "experiment_id": "a_transpose",
+          "recommendation": "Propose an unmaterialized-A SME path for every positive n. Keep the existing NN LIBXSMM call for n=512 as the control path. In the general-size path, compute 2VL×2VL output tiles with four ZA accumulators. For each K step, gather the tile’s A values from row-major A at rows i…i+2VL−1 and column k; load the matching contiguous B values at row k and columns j…j+2VL−1; then issue the four FP32 outer products and store the tile. This removes the full A transpose buffer and its allocation, conversion, and free. It is a distinct algorithm/layout change from both the existing transpose-then-SME fallback and the measured fixed-size TB wrappers. The hypothesis is that avoiding the materialized transpose can reduce total call cost; repeated strided A gathers may instead cost more. Treat the effect as unknown advice, not a measured result.",
+          "risks": "A gathers may have poor locality and repeat A reads across column tiles. Tail masks must cover partial row and column tiles, and n<=0 must remain a no-op. Preserve FP32 operations and tolerance, fresh inputs, complete C overwrite, the ABI, single-thread setting, compiler flags, and license notices. Check sizes around VL and tile boundaries, odd tails, zero and negative n, input preservation, and allocation behavior. For n=512, require ten validation reports and ten fresh alternating paired controls with the frozen best-of-three rule; report historical and fresh same-mode peaks separately. Apply the unchanged promotion gate and held-out check. Include all gather, SME, and store work in timing. No performance gain or goal completion is established."
+        }
+      ],
+      "board_hash": "bc9ba96105f2adf2fb3464868251da41084e9d4f039b6859f1fa30f435c99b28",
+      "experiment_order": [
+        "n512_fast_path",
+        "a_transpose"
+      ]
+    }
+  ]
+}

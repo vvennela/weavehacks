@@ -1,0 +1,1 @@
+{"ranking":["n512_fast_path","a_transpose"],"reason":"TA changes the measured n=512 path and has a supplied legal mapping, though its timed B transpose and added A packing may outweigh any benefit. The unmaterialized-A proposal keeps n=512 on NN, so it is not expected to affect the scored workload; its gather path also adds correctness risk."}

@@ -1,0 +1,1 @@
+{"ranking":["n512_fast_path","a_transpose"],"reason":"TA is a legal, unmeasured n=512 experiment with a verified mapping, though its timed B transpose and retained packing make a gain uncertain. The unmaterialized-A proposal keeps the n=512 NN call unchanged, so it cannot improve the scored workload; its gather path also adds correctness and locality risk."}

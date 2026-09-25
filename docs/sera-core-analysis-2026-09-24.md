@@ -140,3 +140,31 @@ The historical-versus-fresh peak definition remains awaiting user adjudication; 
 The15 specialist swarm received verified optional TA/TB/TT primitives and the ten-run history. Three boards used83 Codex calls. Of four implementation attempts, one produced a valid new kernel: TRANS_B with fresh timed A transpose. It scored 1045.00–1556.15 GFLOP/s, median 1491.34, with 3/10 paired wins and 0/10 runs above either saved or fresh imported baseline peaks. No promotion. All 31 signed reports and the two complete 15 ballot rankings verified. Final1660.00held-out score belongs to the imported baseline.
 
 Astra caught a wrong transpose equation and an already-existing store order before submitting sources. Another assembly edit exceeded180 seconds. The final 15 advisors abstained; TA/TT full-call paths remain unmeasured. Some advisors incorrectly treated unmeasured descriptors as exhausted. This reinforces the production-readiness gap: guards protect promotion, but proposal accuracy and experiment coverage are not reliable. No architecture or threshold change was made. The actual compiler output requested by the assembly advisor was captured after measurement for future proposals. Evidence: `evidence/cpu-libxsmm-transpose-swarm-2026-09-25`.
+
+
+## Compiler-guided phase and lossless prompts, 2026-09-25
+
+The next Low Power board measured the earlier SME-transpose TB source again, then
+four new kernels: NEON-transpose TB, four-step K unroll, 288-byte packed-A slices,
+and SME-transpose TA. All five failed promotion and exceeded the fresh initial
+baseline peak zero times out of ten. TA now has full-call evidence; TT remains
+unmeasured. A final general-size direct-gather source failed compilation.
+All110 signed reports, source hashes, power captures and both15-ballot rankings
+verified. The phase used73 Codex calls and five implementation attempts.
+
+The final Astra review failed because its repeated source history made the prompt
+1,108,459 characters, above the1,048,576 input limit. The phase remains failed:
+no holdout and no winner. Sera now shares identical source text in prompt displays
+using reversible exact replacements. Raw measured sources, hashes, metadata and
+edit bases remain unchanged. Offline reconstruction of the failed prompt reduced
+it to437,183 characters and restored all seven sources exactly. This fixes that
+observed failure; arbitrary unrelated large sources can still exceed input limits.
+The prompt, advisory, edit, ranking and search suite passes64 tests. This remains
+an experimental trusted-local optimizer, not a production-ready service.
+
+The user approved one-level FP32 Strassen alongside the existing methods. A pinned
+LIBXSMM256-square primitive passed byte, ABI, license and correctness checks.
+It is available for the same15-specialist board; no Strassen performance claim
+exists yet. Benchmark rules, ten-run checks, power separation and budgets remain
+unchanged. Evidence: `evidence/cpu-libxsmm-compiler-board-2026-09-25` and
+`evidence/cpu-libxsmm-256-primitive-2026-09-25`.
