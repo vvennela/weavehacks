@@ -31,9 +31,20 @@ def test_altered_checkpoint_is_rejected(part):
         module.validate_checkpoint(**checkpoint)
 
 
-def test_battery_preflight_prevents_model_and_evaluator_setup(monkeypatch):
-    monkeypatch.setattr(module, 'host_observation', lambda: {'battery': "Now drawing from 'Battery Power'"})
-    monkeypatch.setattr(module, 'KernelAdvisoryTeam', lambda **kwargs: pytest.fail('Model setup on battery'))
-    monkeypatch.setattr(module, 'HillsKernelEvaluator', lambda **kwargs: pytest.fail('Evaluator setup on battery'))
-    with pytest.raises(RuntimeError, match='AC power'):
+def test_battery_preflight_allows_setup(monkeypatch):
+    monkeypatch.setattr(module, 'host_observation', lambda: {
+        'battery': "Now drawing from 'Battery Power'", 'power_settings': 'fixed'})
+    def reached_setup(**kwargs):
+        raise RuntimeError('approved battery setup reached')
+    monkeypatch.setattr(module, 'KernelAdvisoryTeam', reached_setup)
+    with pytest.raises(RuntimeError, match='approved battery setup reached'):
         module.main([])
+
+
+def test_power_source_or_settings_changes_are_rejected():
+    initial = dict(battery="Now drawing from 'Battery Power'", power_settings='fixed')
+    module.check_power(initial, initial)
+    with pytest.raises(RuntimeError, match='Power source'):
+        module.check_power({**initial, 'battery': "Now drawing from 'AC Power'"}, initial)
+    with pytest.raises(RuntimeError, match='Power settings'):
+        module.check_power({**initial, 'power_settings': 'changed'}, initial)

@@ -21,3 +21,7 @@ PYTHONPATH=. /tmp/sera-audit-venv/bin/python -u evidence/cpu-libxsmm-measure-pre
 ```
 
 Validation: six checkpoint/preflight tests pass. The check-only invocation confirms the prepared source hash and reports battery power. No performance result or target claim is attached to this continuation yet.
+
+## Updated power authorization
+
+The user subsequently authorized benchmarking on battery with a fresh baseline. The driver now accepts either AC or battery and requires the same power source and settings throughout the block. Prior AC scores remain separate from eligibility. Seven checkpoint/power-policy tests pass. The earlier AC-only preflight and review above describe the previous policy.

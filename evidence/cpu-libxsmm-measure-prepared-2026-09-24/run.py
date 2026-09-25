@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import subprocess
 
-from examples.optimize_cpu_kernel import host_observation, require_ac
+from examples.optimize_cpu_kernel import host_observation
 from sera.cpu_kernel_validation import validate_cpu_kernel
 from sera.kernel_advisory import KernelAdvisoryTeam
 from sera.kernel_edits import candidate_source
@@ -88,6 +88,20 @@ class PreparedThenSwarm:
         return self.team.adjudicate(*args, **kwargs)
 
 
+def power_source(observation):
+    for source in ('AC Power', 'Battery Power'):
+        if "Now drawing from '" + source + "'" in observation['battery']:
+            return source
+    raise RuntimeError('Unknown power source')
+
+
+def check_power(observation, initial):
+    if power_source(observation) != power_source(initial):
+        raise RuntimeError('Power source changed during measurement block')
+    if observation['power_settings'] != initial['power_settings']:
+        raise RuntimeError('Power settings changed during measurement block')
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check-only', action='store_true')
@@ -101,8 +115,9 @@ def main(argv=None):
             prepared_candidate_pending_measurement=True, measurements_imported=False,
             power=initial_host.get('battery'))), flush=True)
         return
-    require_ac(initial_host)
+    check_power(initial_host, initial_host)
     controls = read_json(PREVIOUS/'controls.json')
+    controls['profile']['power'] = power_source(initial_host)
     task = '''Continue the user-approved LIBXSMM SME optimization. The first ranked experiment
 has already been implemented and will receive fresh paired measurements before you continue.
 Preserve the pending swarm order; Astra implements and reviews, while 15 Luna specialists
@@ -133,6 +148,7 @@ Reference provenance and earlier baseline context:\n''' + json.dumps(controls['r
         baseline_hash=digest(checkpoint['baseline']), imported_calls=33, imported_attempts=2,
         max_model_calls=108, max_attempts=6, max_candidates=5, max_seconds=1200,
         target_gflops=1800, measurements_imported=False, task=task,
+        power_policy='User approved a fresh battery baseline; same power source/settings throughout',
         driver_sha256=digest(Path(__file__).read_text()),
         prior_state_sha256=digest((PREVIOUS/'agent/state.json').read_text()),
         implementation_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
@@ -141,9 +157,7 @@ Reference provenance and earlier baseline context:\n''' + json.dumps(controls['r
 
     def evaluate(source_dir, report_path, *, final, timeout):
         before = host_observation()
-        require_ac(before)
-        if before['power_settings'] != initial_host['power_settings']:
-            raise RuntimeError('Power settings changed')
+        check_power(before, initial_host)
         observations = dict(before=before)
         host_path = Path(report_path).with_suffix('.host.json')
         save_json(host_path, observations)
@@ -155,9 +169,7 @@ Reference provenance and earlier baseline context:\n''' + json.dumps(controls['r
             after = host_observation()
             observations['after'] = after
             save_json(host_path, observations)
-            require_ac(after)
-            if after['power_settings'] != initial_host['power_settings']:
-                raise RuntimeError('Power settings changed during scoring')
+            check_power(after, initial_host)
 
     def validate(source, output_path, *, timeout):
         if (REFERENCE/'LICENSE.libxsmm.md').read_text() not in Path(source).read_text():
