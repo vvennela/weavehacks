@@ -17,7 +17,8 @@
 
 - Use GPT-6 Luna subagents for breadth work, such as exploration, inventories, alternatives, and broad audits. The primary agent handles depth analysis, implementation of user-approved choices, integration, and validation. Delegate only concrete independent tasks.
 - The user adjudicates decisions. Present evidence, options, and recommendations; do not independently choose product or research direction, architecture changes, benchmark rules, acceptance thresholds, budgets, or deployment actions. Ask for the user's decision before applying such changes.
-- Sera's requested swarm is 15 GPT-6 Luna specialists working together. Use Codex agents through the user's ChatGPT login; do not substitute API-key or other hosted-provider calls.
+- Sera uses a GPT-6 Astra coordinator at high reasoning effort, advised by 15 GPT-6 Luna specialists. The coordinator may select and replace specialist roles within the approved CPU optimization scope, then implement one coherent candidate. Advisors do not independently submit kernels. Use Codex agents through the user's ChatGPT login; do not substitute API-key or other hosted-provider calls.
+- The user approved AC-power measurements and consistent FP32 CPU optimization toward 1,800 GFLOP/s. Keep the frozen hill, numerical tolerance, compiler flags, thread limit, and repeated-control promotion rules unchanged. Specialist selection and kernel implementation within this contract are delegated to Sera; changes to the contract remain with the user.
 - Commit completed, tested steps as work proceeds. Do not leave all changes for one final commit. Stage only the files for the completed step and preserve unrelated work.
 - Write only the code needed to meet the specification.
 - Write readable code. Do not write clever or compressed code when it reduces clarity.

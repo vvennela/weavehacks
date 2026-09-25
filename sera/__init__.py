@@ -15,6 +15,7 @@ from .placement_config import PlacementPlan, PlacementService, PlacementConstrai
 from .placement_search import optimize_placement, PlacementSearchResult
 from .kernel_search import KernelCandidate, optimize_kernel
 from .kernel_specialists import KernelSpecialistTeam
+from .kernel_advisory import KernelAdvisoryTeam
 from .kernel_tools import CodexKernelProposer, HillsKernelEvaluator
 
 __all__ = ["Budget", "Candidate", "Constraints", "InvestigationSpace", "Objective", "RuntimeConfig", "Workload", "SeraModel", "SeraResponse", "SeraResult", "WandbAgent", "optimize"]
@@ -26,5 +27,5 @@ __all__ += ["optimize_placement", "PlacementSearchResult"]
 __all__ += ["StagedResult"]
 __all__ += ["Replay", "visualize"]
 __all__ += ["OpenAICompatibleAgent"]
-__all__ += ["KernelCandidate", "optimize_kernel", "KernelSpecialistTeam",
+__all__ += ["KernelCandidate", "optimize_kernel", "KernelSpecialistTeam", "KernelAdvisoryTeam",
             "CodexKernelProposer", "HillsKernelEvaluator"]
