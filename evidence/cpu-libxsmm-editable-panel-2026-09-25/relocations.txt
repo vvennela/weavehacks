@@ -1,0 +1,2 @@
+
+/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-editable-panel-p57h7yt1/helper.o:	file format mach-o arm64

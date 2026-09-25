@@ -1,0 +1,13 @@
+{
+  "helper_bytes": 1536,
+  "helper_sha256": "60706b5ff14300b72eaccf91b992c248c3ee983ae57a97ce2449a57a61c38f4c",
+  "helper_byte_identical": true,
+  "no_helper_relocations": true,
+  "baseline_text_bytes": 7640,
+  "baseline_text_byte_identical": true,
+  "baseline_text_sha256": "a64c34a0531a9aaffd9388a600cb078663d75b1ce752138ddedc2d9b3e24ca0f",
+  "baseline_source_sha256": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+  "previous_baseline_sha256": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "transformation": "Instruction spelling and local branch labels only; no instruction change",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+}
