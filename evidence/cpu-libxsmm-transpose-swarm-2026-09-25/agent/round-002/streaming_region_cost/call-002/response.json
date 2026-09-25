@@ -1,0 +1,1 @@
+{"ranking":["sme_fp32_tiles"],"reason":"The only board proposal changes ZA extraction and store order while keeping the SME region, ABI, traversal, and FP32 reduction unchanged. It has no measured benefit, so test it only with the required complete-call paired measurements and correctness checks."}

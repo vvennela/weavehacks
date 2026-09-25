@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "a_transpose",
+    "b_panel_layout",
+    "n512_fast_path",
+    "panel_packing",
+    "transpose_fusion",
+    "cache_blocking",
+    "loop_order",
+    "vector_access",
+    "tail_alignment",
+    "scratch_lifetime",
+    "streaming_region_cost",
+    "register_reuse",
+    "compiler_codegen",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Retain 14 prior roles and replace sme_fp32_tiles with register_reuse. The prior tile-store proposal duplicated the baseline; loaded-vector reuse provides a different review focus within four ZA.S tiles. Transpose and packing roles cover conversion and consumer layouts. Blocking, loop-order, vector-access and cache-layout roles cover traversal and memory access. Scratch and streaming roles cover timed setup and cleanup. Fast-path and tail roles preserve dispatch, bounds and general-size correctness. Compiler and assembly roles check concrete source changes, operand mappings and duplicate proposals using supplied evidence only; unavailable compiler output remains unverified. The measured TB wrapper failed adoption, so its aliases must be excluded. TA and TT remain unmeasured options, without a speed ranking. The 320-byte padding attempt timed out and has no measured result. This roster selects advisors only, not experiments or a queue. Advisors must jointly rank distinct legal proposals. All advice remains unverified; preserve ten candidate reports, ten fresh alternating paired controls, best-of-three timing, the fixed 5% gate, held-out validation and both comparator reports."
+}

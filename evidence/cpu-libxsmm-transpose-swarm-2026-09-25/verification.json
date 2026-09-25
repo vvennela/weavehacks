@@ -1,0 +1,189 @@
+{
+  "report_count": 31,
+  "reports": [
+    {
+      "path": "search/trial-000/validation-0.json",
+      "sha256": "ad0244a2bca19fbf6beaab67c0c4c001afa468de1bf7d0596ef37de5aa394b63",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-1.json",
+      "sha256": "7b4be9ede8197203337f26428886065b00a013f247d9f6880835378445173f16",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-2.json",
+      "sha256": "d3e88118fbac4f1fc3577158a3c04a374bb7743762c8e2ee8d605bd7462a75e5",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-3.json",
+      "sha256": "fa9a7b50074d5af116961ea138218b3fc31c5b1a1dfb868868a75ef8d1a98c64",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-4.json",
+      "sha256": "18dd7388f527ef9222be3b42da7ee12fbee6dc90183ffa6ee4a9e28fec68490a",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-5.json",
+      "sha256": "7f72e7d91c58c65e3ffffddca331f5da8a95c3ae89326c031d3a8de5a4595ade",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-6.json",
+      "sha256": "2982d485f5208b11ce1ccae4f376afc58e7eebd842eb739b6d923c86e2bcd21a",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-7.json",
+      "sha256": "3a7d1b01e42ca246490bfe09b2574635854e014a02407f7c6f45ff3965dd6883",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-8.json",
+      "sha256": "4eaac395e89135f83f2fad7d2b0edd235077e1add13f32e8f04a6bddec9cc83b",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-9.json",
+      "sha256": "97aec3a744f4b22d131e80300ef12c6fb7465797ec1fd2d50da6f40f96deb847",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-0.json",
+      "sha256": "a7e5767dfff2d3c26f54a455de28039ce2b8bf6ca38f981d5b460a0aa4473c7e",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-1.json",
+      "sha256": "c11ab0591e2bcb86bcb7a763be4ec717b10564f967c1751974fe93eb846d3ae9",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-2.json",
+      "sha256": "958bad2c9fb091c46a42d774dfa008ada9aceffc391f592a7f6c25449a4c2750",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-3.json",
+      "sha256": "e4d26651eca3703e0b08c5152de914461124697791ad6a65246eaff4fa87733c",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-4.json",
+      "sha256": "79463b2bcd33887fa653af99edb59ecfa28b4a0b1a8f86eafe1d3229ae1577c9",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-5.json",
+      "sha256": "3c4f95940d369d2cf6c3f34a3cdfac57e7f51ce04d8e54698288b8e2de1926ed",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-6.json",
+      "sha256": "979bb3fb4120cf925315decd88f1e0c3de03d37fac8e7a1d9556ae6f1df30664",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-7.json",
+      "sha256": "2c9261ae4988bf31766b1335af70aa52703f8fe796f989306b12834f903f23dd",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-8.json",
+      "sha256": "598c1d227843bef2125a858c1a348b3a673c13cb0a9e41c9a3ae18df85806797",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-9.json",
+      "sha256": "f961df9f46e2919dfaf1fcc2bb24ba1cea8084e392d32cb35d088a02cc002733",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-0.json",
+      "sha256": "68d7a3bac6029e1f3069ec75ff1cb617344dbb0dc736818c34d7270ce32359e4",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-1.json",
+      "sha256": "0af64cedd73ecfb80ad7b4ca6553b7603505ced98cbf6d91699f86587293fcf1",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-2.json",
+      "sha256": "e94a0d7aa9d0b750b0360aec46048897ff88057360a59a06ce71f5d50509e62c",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-3.json",
+      "sha256": "78afb5469c7a3c207127e51c0e43676f0cf8f24b373ca9b5cd7d9928805ea386",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-4.json",
+      "sha256": "45ba031d7a6d0eb218324fcc86f1b60e7b855c6f5560c659f3e6c382743b6ac7",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-5.json",
+      "sha256": "46fb8c64026be7da5357ec265f9b23480c1677ac9d466243045001425bbb88c9",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-6.json",
+      "sha256": "d5cd881c99bf6c84349baa3888f5d191edbf132813e6f75e713420913bd117c9",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-7.json",
+      "sha256": "4714b91256d2eb33659a0dea78f95fe99405adc52524a8f15bc5594b0e0a7593",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-8.json",
+      "sha256": "7273c588310b252931fa26b027798615a81aba28ddd4f4ed79a1790f6bb49828",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-9.json",
+      "sha256": "50672698236885f96b60dbbac93fd327bda595e6f4675da0383cb2599bcabc44",
+      "signature_verified": true
+    },
+    {
+      "path": "search/final.json",
+      "sha256": "b0e6f102f269473566361fb47bc74a6a8a7cb56180c2fe25dfc0a902ae6bc160",
+      "signature_verified": true
+    }
+  ],
+  "source_hashes_verified": true,
+  "correctness_passed": true,
+  "power_unchanged": true,
+  "scoring_unit": "One signed Hill report; each retains the frozen best-of-three timing rule",
+  "historical_imported_peak_gflops": 1685.6230608449698,
+  "fresh_baseline_peak_gflops": 1684.3008396155346,
+  "comparisons": [
+    {
+      "name": "libxsmm-n512-tb-with-timed-sme-a-transpose",
+      "source_hash": "b675c9702c7fe13049d35a15b7e432519b44c69bfe523f0eaebabbb628b6ec9b",
+      "minimum": 1045.00418379716,
+      "median": 1491.3368655855102,
+      "maximum": 1556.1475364839325,
+      "above_historical_peak": 0,
+      "above_fresh_baseline_peak": 0,
+      "paired_wins": 3,
+      "eligible_for_promotion": false,
+      "promoted": false
+    }
+  ],
+  "model_calls": 83,
+  "implementation_attempts": 4,
+  "board_rankings_verified": true,
+  "advisory_rounds": 3,
+  "final_source": "unchanged imported baseline",
+  "final_gflops": 1660.0011098962214,
+  "ten_of_ten_above_historical_peak": false,
+  "ten_of_ten_above_fresh_peak": false,
+  "goal_complete": false
+}

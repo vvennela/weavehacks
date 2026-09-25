@@ -1,0 +1,1 @@
+{"ranking":["sme_fp32_tiles"],"reason":"This is the only experiment ID on the supplied board. The supplied evidence reports no direct measurements for it, so its expected benefit is unverified; changing store order also carries selector-to-destination correctness risk. Rank it for the swarm queue, not as a measured speedup."}

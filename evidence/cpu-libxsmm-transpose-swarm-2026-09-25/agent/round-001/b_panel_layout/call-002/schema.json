@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "a_transpose",
+          "n512_fast_path",
+          "panel_packing",
+          "transpose_fusion",
+          "scratch_lifetime",
+          "streaming_region_cost",
+          "sme_fp32_tiles",
+          "assembly_audit",
+          "cache_conflict_layout"
+        ]
+      },
+      "minItems": 9,
+      "maxItems": 9
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ranking",
+    "reason"
+  ]
+}

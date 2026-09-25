@@ -1,0 +1,13 @@
+{
+  "name": "libxsmm-n512-tb-with-timed-sme-a-transpose",
+  "hypothesis": "Implement the selected TRANS_B descriptor and physical A transpose using the supplied sme_transpose and sera_libxsmm_tb. The conversion writes at[k*512+i]=A[i*512+k] into a fresh 1 MiB FP32 buffer. Slots [4]=B, [10]=at and [16]=C preserve row-major C=A@B. Correction to the recommendation: the supplied TB path skips generated B-stack packing and does not add A-stack packing. This tests whether the complete changed path offsets allocation, conversion, cleanup and different memory access costs; the net performance effect is unknown. Other sizes retain the existing general fallback; allocation failure calls unchanged full512 NN. All assembly and complete BSD notices remain unchanged. This descriptor-and-layout change is absent from the supplied measured history and differs from the prior C SME compute path. No tools or tests were run. Compilation, fresh-input correctness, full overwrite, tolerance 0.002, tails, n<=0 and allocation-failure checks remain required. Measure ten validation reports and ten fresh alternating paired controls on unchanged AC Automatic, preserving best-of-three timing. Report spread and comparisons against historical AC peak 1685.6230608449698 and fresh same-mode peak; retain Battery Automatic history separately. Adoption requires min(candidate)>1.05*max(paired controls) and the unchanged held-out check. No gain, causal effect or goal completion is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "67da75dd729b153a2129f8b1a71dd77b4d01609a94b6d2909ae69d99974fbdae",
+  "edits": [
+    {
+      "old": "void gemm(int n, const float *A, const float *B, float *C) {\n    if (n != 512) {\n        fallback_gemm(n, A, B, C);\n        return;\n    }\n    /* Row-major C=A*B is column-major C^T=B^T*A^T. Argument offsets\n       are exported from the pinned LIBXSMM ABI; all other fields are zero. */\n    const void *parameters[22] = {0};\n    parameters[4] = B;\n    parameters[10] = A;\n    parameters[16] = C;\n    sera_libxsmm_512(parameters);\n}",
+      "new": "void gemm(int n, const float *A, const float *B, float *C) {\n    if (n != 512) {\n        fallback_gemm(n, A, B, C);\n        return;\n    }\n    const void *parameters[22] = {0};\n    parameters[4] = B;\n    parameters[10] = A;\n    parameters[16] = C;\n\n    float *at = malloc((size_t)512 * 512 * sizeof(float));\n    if (!at) {\n        sera_libxsmm_512(parameters);\n        return;\n    }\n\n    /* Physical at[k*512+i]=A[i*512+k]. The supplied TRANS_B beta-zero\n       primitive computes C^T=B^T*A^T with all leading dimensions 512. */\n    sme_transpose(512, A, at);\n    parameters[10] = at;\n    sera_libxsmm_tb(parameters);\n    free(at);\n}"
+    }
+  ]
+}

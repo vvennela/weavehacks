@@ -1,0 +1,1 @@
+{"ranking":["sme_fp32_tiles"],"reason":"The shared board contains only this experiment ID. It preserves the full K reduction and changes only ZA extraction and store order; expected benefit is unverified and correctness risk is limited to preserving each tile’s destination and writing every output once. No supplied measured result tests this change."}

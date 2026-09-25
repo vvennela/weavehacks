@@ -1,0 +1,1 @@
+{"ranking":["sme_fp32_tiles"],"reason":"This is the only experiment on the board. Its store-order change preserves the reduction and output mapping, so correctness risk appears limited but still needs full validation. No measured evidence establishes a speedup."}

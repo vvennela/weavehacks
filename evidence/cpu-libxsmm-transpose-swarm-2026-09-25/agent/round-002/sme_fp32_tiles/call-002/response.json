@@ -1,0 +1,1 @@
+{"ranking":["sme_fp32_tiles"],"reason":"This is a distinct store-order change that keeps the four ZA.S accumulators, K reduction, and output coverage unchanged. Its benefit is unmeasured and may be small; validate selector-to-output mapping carefully. No supplied measured result supports a stronger ranking."}

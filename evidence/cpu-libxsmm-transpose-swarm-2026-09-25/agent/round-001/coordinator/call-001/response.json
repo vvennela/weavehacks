@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "a_transpose",
+    "b_panel_layout",
+    "n512_fast_path",
+    "panel_packing",
+    "transpose_fusion",
+    "cache_blocking",
+    "loop_order",
+    "vector_access",
+    "tail_alignment",
+    "scratch_lifetime",
+    "streaming_region_cost",
+    "sme_fp32_tiles",
+    "compiler_codegen",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Select these 15 roles to examine the newly available transpose primitives and their complete timed conversion paths. This roster does not select a descriptor or experiment.\n\nA_transpose and b_panel_layout cover physical input transformations; n512_fast_path covers correct NN/TA/TB/TT dispatch and allocation-failure fallback. Panel_packing and transpose_fusion examine distinct conversion-and-consumption designs. Cache_blocking, loop_order and cache_conflict_layout cover working sets, traversal and scratch strides without assuming a cache cause. Vector_access and tail_alignment cover contiguous access, bounds and alignment. Scratch_lifetime covers per-call allocation and cleanup; streaming_region_cost covers valid SME boundaries. Sme_fp32_tiles checks four-tile output mapping. Compiler_codegen covers source-lowering risks; assembly_audit checks concrete instruction and ABI constraints. Compiler-output claims require evidence not supplied here.\n\nDedicated counter, pointer, prefetch and K-schedule roles are omitted because the supplied history already covers many such changes without an adopted gain. Each selected advisor must identify a distinct source change, reject tested aliases, and state conversion costs and risks before joint ranking.\n\nAll advice remains unverified. Preserve the fixed contract, notices, power settings and budgets. Adoption requires ten candidate reports, ten fresh alternating paired controls, unchanged best-of-three timing, min(candidate)>1.05*max(controls), and the held-out check. Report historical and fresh same-mode peak comparisons separately; leave comparator policy unresolved."
+}

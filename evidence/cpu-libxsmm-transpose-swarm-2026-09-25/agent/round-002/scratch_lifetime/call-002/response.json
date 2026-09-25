@@ -1,0 +1,1 @@
+{"ranking":["sme_fp32_tiles"],"reason":"This is the only experiment ID on the supplied board. Its output-store schedule keeps the reduction and traversal unchanged, so correctness risk appears limited to preserving each ZA tile’s destination. No measured result establishes a performance benefit; test it only under the required paired controls and gates."}

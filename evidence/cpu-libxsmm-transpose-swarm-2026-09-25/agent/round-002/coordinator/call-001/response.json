@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "a_transpose",
+    "b_panel_layout",
+    "n512_fast_path",
+    "panel_packing",
+    "transpose_fusion",
+    "cache_blocking",
+    "loop_order",
+    "vector_access",
+    "tail_alignment",
+    "scratch_lifetime",
+    "streaming_region_cost",
+    "sme_fp32_tiles",
+    "compiler_codegen",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Retain these 15 roles. The supplied evidence supports continued review of complete conversion-and-consumption paths, but establishes no winning replacement for NN. The measured TB wrapper failed promotion; its unchanged aliases must be excluded. TA and TT remain unmeasured options, not selected experiments.\n\nA_transpose, b_panel_layout and panel_packing cover physical input layouts and their full conversion costs. Transpose_fusion covers feeding computation directly from small transpose tiles. Cache_blocking and loop_order cover reuse and repeated packing work. Vector_access and sme_fp32_tiles cover operand access and legal mapping across four FP32 ZA tiles. Scratch_lifetime and streaming_region_cost cover temporary storage and valid SME boundaries. N512_fast_path and tail_alignment cover dispatch, allocation failure, general sizes and bounds. Compiler_codegen and assembly_audit review the supplied source and assembly without inventing compiler-output evidence. Cache_conflict_layout checks stride arithmetic and distinct layout hypotheses; the 320-byte attempt timed out and has no measured outcome, and cache indexing remains unknown.\n\nEach advisor must supply a distinct source change or abstain. This roster selects no descriptor or implementation queue; proposals still require joint review and ranking. Advice remains unverified. Preserve all fixed constraints, complete BSD notices and initial power settings. Require ten candidate reports, ten fresh alternating paired controls, best-of-three timing, the unchanged 5% separated-range gate and held-out check. Report historical and fresh same-mode comparisons separately without choosing comparator policy."
+}
