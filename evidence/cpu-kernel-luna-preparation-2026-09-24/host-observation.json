@@ -1,0 +1,45 @@
+{
+  "timestamp_utc": "2026-09-25T03:23:05.246715+00:00",
+  "implementation_commit": "7d6c0ab232be511a46bfc48c077b25fa0da09ffb",
+  "target_gflops": 1800,
+  "observations": {
+    "battery": {
+      "command": [
+        "pmset",
+        "-g",
+        "batt"
+      ],
+      "returncode": 0,
+      "stdout": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t64%; discharging; 2:35 remaining present: true\n"
+    },
+    "power_settings": {
+      "command": [
+        "pmset",
+        "-g",
+        "custom"
+      ],
+      "returncode": 0,
+      "stdout": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+    },
+    "thermal": {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "returncode": 0,
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+    },
+    "processes": {
+      "command": [
+        "ps",
+        "-Ao",
+        "pid,pcpu,comm",
+        "-r"
+      ],
+      "returncode": 0,
+      "stdout": "  PID  %CPU COMM\n50579  92.5 /Applications/Xcode.app/Contents/Developer/usr/bin/git\n  395  40.5 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer\n  692  10.4 /System/Library/PrivateFrameworks/FileProvider.framework/Support/fileproviderd\n30890   7.0 /System/Library/PrivateFrameworks/CloudKitDaemon.framework/Support/cloudd\n 2515   7.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.36/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n 2465   6.8 /Applications/ChatGPT.app/Contents/MacOS/ChatGPT\n 2475   6.2 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.36/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)\n67462   5.6 /System/Library/PrivateFrameworks/CoreDuetContext.framework/Resources/ContextStoreAgent\n16054   4.9 /Library/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python\n50409   4.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared\n 2511   3.8 /Applications/ChatGPT.app/Contents/Resources/codex\n64329   3.6 /Applications/Arc.app/Contents/MacOS/Arc\n  547   3.3 /usr/libexec/rtcreportingd\n49962   3.1 /Applications/Arc.app/Contents/Frameworks/ArcCore.framework/Helpers/Browser Helper (Renderer).app/Contents/MacOS/Browser Helper (Renderer)\n  634   2.9 /usr/libexec/rapportd"
+    }
+  },
+  "performance_measurements": false
+}
