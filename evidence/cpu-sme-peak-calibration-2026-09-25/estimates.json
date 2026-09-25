@@ -1,0 +1,58 @@
+{
+  "n": 512,
+  "nominal_fp32_flops": 268435456,
+  "scenarios": [
+    {
+      "reference": "local_battery_low_power_median",
+      "compute_gflops": 1327.4290950222155,
+      "ideal_compute_us": 202.22206745853157,
+      "assumed_additional_cost_scenarios": [
+        {
+          "extra_us": 0,
+          "estimated_full_call_gflops": 1327.4290950222155
+        },
+        {
+          "extra_us": 10,
+          "estimated_full_call_gflops": 1264.8800344594351
+        },
+        {
+          "extra_us": 20,
+          "estimated_full_call_gflops": 1207.9603932678388
+        },
+        {
+          "extra_us": 40,
+          "estimated_full_call_gflops": 1108.2204805553324
+        }
+      ],
+      "extra_time_budget_us_for_1780": -51.41563150347537,
+      "extra_time_budget_us_for_2000": -68.00433945853158
+    },
+    {
+      "reference": "published_base_m4_compute_microbenchmark",
+      "compute_gflops": 2008.0,
+      "ideal_compute_us": 133.68299601593625,
+      "assumed_additional_cost_scenarios": [
+        {
+          "extra_us": 0,
+          "estimated_full_call_gflops": 2008.0
+        },
+        {
+          "extra_us": 10,
+          "estimated_full_call_gflops": 1868.2479029754302
+        },
+        {
+          "extra_us": 20,
+          "estimated_full_call_gflops": 1746.6828664126538
+        },
+        {
+          "extra_us": 40,
+          "estimated_full_call_gflops": 1545.5482813952021
+        }
+      ],
+      "extra_time_budget_us_for_1780": 17.123439939119947,
+      "extra_time_budget_us_for_2000": 0.5347319840637397
+    }
+  ],
+  "assumptions": "Classical GEMM operation count; effective compute throughput held at the chosen reference; all additional time is an assumed non-overlapped cost.",
+  "limitations": "Measured microbenchmark rates are not proven ceilings. Additional costs are hypothetical, not profiled. Base M4 and local M4 Pro Low Power are different machines/modes. No Automatic M4 Pro rate is measured here."
+}

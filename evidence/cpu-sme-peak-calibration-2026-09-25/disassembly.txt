@@ -1,0 +1,289 @@
+
+/var/folders/4f/r4sxs9j97fdf1c4x4r1wxlt40000gn/T/sera-peak-lywnihpo/probe.so:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+00000000000002c0 <_sera_peak_1>:
+     2c0: d10103ff     	sub	sp, sp, #0x40
+     2c4: 6d0027e8     	stp	d8, d9, [sp]
+     2c8: 6d012fea     	stp	d10, d11, [sp, #0x10]
+     2cc: 6d0237ec     	stp	d12, d13, [sp, #0x20]
+     2d0: 6d033fee     	stp	d14, d15, [sp, #0x30]
+     2d4: d503477f     	smstart
+     2d8: 2598e3e0     	ptrue	p0.s
+     2dc: 25b9ce00     	fmov	z0.s, #1.00000000
+     2e0: 25b9ce01     	fmov	z1.s, #1.00000000
+     2e4: c00800ff     	zero	{za}
+     2e8: b4000880     	cbz	x0, 0x3f8 <_sera_peak_1+0x138>
+     2ec: d503201f     	nop
+     2f0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     2f4: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     2f8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     2fc: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     300: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     304: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     308: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     30c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     310: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     314: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     318: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     31c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     320: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     324: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     328: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     32c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     330: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     334: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     338: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     33c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     340: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     344: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     348: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     34c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     350: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     354: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     358: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     35c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     360: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     364: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     368: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     36c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     370: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     374: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     378: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     37c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     380: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     384: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     388: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     38c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     390: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     394: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     398: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     39c: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3a0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3a4: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3a8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3ac: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3b0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3b4: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3b8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3bc: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3c0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3c4: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3c8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3cc: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3d0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3d4: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3d8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3dc: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3e0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3e4: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3e8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3ec: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     3f0: f1000400     	subs	x0, x0, #0x1
+     3f4: 54fff7e1     	b.ne	0x2f0 <_sera_peak_1+0x30>
+     3f8: 5280000c     	mov	w12, #0x0               ; =0
+     3fc: e0bf0020     	st1w	{za0h.s[w12, 0]}, p0, [x1]
+     400: 04215021     	addvl	x1, x1, #0x1
+     404: 04a0e3e0     	cntw	x0
+     408: d503467f     	smstop
+     40c: 6d4027e8     	ldp	d8, d9, [sp]
+     410: 6d412fea     	ldp	d10, d11, [sp, #0x10]
+     414: 6d4237ec     	ldp	d12, d13, [sp, #0x20]
+     418: 6d433fee     	ldp	d14, d15, [sp, #0x30]
+     41c: 910103ff     	add	sp, sp, #0x40
+     420: d65f03c0     	ret
+     424: d503201f     	nop
+     428: d503201f     	nop
+     42c: d503201f     	nop
+
+0000000000000430 <_sera_peak_2>:
+     430: d10103ff     	sub	sp, sp, #0x40
+     434: 6d0027e8     	stp	d8, d9, [sp]
+     438: 6d012fea     	stp	d10, d11, [sp, #0x10]
+     43c: 6d0237ec     	stp	d12, d13, [sp, #0x20]
+     440: 6d033fee     	stp	d14, d15, [sp, #0x30]
+     444: d503477f     	smstart
+     448: 2598e3e0     	ptrue	p0.s
+     44c: 25b9ce00     	fmov	z0.s, #1.00000000
+     450: 25b9ce01     	fmov	z1.s, #1.00000000
+     454: c00800ff     	zero	{za}
+     458: b4000880     	cbz	x0, 0x568 <_sera_peak_2+0x138>
+     45c: d503201f     	nop
+     460: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     464: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     468: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     46c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     470: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     474: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     478: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     47c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     480: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     484: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     488: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     48c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     490: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     494: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     498: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     49c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4a0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4a4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4a8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4ac: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4b0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4b4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4b8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4bc: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4c0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4c4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4c8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4cc: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4d0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4d4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4d8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4dc: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4e0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4e4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4e8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4ec: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4f0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4f4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     4f8: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     4fc: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     500: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     504: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     508: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     50c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     510: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     514: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     518: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     51c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     520: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     524: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     528: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     52c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     530: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     534: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     538: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     53c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     540: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     544: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     548: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     54c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     550: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     554: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     558: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     55c: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     560: f1000400     	subs	x0, x0, #0x1
+     564: 54fff7e1     	b.ne	0x460 <_sera_peak_2+0x30>
+     568: 5280000c     	mov	w12, #0x0               ; =0
+     56c: e0bf0020     	st1w	{za0h.s[w12, 0]}, p0, [x1]
+     570: 04215021     	addvl	x1, x1, #0x1
+     574: e0bf0024     	st1w	{za1h.s[w12, 0]}, p0, [x1]
+     578: 04215021     	addvl	x1, x1, #0x1
+     57c: 04a0e3e0     	cntw	x0
+     580: d503467f     	smstop
+     584: 6d4027e8     	ldp	d8, d9, [sp]
+     588: 6d412fea     	ldp	d10, d11, [sp, #0x10]
+     58c: 6d4237ec     	ldp	d12, d13, [sp, #0x20]
+     590: 6d433fee     	ldp	d14, d15, [sp, #0x30]
+     594: 910103ff     	add	sp, sp, #0x40
+     598: d65f03c0     	ret
+     59c: d503201f     	nop
+
+00000000000005a0 <_sera_peak_4>:
+     5a0: d10103ff     	sub	sp, sp, #0x40
+     5a4: 6d0027e8     	stp	d8, d9, [sp]
+     5a8: 6d012fea     	stp	d10, d11, [sp, #0x10]
+     5ac: 6d0237ec     	stp	d12, d13, [sp, #0x20]
+     5b0: 6d033fee     	stp	d14, d15, [sp, #0x30]
+     5b4: d503477f     	smstart
+     5b8: 2598e3e0     	ptrue	p0.s
+     5bc: 25b9ce00     	fmov	z0.s, #1.00000000
+     5c0: 25b9ce01     	fmov	z1.s, #1.00000000
+     5c4: c00800ff     	zero	{za}
+     5c8: b4000880     	cbz	x0, 0x6d8 <_sera_peak_4+0x138>
+     5cc: d503201f     	nop
+     5d0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     5d4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     5d8: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     5dc: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     5e0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     5e4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     5e8: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     5ec: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     5f0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     5f4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     5f8: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     5fc: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     600: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     604: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     608: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     60c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     610: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     614: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     618: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     61c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     620: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     624: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     628: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     62c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     630: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     634: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     638: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     63c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     640: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     644: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     648: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     64c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     650: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     654: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     658: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     65c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     660: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     664: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     668: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     66c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     670: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     674: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     678: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     67c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     680: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     684: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     688: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     68c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     690: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     694: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     698: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     69c: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     6a0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     6a4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     6a8: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     6ac: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     6b0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     6b4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     6b8: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     6bc: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     6c0: 80810000     	fmopa	za0.s, p0/m, p0/m, z0.s, z1.s
+     6c4: 80810001     	fmopa	za1.s, p0/m, p0/m, z0.s, z1.s
+     6c8: 80810002     	fmopa	za2.s, p0/m, p0/m, z0.s, z1.s
+     6cc: 80810003     	fmopa	za3.s, p0/m, p0/m, z0.s, z1.s
+     6d0: f1000400     	subs	x0, x0, #0x1
+     6d4: 54fff7e1     	b.ne	0x5d0 <_sera_peak_4+0x30>
+     6d8: 5280000c     	mov	w12, #0x0               ; =0
+     6dc: e0bf0020     	st1w	{za0h.s[w12, 0]}, p0, [x1]
+     6e0: 04215021     	addvl	x1, x1, #0x1
+     6e4: e0bf0024     	st1w	{za1h.s[w12, 0]}, p0, [x1]
+     6e8: 04215021     	addvl	x1, x1, #0x1
+     6ec: e0bf0028     	st1w	{za2h.s[w12, 0]}, p0, [x1]
+     6f0: 04215021     	addvl	x1, x1, #0x1
+     6f4: e0bf002c     	st1w	{za3h.s[w12, 0]}, p0, [x1]
+     6f8: 04215021     	addvl	x1, x1, #0x1
+     6fc: 04a0e3e0     	cntw	x0
+     700: d503467f     	smstop
+     704: 6d4027e8     	ldp	d8, d9, [sp]
+     708: 6d412fea     	ldp	d10, d11, [sp, #0x10]
+     70c: 6d4237ec     	ldp	d12, d13, [sp, #0x20]
+     710: 6d433fee     	ldp	d14, d15, [sp, #0x30]
+     714: 910103ff     	add	sp, sp, #0x40
+     718: d65f03c0     	ret

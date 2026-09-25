@@ -1,0 +1,351 @@
+{
+  "kind": "compute-only SME calibration, not GEMM or a hill score",
+  "hardware": "arm64",
+  "cpu": "Apple M4 Pro",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+  "flags": [
+    "-O3",
+    "-march=native",
+    "-shared",
+    "-fPIC"
+  ],
+  "source_sha256": "8dbbc4e8c841e4358c3414c241db185805bdb8abf4f165dac1262bf98443695c",
+  "disassembly_sha256": "72a2c7b5fa069f4c5fc0200f2c46bcfea649028d6b4d3b72964fb67536008ec8",
+  "host": {
+    "timestamp_utc": "2026-09-25T21:46:40.614709+00:00",
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t50%; discharging; 1:24 remaining present: true\n",
+    "power_settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+  },
+  "power": "Battery Power",
+  "iterations": 200000,
+  "warmup_iterations_per_variant": 10000,
+  "rounds": 10,
+  "fmopa_per_iteration": 64,
+  "source_inputs": "all FP32 ones; ZA zeroed on each invocation",
+  "thread_count": 1,
+  "power_settings_changed": false,
+  "core_affinity_requested": false,
+  "qos_changed": false,
+  "timing": "perf_counter_ns around one native call; includes entry/exit, state save/restore and final row stores",
+  "limitation": "Register-only operands; no matrix packing or normal GEMM memory traffic. Measured reference, not a proven physical ceiling.",
+  "summary": {
+    "1": {
+      "minimum": 325.7445399541812,
+      "median": 331.7858772023231,
+      "maximum": 333.34406569384686
+    },
+    "2": {
+      "minimum": 661.0255841794436,
+      "median": 663.9248798317938,
+      "maximum": 667.395340391889
+    },
+    "4": {
+      "minimum": 1294.5170479180292,
+      "median": 1327.4290950222155,
+      "maximum": 1336.0834057242253
+    }
+  },
+  "records": [
+    {
+      "round": 0,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19718542,
+      "gflops": 332.3572300629529,
+      "output_verified": true
+    },
+    {
+      "round": 0,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9847458,
+      "gflops": 665.511850875627,
+      "output_verified": true
+    },
+    {
+      "round": 0,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4905083,
+      "gflops": 1336.0834057242253,
+      "output_verified": true
+    },
+    {
+      "round": 1,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9877083,
+      "gflops": 663.515736376823,
+      "output_verified": true
+    },
+    {
+      "round": 1,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4932417,
+      "gflops": 1328.6792256210292,
+      "output_verified": true
+    },
+    {
+      "round": 1,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 20118833,
+      "gflops": 325.7445399541812,
+      "output_verified": true
+    },
+    {
+      "round": 2,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4929334,
+      "gflops": 1329.5102340397302,
+      "output_verified": true
+    },
+    {
+      "round": 2,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 20106792,
+      "gflops": 325.9396128432621,
+      "output_verified": true
+    },
+    {
+      "round": 2,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9861000,
+      "gflops": 664.597910962377,
+      "output_verified": true
+    },
+    {
+      "round": 3,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19743208,
+      "gflops": 331.9420025357581,
+      "output_verified": true
+    },
+    {
+      "round": 3,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9903583,
+      "gflops": 661.7403014646316,
+      "output_verified": true
+    },
+    {
+      "round": 3,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4944917,
+      "gflops": 1325.3205261079206,
+      "output_verified": true
+    },
+    {
+      "round": 4,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9835334,
+      "gflops": 666.3322262365467,
+      "output_verified": true
+    },
+    {
+      "round": 4,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4949041,
+      "gflops": 1324.2161461180056,
+      "output_verified": true
+    },
+    {
+      "round": 4,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19660167,
+      "gflops": 333.34406569384686,
+      "output_verified": true
+    },
+    {
+      "round": 5,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4909791,
+      "gflops": 1334.802234962751,
+      "output_verified": true
+    },
+    {
+      "round": 5,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19739292,
+      "gflops": 332.00785519561697,
+      "output_verified": true
+    },
+    {
+      "round": 5,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9880334,
+      "gflops": 663.2974148444779,
+      "output_verified": true
+    },
+    {
+      "round": 6,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19957417,
+      "gflops": 328.3791685066259,
+      "output_verified": true
+    },
+    {
+      "round": 6,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9819667,
+      "gflops": 667.395340391889,
+      "output_verified": true
+    },
+    {
+      "round": 6,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 5062583,
+      "gflops": 1294.5170479180292,
+      "output_verified": true
+    },
+    {
+      "round": 7,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9914291,
+      "gflops": 661.0255841794436,
+      "output_verified": true
+    },
+    {
+      "round": 7,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4935833,
+      "gflops": 1327.759670961315,
+      "output_verified": true
+    },
+    {
+      "round": 7,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19746833,
+      "gflops": 331.88106670067043,
+      "output_verified": true
+    },
+    {
+      "round": 8,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4951292,
+      "gflops": 1323.6141193046178,
+      "output_verified": true
+    },
+    {
+      "round": 8,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19758167,
+      "gflops": 331.69068770397575,
+      "output_verified": true
+    },
+    {
+      "round": 8,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9864917,
+      "gflops": 664.3340232867646,
+      "output_verified": true
+    },
+    {
+      "round": 9,
+      "tiles": 1,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 19790083,
+      "gflops": 331.1557611961506,
+      "output_verified": true
+    },
+    {
+      "round": 9,
+      "tiles": 2,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 9896500,
+      "gflops": 662.2139140100036,
+      "output_verified": true
+    },
+    {
+      "round": 9,
+      "tiles": 4,
+      "lanes": 16,
+      "iterations": 200000,
+      "flops": 6553600000,
+      "elapsed_ns": 4938292,
+      "gflops": 1327.0985190831161,
+      "output_verified": true
+    }
+  ]
+}
