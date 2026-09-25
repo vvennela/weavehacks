@@ -1,0 +1,14 @@
+{
+  "name": "libxsmm-k-loop-software-pipeline",
+  "hypothesis": "Preloading the next K operands into z4–z7 before the current FMOPA group may hide load latency. Each loop uses one prologue load, 511 lookahead iterations, four register copies per iteration, and one final FMOPA drain. Pointer advances and FP32 accumulation order are preserved, with no load beyond K=511. Only the two selected compute loops change; the BSD notice and fallback remain intact. This source differs from the supplied measured reference. Assembly, correctness and performance are untested; validation requires the fixed flags, tolerance, general-size checks and repeated unchanged controls.",
+  "specialist_id": "astra_coordinator",
+  "source_hash": "bf47e981d23289bfc6faba38d6ac5a3c8362db81f2b61e0215dd441135878685",
+  "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-swarm-edits-2026-09-24/prepared/kernel.c",
+  "performance_measured": false,
+  "host": {
+    "timestamp_utc": "2026-09-25T04:46:55.823339+00:00",
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t98%; discharging; 5:43 remaining present: true\n",
+    "power_settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+  }
+}

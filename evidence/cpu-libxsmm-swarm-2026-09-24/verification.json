@@ -1,0 +1,115 @@
+{
+  "schema_version": "sera-libxsmm-swarm-interrupted-verification-v1",
+  "block": "evidence/cpu-libxsmm-swarm-2026-09-24",
+  "conclusion": "baseline reports verified; first implementation timed out; no candidate source or candidate score",
+  "model_calls": {
+    "total": 32,
+    "response_artifacts": 32,
+    "breakdown": {
+      "astra_high_roster_selection": 1,
+      "luna_proposals": 15,
+      "luna_rankings": 15,
+      "astra_high_implementation_timed_out": 1
+    },
+    "max_model_calls": 108,
+    "calls_remaining": 76
+  },
+  "preserved_plan": {
+    "roles": 15,
+    "proposals_received": 15,
+    "valid_rankings_received": 15,
+    "selected_order": [
+      "k_loop_schedule",
+      "address_generation",
+      "sme_fp32_tiles"
+    ],
+    "implementation_attempts": [
+      {
+        "experiment_id": "k_loop_schedule",
+        "status": "failed",
+        "error": "TimeoutExpired: Command '['codex', 'exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method=\"chatgpt\"', '-c', 'model_provider=\"openai\"', '-c', 'model_reasoning_effort=\"high\"', '--disable', 'shell_tool', '--disable', 'view_image', '--disable', 'image_generation', '-c', 'web_search=\"disabled\"', '--model', 'gpt-6-astra', '--output-schema', '/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-swarm-2026-09-24/agent/implementation-001/call-001/schema.json', '--output-last-message', '/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-swarm-2026-09-24/agent/implementation-001/call-001/response.json', '--color', 'never', '-']' timed out after 179.94400729100744 seconds"
+      }
+    ],
+    "pending_order": [
+      "address_generation",
+      "sme_fp32_tiles"
+    ]
+  },
+  "baseline": {
+    "name": "libxsmm-aot-reference",
+    "source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+    "saved_source_matches_hash": true,
+    "validation_gflops": [
+      1643.4756775419414,
+      1276.74414125079,
+      1176.058920286144
+    ],
+    "correctness_recorded_passed": true,
+    "correctness_recorded_case_count": 48,
+    "correctness_recorded_tolerance": 0.002,
+    "correctness_independent_rerun": false
+  },
+  "search": {
+    "status": "failed",
+    "failure_type": "TimeoutExpired",
+    "failed_model_call_timeout_seconds": 179.94400729100744,
+    "candidate_count": 0,
+    "candidate_score_count": 0,
+    "winner_source": null,
+    "final_report": null,
+    "final_gflops": null,
+    "target_gflops": 1800,
+    "target_met": false
+  },
+  "host_checks": {
+    "baseline_observations": 3,
+    "all_baseline_measurements_ac_and_power_unchanged": true
+  },
+  "hill_report_verification": {
+    "method": "hills verify --json <report>",
+    "signed_report_count": 3,
+    "all_signatures_valid": true,
+    "all_official": true,
+    "all_passed": true,
+    "same_tree_hash": true,
+    "same_submission_hash": true,
+    "reports": [
+      {
+        "path": "search/trial-000/validation-0.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1643.4756775419414,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:587a3d274203c4eb9f82282744d91c9720b2c4d023c35bd247db17cdba4c13e2"
+      },
+      {
+        "path": "search/trial-000/validation-1.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1276.74414125079,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:587a3d274203c4eb9f82282744d91c9720b2c4d023c35bd247db17cdba4c13e2"
+      },
+      {
+        "path": "search/trial-000/validation-2.json",
+        "signature_valid": true,
+        "official": true,
+        "passed": true,
+        "final": false,
+        "gflops": 1176.058920286144,
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "submission_hash": "sha256:587a3d274203c4eb9f82282744d91c9720b2c4d023c35bd247db17cdba4c13e2"
+      }
+    ]
+  },
+  "limits": [
+    "The three scores are baseline-only validation measurements, not candidate results.",
+    "No candidate correctness run, candidate performance report, or final holdout exists in this block.",
+    "The swarm order is preserved but the first Astra-high implementation timed out.",
+    "The public correctness result is the saved run record; it was not rerun for this verification."
+  ]
+}

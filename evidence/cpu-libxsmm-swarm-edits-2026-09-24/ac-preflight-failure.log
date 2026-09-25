@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-swarm-edits-2026-09-24/run.py", line 20, in <module>
+    require_ac(initial_host)
+  File "/Users/vishnuv/Documents/Documents/weavehacks/examples/optimize_cpu_kernel.py", line 34, in require_ac
+    raise RuntimeError('AC power is required for this approved benchmark run')
+RuntimeError: AC power is required for this approved benchmark run

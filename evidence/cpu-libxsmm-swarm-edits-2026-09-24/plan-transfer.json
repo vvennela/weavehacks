@@ -1,0 +1,16 @@
+{
+  "previous_phase": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-swarm-2026-09-24",
+  "prior_state_sha256": "2ad24616ccced768aef0a4eea8752ab3138a46ec2f533c383e2ac123ff48753c",
+  "board_hash": "622c5b390f1e65036b1afd9d5cba6e1ebe13452f665bdc948195d6c223fac5d9",
+  "retained_order": [
+    "k_loop_schedule",
+    "address_generation",
+    "sme_fp32_tiles"
+  ],
+  "spent_calls": 32,
+  "spent_attempts": 1,
+  "remaining_attempts": 5,
+  "remaining_model_calls": 76,
+  "measurements_imported": false,
+  "reason": "Retry the unchanged swarm-selected experiment with guarded edits after full-file response timeout"
+}

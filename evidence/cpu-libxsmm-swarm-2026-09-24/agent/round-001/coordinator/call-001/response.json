@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_tiles",
+    "k_loop_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "loop_order",
+    "address_generation",
+    "tail_alignment",
+    "scratch_lifetime",
+    "prefetch_locality",
+    "b_panel_layout",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "These 15 roles cover distinct changes to the supplied LIBXSMM source. sme_fp32_tiles examines four-tile output mapping. k_loop_schedule examines Llibxsmm_478 and Llibxsmm_70c separately, excluding unchanged prior unroll variants. register_reuse examines vector lifetimes within those loops. a_transpose targets Llibxsmm_78, which packs row-major A after the wrapper swaps operands. panel_packing examines its 64-wide packed panel; b_panel_layout separately evaluates packing row-major B, consumed through x0. cache_blocking studies panel capacity and reuse; loop_order studies traversal at Llibxsmm_64 and Llibxsmm_440. vector_access targets the output-store blocks, recognizing that paired loads and grouped ZA transfers already exist. address_generation targets pointer updates and loop bookkeeping. scratch_lifetime examines stack reservation and packed-data lifetime through consumption. cache_conflict_layout evaluates alternative scratch strides without assuming cache conflicts. prefetch_locality evaluates bounded prefetch experiments for the recorded access streams. assembly_audit checks the supplied assembly for concrete redundant work and ABI hazards. tail_alignment covers the general fallback's predicated accesses and odd sizes. Duplicate fixed-512 roles are omitted because that path already exists. This is a roster selection, not a joint experiment ranking or measured optimization. All proposals remain unverified and must preserve LIBXSMM provenance, its BSD notice, and the fixed correctness and promotion rules."
+}
