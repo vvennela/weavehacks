@@ -43,3 +43,6 @@ def test_driver_keeps_gates_and_requires_both_correctness_suites(monkeypatch,tmp
     controls = saved[str(folder/'controls.json')]
     assert controls['approved_one_level_strassen']
     assert not controls['prior_scores_imported']
+    assert controls['historical_battery_automatic_peak_gflops'] == 1668.5964359101147
+    assert controls['prior_ac_initial_baseline_peak_gflops'] == 1685.6230608449698
+    assert controls['prior_ac_control_peak_gflops'] == 1687.3925479742732
