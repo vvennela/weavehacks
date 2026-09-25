@@ -1,0 +1,34 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 1,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 0,
+  "adjudications": [
+    {
+      "source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "Retain the incumbent unchanged; do not promote eb091b1e…. Correctness passed at tolerance 0.002, but eligible=false. The fresh replay won 7/10 pairs, including one near-tie. Candidate scores ranged from 714.794759 to 1108.664718 GFLOP/s; paired controls ranged from 933.419129 to 1094.725487. These ranges overlap, so the required separated-range-plus-5% gate fails. Repeatable improvement is not established.\n\nFresh peaks were 1108.664718 for the candidate, 1094.725487 for paired controls, and 1100.524173 for the separate initial imported-control block. All ten candidate scores were below the historical Battery Automatic imported peak of 1668.5964359101147. Historical AC observations remain separate: candidate peak 1701.6509826, that phase's initial imported peak 1685.6230608, and later control peak 1687.3925479742732. The prior AC result had only 1/10 initial-peak exceedances and 5/10 paired wins; it contributes nothing to current eligibility.\n\nNo cause for variation or system-wide optimum is established. Goal policy remains pending; the legacy 1800 target does not determine success. Raw timing triplets and held-out confirmation were not supplied, so their preservation and results cannot be verified here. No new measurements, source edits, or power changes were performed."
+    }
+  ],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "single-thread"
+    ]
+  },
+  "rounds": []
+}

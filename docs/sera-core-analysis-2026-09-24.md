@@ -220,3 +220,12 @@ fresh imported initial peak1/10times. Both candidate and control have substantia
 variation among their three raw timed calls. The next step is an exact-source replay
 with the original imported control, preserving all raw timing triplets and gates.
 No claim of system-wide optimality or production readiness is established.
+
+
+The exact best-kernel ten-pair replay on Battery Low Power is complete. It won7/10
+pairs, with714.79–1108.66GFLOP/s against933.42–1094.73controls, but failed promotion.
+All31signed reports and93raw timings verified. The final1034.27score belongs to the
+unchanged imported baseline. The variation occurs within the three calls of each
+report as well as between reports; current evidence does not isolate its cause.
+No kernel source, benchmark rule, power setting or correctness tolerance changed.
+Evidence: `evidence/cpu-best-kernel-repeatability-2026-09-25`.

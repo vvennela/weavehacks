@@ -42,3 +42,16 @@ Candidate range was 1251.202–1701.651, median 1493.032 GFLOP/s. Controls range
 - `evidence/cpu-libxsmm-dataflow-board-2026-09-25/` was interrupted with `KeyboardInterrupt`/SIGINT (exit 130) before any candidate implementation. Its baseline source hash is `8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18`, not the exact hash inventoried here. Its baseline-only scores are not additional measurements of this source. The phase recorded zero implementations.
 
 No exact-hash candidate result was found beyond the three Battery Low Power pairs and ten AC Automatic pairs listed above. Neither series establishes a promotion or a repeatable win over its paired control distribution.
+
+
+## Fresh ten-pair Battery Low Power replay
+
+`evidence/cpu-best-kernel-repeatability-2026-09-25` remeasured the same eb091b1e
+candidate and04fc3ff control with unchanged settings. All31 reports and93raw timings
+verified. Candidate714.79–1108.66GFLOP/s, median1076.95; paired controls933.42–1094.73,
+median1056.19. Candidate won7/10pairs and exceeded the fresh initial1100.52peak3/10times.
+It failed the unchanged5%separated-range gate and was not promoted. Final1034.27
+confirms only the imported baseline. No source changed. Total exact-source paired
+evidence is now3priorLowPower +10AC +10freshLowPower; keep these blocks separate.
+The per-report median slowest/fastest raw timing ratio is1.33x for candidate and1.31x
+for controls. The causes of this variation remain unmeasured.

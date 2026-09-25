@@ -1,0 +1,46 @@
+{
+  "host": {
+    "timestamp_utc": "2026-09-25T21:34:59.544100+00:00",
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t56%; discharging; 1:52 remaining present: true\n",
+    "power_settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+  },
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "single-thread"
+    ]
+  },
+  "task": "Remeasure ONLY the exact best prior Sera kernel eb091b1e... against its\noriginal imported control04fc3ff... under the CURRENT unchanged power profile.\nThe user redirected research toward making this source repeatable, not Strassen\nor alternative algorithms. No new proposals, source edits or roster calls are needed.\nAstra reviews the one fresh ten-pair replay under the existing separated-range-plus-5%\ngate. Save all three raw timings behind each official best-of-three report unchanged.\nDo not redefine the official metric, change warmup/compiler/tolerance/thread settings,\nclaim causality for noise, discard slow samples or pool scores across power modes.\nThe previous AC peak1701.6509826 exceeded that phase's imported initial peak1685.6230608\nonly1/10 times, with5/10pairedwins. It does not establish repeatability or system-wide\noptimality. The historical Battery Automatic imported peak is1668.5964359101147;\nlater AC controlpeak1687.3925479742732 is a separate observation. Report all relevant\ncomparators and fresh same-mode peaks without deciding the still-pending goal policy.\nThe legacy internal1800target does not redefine the user's ten-run goal.\nPreserve frozen FP32 C=A@B, all timed allocation/packing, exactsourcehashes, singlethread,\ncorrectness.002,10 alternatingpairs and held-outconfirmation. No power-setting changes.\nImported baseline code is not a Sera improvement. Prior scores do not enter eligibility.\n",
+  "prior_phase": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-editable-panel-2026-09-25",
+  "prior_calls": 72,
+  "prior_attempts": 6,
+  "prior_state_sha256": "811919e8f91d9dbd24f06fc9ec414090ad830d007e92b178a69c0ca62c1b7414",
+  "source_hashes": [
+    "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+    "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf"
+  ],
+  "prior_scores_imported": false,
+  "prior_ac_initial_baseline_peak_gflops": 1685.6230608449698,
+  "prior_ac_control_peak_gflops": 1687.3925479742732,
+  "preserve_raw_timing_triplets": true,
+  "reusing_selected_sources": true,
+  "new_proposals": false,
+  "max_candidates": 6,
+  "max_model_calls": 108,
+  "max_seconds": 1800,
+  "agent_timeout": 180,
+  "target_gflops": 1800,
+  "target_role": "legacy internal search gate; not new-goal adjudication",
+  "goal": "beat the imported baseline peak consistently over 10 runs",
+  "repeats": 10,
+  "min_improvement": 0.05,
+  "historical_imported_peak_gflops": 1668.5964359101147,
+  "implementation_commit": "f8d1857b85f09344fb53032b3b9e5cba11652a11",
+  "driver_sha256": "ae3e59c345285c34378eb4f90878fced64695e58a38ab0b3482732a0b21281ca"
+}
