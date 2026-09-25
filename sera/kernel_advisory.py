@@ -247,12 +247,26 @@ class KernelAdvisoryTeam:
             raise
 
     def _vote(self, role, common, board, board_hash, schema, deadline):
-        return self._request(self.advisors[role], common + '\nYou are the specialist ' + role + '. '
-            + ADVISOR_ROLES[role] + "\nReview the other specialists' proposals on the shared board. "
+        prompt = (common + '\nYou are the specialist ' + role + '. ' + ADVISOR_ROLES[role]
+            + "\nReview the other specialists' proposals on the shared board. "
             'Rank EVERY experiment ID exactly once in the order the swarm should test them. '
             'Use measured evidence, expected benefit, and correctness risk. Your ranking helps '
             'select the batch; Astra does not choose the experiment order. Explain briefly. '
-            '\nBoard hash: ' + board_hash + '\nImmutable shared board:\n' + json.dumps(board), schema, deadline)
+            '\nBoard hash: ' + board_hash + '\nImmutable shared board:\n' + json.dumps(board))
+        ids = [item['experiment_id'] for item in board]
+        for repair in range(2):
+            vote = self._request(self.advisors[role], prompt, schema, deadline)
+            try:
+                if set(vote) != {'ranking', 'reason'} or not isinstance(vote['reason'], str):
+                    raise ValueError('Malformed ranking response')
+                rank_experiments(ids, [vote.get('ranking')], limit=1)
+                return dict(vote, format_repairs=repair)
+            except ValueError:
+                if repair:
+                    raise
+                prompt += ('\nYour response was not a complete valid ranking. Repair the format '
+                    'without changing the board. Include every ID once; no duplicates or omissions. '
+                    '\nExact required IDs: ' + json.dumps(ids) + '\nInvalid response: ' + json.dumps(vote))
 
     def _implement(self, common, deadline):
         batch = self.rounds[-1]

@@ -168,3 +168,30 @@ def test_second_batch_implementation_receives_fresh_experiment_evidence(tmp_path
     measured[0]['scores']=[1234.5]*3
     team.propose(measured,timeout=60)
     assert '1234.5' in calls[-1][1]
+
+
+def test_invalid_specialist_ranking_gets_one_bounded_format_repair(tmp_path):
+    calls=[]
+    base=factory_for(calls)
+    attempts={}
+    def factory(**settings):
+        agent=base(**settings)
+        original=agent.request
+        def request(prompt,schema,*,timeout):
+            if 'ranking' in schema['properties']:
+                role=str(settings['work_dir'])
+                attempts[role]=attempts.get(role,0)+1
+                if attempts[role]==1:
+                    calls.append((settings,prompt))
+                    ids=schema['properties']['ranking']['items']['enum']
+                    return dict(ranking=[ids[0]]*len(ids),reason='invalid repeated ID')
+            return original(prompt,schema,timeout=timeout)
+        agent.request=request
+        return agent
+    team=KernelAdvisoryTeam(work_dir=tmp_path/'team',task='FP32',profile={},
+        max_rounds=1,agent_factory=factory)
+    assert team.propose(history(tmp_path),timeout=60).source=='new source'
+    assert set(attempts.values())=={2}
+    assert len(calls)==47
+    state=json.loads((tmp_path/'team/state.json').read_text())
+    assert all(vote['format_repairs']==1 for vote in state['rounds'][0]['ballots'])
