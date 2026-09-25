@@ -1,0 +1,17 @@
+{
+  "name": "libxsmm-k-loop-interleaved-pointer-updates",
+  "hypothesis": "Interleaving pointer updates with FMOPA operations tests whether their scheduling improves throughput. In both K loops, move the x0 update after the first FMOPA and the x3 update after the third. Loads, FP32 accumulation order, counter placement, 512 iterations and pointer strides remain unchanged. This schedule differs from the supplied prior candidates. All other code, including the complete BSD notice, packing, ABI, streaming transitions and general-size fallback, remains unchanged. Assembly, correctness and performance are untested; no gain is established. Validation requires the fixed compiler flags, 0.002 tolerance, n=512 and general-size boundary checks, followed by fresh repeated paired controls with power source and settings unchanged under the existing promotion rules.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+  "edits": [
+    {
+      "old": "    \"Llibxsmm_478:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"\n    \"add\\tx0, x0, x9\\n\"\n    \"add\\tx3, x3, x10\\n\"\n    \"fmopa\\tza0.s, p1/m, p0/m, z2.s, z0.s\\n\"\n    \"fmopa\\tza1.s, p1/m, p2/m, z2.s, z1.s\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_478\\n\"",
+      "new": "    \"Llibxsmm_478:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"\n    \"fmopa\\tza0.s, p1/m, p0/m, z2.s, z0.s\\n\"\n    \"add\\tx0, x0, x9\\n\"\n    \"fmopa\\tza1.s, p1/m, p2/m, z2.s, z1.s\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"add\\tx3, x3, x10\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_478\\n\""
+    },
+    {
+      "old": "    \"Llibxsmm_70c:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"\n    \"add\\tx0, x0, x9\\n\"\n    \"add\\tx3, x3, x10\\n\"\n    \"fmopa\\tza0.s, p1/m, p0/m, z2.s, z0.s\\n\"\n    \"fmopa\\tza1.s, p1/m, p2/m, z2.s, z1.s\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_70c\\n\"",
+      "new": "    \"Llibxsmm_70c:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"\n    \"fmopa\\tza0.s, p1/m, p0/m, z2.s, z0.s\\n\"\n    \"add\\tx0, x0, x9\\n\"\n    \"fmopa\\tza1.s, p1/m, p2/m, z2.s, z1.s\\n\"\n    \"fmopa\\tza2.s, p3/m, p0/m, z3.s, z0.s\\n\"\n    \"add\\tx3, x3, x10\\n\"\n    \"fmopa\\tza3.s, p3/m, p2/m, z3.s, z1.s\\n\"\n    \"sub\\tx8, x8, #0x1\\n\"\n    \"cbnz\\tx8, Llibxsmm_70c\\n\""
+    }
+  ]
+}

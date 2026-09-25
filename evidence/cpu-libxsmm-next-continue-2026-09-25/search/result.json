@@ -1,0 +1,420 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "completed",
+  "trials": [
+    {
+      "name": "libxsmm-aot-reference",
+      "hypothesis": "Pinned LIBXSMM SME reference adapted to the frozen row-major beta-zero ABI",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-000/source/kernel.c",
+      "source_hash": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+      "status": "passed",
+      "scores": [
+        807.120791422058,
+        1035.7664763501227,
+        1076.972778471826
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-000/validation-2.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 1035.7664763501227,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    },
+    {
+      "name": "libxsmm-k-loop-counter-schedule",
+      "hypothesis": "Moving the counter decrement before the four FMOPA instructions may reduce exposed loop-control latency. This implements only the selected scheduling change in Llibxsmm_478 and Llibxsmm_70c. Each loop retains 512 iterations, the same loads and pointer updates, unchanged FP32 accumulation order, and the branch after all four FMOPA operations. The supplied history contains no identical change. All other code, including the complete BSD notice, packing, ABI, streaming transitions and general-size fallback, remains unchanged. Assembly, correctness and performance are untested. Validation requires the fixed compiler flags, 0.002 tolerance, general-size and boundary checks, and fresh repeated paired controls on unchanged battery power and settings. No speedup is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-001/source/kernel.c",
+      "source_hash": "71c55f82b9955eefda8ca17f47e59fbe04c98919c7d30d110a6c540f38005bb8",
+      "status": "passed",
+      "scores": [
+        1052.6880968473677,
+        1015.5199985790974,
+        855.9121710529221
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-001/validation-2.json"
+      ],
+      "control_scores": [
+        866.5021857187708,
+        1093.0494478390983,
+        1087.1485421776142
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-001/control-2.json"
+      ],
+      "median_gflops": 1015.5199985790974,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "71c55f82b9955eefda8ca17f47e59fbe04c98919c7d30d110a6c540f38005bb8",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded validation passed, but eligible=false prohibits adoption. Candidate scores were 855.9–1052.7 GFLOP/s versus paired controls of 866.5–1093.0. Paired changes were +21.5%, −7.1%, and −21.3%; candidate and control spreads were 196.8 and 226.5 GFLOP/s. These mixed results establish no repeatable gain or causal explanation. No repeat exceeded 1800 GFLOP/s. Retain the unchanged LIBXSMM incumbent. Treat the counter scheduling hypothesis as unproven; preserve the pending experiment order and original limits, and do not repeat this identical source."
+      }
+    },
+    {
+      "name": "libxsmm-k-loop-consume-before-pointer-updates",
+      "hypothesis": "Both supplied K loops have the same instruction order. Move their two pointer updates after the four FMOPA operations so computation immediately follows the operand loads. Preserve the paired loads, registers, FMOPA order, counter and 512 iterations. Under the wrapper's operand swap, z0/z1 contain B values and z2/z3 contain packed A values. This distinct scheduling change tests earlier operand consumption; no gain is established. All other code and the complete BSD notice remain unchanged. Assembly, correctness and performance are untested. Validation requires the fixed flags, 0.002 tolerance, general-size and boundary checks, and fresh repeated paired controls with power source and settings unchanged.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-002/source/kernel.c",
+      "source_hash": "13bc6a2ba0dc662d722b0ba8d09db1f2fc55ef77396b1056243d5fb154bf3cdc",
+      "status": "passed",
+      "scores": [
+        1090.8285440982768,
+        1103.346821684224,
+        972.1519207636735
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-002/validation-2.json"
+      ],
+      "control_scores": [
+        984.6325414659273,
+        1031.4522701496105,
+        1086.4137661735374
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-002/control-2.json"
+      ],
+      "median_gflops": 1090.8285440982768,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "13bc6a2ba0dc662d722b0ba8d09db1f2fc55ef77396b1056243d5fb154bf3cdc",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded validation passed, but eligible=false prohibits adoption. Candidate scores were 972.2–1103.3 GFLOP/s versus paired controls of 984.6–1086.4. Paired changes were +10.8%, +7.0%, and −10.5%; candidate and control spreads were 131.2 and 101.8 GFLOP/s. These mixed results establish no repeatable gain or causal explanation. No repeat exceeded 1800 GFLOP/s. Retain the unchanged LIBXSMM incumbent and treat earlier operand consumption as unproven. Preserve the pending experiment order and original limits, including spent calls; do not repeat this identical source."
+      }
+    },
+    {
+      "name": "libxsmm-k-loop-interleaved-pointer-updates",
+      "hypothesis": "Interleaving pointer updates with FMOPA operations tests whether their scheduling improves throughput. In both K loops, move the x0 update after the first FMOPA and the x3 update after the third. Loads, FP32 accumulation order, counter placement, 512 iterations and pointer strides remain unchanged. This schedule differs from the supplied prior candidates. All other code, including the complete BSD notice, packing, ABI, streaming transitions and general-size fallback, remains unchanged. Assembly, correctness and performance are untested; no gain is established. Validation requires the fixed compiler flags, 0.002 tolerance, n=512 and general-size boundary checks, followed by fresh repeated paired controls with power source and settings unchanged under the existing promotion rules.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-003/source/kernel.c",
+      "source_hash": "a748475df6036ec229169ae103e91d567ca0854e45d885c5c8887c2e9580c36a",
+      "status": "passed",
+      "scores": [
+        998.6735638940175,
+        1067.6901365761469,
+        1066.277895383754
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-003/validation-2.json"
+      ],
+      "control_scores": [
+        1041.9619360725455,
+        997.4378395278604,
+        1062.5846732064438
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-003/control-2.json"
+      ],
+      "median_gflops": 1066.277895383754,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "a748475df6036ec229169ae103e91d567ca0854e45d885c5c8887c2e9580c36a",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded validation passed, but eligible=false prohibits adoption. Candidate scores were 998.7–1067.7 GFLOP/s versus paired controls of 997.4–1062.6. Paired changes were −4.2%, +7.0%, and +0.3%; candidate and control spreads were 69.0 and 65.1 GFLOP/s. These mixed, overlapping results establish no repeatable gain or causal explanation. No repeat exceeded 1800 GFLOP/s. Retain the unchanged LIBXSMM incumbent and treat interleaved pointer scheduling as unproven. Preserve the pending experiment order and original limits, including spent calls; do not repeat this identical source."
+      }
+    }
+  ],
+  "target_gflops": 1800,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-000/source/kernel.c",
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 3,
+    "min_improvement": 0.05,
+    "max_seconds": 1191.542088
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "search-exhausted",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-continue-2026-09-25/search/final.json",
+  "final_gflops": 1081.1280478882752,
+  "final_minimum_gflops": 766.7647518509551
+}

@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_tiles",
+    "sme_fp32_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "loop_order",
+    "address_generation",
+    "scratch_lifetime",
+    "prefetch_locality",
+    "transpose_fusion",
+    "b_panel_layout",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Retain 14 prior advisors and replace tail_alignment with register_reuse to examine operand reuse in the measured n=512 path. General sizes, odd tails, alignment and n<=0 remain mandatory validation requirements for every candidate. The selection is based on supplied source mechanisms, not historical score eligibility.\n\nAssign distinct areas: a_transpose examines the load/transpose sequence in Llibxsmm_78; panel_packing examines bounded panel dimensions; scratch_lifetime examines allocation and pack/consume lifetimes; b_panel_layout examines the direct B stream; transpose_fusion examines feeding compute from a small transpose tile while accounting for ZA conflicts. cache_blocking examines block sizes beyond the existing 64x32 traversal; loop_order examines traversal order; cache_conflict_layout examines scratch-stride alternatives without assuming cache geometry or a measured conflict; prefetch_locality examines bounded lookahead and its full cost.\n\nsme_fp32_tiles examines output tile shape; register_reuse examines operand-vector reuse within the available registers; sme_fp32_schedule examines distinct instruction schedules in both K loops. address_generation examines packing and output address chains without repeating pointer-end tests. vector_access examines the actual output sequence: grouped ZA extraction followed by two single-vector ST1W instructions per row. assembly_audit examines redundant setup and instruction dependencies in the supplied assembly, without treating instruction counts as timing proof.\n\nEach advisor must identify an exact before/after change, risks and validation. Exclude unchanged prior candidates, existing traversal presented as new, and unsupported paired-load writeback. This roster selection does not reorder pending experiments, reset spent calls, change original limits or establish a joint ranking. All advice remains unverified; retain LIBXSMM provenance, the complete BSD notice and every fixed gate."
+}
