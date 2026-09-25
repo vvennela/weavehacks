@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "n512_fast_path",
+    "panel_packing",
+    "a_transpose",
+    "b_panel_layout",
+    "cache_blocking",
+    "loop_order",
+    "scratch_lifetime",
+    "streaming_region_cost",
+    "transpose_fusion",
+    "cache_conflict_layout",
+    "vector_access",
+    "register_reuse",
+    "za_four_tile_reuse",
+    "tail_alignment",
+    "assembly_audit"
+  ],
+  "rationale": "Select these 15 advisors to develop and review distinct layout experiments. n512_fast_path owns the optional sixteen-call panel32 wrapper: parameters[4]=B, [10]=A+r*512, [16]=C+r*512, with all other fields zero and the existing general fallback preserved. panel_packing owns coordinated pack/consumer layout changes; a_transpose studies ZA-based A packing; b_panel_layout evaluates separately packed B. cache_blocking compares working sets, while loop_order checks traversal and complete output coverage. scratch_lifetime accounts for allocation, reuse and cleanup; streaming_region_cost examines the helper's sixteen SME entries/exits against the original single region. transpose_fusion assesses direct use of transposed tiles and repeated work. cache_conflict_layout evaluates bounded padding without assuming cache conflicts. vector_access checks contiguous accesses and alignment; register_reuse studies input-vector reuse; za_four_tile_reuse checks output mapping across exactly four FP32 ZA tiles. tail_alignment protects general sizes, boundaries and n<=0. assembly_audit reviews supplied instructions and checks coordinated pointer, stride, rewind and store changes.\n\nLayout proposals must name all affected blocks, including Llibxsmm_64, Llibxsmm_78, Llibxsmm_440, both K loops and traversal updates where applicable. Overlapping proposals count as one experiment. Dedicated scheduling roles are omitted to avoid repeating measured sources. The fresh augmented baseline scored 1034.6–1071.2 GFLOP/s on battery; helper performance remains unknown. This roster is a selection, not a completed advisor review. All advice remains unverified until full-call correctness and fresh paired performance gates pass under the unchanged contract, license and power settings."
+}

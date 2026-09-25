@@ -13,3 +13,15 @@ Run once:
 ```sh
 PYTHONPATH=. /tmp/sera-audit-venv/bin/python -u evidence/cpu-libxsmm-panel-swarm-2026-09-25/run.py
 ```
+
+## Completed Low Power outcome
+
+The block completed with 102 total model calls and six attempts. Three distinct candidates passed correctness; none passed promotion. The unchanged reference's final score was 957.13 GFLOP/s and failed confirmation. No winner was returned, and the target remains unmet. All 22 signed reports were independently verified; exact source hashes and unchanged power/settings checks passed.
+
+| Source | Candidate GFLOP/s | Paired controls GFLOP/s |
+| --- | --- | --- |
+| libxsmm-n512-sixteen-panel32-calls | 1078.05, 1078.60, 1090.83 | 1112.30, 1073.57, 1066.98 |
+| libxsmm-n512-constant-shape-c-sme | 1047.21, 760.44, 1082.40 | 1077.33, 1060.13, 1077.51 |
+| libxsmm-full512-padded-272-byte-a-slices | 968.06, 1027.18, 836.03 | 1097.33, 935.45, 1057.70 |
+
+`power-mode-observation.json` records a contemporaneous Foundation API result: Low Power Mode was enabled. The block's battery configuration was `powermode 1`; AC was configured separately as `powermode 0`. System Settings subsequently confirmed the Battery pane values Low Power and Automatic. No settings were changed during this block. The user then approved one temporary Automatic battery measurement block followed by restoration. New scores must use fresh controls in that mode, with prior Low Power scores retained separately.

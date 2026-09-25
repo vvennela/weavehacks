@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "n512_fast_path",
+    "panel_packing",
+    "a_transpose",
+    "b_panel_layout",
+    "cache_blocking",
+    "loop_order",
+    "scratch_lifetime",
+    "streaming_region_cost",
+    "transpose_fusion",
+    "cache_conflict_layout",
+    "vector_access",
+    "register_reuse",
+    "za_four_tile_reuse",
+    "tail_alignment",
+    "assembly_audit"
+  ],
+  "rationale": "Select these 15 roles to examine distinct packing, layout, traversal, and streaming changes. Replace constant_shape_512 with n512_fast_path: the measured constant-shape implementation established no repeatable gain, while guarded integration of a different layout remains relevant. Do not repeat that source, the sixteen-panel wrapper, or previously measured instruction schedules.\n\npanel_packing, a_transpose, b_panel_layout, and transpose_fusion cover different operand preparation choices. cache_blocking and loop_order coordinate reuse and traversal. scratch_lifetime checks allocation and buffer ownership. cache_conflict_layout must resolve the prior inconsistent padding proposal: the current full512 scratch has 64 FP32 values per K slice, a 256-byte stride, and 128 KiB total. Every proposed replacement must specify consistent allocation, pack addresses, consumer strides, half offsets, and rewinds.\n\nstreaming_region_cost examines valid ways to share streaming setup; the panel measurements do not identify transition overhead as a cause. vector_access, register_reuse, and za_four_tile_reuse assess memory operations and operand reuse within four FP32 ZA tiles. assembly_audit checks the supplied instruction blocks, especially Llibxsmm_64, Llibxsmm_78, Llibxsmm_440, Llibxsmm_478, and Llibxsmm_70c. tail_alignment protects general sizes, bounds, and n<=0; n512_fast_path owns guarded dispatch integration.\n\nThese are advisor assignments, not ranked experiments or measured improvements. Merge duplicate proposals before ranking. Preserve both complete license notices and every fixed gate. Adoption requires fresh full-call paired results under unchanged battery settings; keep AC records separate. No supplied candidate establishes throughput above 1800 GFLOP/s."
+}

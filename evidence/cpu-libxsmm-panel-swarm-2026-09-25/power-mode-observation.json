@@ -1,0 +1,9 @@
+{
+  "timestamp_utc": "2026-09-25T09:36:09.554033+00:00",
+  "foundation_is_low_power_mode_enabled": "true",
+  "power_source": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t44%; discharging; 1:45 remaining present: true\n",
+  "configured_modes": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+  "settings_changed_by_agent": false,
+  "scope": "Current read-only observation; not a retrospective API sample for prior phases",
+  "apple_documentation": "https://support.apple.com/en-ie/101613"
+}

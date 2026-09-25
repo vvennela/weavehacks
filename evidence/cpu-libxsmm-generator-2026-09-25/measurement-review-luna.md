@@ -37,3 +37,9 @@ Within the frozen scorer, collect several additional independent **unchanged-sou
 - AC reference: `evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/` and `baseline-verification.json`.
 - Separate AC swarm baseline: `evidence/cpu-libxsmm-swarm-2026-09-24/search/` and `verification.json`.
 - Battery swarm: `evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/` and `verification.json`.
+
+## Current energy-mode observation (2026-09-25)
+
+A later, current Foundation check using `NSProcessInfo.processInfo.isLowPowerModeEnabled` returned `true`. The current `pmset -g custom` snapshot reports `powermode 1` for Battery Power and `powermode 0` for AC Power, matching the saved settings in the current panel-swarm controls. This is a present-day observation; the historical AC and battery reports captured `pmset` state but did not record the Foundation flag. Do not project this result backward onto those runs or attribute their scores to Low Power Mode.
+
+Apple documents that energy modes can be configured independently for battery and adapter power, and that Low Power Mode reduces energy use. Its guide describes the user-facing modes, but does not define the numeric `pmset powermode` values as a mapping to those modes. The measurements therefore distinguish two facts: the host was on AC or battery, and the OS had a configured/runtime energy mode. Neither fact alone identifies the active clock or a performance ceiling. [Apple Support: About Power Modes on your Mac](https://support.apple.com/en-ie/101613)

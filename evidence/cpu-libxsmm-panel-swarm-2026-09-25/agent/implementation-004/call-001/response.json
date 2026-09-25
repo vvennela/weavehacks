@@ -1,0 +1,17 @@
+{
+  "name": "libxsmm-n512-constant-shape-c-sme",
+  "hypothesis": "Route n=512 through the existing full A transpose and a guarded C SME implementation with fixed 32x32 tiles and 512 K steps. Each tile remains in ZA for its full FP32 accumulation. The guard requires 16 streaming FP32 lanes; other vector lengths retain the general loop. Allocation failure, other sizes, tails and n<=0 retain existing fallback behavior. This tests compiler-visible constant bounds. The full512 assembly, panel helper and complete license notices remain unchanged. This source is absent from the supplied measured history. Compilation, correctness and performance are untested; no gain or throughput above 1800 GFLOP/s is established. Validate the full timed GEMM under the fixed gates with fresh repeated paired battery controls and unchanged settings. Results compare the complete changed path and cannot isolate constant bounds from the change in implementation.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "edits": [
+    {
+      "old": "static void sme_gemm(int n,const float *at,const float *b,float *c) {\n    const int vl=(int)svcntsw();\n    for(int i=0;i<n;i+=2*vl) {",
+      "new": "static void sme_gemm(int n,const float *at,const float *b,float *c) {\n    const int vl=(int)svcntsw();\n    if (n == 512 && vl == 16) {\n        const svbool_t all = svptrue_b32();\n        for (int i = 0; i < 512; i += 32) {\n            for (int j = 0; j < 512; j += 32) {\n                svzero_za();\n                for (int k = 0; k < 512; ++k) {\n                    const float *a_values = at + (size_t)k * 512 + i;\n                    const float *b_values = b + (size_t)k * 512 + j;\n                    svfloat32_t a0 = svld1_f32(all, a_values);\n                    svfloat32_t a1 = svld1_f32(all, a_values + 16);\n                    svfloat32_t b0 = svld1_f32(all, b_values);\n                    svfloat32_t b1 = svld1_f32(all, b_values + 16);\n                    svmopa_za32_f32_m(0, all, all, a0, b0);\n                    svmopa_za32_f32_m(1, all, all, a0, b1);\n                    svmopa_za32_f32_m(2, all, all, a1, b0);\n                    svmopa_za32_f32_m(3, all, all, a1, b1);\n                }\n                for (int r = 0; r < 16; ++r) {\n                    float *output = c + (size_t)(i + r) * 512 + j;\n                    svst1_hor_za32(0, r, all, output);\n                    svst1_hor_za32(1, r, all, output + 16);\n                }\n                for (int r = 0; r < 16; ++r) {\n                    float *output = c + (size_t)(i + 16 + r) * 512 + j;\n                    svst1_hor_za32(2, r, all, output);\n                    svst1_hor_za32(3, r, all, output + 16);\n                }\n            }\n        }\n        return;\n    }\n    for(int i=0;i<n;i+=2*vl) {"
+    },
+    {
+      "old": "    /* Row-major C=A*B is column-major C^T=B^T*A^T. Argument offsets\n       are exported from the pinned LIBXSMM ABI; all other fields are zero. */\n    const void *parameters[22] = {0};\n    parameters[4] = B;\n    parameters[10] = A;\n    parameters[16] = C;\n    sera_libxsmm_512(parameters);\n}",
+      "new": "    /* Use the existing A transpose and allocation-failure handling.\n       sme_gemm selects the guarded constant-shape C SME implementation. */\n    fallback_gemm(512, A, B, C);\n}"
+    }
+  ]
+}

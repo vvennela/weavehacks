@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "constant_shape_512",
+    "panel_packing",
+    "a_transpose",
+    "b_panel_layout",
+    "cache_blocking",
+    "loop_order",
+    "scratch_lifetime",
+    "streaming_region_cost",
+    "transpose_fusion",
+    "cache_conflict_layout",
+    "vector_access",
+    "register_reuse",
+    "za_four_tile_reuse",
+    "tail_alignment",
+    "assembly_audit"
+  ],
+  "rationale": "Select these 15 roles to examine distinct layout, packing, reuse, and streaming-region hypotheses. Replace n512_fast_path with constant_shape_512 to assess a specialized consumer beyond the already measured sixteen-panel wrapper. That wrapper passed correctness but established no repeatable gain; repeating it under another role is not a new experiment. Packing, transpose, B-layout, blocking, loop-order, scratch, and cache-conflict advisors must coordinate producer layouts, consumer strides, rewinds, allocation bounds, and traversal. Transpose-fusion and streaming-region advisors examine alternatives that count all data movement and valid SME entry/exit costs. Vector-access, register-reuse, and four-tile advisors examine operand delivery using only ZA0.S–ZA3.S. Tail-alignment protects general sizes and n<=0; assembly-audit checks proposals against the supplied instructions. Exclude dedicated scheduling roles because prior scheduling sources established no promotion and must not be repeated unchanged. Advisors must identify exact source blocks and jointly deduplicate and rank proposals. This selection uses only supplied evidence; no advisors were invoked or experiments run. All advice remains unverified. Preserve both complete license notices, the fixed contract and budgets, and fresh paired gates on unchanged battery power/settings; keep AC records separate. No evidence establishes throughput above 1800 GFLOP/s."
+}

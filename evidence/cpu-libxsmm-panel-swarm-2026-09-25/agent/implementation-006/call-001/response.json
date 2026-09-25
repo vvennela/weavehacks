@@ -1,0 +1,37 @@
+{
+  "name": "libxsmm-full512-padded-272-byte-a-slices",
+  "hypothesis": "Implement the selected padding experiment in the full512 kernel: allocate 139264 bytes, pack 512 slices at 272-byte intervals, and update both packed-A consumer strides and rewinds. Each slice contains 256 data bytes followed by 16 unused bytes. The second row half still starts at byte 128; the final data byte is at offset 139247, within the allocation. B and C addressing, FP32 FMOPA order, one kernel call, SME transitions, general-size fallback, and both complete license notices remain unchanged. This corrected layout is absent from the supplied measured history. The hypothesis is that padding changes scratch cache mapping; cache geometry and benefit are unverified. No tools or tests were run. Compilation, full-GEMM correctness, and performance require fresh validation under the fixed gates and repeated paired controls with battery power and settings unchanged. No gain or throughput above 1800 GFLOP/s is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "edits": [
+    {
+      "old": "    \"Llibxsmm_64:\\n\"\n    \"mov\\tx20, sp\\n\"\n    \"sub\\tsp, sp, #0x20, lsl #12\\n\"\n    \"mov\\tx3, sp\\n\"\n    \"mov\\tx26, sp\\n\"",
+      "new": "    \"Llibxsmm_64:\\n\"\n    \"mov\\tx20, sp\\n\"\n    \"sub\\tsp, sp, #0x22, lsl #12\\n\"\n    \"mov\\tx3, sp\\n\"\n    \"mov\\tx26, sp\\n\""
+    },
+    {
+      "old": "    \"st1w\\t{ z0.s, z4.s, z8.s, z12.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z1.s, z5.s, z9.s, z13.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z2.s, z6.s, z10.s, z14.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z3.s, z7.s, z11.s, z15.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z16.s, z20.s, z24.s, z28.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z17.s, z21.s, z25.s, z29.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z18.s, z22.s, z26.s, z30.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z19.s, z23.s, z27.s, z31.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"mov\\t{ z0.s - z3.s }, za0v.s[w12, 0x0:0x3]\\n\"",
+      "new": "    \"st1w\\t{ z0.s, z4.s, z8.s, z12.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z1.s, z5.s, z9.s, z13.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z2.s, z6.s, z10.s, z14.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z3.s, z7.s, z11.s, z15.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z16.s, z20.s, z24.s, z28.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z17.s, z21.s, z25.s, z29.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z18.s, z22.s, z26.s, z30.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z19.s, z23.s, z27.s, z31.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"mov\\t{ z0.s - z3.s }, za0v.s[w12, 0x0:0x3]\\n\""
+    },
+    {
+      "old": "    \"st1w\\t{ z0.s, z4.s, z8.s, z12.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z1.s, z5.s, z9.s, z13.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z2.s, z6.s, z10.s, z14.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z3.s, z7.s, z11.s, z15.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z16.s, z20.s, z24.s, z28.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z17.s, z21.s, z25.s, z29.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z18.s, z22.s, z26.s, z30.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"st1w\\t{ z19.s, z23.s, z27.s, z31.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x100\\n\"\n    \"add\\tx1, x1, #0x40\\n\"",
+      "new": "    \"st1w\\t{ z0.s, z4.s, z8.s, z12.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z1.s, z5.s, z9.s, z13.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z2.s, z6.s, z10.s, z14.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z3.s, z7.s, z11.s, z15.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z16.s, z20.s, z24.s, z28.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z17.s, z21.s, z25.s, z29.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z18.s, z22.s, z26.s, z30.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"st1w\\t{ z19.s, z23.s, z27.s, z31.s }, pn8, [sp]\\n\"\n    \"add\\tsp, sp, #0x110\\n\"\n    \"add\\tx1, x1, #0x40\\n\""
+    },
+    {
+      "old": "    \"mov\\tx10, #0x100\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn8.b, xzr, x11, vlx2\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn9.b, xzr, x11, vlx2\\n\"\n    \"ptrue\\tp0.b\\n\"\n    \"ptrue\\tp2.b\\n\"\n    \"ptrue\\tp1.b\\n\"\n    \"ptrue\\tp3.b\\n\"\n    \"mov\\tx8, #0x200\\n\"\n    \"Llibxsmm_478:\\n\"",
+      "new": "    \"mov\\tx10, #0x110\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn8.b, xzr, x11, vlx2\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn9.b, xzr, x11, vlx2\\n\"\n    \"ptrue\\tp0.b\\n\"\n    \"ptrue\\tp2.b\\n\"\n    \"ptrue\\tp1.b\\n\"\n    \"ptrue\\tp3.b\\n\"\n    \"mov\\tx8, #0x200\\n\"\n    \"Llibxsmm_478:\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx8, Llibxsmm_478\\n\"\n    \"sub\\tx0, x0, #0x100, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x20, lsl #12\\n\"",
+      "new": "    \"cbnz\\tx8, Llibxsmm_478\\n\"\n    \"sub\\tx0, x0, #0x100, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x22, lsl #12\\n\""
+    },
+    {
+      "old": "    \"mov\\tx10, #0x100\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn8.b, xzr, x11, vlx2\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn9.b, xzr, x11, vlx2\\n\"\n    \"ptrue\\tp0.b\\n\"\n    \"ptrue\\tp2.b\\n\"\n    \"ptrue\\tp1.b\\n\"\n    \"ptrue\\tp3.b\\n\"\n    \"mov\\tx8, #0x200\\n\"\n    \"Llibxsmm_70c:\\n\"",
+      "new": "    \"mov\\tx10, #0x110\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn8.b, xzr, x11, vlx2\\n\"\n    \"mov\\tx11, #0x80\\n\"\n    \"whilelt\\tpn9.b, xzr, x11, vlx2\\n\"\n    \"ptrue\\tp0.b\\n\"\n    \"ptrue\\tp2.b\\n\"\n    \"ptrue\\tp1.b\\n\"\n    \"ptrue\\tp3.b\\n\"\n    \"mov\\tx8, #0x200\\n\"\n    \"Llibxsmm_70c:\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx8, Llibxsmm_70c\\n\"\n    \"sub\\tx0, x0, #0x100, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x20, lsl #12\\n\"",
+      "new": "    \"cbnz\\tx8, Llibxsmm_70c\\n\"\n    \"sub\\tx0, x0, #0x100, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x22, lsl #12\\n\""
+    }
+  ]
+}

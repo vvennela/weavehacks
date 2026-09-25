@@ -1,0 +1,124 @@
+{
+  "report_count": 22,
+  "reports": [
+    {
+      "path": "search/trial-000/validation-0.json",
+      "sha256": "b6b526c173a0a9a86647fd4ccd2b9b860c4c0d32623297223e431e36c22c79ab",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-1.json",
+      "sha256": "14684477550c37c119f454a5b7e3182706369280c7b310a5f5437536b27f4e73",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-2.json",
+      "sha256": "0cfa854d159c0e40b0c053d601f1cec2391f466f1406b66b1da8266fbb7e19d2",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-0.json",
+      "sha256": "1e159e491150a8bfcdf8ce0dc4a098ed85292110e46759433c667026614d05a7",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-1.json",
+      "sha256": "a84f8da02305710620504eff5854c9cd5f0adb9962e45ea29cdf417126a20a6f",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-2.json",
+      "sha256": "2f7a3bbe34a8416d0ba45f5950d0004a2aed9fe0ec7f31d3cef7f0976d36e53c",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-0.json",
+      "sha256": "bc0c238c4c93b9740d4ffb8f7c0e0c5b8f540e62421e1844cb642ae6bef3a5d1",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-1.json",
+      "sha256": "28210c661f86aeafb78527985e3911d8b730a6b2203bcc63d86f6c3d8c89b0ee",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-2.json",
+      "sha256": "4f4af3e7584e08a599acab39179c8ccd6c7169e674a944f73cf3fb2a879edcfb",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/validation-0.json",
+      "sha256": "0e5b4d5f328a1b48c804df9caaeb88455384c200cd31054e4e5a21284ff0ee47",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/validation-1.json",
+      "sha256": "f85275133c4499f0ba6e94afe3788fb2fcc126a595a55f56daa7ca70ddbad8a0",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/validation-2.json",
+      "sha256": "38116fd18686efb8f62e6879426dd1345bb1c48863741fddfc7a70095f9a0f2e",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/control-0.json",
+      "sha256": "bac5994cdae03c140ff48f0da695dca3a81d7efac9ce802140b03349d8226291",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/control-1.json",
+      "sha256": "3b5f4c014e69264b1764633fa271a5b79aa2697a7974e7f18ee0e0d56361f36c",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/control-2.json",
+      "sha256": "6064e38f624c6b26f6482973d13cf076088071defa8729054b690258ff64d7c0",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/validation-0.json",
+      "sha256": "5103e4e2c87ae01bcde6c78573725bc90d35c1e4d00eaa74ff6f9ac3ca41aef5",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/validation-1.json",
+      "sha256": "2daf62fca9ca4d84fdcddeb382cc006bfb0ef982abeedd1c09c4b316faa6a92c",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/validation-2.json",
+      "sha256": "12af724e82bf2bf1d21ee7d4825721633d553322e62c75069b219cd18a23fc43",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/control-0.json",
+      "sha256": "1454d4405fb8eeeb702a33d4f44cf350de6304fc47b1fdf03ab49f814a231afb",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/control-1.json",
+      "sha256": "7f69941aea74cbca8d57d0fb6e0809d32f149bb2be054a1748d469e22c50a0ac",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/control-2.json",
+      "sha256": "de29a4e9c3a8de661d40be5bd8aebe08e7c3883020fcc7e4ee8d97f920c98d4c",
+      "signature_verified": true
+    },
+    {
+      "path": "search/final.json",
+      "sha256": "aeb8407dafdbd70d3ec70c24b366f7ae55a2a99d0503b15b9e838f7f6ce2ecd5",
+      "signature_verified": true
+    }
+  ],
+  "source_hashes_match": true,
+  "correctness_passed": true,
+  "power_and_settings_unchanged": true,
+  "status": "final-performance-unconfirmed",
+  "target_met": false,
+  "final_gflops": 957.1290355536603,
+  "calls": 102,
+  "attempts": 6,
+  "promoted": 0
+}
