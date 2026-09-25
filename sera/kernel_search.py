@@ -21,6 +21,7 @@ class KernelCandidate:
     name: str
     source: str
     hypothesis: str
+    specialist_id: str | None = None
 
     def __post_init__(self):
         if any(not isinstance(value, str) or not value.strip()
@@ -60,7 +61,7 @@ def _score(report, *, final, identity):
 
 def optimize_kernel(*, baseline, propose, evaluate, output_dir, max_candidates=8,
                     repeats=3, target_gflops=1780.0, min_improvement=0.05,
-                    max_seconds=1800.0, trial_timeout=120.0):
+                    max_seconds=1800.0, trial_timeout=120.0, validate=None):
     """Search standalone gemm C sources; return source only after held-out checks.
 
     ``propose(history)`` returns a KernelCandidate or None. ``evaluate`` owns
@@ -119,11 +120,22 @@ def optimize_kernel(*, baseline, propose, evaluate, output_dir, max_candidates=8
         source = source_dir / "kernel.c"
         source.write_text(candidate.source)
         record = dict(name=candidate.name, hypothesis=candidate.hypothesis,
+                      specialist_id=candidate.specialist_id,
                       source=str(source), source_hash=source_hash, status="running",
                       scores=[], reports=[], control_scores=[], control_reports=[],
                       median_gflops=None)
         report["trials"].append(record)
         save()
+        if validate is not None:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Kernel search deadline reached")
+            record["public_correctness"] = validate(
+                source, trial_dir / "correctness.json", timeout=min(trial_timeout, remaining))
+            if record["public_correctness"].get("passed") is not True:
+                record.update(status="rejected", error=record["public_correctness"].get("error"))
+                save()
+                return record
         for repeat in range(repeats):
             def measure_control():
                 control_path = trial_dir / f"control-{repeat}.json"
@@ -151,6 +163,7 @@ def optimize_kernel(*, baseline, propose, evaluate, output_dir, max_candidates=8
             if identity is None:
                 identity = _identity(measured)
                 report["comparison_identity"] = identity
+            record["comparison_identity"] = identity
             record["scores"].append(score)
             save()
             if control is not None and repeat % 2 == 1:
@@ -180,9 +193,11 @@ def optimize_kernel(*, baseline, propose, evaluate, output_dir, max_candidates=8
                 report["stop_reason"] = "duplicate-source"
                 break
             # Promotion requires separated observed ranges, not a lucky best sample.
-            if (current["status"] == "passed" and min(current["scores"]) >
-                    max(current["control_scores"]) * (1 + min_improvement)):
+            current["promoted"] = (current["status"] == "passed" and min(current["scores"]) >
+                                    max(current["control_scores"]) * (1 + min_improvement))
+            if current["promoted"]:
                 best = current
+            save()
             if min(best["scores"]) > target_gflops:
                 report["stop_reason"] = "validation-target-reached"
                 break

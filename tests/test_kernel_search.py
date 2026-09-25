@@ -120,3 +120,11 @@ def test_proposer_receives_measured_history(tmp_path):
         return None
     report, _ = run(tmp_path, {"base": 1000}, propose=propose)
     assert report["stop_reason"] == "search-exhausted"
+
+
+def test_public_correctness_failure_prevents_scoring(tmp_path):
+    def validate(source, output, *, timeout):
+        return dict(passed=source.read_text() == "base", error="wrong tail")
+    report, evaluator = run(tmp_path, {"base": 1000, "new": 9999}, validate=validate)
+    assert ("new", False) not in evaluator.calls
+    assert report["trials"][1]["status"] == "rejected"

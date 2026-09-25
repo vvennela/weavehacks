@@ -122,7 +122,8 @@ class CodexKernelProposer:
         call_dir.mkdir()
         # Share measurements and source, never evaluator paths or private inputs.
         evidence = [{key: trial.get(key) for key in
-                     ("name", "hypothesis", "status", "scores", "median_gflops", "error")}
+                     ("name", "hypothesis", "status", "scores", "control_scores",
+                      "median_gflops", "promoted", "error")}
                     | {"source": Path(trial["source"]).read_text()} for trial in history]
         prompt = (
             "You are Sera's CPU kernel engineer. Produce one complete standalone C kernel. "
