@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_tiles",
+    "sme_fp32_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "loop_order",
+    "address_generation",
+    "tail_alignment",
+    "scratch_lifetime",
+    "k_loop_schedule",
+    "b_panel_layout",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Retain 14 prior advisors and replace prefetch_locality with sme_fp32_schedule. The supplied loop experiments establish no accepted gain; schedule and K-loop specialists cover accumulator dependencies and distinct alternatives without repeating tested implementations unchanged. Tile and register specialists cover reuse within four ZA.S tiles. Transpose, packing, cache, scratch and loop-order specialists cover the supplied packing and consumption paths; cache conflicts remain an unverified hypothesis. Vector, address, tail and assembly specialists cover bounds, pointer changes and small edits tied to source hashes. All advice remains unverified until measured. This roster selection does not rank experiments or change the pending swarm order. Fresh paired measurements and Astra review remain prerequisites to continuation; the 15 Luna specialists jointly rank new batches. Preserve the fixed benchmark, FP32 arithmetic, ABI, streaming transitions, general-size behavior, timed packing and allocation, and complete BSD notice."
+}

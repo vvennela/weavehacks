@@ -1,27 +1,36 @@
-# AC-only measurement continuation
+# LIBXSMM battery measurement continuation
 
-This script is prepared but has not run a performance measurement. It consumes the correctness-tested `libxsmm-k-loop-software-pipeline` candidate from the previous preparation phase once, then continues the original pending order: `address_generation`, `sme_fp32_tiles`.
+The completed block retained the original 15-specialist rankings and spent budgets, measured the prepared software-pipeline candidate, then continued the pending pointer-end and two-step-unroll experiments. All three candidates passed 48 deterministic correctness cases. None passed the unchanged promotion gate: minimum candidate throughput must exceed maximum paired control throughput by 5%.
 
-Before execution it checks the board hash, all 15 rankings, aggregated order, spent budgets, candidate hash, correctness evidence, retained license, and exact replay of the saved edits against the reference. The existing 33 model calls and two implementation attempts remain spent. The hard caps remain 108 calls and six attempts: one prepared candidate awaits measurement, and four new implementation attempts remain available.
+| Source | Validation GFLOP/s | Paired controls GFLOP/s | Astra review |
+| --- | --- | --- | --- |
+| Unchanged LIBXSMM reference | 1020.50, 1077.33, 1055.97 | Initial baseline | Retained |
+| Software pipeline | 730.60, 778.17, 756.87 | 795.07, 1015.36, 847.47 | Reject |
+| Pointer-end tests | 765.68, 1018.89, 954.30 | 824.69, 868.49, 801.90 | Revise; not promoted |
+| Two-step K unroll | 1087.51, 1047.55, 1091.20 | 947.56, 1040.11, 873.32 | Revise; not promoted |
 
-The script imports no old timing results into promotion eligibility. It will run a fresh reference baseline, repeated paired controls, Astra's measured reviews, and the final held-out check under the unchanged hill. AC is required before model/evaluator setup and around each score. Power settings must remain unchanged. Candidate sources must retain the LIBXSMM license notice before they reach correctness or timing checks.
+The unchanged reference's final held-out score was **801.30 GFLOP/s**, below its 969.48 confirmation floor. The result is `final-performance-unconfirmed`, with no winner returned and the 1,800 GFLOP/s target unmet. The low final result and control spread limit performance conclusions. No improvement is claimed.
 
-This is a specific audited research continuation, not a general production resume API. It requires a fresh `agent/` and `search/` output directory; it does not overwrite a partially measured run.
+All 22 signed reports were independently verified. Before/after observations confirm battery power and unchanged power settings for each score. Source hashes match the saved correctness records. See [verification.json](verification.json), [search/result.json](search/result.json), and the [AC/battery source comparison](../cpu-libxsmm-power-comparison-2026-09-24/report.md). AC results remain preserved separately. These new candidates do not yet have AC measurements.
 
-Check the saved plan without generation or scoring:
+## Budgets and continuation
+
+The script checked the board hash, all 15 rankings, aggregated order, spent budgets, candidate hash, correctness evidence, retained license, and replay of the saved edits. It imported 33 model calls and two implementation attempts, but no old timing results for eligibility. The completed plan used 71 total model calls and six total implementation attempts, including the earlier timeout and prepared candidate. The second swarm batch selected two ideas: Astra abstained because one was already present in the reference and the other required an unsupported paired-load writeback form. No unmeasured proposal was credited as an improvement.
+
+The hard caps remained 108 calls and six attempts. The frozen hill, numerical tolerance, compiler flags, one-thread limit, three repeats, paired controls, and final held-out check stayed unchanged. This is a specific audited research continuation, not a general production resume API. Output directories cannot be reused to overwrite a run.
+
+## Power policy and checks
+
+The user approved measurements on both AC and battery. Each block establishes fresh baselines and paired controls, keeps power source/settings unchanged, and retains both power modes separately for the same exact source. Missing source/power combinations remain unmeasured until that mode is available. Earlier AC-only preflight and review artifacts record the superseded policy.
+
+Seven checkpoint and power-policy tests pass. Check the saved plan without generation or scoring:
 
 ```sh
 PYTHONPATH=. /tmp/sera-audit-venv/bin/python evidence/cpu-libxsmm-measure-prepared-2026-09-24/run.py --check-only
 ```
 
-Run measurements after AC is restored:
+The completed invocation was:
 
 ```sh
 PYTHONPATH=. /tmp/sera-audit-venv/bin/python -u evidence/cpu-libxsmm-measure-prepared-2026-09-24/run.py
 ```
-
-Validation: six checkpoint/preflight tests pass. The check-only invocation confirms the prepared source hash and reports battery power. No performance result or target claim is attached to this continuation yet.
-
-## Updated power authorization
-
-The user subsequently authorized benchmarking on battery with a fresh baseline. The driver now accepts either AC or battery and requires the same power source and settings throughout the block. Prior AC scores remain separate from eligibility. Seven checkpoint/power-policy tests pass. The earlier AC-only preflight and review above describe the previous policy.
