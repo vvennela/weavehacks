@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_tiles",
+    "sme_fp32_schedule",
+    "register_reuse",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "address_generation",
+    "tail_alignment",
+    "scratch_lifetime",
+    "n512_fast_path",
+    "general_c_fallback",
+    "constant_shape_512",
+    "streaming_region_cost",
+    "b_panel_layout"
+  ],
+  "rationale": "Select these 15 advisors to assess a constant-loop n=512 candidate with a correct general fallback. n512_fast_path and constant_shape_512 cover dispatch and compile-time specialization. sme_fp32_tiles, sme_fp32_schedule, and register_reuse cover FP32 computation using only ZA selectors 0–3. a_transpose, panel_packing, b_panel_layout, and cache_blocking assess data layouts and reuse, including all timed packing costs. vector_access and address_generation cover memory access and loop overhead. tail_alignment and general_c_fallback protect odd dimensions, bounds, and n<=0 behavior. scratch_lifetime and streaming_region_cost assess per-call setup and cleanup. Replace loop_order, compiler_codegen, and prefetch_locality with constant_shape_512, streaming_region_cost, and b_panel_layout to focus this round; no compiler output or prefetch evidence was supplied. All advice remains unverified. Battery results establish neither gains nor causes. Preserve the ABI, FP32 arithmetic, compiler flags, thread count, tolerance, and frozen benchmark; promotion requires fresh AC measurements with unchanged repeated paired controls."
+}

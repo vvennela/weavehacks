@@ -47,3 +47,10 @@ def test_compiler_failure_is_recorded(tmp_path):
     report = check(tmp_path, "not valid c")
     assert report["passed"] is False
     assert report["stage"] == "compile"
+
+
+def test_broken_512_fast_path_is_rejected(tmp_path):
+    source = GOOD.replace('for (int i=0;', 'if(n == 512) return; for (int i=0;', 1)
+    report = check(tmp_path, source)
+    assert report['passed'] is False
+    assert 'n=512' in report['error']

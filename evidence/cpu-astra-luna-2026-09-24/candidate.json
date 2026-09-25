@@ -1,0 +1,6 @@
+{
+  "name": "sme-512-constant-bound-full-tiles",
+  "hypothesis": "Specialize only the multiplication loop for n=512 when the runtime streaming vector length gives complete 2VL tiles. Use constant reduction bounds, constant matrix strides, and all-active predicates. Retain the full transpose layout, separate streaming regions, four FP32 ZA tiles, and increasing-k updates. The general predicated path handles other sizes and incompatible vector lengths. The advisories do not establish a 32-lane vector length or a benefit from packing, scheduling, or allocation changes, so those changes are excluded. The compiler may already generate equivalent code. This source has not been compiled, tested, or measured; correctness at tolerance 0.002 and progress toward 1800 GFLOP/s require validation and fresh AC measurements under the unchanged frozen hill and repeated paired controls.",
+  "source_hash": "3eb823dcf4cc48e60404729587264a3d815a2e1a35bb5f378c4f816a811fa714",
+  "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-astra-luna-2026-09-24/candidate/kernel.c"
+}

@@ -1,0 +1,154 @@
+{
+  "schema_version": "sera-kernel-advisory-v1",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 1,
+  "max_model_calls": 17,
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "neon",
+      "simd",
+      "single-thread"
+    ]
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "proposed",
+      "roles": [
+        "sme_fp32_tiles",
+        "sme_fp32_schedule",
+        "register_reuse",
+        "a_transpose",
+        "panel_packing",
+        "cache_blocking",
+        "vector_access",
+        "address_generation",
+        "tail_alignment",
+        "scratch_lifetime",
+        "n512_fast_path",
+        "general_c_fallback",
+        "constant_shape_512",
+        "streaming_region_cost",
+        "b_panel_layout"
+      ],
+      "advice": [
+        {
+          "role": "sme_fp32_tiles",
+          "status": "received",
+          "advice": "Consider one focused n=512 fast-path experiment: retain the existing FP32 SME 2VL×2VL output tile in ZA0–ZA3, but process complete tiles with a constant-bound reduction loop because 512 is fixed and divisible by the supported streaming vector length on this M4 Pro. Keep the current predicated loop for general sizes and all tails. This removes the dynamic reduction bound in the dominant shape while preserving four FP32 accumulators and increasing-k update order. Advice only; no source or measurements were inspected or produced.",
+          "risks": "The compiler may already optimize the 512 bound, so this may have no effect. Confirm SVL assumptions on the target, validate odd and small sizes plus n<=0 against the existing tolerance, and compare with fresh AC paired controls. Do not attribute any joint outcome to this change alone.",
+          "abstain": false
+        },
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "advice": "No schedule change can be recommended from the supplied evidence. The four ZA tiles each accumulate in increasing k order, and the two-step pipeline already tested that order while showing no established gain under noisy battery measurements. Keep the schedule unchanged for the fresh AC baseline. If Sera evaluates another schedule, check generated instructions for preserved per-tile k order, run the fixed correctness check across n=512 and odd tails, and compare repeated paired AC measurements against unchanged controls before drawing a performance conclusion.",
+          "risks": "A different interleaving may change floating-point accumulation order or increase register pressure; neither correctness nor speed can be inferred without compilation and measurement. Historical scores are noisy battery results and do not establish causality or a gain.",
+          "abstain": true
+        },
+        {
+          "role": "register_reuse",
+          "status": "received",
+          "advice": "No useful register-reuse change is supported by the supplied evidence. The current 2VL×2VL SME tile already reuses each loaded A vector across two B column vectors and each loaded B vector across two A row vectors, using exactly the four permitted ZA tiles. Increasing reuse across more output rows or columns would require a different ZA mapping or more live FP32 vectors, with no supplied evidence that the added register pressure would pay off. Keep the current tile and advise Sera to inspect generated assembly before considering any vector-lifetime changes.",
+          "risks": "Register-pressure effects and assembly quality cannot be assessed from the supplied source and historical battery scores. Those scores are noisy context and do not establish causality or performance. No change or performance claim is recommended.",
+          "abstain": true
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "advice": "No legal, evidence-supported transpose or packing change is established. The supplied measurements show no candidate gain, and the historical scores were noisy battery runs, so they do not support a performance conclusion. Recommend no transpose change. Compare full timed costs on the fresh AC baseline for every supported n: include allocation, transpose or packing, kernel consumption, and free; check odd tails, n<=0, and the fixed FP32 error tolerance.",
+          "risks": "The evidence gives no per-n AC timings or stable paired results. Selecting full transpose, panel packing, or another layout from these data could add cost without a demonstrated benefit. Any candidate also needs checks for all four ZA tile selectors and correct handling of partial tiles.",
+          "abstain": true
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Test a bounded B-panel layout inside gemm: for each contiguous block of up to 2*svcntsw() output columns, pack B into k-major storage with those columns contiguous, then reuse it across row tiles. Keep the existing four ZA output tiles and FP32 outer products; replace strided B loads with contiguous packed-panel loads. Allocate only n*panel_width floats, include allocation, packing, and free in the call, and retain a correct fallback if allocation fails. Handle the final short column panel with predicates and avoid reading or writing beyond n. This is a concrete layout hypothesis; the supplied evidence does not establish that it improves performance.",
+          "risks": "Packing cost may exceed the saved B-load cost, especially because the packed panel is rebuilt for each column block. The benefit is unmeasured and may be within timing noise. Check n512 correctness against the frozen 0.002 tolerance, odd and short tails, n<=0, allocation failure behavior, and unchanged general GEMM ABI and FP32 arithmetic. Compare with a fresh AC baseline using repeated paired controls; do not attribute any joint result to this change alone.",
+          "abstain": false
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "Recommend one limited n=512 experiment: keep the existing ZA transpose and FP32 SME outer-product arithmetic, but add cache blocking only to the output column loop. Process adjacent column tiles in small groups while reusing each loaded A vector across those tiles; retain the current general path for other n and all tails. This is a hypothesis about reuse, not evidence of a cache bottleneck or a predicted gain. Supplied results do not isolate cache effects or establish a stable candidate gain.",
+          "risks": "Extra live ZA accumulators or vectors can raise register pressure and reduce throughput; changing tile scheduling can also add loop overhead. Avoid proposing a specific block size as established without measurements. Check correctness against the fixed tolerance on n=512, odd dimensions, small positive n, and n<=0; then compare with a fresh AC baseline using repeated paired controls under the unchanged hill and settings. Attribute any result only to the tested candidate, not an advisor.",
+          "abstain": false
+        },
+        {
+          "role": "vector_access",
+          "status": "received",
+          "advice": "I abstain from proposing a vector-access change. The supplied evidence shows SME vector loads and stores, but gives no guaranteed input alignment, streaming vector length, or verified access pattern that supports a safe improvement. Keep predicated loads and stores for odd tails and general n. Do not assume alignment from n=512: the ABI does not specify A, B, or C alignment.",
+          "risks": "An unproven alignment assumption can make accesses incorrect. Changing tile widths or access patterns can also break odd-tail handling or FP32 tolerance. No advice here is measured; validate any later candidate on general odd sizes and n<=0, then use the frozen AC paired controls for performance evaluation.",
+          "abstain": true
+        },
+        {
+          "role": "address_generation",
+          "status": "received",
+          "advice": "For the full-tile path, compute row and column base pointers once per output tile, then use a constant-trip reduction loop with pointer increments instead of recomputing k*n+i and k*n+j addresses each step. Keep the existing predicated tail path for incomplete tiles and general n. At n=512, a specialized path can use a fixed 512-step reduction loop only when n==512; it must still advance pointers within valid bounds and leave other dimensions on the general path. This directly targets repeated address arithmetic and loop branches while retaining FP32 SME outer products and the four ZA tile selectors.",
+          "risks": "The compiler may already strength-reduce these expressions, so the change may have no effect. Pointer increments can introduce off-by-one or out-of-bounds access errors, especially when the final reduction step advances past the valid object; avoid forming invalid pointers and check odd dimensions, n smaller than a tile, tail rows and columns, n<=0, and numerical error against the fixed tolerance. Any performance conclusion requires fresh AC paired controls; the supplied battery scores are noisy historical context.",
+          "abstain": false
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "For the general SME path, build tail predicates and offsets from each tile’s remaining element count. For a tile beginning at j, load the second B vector from j + min(VL, n-j), with a predicate covering only the remaining columns after the first VL. Apply the same rule to A’s second row vector and store only active rows and columns. This avoids relying on masked loads to make an out-of-bounds base pointer safe. Keep the existing four ZA tile selectors (0–3), and use a full-tile branch only when both dimensions contain the complete 2VL tile. For n=512, consider a separate constant-loop path only if it is guarded by runtime checks that n is 512 and the full-tile assumptions hold; retain the general path for every other size.",
+          "risks": "The supplied evidence contains no validated tail-specific failure or measured benefit, so this is correctness hardening advice, not a performance claim. Predicate and pointer-offset mistakes can still corrupt odd tails; the current benchmark evidence also does not establish that a fast path will improve AC scores. Do not attribute any future score change to tail handling without paired controls.",
+          "abstain": false
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "No useful allocation change is supported by the supplied evidence. The row-panel packing candidate uses O(n·2VL) scratch, but its recorded scores did not establish a gain, and there is no AC baseline. Keep scratch per-call and free it before return; do not add persistent state. If Sera evaluates panel packing, verify allocation overflow handling, allocation-failure fallback, odd tails, n<=0 behavior, correctness tolerance, and reentrancy. Treat performance as unverified until repeated paired AC controls show a gain.",
+          "risks": "Reducing allocation size alone may not reduce timed cost; panel packing adds copy work and may shift the bottleneck. Do not infer cause or credit one advisor from the noisy historical scores.",
+          "abstain": true
+        },
+        {
+          "role": "n512_fast_path",
+          "status": "received",
+          "advice": "Try a constant-bound n=512 fast path with a 2VL×2VL ZA output tile. Since 512 is divisible by the M4 Pro's 32-lane streaming FP32 vector length, use unpredicated full tiles and fixed tile/reduction bounds; retain the existing predicated SME path for every other n. This removes repeated tail checks and bound calculations from the fixed shape without changing arithmetic, ABI, packing, or allocation rules. Validate n=512 against the fixed tolerance, and validate odd sizes, n<=0, and sizes smaller than one tile through the fallback. Treat any speed change as unverified until paired AC measurements.",
+          "risks": "The benefit may be small because the existing kernel already handles full tiles with predicates that are true at n=512. Confirm the streaming vector length assumption on the target and verify full-tile stores cover exactly the output. Do not infer performance or advisor-specific causality from the noisy historical scores.",
+          "abstain": false
+        },
+        {
+          "role": "general_c_fallback",
+          "status": "received",
+          "advice": "Use a cache-blocked scalar C fallback with small fixed row and column tiles and an increasing-k inner loop. Initialize each C tile to zero, then iterate k blocks in ascending order and update C[i:i+MR, j:j+NR] using FP32 multiply-adds. Keep a scalar cleanup path for incomplete tiles. Add checked size arithmetic for any scratch allocation; the fallback itself can avoid allocation entirely. Route only unsupported-SME or allocation-failure cases to this path, while preserving n<=0 as an immediate return. This is a general C change: it improves B and C locality for edge shapes without relying on the benchmark size, external libraries, or input values.",
+          "risks": "No portable tile size is established by the supplied evidence, and compiler vectorization may change rounding or fail to vectorize the intended loops. Do not claim a speedup. Ensure the accumulation order remains increasing in k and check the existing 0.002 relative-to-reference maximum error on odd and small sizes, plus n<=0. Check unsupported-SME dispatch and allocation-failure behavior. Any performance decision needs the specified repeated paired measurements against a fresh AC baseline.",
+          "abstain": false
+        },
+        {
+          "role": "constant_shape_512",
+          "status": "received",
+          "advice": "A useful n=512 specialization is to keep the existing four-tile SME transpose and arithmetic, but remove repeated tail handling from that path. Add a compile-time n=512 variant with fixed bounds and all-active predicates, selected only when n == 512; retain the current general kernel for every other n and for n <= 0. The supplied source already shows the necessary four-tile layout and full-tile outer-product operations. At n=512, its tiles are full when the runtime streaming vector length divides 512 into complete 2VL blocks; verify that condition before using all-active loads or stores. Keep accumulation in FP32 and preserve increasing-k order. This is a candidate optimization, not a measured gain.",
+          "risks": "The evidence does not establish the streaming vector length or that 512 always forms complete tiles on the target, so an unchecked all-active specialization could access past array bounds. Fixed bounds may also be optimized identically to the existing loops, giving no speedup. Do not attribute any future joint result to this change alone without isolated paired controls.",
+          "abstain": false
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "advice": "No supported change identified. Keep the existing legal SME function boundaries and ZA setup. The supplied evidence has no measurements that isolate streaming-region entry, exit, or ZA setup costs, so it does not support changing those boundaries or combining transpose and GEMM. Any proposed change would need an independent source review and a complete-call paired measurement against a fresh AC baseline, with correctness checked at n=512 and odd-tail sizes.",
+          "risks": "Combining work in one streaming region may reduce entry and exit overhead, but may also increase live ZA state or complicate function boundaries. The evidence does not show whether that overhead matters relative to packing and GEMM time. Prior battery scores are noisy and cannot establish causality or performance.",
+          "abstain": true
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not establish that packing a row-major B panel will improve the SME consumer enough to pay for timed packing. The prior panel-packing trials packed A, so their noisy joint scores do not isolate or support a B-panel change. If Sera tests this direction, preserve FP32 values and ABI, include allocation and packing in `gemm` timing, and compare against the unchanged baseline with repeated paired AC controls; check odd tails and the fixed error tolerance.",
+          "risks": "A packed B layout may add enough copy and allocation cost to erase any consumer benefit. The supplied battery measurements are noisy historical context and cannot verify an AC gain or causal attribution.",
+          "abstain": true
+        }
+      ],
+      "rationale": "Select these 15 advisors to assess a constant-loop n=512 candidate with a correct general fallback. n512_fast_path and constant_shape_512 cover dispatch and compile-time specialization. sme_fp32_tiles, sme_fp32_schedule, and register_reuse cover FP32 computation using only ZA selectors 0–3. a_transpose, panel_packing, b_panel_layout, and cache_blocking assess data layouts and reuse, including all timed packing costs. vector_access and address_generation cover memory access and loop overhead. tail_alignment and general_c_fallback protect odd dimensions, bounds, and n<=0 behavior. scratch_lifetime and streaming_region_cost assess per-call setup and cleanup. Replace loop_order, compiler_codegen, and prefetch_locality with constant_shape_512, streaming_region_cost, and b_panel_layout to focus this round; no compiler output or prefetch evidence was supplied. All advice remains unverified. Battery results establish neither gains nor causes. Preserve the ABI, FP32 arithmetic, compiler flags, thread count, tolerance, and frozen benchmark; promotion requires fresh AC measurements with unchanged repeated paired controls.",
+      "source_hash": "3eb823dcf4cc48e60404729587264a3d815a2e1a35bb5f378c4f816a811fa714",
+      "name": "sme-512-constant-bound-full-tiles",
+      "hypothesis": "Specialize only the multiplication loop for n=512 when the runtime streaming vector length gives complete 2VL tiles. Use constant reduction bounds, constant matrix strides, and all-active predicates. Retain the full transpose layout, separate streaming regions, four FP32 ZA tiles, and increasing-k updates. The general predicated path handles other sizes and incompatible vector lengths. The advisories do not establish a 32-lane vector length or a benefit from packing, scheduling, or allocation changes, so those changes are excluded. The compiler may already generate equivalent code. This source has not been compiled, tested, or measured; correctness at tolerance 0.002 and progress toward 1800 GFLOP/s require validation and fresh AC measurements under the unchanged frozen hill and repeated paired controls."
+    }
+  ]
+}

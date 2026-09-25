@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "hypothesis": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "stop": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "name",
+    "hypothesis",
+    "source",
+    "stop"
+  ]
+}

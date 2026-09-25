@@ -14,7 +14,7 @@ import tempfile
 import time
 
 SEED = 20260924
-SIZES = (0, 1, 3, 15, 16, 17, 31, 32, 33, 63, 64, 65, 96, 127, 129)
+SIZES = (0, 1, 3, 15, 16, 17, 31, 32, 33, 63, 64, 65, 96, 127, 129, 512)
 FLAGS = ("-O3", "-march=native", "-ffast-math", "-shared", "-fPIC", "-lm")
 
 
