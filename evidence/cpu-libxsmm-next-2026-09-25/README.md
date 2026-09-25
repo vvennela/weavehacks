@@ -15,3 +15,7 @@ PYTHONPATH=. /tmp/sera-audit-venv/bin/python -u evidence/cpu-libxsmm-next-2026-0
 ```
 
 Execution status and exact source hashes are in `controls.json`, `agent/state.json`, and `search/result.json` when created. Signed reports and before/after power observations accompany each trial. The source reviews are unverified research advice; the evaluator decides correctness and speed.
+
+## Terminal outcome
+
+The first implementation call exceeded its unchanged 180-second limit. The process exited with failure before any candidate source or score. All three fresh baseline reports were verified: 1105.62, 1044.67, and 936.95 GFLOP/s. There is no candidate result or final holdout. The saved plan retains 32 spent model calls, one spent implementation attempt, and the remaining swarm-ranked queue. Continuation must preserve those budgets and order.

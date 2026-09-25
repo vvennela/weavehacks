@@ -1,0 +1,20 @@
+{
+  "verified_reports": [
+    {
+      "path": "search/trial-000/validation-0.json",
+      "sha256": "19ea93f03e99b65add356f71b535a081e32c4de33cd9010a4b75b645a08894df"
+    },
+    {
+      "path": "search/trial-000/validation-1.json",
+      "sha256": "4b1ed364cc3d4a5f97ed1ce10d292044426cabc2b6dc0e10154cb54c483abada"
+    },
+    {
+      "path": "search/trial-000/validation-2.json",
+      "sha256": "e9bd7962f56d15a3e0c4478f05ba6b90480f5c34a03b6835a89c83baa4b91188"
+    }
+  ],
+  "report_count": 3,
+  "candidate_measurements": 0,
+  "status": "implementation-timeout",
+  "target_met": false
+}

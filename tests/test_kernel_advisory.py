@@ -309,3 +309,41 @@ def test_replacement_specialists_receive_skipped_experiment_reasons(tmp_path):
         assert 'Fold pointer updates into paired loads' in prompt
         assert 'Paired LD1W has no post-index writeback form' in prompt
         assert 'abstained' in prompt
+
+
+@pytest.mark.parametrize("call_limit", [32, 33])
+def test_implementation_timeout_consumes_attempt_and_keeps_ranked_queue(tmp_path, call_limit):
+    import subprocess
+    calls = []
+    base_factory = factory_for(calls)
+    attempts = []
+    def factory(**settings):
+        base = base_factory(**settings)
+        class Agent:
+            def request(self, prompt, schema, *, timeout):
+                if 'source' in schema['properties']:
+                    attempts.append(prompt)
+                    if len(attempts) == 1:
+                        calls.append((settings, prompt))
+                        raise subprocess.TimeoutExpired('codex', timeout)
+                return base.request(prompt, schema, timeout=timeout)
+        return Agent()
+    team = KernelAdvisoryTeam(work_dir=tmp_path/'team', task='FP32', profile={},
+        max_rounds=2, batch_size=2, agent_factory=factory, max_calls=call_limit)
+    if call_limit == 32:
+        with pytest.raises(subprocess.TimeoutExpired):
+            team.propose(history(tmp_path), timeout=60)
+        assert team.calls == 32
+        assert team.proposal_count == 1
+        assert team.pending == [DEFAULT_ADVISOR_IDS[1]]
+        return
+    candidate = team.propose(history(tmp_path), timeout=60)
+    assert candidate.source == 'new source'
+    assert team.calls == 33
+    assert team.proposal_count == 2
+    assert len(team.rounds) == 1
+    records = team.rounds[0]['implementations']
+    assert [r['experiment_id'] for r in records] == list(DEFAULT_ADVISOR_IDS[:2])
+    assert [r['status'] for r in records] == ['failed', 'proposed']
+    assert 'TimeoutExpired' in records[0]['error']
+    assert team.propose(history(tmp_path), timeout=60) is None

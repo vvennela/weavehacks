@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_tiles",
+    "sme_fp32_schedule",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "loop_order",
+    "address_generation",
+    "tail_alignment",
+    "scratch_lifetime",
+    "prefetch_locality",
+    "transpose_fusion",
+    "b_panel_layout",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "This roster covers distinct changes grounded in the supplied reference. sme_fp32_tiles examines alternatives to the current 32x32 four-ZA mapping; sme_fp32_schedule examines within-step FMOPA scheduling without repeating prior pipeline or unroll sources. a_transpose targets Llibxsmm_78 transfer scheduling; panel_packing examines the packed A layout; b_panel_layout examines packing the currently direct B stream. transpose_fusion examines consuming transposed values before scratch storage, accounting for repeated transpose work. cache_blocking examines reduction-block sizes; loop_order examines traversal changes beyond the existing 64x32 traversal. vector_access targets the output blocks: the supplied assembly uses two single-vector ST1W instructions per row, despite the review's paired-store description. address_generation targets packing and output pointer chains, excluding the previous pointer-end tests. scratch_lifetime examines stack reservation and scratch lifetimes; cache_conflict_layout examines distinct padding or stride changes without assuming cache conflicts. prefetch_locality evaluates bounded lookahead on the recorded access streams. tail_alignment covers safe alignment handling and general-size bounds. assembly_audit checks exact register lifetimes, redundant setup, instruction legality and ABI preservation in the supplied assembly. The existing n=512 dispatch and handwritten compute assembly make another generic fast-path or compiler-lowering role less useful here. These are advisor assignments, not experiment rankings or measured findings. Each advisor must propose a distinct block-level change with risks and validation. All fixed gates, per-call packing and allocation, the general ABI, and the complete BSD notice remain mandatory; promotion requires fresh paired controls."
+}

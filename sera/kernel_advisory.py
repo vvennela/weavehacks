@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import time
 from threading import Lock
 
@@ -341,6 +342,14 @@ class KernelAdvisoryTeam:
                           name=candidate.name, hypothesis=candidate.hypothesis)
             self._save()
             return candidate
+        except subprocess.TimeoutExpired as error:
+            record.update(status='failed', error=f'{type(error).__name__}: {error}')
+            self._save()
+            if time.monotonic() >= deadline or self.calls >= self.max_calls:
+                raise
+            if self.pending and self.proposal_count < self.max_rounds:
+                return self._implement(common, deadline, evidence)
+            return None
         except BaseException as error:
             record.update(status='failed', error=f'{type(error).__name__}: {error}')
             self._save()
