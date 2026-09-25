@@ -1,0 +1,121 @@
+{
+  "report_count": 22,
+  "reports": [
+    {
+      "path": "search/trial-000/validation-0.json",
+      "sha256": "c6d7b662ea9ade76a0820e1160771331c0319160d6004953504cd8ae86ad9df4",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-1.json",
+      "sha256": "8396ece44435c296fc3462822224dc61fd6644b8aba3f5dc7132bb5b5082b0e0",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-000/validation-2.json",
+      "sha256": "1d554612a0c392da0a41cec771af04e903e7bf2c9baa8807ea6ee30be67b8e84",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-0.json",
+      "sha256": "eaffdc75ebc571a39ac600b827c2ff788fd3961413b9d5a994a1c0a9d0654337",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-1.json",
+      "sha256": "8571fdb3eae35b87acd5e955d2f90f0bb8f99da5335c8c7b68b3654cfb3ff4d3",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/validation-2.json",
+      "sha256": "ec1c10ec1d999d720fc9573b42aaa2b3bff3778726ca5eb5e971366cd7d91b8f",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-0.json",
+      "sha256": "69692273da9cb52eba5bdfad521232794ee3299a35a730229695f6411f7cc849",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-1.json",
+      "sha256": "47f5ca4d989d5df1bc32e16a4773c6b9d4bf59a22a8abc1f0581b16765faab51",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-001/control-2.json",
+      "sha256": "e1fe876365098d01a722e6afe748ec534f050597c3057588f3579e744c4ad58f",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/validation-0.json",
+      "sha256": "b1b3959cc74434eadc72011b7f017d78b7301bfc8ddb38c4a3de8b6283131329",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/validation-1.json",
+      "sha256": "a7d1873e01fe15d751408851b3dae577eddf044fce187847d8a6d1112e3fee6a",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/validation-2.json",
+      "sha256": "610bcd66feb59baa256903179d47c653083a6d7405b6babcef5b7990afb46a13",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/control-0.json",
+      "sha256": "a7a949ce604e41938c7a863094d8e42b5f7d981a85d5b9416f354a90ff691359",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/control-1.json",
+      "sha256": "40ecd98b7a09b4914bce406738615f524d7426367020513b09e7c96143a58939",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-002/control-2.json",
+      "sha256": "67a2fffce3d412e056f079ab6518f0dd1043f30b425b467bb4b6d291f09fe4cd",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/validation-0.json",
+      "sha256": "9830b947c5ab05f6842c3ab0b69b26d273402b82b5333f1e33cd2d63ee3889c3",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/validation-1.json",
+      "sha256": "a8aa742274b6ad13e2a80974c7d9d979e096826bfb16398a1ca0e8ce22384cb3",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/validation-2.json",
+      "sha256": "8066d23d6a5a56d3d3aac54d7c51b866b03675fb35a204223744e870cff1a68f",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/control-0.json",
+      "sha256": "b21c2b5a8e4f6a0ca054b4c1439a64477dffadac8e3fdd5d650de028e2a05511",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/control-1.json",
+      "sha256": "50b717af49459308bf3eda1647d0ae034c701541dd59b61cf689945c8dda1398",
+      "signature_verified": true
+    },
+    {
+      "path": "search/trial-003/control-2.json",
+      "sha256": "9096a0e98f2443af9479650a36e9966435589d249fb0d13a79f021f40b17fe71",
+      "signature_verified": true
+    },
+    {
+      "path": "search/final.json",
+      "sha256": "79e08af9b5855ffcc092574c3651649702d02813b4e4bd73c00fbf7152ed127d",
+      "signature_verified": true
+    }
+  ],
+  "source_hashes_and_order_match": true,
+  "correctness_passed": true,
+  "unchanged_automatic_battery": true,
+  "promotion_gates_recomputed": true,
+  "status": "final-performance-unconfirmed",
+  "target_met": false
+}

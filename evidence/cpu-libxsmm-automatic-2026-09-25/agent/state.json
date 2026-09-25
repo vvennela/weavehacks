@@ -1,0 +1,49 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 3,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 0,
+  "adjudications": [
+    {
+      "source_hash": "0b3b4431f6de2c249f799b21fa2e6731a4353a8cf303b8ec36d2e3b8b86b2051",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "revise",
+      "reason": "Retain the incumbent: the fixed evaluator marked this candidate ineligible. Recorded correctness passed, but fresh Automatic battery paired differences were −10.9%, +17.7%, and +14.1%. Candidate scores ranged from 1339.7–1630.2 GFLOP/s; controls ranged from 1236.3–1503.5. These variable results do not establish a repeatable optimization gain over the imported LIBXSMM reference. No held-out result is supplied. Any revision must pass the unchanged correctness, paired-repeat, promotion, and held-out gates."
+    },
+    {
+      "source_hash": "cadb05ebb2492c7eda03d5a5e2a71eca07ce0a5bcfd4e4a83053f708a3c598b7",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "The fixed evaluator marked this candidate ineligible. Recorded correctness passed, but fresh Automatic battery throughput was below its paired control in all three repeats: −8.6%, −5.9%, and −22.1%. Candidate scores ranged from 1207.1–1488.6 GFLOP/s; controls ranged from 1282.8–1632.2. Despite substantial repeat variation, no pair showed a gain over the imported LIBXSMM reference. No held-out result is supplied. Discard this candidate and retain the incumbent. These measurements do not isolate the effects of constant bounds, transpose, or implementation choice."
+    },
+    {
+      "source_hash": "0e428f343d60f7adb08f3627e633c382df52ec6417375aeeff58cc18c9916dca",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "The fixed evaluator marked this candidate ineligible. Recorded correctness passed, but fresh Automatic battery paired differences were +10.6%, −19.2%, and −4.4%. Candidate throughput ranged from 1252.9–1377.2 GFLOP/s; controls ranged from 1132.4–1549.8. This variation and two losing pairs do not establish a repeatable gain over the imported LIBXSMM reference. No held-out result is supplied. Discard this candidate and retain the incumbent. These scores do not establish a cache-mapping cause or a power-mode kernel speedup."
+    }
+  ],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "energy_mode": "Automatic",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "single-thread"
+    ]
+  },
+  "rounds": []
+}

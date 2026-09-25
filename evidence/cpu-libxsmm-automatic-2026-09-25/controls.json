@@ -1,0 +1,41 @@
+{
+  "host": {
+    "timestamp_utc": "2026-09-25T09:46:43.909119+00:00",
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=21889123)\t39%; discharging; 1:33 remaining present: true\n",
+    "power_settings": "Battery Power:\n powermode            0\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+  },
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "energy_mode": "Automatic",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "single-thread"
+    ]
+  },
+  "task": "Remeasure the exact baseline and three previously swarm-selected candidate sources\nunder the user-approved temporary Automatic battery mode. Source hashes and order are\npreserved. No new proposal or roster selection is needed for this cross-profile replay.\nAstra reviews each candidate using ONLY fresh measured history and fixed eligibility.\nDo not import prior Low Power timing results into eligibility or claim a power-mode\nchange as a kernel speedup. Keep the frozen FP32 row-major full GEMM ABI, single-thread\ncompiler flags, tolerance, paired repeats, promotion gate, and held-out check.\nThe generated32-row primitive and full512 reference are imported LIBXSMM code; only a\nmeasured source change beyond the fresh reference can establish an optimization gain.\nThe user authorized restoring Low Power after this block. Never change system settings\nfrom an agent call; the host coordinates this separately.",
+  "prior_phase": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-panel-swarm-2026-09-25",
+  "prior_calls": 102,
+  "prior_attempts": 6,
+  "prior_state_sha256": "75d44db1e1f52dde22fa7d888d7c7c419cfafac5e52ad8cefafcbb632bc2a27a",
+  "source_hashes": [
+    "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+    "0b3b4431f6de2c249f799b21fa2e6731a4353a8cf303b8ec36d2e3b8b86b2051",
+    "cadb05ebb2492c7eda03d5a5e2a71eca07ce0a5bcfd4e4a83053f708a3c598b7",
+    "0e428f343d60f7adb08f3627e633c382df52ec6417375aeeff58cc18c9916dca"
+  ],
+  "prior_scores_imported": false,
+  "reusing_selected_sources": true,
+  "new_proposals": false,
+  "max_candidates": 6,
+  "max_model_calls": 108,
+  "max_seconds": 1800,
+  "agent_timeout": 180,
+  "target_gflops": 1800,
+  "implementation_commit": "6aae9e66c1ad3f26dc005ab34d473eefb69a7e2e",
+  "driver_sha256": "20af8a74957cecd126874c7beeac2b4472c64de3473f160893bb53690c1c6e0f"
+}

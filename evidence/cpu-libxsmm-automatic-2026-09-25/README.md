@@ -13,3 +13,20 @@ Run once after the approved mode is visibly active:
 ```sh
 PYTHONPATH=. /tmp/sera-audit-venv/bin/python -u evidence/cpu-libxsmm-automatic-2026-09-25/run.py
 ```
+
+## Completed Automatic outcome
+
+The exact-source replay completed with three Astra review calls and no new implementations. All four sources passed the 48-case correctness check. All 22 signed reports were independently verified. Source hashes and order match the preceding Low Power block; every timing report retained Battery Power and Automatic settings.
+
+| Source | Scores (GFLOP/s) | Paired controls (GFLOP/s) |
+| --- | --- | --- |
+| libxsmm-reference-with-unused-panel32 | 1395.38, 1668.60, 1638.05 | Baseline |
+| libxsmm-n512-sixteen-panel32-calls | 1339.67, 1630.17, 1410.96 | 1503.49, 1384.88, 1236.32 |
+| libxsmm-n512-constant-shape-c-sme | 1488.55, 1207.13, 1270.95 | 1628.12, 1282.85, 1632.23 |
+| libxsmm-full512-padded-272-byte-a-slices | 1252.91, 1252.91, 1377.19 | 1132.44, 1549.78, 1441.26 |
+
+No candidate passed the fixed promotion gate. The first candidate reached 1,630.17 GFLOP/s in one report, but its median was 1,410.96 and its range overlapped controls. The imported baseline reached 1,668.60 in one validation report. Its held-out result was 1,153.52, below the 1,325.61 confirmation floor. Status: `final-performance-unconfirmed`; no winner; target unmet.
+
+The user-approved temporary setting was restored to battery Low Power immediately after the process exited successfully. Both System Settings and `pmset` confirmed restoration; see `power-restoration.json`. AC remains Automatic.
+
+The higher Automatic scores do not establish a kernel improvement or isolate a causal power-mode effect. These modes were measured in sequential blocks, not a randomized crossover. The same three source changes remain unpromoted in both modes. No AC results exist for these three exact sources yet.
