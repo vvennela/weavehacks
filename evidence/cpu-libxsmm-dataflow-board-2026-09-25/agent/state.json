@@ -1,0 +1,43 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 1,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 0,
+  "adjudications": [],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "Battery Power",
+    "streaming_fp32_lanes": 16,
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "neon",
+      "simd",
+      "single-thread"
+    ],
+    "sme2": true,
+    "p_core_l1d_bytes": 131072,
+    "e_core_l1d_bytes": 65536,
+    "cache_line_bytes": 128
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "failed",
+      "roles": [],
+      "advice": [],
+      "ballots": [],
+      "implementations": [],
+      "error": "KeyboardInterrupt: "
+    }
+  ]
+}

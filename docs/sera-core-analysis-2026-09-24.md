@@ -203,3 +203,20 @@ another size-limit failure. Production readiness remains unproven; no model-work
 integration, native-code isolation or broad accuracy guarantee follows from this run.
 The ten-run improvement goal is still unmet. Evidence and independent source audit:
 `evidence/cpu-libxsmm-strassen-swarm-2026-09-25`.
+
+
+## User-directed return to repeatability
+
+The user redirected research to the strongest existing Sera source,
+`eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf`,
+instead of further Strassen or broad algorithm searches. The next broad board was
+interrupted during coordinator planning:10 baseline reports,1 model call,0candidate
+implementations, no holdout. Its raw terminal state is failed/KeyboardInterrupt;
+all10 reports and its source/power records verified. No background run remains.
+
+That best source uses32-row panels,64KiB scratch and one SME region across16panels.
+The source change is real, but the previous AC series won5/10pairs and exceeded the
+fresh imported initial peak1/10times. Both candidate and control have substantial
+variation among their three raw timed calls. The next step is an exact-source replay
+with the original imported control, preserving all raw timing triplets and gates.
+No claim of system-wide optimality or production readiness is established.

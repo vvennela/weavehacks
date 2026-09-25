@@ -1,0 +1,21 @@
+{
+  "phase": "cpu-libxsmm-dataflow-board-2026-09-25",
+  "search_status": "failed",
+  "cause": "KeyboardInterrupt after baseline measurements, during first coordinator request",
+  "shell_exit_code": 130,
+  "run_process_terminal": true,
+  "future_benchmark_live": false,
+  "model_calls": 1,
+  "implementation_attempts": 0,
+  "candidate_sources": 0,
+  "holdout_present": false,
+  "winner_source": null,
+  "signed_baseline_reports": 10,
+  "baseline_source_sha256": "8bb0113e377808a841819354296fa0ef02ff49e4188d57a091afc6463fc0ca18",
+  "power_mode": "Battery Power",
+  "baseline_score_min": 794.3828585635054,
+  "baseline_score_median": 1031.196256389511,
+  "baseline_score_max": 1099.9560103146712,
+  "no_performance_runs_launched_by_verifier": true,
+  "evidence": "search/result.json, agent/state.json, and terminal run.log"
+}
