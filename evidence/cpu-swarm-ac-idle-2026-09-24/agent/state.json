@@ -1,0 +1,314 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 32,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 1,
+  "adjudications": [],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "AC",
+    "user_idle_requested": true,
+    "streaming_fp32_lanes": 16,
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "neon",
+      "simd",
+      "single-thread"
+    ]
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "status": "selected",
+      "roles": [
+        "sme_fp32_schedule",
+        "a_transpose",
+        "panel_packing",
+        "cache_blocking",
+        "loop_order",
+        "compiler_codegen",
+        "tail_alignment",
+        "scratch_lifetime",
+        "za_four_tile_reuse",
+        "transpose_fusion",
+        "b_panel_layout",
+        "constant_shape_512",
+        "streaming_region_cost",
+        "assembly_audit",
+        "cache_conflict_layout"
+      ],
+      "advice": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "advice": "Abstain. The supplied incumbent issues four MOPAs per k step to four distinct ZA tiles, so the listed instructions show no same-step accumulator dependency between those operations. Changing their order or interleaving them across k steps is not a supported opportunity from this evidence. The source and compiler output for a new schedule candidate are not supplied, so I cannot verify a distinct change or that clang does not already emit it.",
+          "risks": "Any schedule proposal without source and compiler output could repeat existing compiler behavior. Reordering reductions could also change FP32 results; preserve increasing-k accumulation and tolerance 0.002.",
+          "abstain": true
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "advice": "Abstain. The supplied history contains no actual compiler output for the incumbent transpose body, and the instructions require inspecting compiler output before proposing a change. I cannot inspect it under the no-tools constraint. I have no evidence-based new transpose or packing experiment to recommend.",
+          "risks": "The existing transpose may have optimization opportunities, but proposing one without the required source and compiler-output comparison could repeat work the compiler already performs or a prior experiment already tested. Any future candidate must compare the full timed cost of packing and consumption across supported n, preserve the ABI and fixed benchmark contract, and pass general-size correctness and fixed-tolerance checks. No performance claim is established.",
+          "abstain": true
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "advice": "Abstain. I cannot propose a defensible panel-packing experiment from the supplied evidence. The incumbent already transposes all of A inside gemm, and its SME loop streams packed A rows and B rows for four ZA accumulators. The supplied compiler blocks show these loads and MOPAs; they do not show that another bounded A or B panel layout would improve useful reuse. Any packing change would add allocation, copy, and tail-handling work inside the measured call, with no evidence here to show that reuse would repay that cost. Source name/hash: existing-sme / 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258.",
+          "risks": "A speculative panel could increase measured-call traffic and storage, add tail bugs, or change accumulation behavior. The supplied block does not include current measurements for a panel layout, and prior noisy outcomes do not establish causality. No correctness or performance claim is made.",
+          "abstain": true
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "advice": "Abstain. The supplied incumbent keeps four FP32 ZA accumulators live for one 32×32 output tile while streaming each reduction step across Aᵀ and B. The evidence includes no cache-miss, bandwidth, or compiler data that supports a cache-blocking change, and it does not identify a distinct block-size experiment that is likely to help at n=512. The tested A-reuse loop spilled partial C each reduction step and was rejected after severe regressions; do not repeat it. No new cache-blocking proposal is supported by the supplied evidence.",
+          "risks": "A speculative blocking change could add packing or memory traffic inside gemm without a demonstrated cache benefit. Any future candidate needs a named base source and hash, fixed-flag compiler output showing the change is not already emitted, correctness checks for general sizes and odd tails, and fresh repeated paired AC results under the fixed gates.",
+          "abstain": true
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "advice": "Base: supplied `existing-sme` source, hash `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Propose interchanging the outer `i` and `j` output-tile loops in `sme_gemm`: traverse all column tiles for one row tile before advancing to the next row tile. Keep the `k` loop inside both tile loops, with its full increasing-order reduction; preserve all loads, four ZA selectors, predicates, stores, transpose, allocation, ABI, and fallback behavior. Hypothesis: writing adjacent column tiles for each row block may improve C write locality. This is unverified advice, not a measured fact. The supplied compiler block shows the reduction loop but does not establish whether this outer-loop change is already emitted by the compiler; inspect fixed-flag compiler output before implementation and abstain if it is equivalent.",
+          "risks": "The change may not improve locality because each tile writes a 32-row by 32-column region and the current traversal already writes adjacent columns within each row tile. Changing traversal may affect reuse of A/B data and cache behavior. Preserve the complete k reduction and test n=512 plus odd sizes, partial tiles, small sizes, and n<=0 against the fixed 0.002 tolerance. Measure with fresh paired controls in the current AC block and report spread; do not infer causality from noisy scores or attribute a joint outcome to this proposal alone.",
+          "abstain": false
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence includes fixed-flag compiler output for several sources, but it does not include the actual compiler output for the fresh baseline source hash 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. The other available code-generation changes are either already present in the baseline or repeat tested pointer advancement, load scheduling, or two-step unrolling. The failed A-reuse proposal is also explicitly excluded. I cannot identify a distinct source change justified by both source and compiler output.",
+          "risks": "No new code-generation experiment is proposed. Making one from the supplied evidence would risk repeating a tested transformation or recommending work already performed by the compiler.",
+          "abstain": true
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "advice": "Abstain. The supplied source has predicated SME loads and stores for partial tiles, while its four ZA selectors (0–3) already cover the output tile. The fresh benchmark is n=512, a multiple of the 16-lane width, so a tail-specific change has no clear opportunity to improve the measured workload. No source/compiler evidence identifies redundant tail work worth changing safely.",
+          "risks": "A speculative tail rewrite could introduce out-of-bounds access or alter correct results for odd and partial shapes without improving n=512. No new experiment is supported by the supplied evidence.",
+          "abstain": true
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not identify a safe scratch change with likely benefit. The baseline allocates one n×n FP32 transpose buffer, writes it during transpose, reads it during GEMM, then frees it. Avoid replacing malloc/free with retained state, uninitialized scratch, or answer caching. No distinct improvement in per-call allocation or initialization is justified by the source or compiler evidence provided.",
+          "risks": "A smaller or reused buffer could break the full at[k*n+i] layout or tail handling; retained storage would violate the no-state and reentrancy constraints. No scratch-allocation timing or compiler evidence was supplied, so any benefit claim would be unverified.",
+          "abstain": true
+        },
+        {
+          "role": "za_four_tile_reuse",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence names only the incumbent source `existing-sme` (SHA-256 `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`) and its emitted FMOPA sequence: it loads A0, A1, B0, B1 and updates ZA0–ZA3. It does not provide compiler output for a distinct four-tile output mapping or schedule. Any proposed remapping or scheduling change would therefore lack the required source-and-compiler inspection and could repeat a transformation already emitted by the compiler. No new legal optimization is established by this evidence.",
+          "risks": "Do not infer a performance gain from the static instruction listing. Any later proposal needs actual compiler output, correctness checks for general sizes and odd tails at tolerance 0.002, and fresh paired AC measurements under the fixed benchmark controls.",
+          "abstain": true
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "advice": "Abstain. The supplied source and compiler output show that `sme_transpose` materializes all of `at` before `sme_gemm` consumes it. A proposal that feeds a small transposed A tile directly to MOPA would need to change the loop order or retain partial C across more reduction work. The supplied evidence does not establish a new legal design that avoids the known partial-C spill/reload cost. No complete source or compiler output for a distinct tile-fusion design is supplied, so I cannot verify that it is absent from the current code or avoid repeating the rejected tradeoff. The fresh baseline is 1372.78–1504.19 GFLOP/s; it provides no evidence for a fusion change.",
+          "risks": "Any fused design must count repeated transpose work and all scratch traffic inside the timed `gemm` call. It must preserve FP32 MOPA selectors 0–3, increasing-k arithmetic, general-size and odd-tail behavior, and tolerance 0.002. No performance claim is supported without compiler output and fresh paired AC measurements.",
+          "abstain": true
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not include the incumbent’s actual compiler output, so it is not possible to check whether B-panel packing is already emitted or present. I cannot propose a source-based experiment that meets the required inspection rule without that evidence.",
+          "risks": "The fresh AC baseline scores are 1372.78–1504.19 GFLOP/s, but they do not show whether packing improves the SME consumer enough to cover its setup cost. Do not infer a packing benefit from those scores. Any later proposal should identify the base source hash and verify that panel setup is included in timing.",
+          "abstain": true
+        },
+        {
+          "role": "constant_shape_512",
+          "status": "received",
+          "advice": "Abstain. The supplied evidence does not include current source or compiler output for a constant-shape 512 kernel, so I cannot verify a distinct change or rule out that the compiler already emits it. The fresh baseline is 1372.78–1504.19 GFLOP/s; it does not identify a specific optimization opportunity. Do not treat historical noisy outcomes as evidence for this experiment.",
+          "risks": "Proposing a specialization without inspecting its source and generated instructions could repeat an existing transformation. Any future candidate must preserve FP32 MOPA selectors 0–3, the general fallback, odd tails, n<=0 behavior, ABI, tolerance, and allocation inside gemm, then pass the unchanged correctness checks and fresh paired AC trials.",
+          "abstain": true
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "advice": "Abstain. The supplied source and static compiler blocks do not show enough evidence to identify an untested, legal reduction in SME streaming-region entry, exit, or ZA setup costs. They show SME functions and ZA use, but not the generated entry/exit instructions or their cost. Proposing a source change from this evidence would risk repeating compiler-emitted behavior. Base: `existing-sme`, source hash `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`.",
+          "risks": "No new experiment is proposed. Any future candidate must inspect compiler output for the complete `gemm` call, preserve valid SME language and ABI boundaries, and compare repeated complete-call AC measurements against fresh paired controls. The supplied baseline scores have substantial spread and do not establish the cost or cause of streaming-region overhead.",
+          "abstain": true
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "advice": "Abstain. No new bottleneck can be established from the supplied current-source assembly: the evidence shows compiler blocks for historical variants, not compiler output for the fresh incumbent source/hash. The known blocks show four FMOPAs per reduction step and address/load instructions, but the source already contains those operations; proposing changes from these blocks would not satisfy the requirement to inspect actual compiler output for the source being optimized. Request the incumbent's fixed-flag compiler output before selecting an assembly-level experiment.",
+          "risks": "No experiment proposed. Historical score variation does not identify a cause, and the old A-reuse spill/reload path and prior pointer or unrolling variants should not be repeated.",
+          "abstain": true
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "advice": "Abstain. Supplied evidence identifies the baseline source (existing-sme, hash 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258) and runtime/compiler setup, but it does not include cache geometry, scratch addresses, or compiler output for a padded layout. The source allocates an n×n transpose with stride n; for n=512 that stride is 2048 bytes. A padding proposal would need a changed allocation and transpose/gemm indexing, and the supplied evidence cannot establish that this stride causes cache-set conflicts or that padding is beneficial. Do not propose it without that evidence.",
+          "risks": "Padding adds allocation size and memory traffic and can affect transpose and GEMM indexing, including odd tails. Any future test must keep all accesses within the padded allocation and measure the full allocation, packing, and computation cost. Historical AC scores are not eligible for this block; compare against fresh paired controls under the fixed gates.",
+          "abstain": true
+        }
+      ],
+      "ballots": [
+        {
+          "role": "sme_fp32_schedule",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Test `loop_order` once after fixed-flag compiler inspection. Fresh baseline scores are 1373–1504 GFLOP/s; no current candidate measurements show this change helps. The current order already writes adjacent column tiles for each row tile, so the locality benefit is uncertain and changing traversal may reduce A reuse. The proposal preserves the full increasing-k reduction and four ZA tiles, which keeps correctness risk low if the compiler has not already made the change.",
+          "format_repairs": 0
+        },
+        {
+          "role": "a_transpose",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only one experiment is on the board. The fresh baseline measured 1373–1504 GFLOP/s; the supplied history gives no direct evidence for this loop interchange. The current j-inner traversal already writes adjacent C tiles, so the proposed locality gain is uncertain and changing traversal may reduce A reuse. Rank it for testing, with low expected benefit and moderate cache-behavior risk; compare full timed transpose, packing, and consumption costs across supported sizes.",
+          "format_repairs": 0
+        },
+        {
+          "role": "panel_packing",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only one experiment is on the board, so it ranks first. Fresh baseline scores range from 1372.78 to 1504.19 GFLOP/s, with no paired controls; they do not show a gain for this change. The compiler evidence does not establish whether loop interchange is already emitted. Check fixed-flag output before implementation, then measure with fresh paired controls if the change is distinct.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_blocking",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Test loop_order first; it is the only proposal on the board. The fresh baseline scores vary (1373–1504 GFLOP/s), and supplied compiler blocks do not show whether the outer-loop interchange is already present. Any locality benefit is unverified, so inspect fixed-flag output and measure with paired controls before drawing conclusions.",
+          "format_repairs": 0
+        },
+        {
+          "role": "loop_order",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only one experiment is on the board. Its tile-loop interchange preserves the full increasing-k reduction and ZA mapping, so correctness risk is low. The possible C write-locality benefit is unverified and may be offset by reduced A/B reuse. The supplied compiler block does not show the outer tile-loop order, so equivalence is unresolved; inspect fixed-flag output before implementation. No fresh paired measurements establish a gain.",
+          "format_repairs": 0
+        },
+        {
+          "role": "compiler_codegen",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "It is the only experiment on the board, so it ranks first. The supplied compiler blocks show the reduction loop but do not show whether interchanging the output-tile loops changes generated code. Expected benefit to C write locality is unverified, and cache or operand reuse could worsen. No measured evidence supports a gain. Inspect fixed-flag output before implementation; abstain if the change is already present or compiler-equivalent. Preserve the stated correctness checks and fresh paired controls.",
+          "format_repairs": 0
+        },
+        {
+          "role": "tail_alignment",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Test `loop_order` first. It is the only board experiment, and it preserves the full reduction and tail predicates, so its correctness risk is low. Better C write locality is plausible but unverified; the supplied compiler blocks do not show whether the compiler already emits an equivalent traversal. The fresh baseline varied from 1372.78 to 1504.19 GFLOP/s, and no candidate measurements are supplied, so performance benefit is unknown. Inspect fixed-flag compiler output and skip the experiment if it is already equivalent.",
+          "format_repairs": 0
+        },
+        {
+          "role": "scratch_lifetime",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only `loop_order` is on the board, so it is ranked once. Fresh baseline scores were 1373–1504 GFLOP/s; there is no measured candidate evidence. The loop swap preserves the reduction and arithmetic, so correctness risk appears low. Any locality benefit is unverified, and the supplied compiler block does not show whether it is already emitted.",
+          "format_repairs": 0
+        },
+        {
+          "role": "za_four_tile_reuse",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "This is the only board experiment, so it ranks first. It preserves the four-tile mapping and reduction order, giving it low correctness risk. The expected write-locality benefit is uncertain: the current traversal already visits adjacent column tiles, and supplied compiler output does not show whether the loop interchange is already present. Fresh baseline scores vary from 1372.78 to 1504.19 GFLOP/s; there is no candidate evidence to establish a gain.",
+          "format_repairs": 0
+        },
+        {
+          "role": "transpose_fusion",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "The board contains only `loop_order`, so it is ranked once. Its benefit is uncertain: the current i-then-j order already writes adjacent column tiles, while swapping the loops could improve B reuse but reduce C write locality. The supplied compiler block does not show the outer tile loops, so whether this change is already emitted remains unverified. The evidence provides no basis to rank a transpose-fusion experiment because none is on the board.",
+          "format_repairs": 0
+        },
+        {
+          "role": "b_panel_layout",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only `loop_order` appears on the supplied board. The fresh baseline ranged from 1372.78 to 1504.19 GFLOP/s, and prior paired results were noisy, so the proposed cache-locality benefit is unverified. Rank it for testing, with modest expected benefit and low correctness risk if the reduction order and tile handling stay unchanged.",
+          "format_repairs": 0
+        },
+        {
+          "role": "constant_shape_512",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only one experiment is on the board, so it ranks first. The fresh baseline scores range from 1372.78 to 1504.19 GFLOP/s, and no supplied measurement tests this loop interchange. Its correctness risk is low if the reduction order and tile operations stay unchanged, but the expected cache benefit is uncertain because the current loop already writes adjacent column tiles. Inspect fixed-flag compiler output before implementation; abstain if it already emits equivalent traversal.",
+          "format_repairs": 0
+        },
+        {
+          "role": "streaming_region_cost",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only `loop_order` is on the board, so it ranks first. Its proposed change preserves the reduction and ZA operations, with low correctness risk. A cache benefit is only a hypothesis: supplied compiler output does not show the outer tile-loop order, and the historical scores do not measure this experiment. Inspect fixed-flag output and measure the complete call with fresh paired controls.",
+          "format_repairs": 0
+        },
+        {
+          "role": "assembly_audit",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "The compiler block shows four `ld1w` loads and four `fmopa` operations per reduction step; this identifies the work in the inner loop, but instruction counts do not establish a timing bottleneck. Test `loop_order` first because it preserves the reduction and arithmetic, so correctness risk is low. Its proposed C locality benefit is uncertain: the current traversal already visits adjacent column tiles within each row tile. No measured evidence supports a gain; verify fixed-flag output for equivalence, then use fresh paired controls.",
+          "format_repairs": 0
+        },
+        {
+          "role": "cache_conflict_layout",
+          "status": "received",
+          "ranking": [
+            "loop_order"
+          ],
+          "reason": "Only one experiment is on the board, so it ranks first. The supplied evidence does not include M4 Pro cache geometry or compiler output for the outer tile loops, so it cannot establish a cache-set conflict or confirm whether the loop interchange is already emitted. Its benefit is unverified; preserve full k order and check fixed-flag output before implementation. Measure padding and allocation costs only if a padding experiment is proposed.",
+          "format_repairs": 0
+        }
+      ],
+      "implementations": [
+        {
+          "experiment_id": "loop_order",
+          "status": "abstained",
+          "reason": "Stop: base existing-sme, hash 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258, already traverses all j column tiles inside each i row tile, exactly as recommended. Interchanging those loops would contradict the selected traversal. The supplied compiler block covers the reduction, not the outer loops. No new experiment is implemented; the source below is the unchanged baseline."
+        }
+      ],
+      "rationale": "Review base: existing-sme, hash 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Its source and supplied compiler block already show four input-vector loads feeding four MOPAs, with a shared advancing offset and output accumulators retained across k. Pointer advancement, unchanged two-step unrolling, and per-k partial-C spills are not new leads. The roster covers distinct areas: SME scheduling and four-tile mapping; A transpose and fusion; bounded packing and B layout; cache blocks, loop order, and scratch stride; allocation lifetime; constant-shape specialization; streaming boundaries; compiler review; and tail correctness. These are review assignments, not selected experiments or measured improvements. Compiler and assembly advisors must reject duplicate transformations and identify missing evidence; the supplied MOPA blocks do not establish streaming-transition costs or cache conflicts. Specialists must jointly rank concrete proposals tied to a source name/hash, or abstain. Fresh baseline scores span 1372.78–1504.19 GFLOP/s and establish no candidate gain. Preserve all fixed contracts, include allocation and packing within gemm, and require fresh paired controls under unchanged promotion gates.",
+      "board": [
+        {
+          "experiment_id": "loop_order",
+          "recommendation": "Base: supplied `existing-sme` source, hash `3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258`. Propose interchanging the outer `i` and `j` output-tile loops in `sme_gemm`: traverse all column tiles for one row tile before advancing to the next row tile. Keep the `k` loop inside both tile loops, with its full increasing-order reduction; preserve all loads, four ZA selectors, predicates, stores, transpose, allocation, ABI, and fallback behavior. Hypothesis: writing adjacent column tiles for each row block may improve C write locality. This is unverified advice, not a measured fact. The supplied compiler block shows the reduction loop but does not establish whether this outer-loop change is already emitted by the compiler; inspect fixed-flag compiler output before implementation and abstain if it is equivalent.",
+          "risks": "The change may not improve locality because each tile writes a 32-row by 32-column region and the current traversal already writes adjacent columns within each row tile. Changing traversal may affect reuse of A/B data and cache behavior. Preserve the complete k reduction and test n=512 plus odd sizes, partial tiles, small sizes, and n<=0 against the fixed 0.002 tolerance. Measure with fresh paired controls in the current AC block and report spread; do not infer causality from noisy scores or attribute a joint outcome to this proposal alone."
+        }
+      ],
+      "board_hash": "df13dc06b294432d45b067c70dcd7e6690519c2c906875ce324fdd75e4c06a92",
+      "experiment_order": [
+        "loop_order"
+      ]
+    }
+  ]
+}

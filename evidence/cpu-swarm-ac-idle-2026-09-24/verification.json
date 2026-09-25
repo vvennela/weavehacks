@@ -1,0 +1,116 @@
+{
+  "schema_version": "sera-cpu-ac-block-verification-v1",
+  "block": "evidence/cpu-swarm-ac-idle-2026-09-24",
+  "conclusion": "baseline-only; no candidate implemented, timed, or promoted; target not met",
+  "model_calls": {
+    "total": 32,
+    "state_recorded_total": 32,
+    "response_artifacts": 32,
+    "luna_proposals": 15,
+    "luna_rankings": 15,
+    "astra_high_roster_selection": 1,
+    "astra_high_implementation": 1,
+    "calls_with_repair": 0,
+    "failed_roles": 0
+  },
+  "advisory_outcome": {
+    "roles": 15,
+    "received_proposals": 15,
+    "proposal_abstentions": [
+      "sme_fp32_schedule",
+      "a_transpose",
+      "panel_packing",
+      "cache_blocking",
+      "compiler_codegen",
+      "tail_alignment",
+      "scratch_lifetime",
+      "za_four_tile_reuse",
+      "transpose_fusion",
+      "b_panel_layout",
+      "constant_shape_512",
+      "streaming_region_cost",
+      "assembly_audit",
+      "cache_conflict_layout"
+    ],
+    "board_experiments": ["loop_order"],
+    "valid_rankings": 15,
+    "ranking_order": ["loop_order"],
+    "implementation_model": "gpt-6-astra",
+    "implementation_reasoning": "high",
+    "implementation_abstained": true,
+    "implementation_reason": "The selected loop-order proposal matched the existing baseline traversal."
+  },
+  "run": {
+    "status": "completed",
+    "target_gflops": 1800,
+    "target_met": false,
+    "measured_candidate_count": 0,
+    "promoted_candidate": null,
+    "baseline_source_sha256": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+    "baseline_validation_gflops": [
+      1504.1940641698523,
+      1372.776459277793,
+      1451.00248725347
+    ],
+    "baseline_validation_median_gflops": 1451.00248725347,
+    "final_baseline_gflops": 1640.5528806353868,
+    "scoring": "Frozen kernel-opt hill; three validation repeats; one final held-out report"
+  },
+  "correctness": {
+    "passed": true,
+    "case_count": 48,
+    "size_count": 16,
+    "input_kind_count": 3,
+    "source_sha256": "3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258",
+    "tolerance": 0.002,
+    "worst_relative_error": 1.0017720606112918e-06,
+    "scope_limit": "A finite deterministic test set; not proof for all dimensions"
+  },
+  "host_checks": {
+    "reports_with_before_after_observations": 4,
+    "all_observations_on_ac": true,
+    "power_settings_unchanged": true,
+    "thermal_or_performance_warning_recorded": false
+  },
+  "hill_report_verification": {
+    "method": "hills verify --json <report>",
+    "signed_reports_verified": 4,
+    "all_valid": true,
+    "all_official": true,
+    "all_passed": true,
+    "hill": "kernel-opt",
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "reports": [
+      {
+        "path": "search/trial-000/validation-0.json",
+        "valid": true,
+        "final": false,
+        "gflops": 1504.1940641698523
+      },
+      {
+        "path": "search/trial-000/validation-1.json",
+        "valid": true,
+        "final": false,
+        "gflops": 1372.776459277793
+      },
+      {
+        "path": "search/trial-000/validation-2.json",
+        "valid": true,
+        "final": false,
+        "gflops": 1451.00248725347
+      },
+      {
+        "path": "search/final.json",
+        "valid": true,
+        "final": true,
+        "gflops": 1640.5528806353868
+      }
+    ]
+  },
+  "limits": [
+    "No candidate source was implemented or scored.",
+    "Baseline measurements do not establish an optimization gain.",
+    "The native evaluator is a trusted local research boundary, not a sandbox.",
+    "The public correctness validator covers a finite set of input sizes."
+  ]
+}

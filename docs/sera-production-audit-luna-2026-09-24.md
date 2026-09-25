@@ -3,15 +3,17 @@
 Date: 2026-09-24  
 Scope: `import sera` core library and its supported runtime. Frontend, notebooks, and `sera_loop` are excluded. This report does not modify product code.
 
+> **Historical-scope note (updated 2026-09-24):** The original findings below assess the stable vLLM optimization path. They do not describe the newer experimental CPU kernel-search path. That path now exists in this repository, but it remains a supervised local research feature and has not passed the production gates below. The original production verdict is unchanged.
+
 ## Verdict
 
-**Not ready for general production use or CPU kernel optimization.** The current release is a carefully measured, controlled vLLM inference experiment for a narrow NVIDIA setup. Its own release record says the latest installed-wheel joint run missed one latency gate, and live outage recovery and soak testing are deferred. The code has good controls around candidate validation, quality gates, process ownership, and saved evidence. It does not provide a CPU execution-kernel adapter or a general drop-in model optimizer.
+**Not ready for general production use or drop-in model optimization.** The stable `sera.optimize` path is a carefully measured, controlled vLLM inference experiment for a narrow NVIDIA setup. Its release record says the latest installed-wheel joint run missed one latency gate, and live outage recovery and soak testing are deferred. The code has good controls around candidate validation, quality gates, process ownership, and saved evidence. The experimental CPU kernel-search path is separate; it does not turn the stable model optimizer into a general drop-in optimizer.
 
 The `kernel-opt` AutoLab hill and its earlier 1160–1449 GFLOP/s result are a separate project and are not evidence for this Python Sera package. The `/root/sera` agent name in that task did not refer to this repository's `sera` package. The user's reported 1780 GFLOP/s on the same M4 Pro hill is also external to this library. The mature paths audited here invoke vLLM; any new CPU-kernel adapter/search work is experimental and has not been reviewed or accepted by this audit.
 
 ## Prioritized findings
 
-### P0 — The current optimizer cannot modify CPU execution kernels
+### P0 — The stable model optimizer cannot modify CPU execution kernels
 
 The `SeraModel` runtime launches vLLM's OpenAI API server and requires Linux plus an NVIDIA GPU. The default API accepts only the two pinned Qwen model IDs, while candidate configuration is restricted to a small set of vLLM controls. The portable adapter is also a vLLM/GPU path and only accepts BF16 weights and KV. There is no CPU backend, kernel ABI, build/validation path, or CPU correctness/performance gate in these stable paths. See [api.py](/Users/vishnuv/Documents/Documents/weavehacks/sera/api.py:97), [runtime.py](/Users/vishnuv/Documents/Documents/weavehacks/sera/runtime.py:230), [config.py](/Users/vishnuv/Documents/Documents/weavehacks/sera/config.py:48), and [portable_runtime.py](/Users/vishnuv/Documents/Documents/weavehacks/sera/portable_runtime.py:17).
 
@@ -89,7 +91,15 @@ Until these gates pass, describe the CPU path as experimental and do not combine
 
 ## Addendum — experimental CPU kernel path
 
-Reviewed `sera/kernel_search.py`, `sera/kernel_tools.py`, and `tests/test_kernel_search.py` plus `tests/test_kernel_tools.py` after the initial audit. Targeted tests pass: **19 passed** in 0.23 seconds. The module clearly labels itself experimental and does not export a model deployment path. The Codex adapter removes common API-key variables from its child environment, requires a ChatGPT login, ignores user config, requests read-only mode, and does not provide a provider fallback. The Hills adapter verifies the evaluator report. Those are useful controls, but they do not sandbox generated native code.
+Reviewed `sera/kernel_search.py`, `sera/kernel_tools.py`, and their tests after the initial audit. The module clearly labels itself experimental and does not export a model deployment path. The Codex adapter removes common API-key variables from its child environment, requires a ChatGPT login, ignores user config, requests read-only mode, and does not provide a provider fallback. The Hills adapter verifies the evaluator report. Those are useful controls, but they do not sandbox generated native code.
+
+### Status update — CPU swarm and current AC evidence
+
+The current experimental swarm uses 15 GPT-6 Luna specialists to propose experiments and rank the shared board. A GPT-6 Astra-high coordinator selects the roster, implements the selected experiment, and reviews measured outcomes. The approved goal is strictly greater than **1,800 GFLOP/s** on the unchanged single-thread FP32 n=512 hill, with AC measurements. The current CPU-path test run recorded **97 passed**. The public validator now includes n=512: 16 fixed sizes times three input kinds, or 48 deterministic cases. This is broader than the earlier validator described above, but it remains finite coverage.
+
+The latest [AC idle block](../evidence/cpu-swarm-ac-idle-2026-09-24/README.md) completed as a baseline-only run. All four signed Hill reports verified. The unchanged baseline scored 1,504.19, 1,372.78, and 1,451.00 GFLOP/s in validation and 1,640.55 GFLOP/s in the final report. Fourteen specialists abstained from proposing a distinct experiment; Astra abstained after identifying that the sole board item duplicated the baseline's traversal. No candidate was measured or promoted, and the 1,800 target was not met. This evidence does not change the production verdict.
+
+Remaining production blockers are native-code isolation with CPU/memory/filesystem/network limits; end-to-end integration into a real CPU model operator and packaging/capability dispatch; complete correctness coverage beyond a finite known set; durable recovery/resume; and evidence that the search improves on equal-budget non-agent baselines across representative workloads and hardware. The generic low-level search API still permits `validate=None`, so production entry points must always wire a correctness gate. Until those gates pass, describe CPU work as experimental local research.
 
 ### P1 — Final performance gate can still accept a candidate below its comparison control
 

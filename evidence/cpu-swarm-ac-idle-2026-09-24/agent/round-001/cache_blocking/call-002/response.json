@@ -1,0 +1,1 @@
+{"ranking":["loop_order"],"reason":"Test loop_order first; it is the only proposal on the board. The fresh baseline scores vary (1373–1504 GFLOP/s), and supplied compiler blocks do not show whether the outer-loop interchange is already present. Any locality benefit is unverified, so inspect fixed-flag output and measure with paired controls before drawing conclusions."}

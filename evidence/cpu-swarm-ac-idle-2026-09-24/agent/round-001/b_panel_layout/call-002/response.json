@@ -1,0 +1,1 @@
+{"ranking":["loop_order"],"reason":"Only `loop_order` appears on the supplied board. The fresh baseline ranged from 1372.78 to 1504.19 GFLOP/s, and prior paired results were noisy, so the proposed cache-locality benefit is unverified. Rank it for testing, with modest expected benefit and low correctness risk if the reduction order and tile handling stay unchanged."}

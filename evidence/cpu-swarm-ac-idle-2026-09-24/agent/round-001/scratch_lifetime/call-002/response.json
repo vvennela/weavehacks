@@ -1,0 +1,1 @@
+{"ranking":["loop_order"],"reason":"Only `loop_order` is on the board, so it is ranked once. Fresh baseline scores were 1373–1504 GFLOP/s; there is no measured candidate evidence. The loop swap preserves the reduction and arithmetic, so correctness risk appears low. Any locality benefit is unverified, and the supplied compiler block does not show whether it is already emitted."}

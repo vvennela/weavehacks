@@ -57,7 +57,7 @@ The Codex adapter checks ChatGPT login, strips API credentials from the child en
 
 The scorer invokes the frozen Hills evaluator, verifies each signed report, and checks evaluator, workload, machine, compiler, flags, OS, and architecture identity before comparison. It neither reads nor changes private seeds. The search saves source hashes, raw reports, hypotheses, repeated scores, unchanged controls, and one final held-out report. A hard candidate cap and command timeouts bound the research run.
 
-The target is strictly greater than **1,780 GFLOP/s**, with the full single-threaded row-major float32 product at n=512, tolerance 0.002, no external libraries, and the existing fixed compiler flags. Packing, allocation, and call overhead remain inside the evaluator's timing. The evaluator's best-of-three rule is unchanged; Sera adds repeated reports and conservative promotion above it.
+The current approved target is strictly greater than **1,800 GFLOP/s**, with the full single-threaded row-major float32 product at n=512, tolerance 0.002, no external libraries, and the existing fixed compiler flags. Packing, allocation, and call overhead remain inside the evaluator's timing. The evaluator's best-of-three rule is unchanged; Sera adds repeated reports and conservative promotion above it.
 
 ## Remaining production gates
 
@@ -70,10 +70,10 @@ The target is strictly greater than **1,780 GFLOP/s**, with the full single-thre
 
 The independent [GPT-6 Luna audit](sera-production-audit-luna-2026-09-24.md) provides prioritized production findings. The intended next release is a supervised CPU research adapter with clear failure behavior, not an unattended general optimizer.
 
-## Measured outcome and user decisions
+## Current measured outcome and approved research scope
 
-Two six-candidate Codex-only searches completed. Neither met 1,780 GFLOP/s or retained a candidate. The frozen three-specialist run saved 40 independently verified signed reports and public correctness results for all seven sources. Its baseline varied from 620.24 to 1,059.26 GFLOP/s; the unchanged selected baseline scored 623.97 GFLOP/s on the final check. See the [complete measured report](../evidence/cpu-specialists-codex-2026-09-24/README.md). This demonstrates source modification, evaluation, and specialist feedback, not optimization superiority.
+The approved target is strictly greater than **1,800 GFLOP/s** on the unchanged single-thread FP32 n=512 kernel-opt hill, measured on AC power. The current swarm uses 15 GPT-6 Luna specialists to propose and rank experiments on one shared board. GPT-6 Astra-high selects the roster, implements the selected experiment, and reviews measured results. The run is bounded by the caller's declared trial, elapsed-time, and model-call budgets; the standard research configuration allows up to six implementation attempts and 108 calls.
 
-The implemented routing checkpoint uses a 15-role catalog with at most three concurrent agents. The user's later decision is to have all 15 work together as GPT-6 Luna agents. The role choice is awaiting user adjudication: replace the three inapplicable single-thread MatMul roles, or retain them with explicit abstention. This requested design must not be described as already validated by the earlier Astra run.
+The latest [AC idle block](../evidence/cpu-swarm-ac-idle-2026-09-24/README.md) produced no new candidate. Fourteen specialists abstained from proposing a distinct experiment; all 15 ranked the remaining `loop_order` proposal. Astra-high correctly abstained because it matched the baseline traversal. The unchanged baseline measured 1,504.19, 1,372.78, and 1,451.00 GFLOP/s in validation, then 1,640.55 GFLOP/s in the held-out final report. All four signed reports were independently verified. No source was promoted and the target was not met.
 
-The user adjudicates product and research decisions. Changes to baseline stability limits, final acceptance thresholds, role definitions, and swarm behavior remain proposals until approved. Luna handles breadth analysis; the primary agent implements approved choices and performs depth analysis and validation.
+Earlier battery measurements from this package remain historical planning context and are not AC comparison evidence. The separate earlier AutoLab task did not use this Python package. The current CPU path has finite deterministic correctness coverage, executes native code in a trusted local research environment, and does not integrate into end-to-end model inference. Do not claim production readiness or an end-to-end model speedup from this operator-level work. The user has approved the 15-Luna/Astra-high architecture and 1,800 GFLOP/s goal; do not present these as pending choices.

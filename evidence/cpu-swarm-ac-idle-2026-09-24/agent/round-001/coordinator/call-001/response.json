@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "sme_fp32_schedule",
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "loop_order",
+    "compiler_codegen",
+    "tail_alignment",
+    "scratch_lifetime",
+    "za_four_tile_reuse",
+    "transpose_fusion",
+    "b_panel_layout",
+    "constant_shape_512",
+    "streaming_region_cost",
+    "assembly_audit",
+    "cache_conflict_layout"
+  ],
+  "rationale": "Review base: existing-sme, hash 3719c58530161598ab9a537a43be749a5287c8d8dbd35b855e5afea97cd15258. Its source and supplied compiler block already show four input-vector loads feeding four MOPAs, with a shared advancing offset and output accumulators retained across k. Pointer advancement, unchanged two-step unrolling, and per-k partial-C spills are not new leads. The roster covers distinct areas: SME scheduling and four-tile mapping; A transpose and fusion; bounded packing and B layout; cache blocks, loop order, and scratch stride; allocation lifetime; constant-shape specialization; streaming boundaries; compiler review; and tail correctness. These are review assignments, not selected experiments or measured improvements. Compiler and assembly advisors must reject duplicate transformations and identify missing evidence; the supplied MOPA blocks do not establish streaming-transition costs or cache conflicts. Specialists must jointly rank concrete proposals tied to a source name/hash, or abstain. Fresh baseline scores span 1372.78–1504.19 GFLOP/s and establish no candidate gain. Preserve all fixed contracts, include allocation and packing within gemm, and require fresh paired controls under unchanged promotion gates."
+}

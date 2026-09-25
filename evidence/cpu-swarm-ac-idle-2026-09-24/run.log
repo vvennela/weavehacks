@@ -1,0 +1,5 @@
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-idle-2026-09-24/search/trial-000/validation-0.json True [{'name': 'gflops', 'value': 1504.1940641698523, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-idle-2026-09-24/search/trial-000/validation-1.json True [{'name': 'gflops', 'value': 1372.776459277793, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-idle-2026-09-24/search/trial-000/validation-2.json True [{'name': 'gflops', 'value': 1451.00248725347, 'direction': 'max'}]
+SCORED /Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-idle-2026-09-24/search/final.json True [{'name': 'gflops', 'value': 1640.5528806353868, 'direction': 'max'}]
+RESULT {"status": "completed", "target_met": false, "final_gflops": 1640.5528806353868, "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-swarm-ac-idle-2026-09-24/search/trial-000/source/kernel.c", "stop_reason": "search-exhausted"}
