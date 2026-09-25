@@ -1,0 +1,22 @@
+{
+  "baseline_source_sha256": "67da75dd729b153a2129f8b1a71dd77b4d01609a94b6d2909ae69d99974fbdae",
+  "original_source_sha256": "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+  "helpers_sha256": {
+    "ta": "57588f80f6c87d597ac0ba425945cd974295f0f2562301e353f61b049858a339",
+    "tb": "be098846707aa8aaebb8f23ac2f43d0697d7fc5cbecc1c9f12e5da67130ba77f",
+    "tt": "3cc6a6ce315b9672ec47cb2ed32bd9704b09675874d72fd2b029d97327b6107b"
+  },
+  "source_bytes": 108226,
+  "compiled_text_bytes": 20628,
+  "exact_exported_bodies_found_at_offsets": {
+    "nn": 0,
+    "ta": 8192,
+    "tb": 12288,
+    "tt": 16384
+  },
+  "original_gemm_source_unchanged": true,
+  "helpers_unused": true,
+  "correctness_passed": true,
+  "performance_measured": false,
+  "limitation": "Added helpers change binary layout; measure a fresh baseline. No speedup claimed."
+}
