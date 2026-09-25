@@ -1,0 +1,7 @@
+{
+  "primitive_tests_passed": 12,
+  "baseline_correctness_passed": true,
+  "baseline_cases": 48,
+  "current_correctness": "baseline-correctness-final.json",
+  "performance_measured": false
+}

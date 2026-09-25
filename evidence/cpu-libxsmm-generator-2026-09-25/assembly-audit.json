@@ -1,0 +1,9 @@
+{
+  "code_size": 1536,
+  "instruction_count": 384,
+  "byte_roundtrip": true,
+  "no_external_call_or_address_instructions": true,
+  "no_x18": true,
+  "no_body_relocations": true,
+  "all_direct_branches_internal": true
+}

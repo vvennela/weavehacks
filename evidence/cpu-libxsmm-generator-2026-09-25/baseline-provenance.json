@@ -1,0 +1,7 @@
+{
+  "original_source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+  "augmented_source_sha256": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "existing_gemm_body_unchanged": true,
+  "optional_primitive_called_by_baseline": false,
+  "requires_fresh_baseline": true
+}

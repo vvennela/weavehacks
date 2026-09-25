@@ -1,0 +1,15 @@
+
+/tmp/sera-panel-probe.o:	file format mach-o arm64
+
+RELOCATION RECORDS FOR [__text]:
+OFFSET           TYPE                     VALUE
+0000000000000670 ARM64_RELOC_BRANCH26     ___stack_chk_fail
+0000000000000654 ARM64_RELOC_GOT_LOAD_PAGEOFF12 ___stack_chk_guard
+0000000000000650 ARM64_RELOC_GOT_LOAD_PAGE21 ___stack_chk_guard
+0000000000000648 ARM64_RELOC_BRANCH26     _sera_libxsmm_panel32
+0000000000000610 ARM64_RELOC_GOT_LOAD_PAGEOFF12 ___stack_chk_guard
+000000000000060c ARM64_RELOC_GOT_LOAD_PAGE21 ___stack_chk_guard
+
+RELOCATION RECORDS FOR [__compact_unwind]:
+OFFSET           TYPE                     VALUE
+0000000000000000 ARM64_RELOC_UNSIGNED     __text
