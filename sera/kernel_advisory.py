@@ -12,6 +12,7 @@ from .codex_agent import CodexJSONAgent
 from .kernel_advisor_roles import ADVISOR_ROLES, DEFAULT_ADVISOR_IDS
 from .kernel_search import KernelCandidate
 from .kernel_edits import candidate_source
+from .kernel_prompt import compact_sources
 from .storage import content_hash, save_json
 from .kernel_swarm_plan import rank_experiments
 
@@ -38,6 +39,12 @@ RULES = (
     'No external libraries, answer caching, input-specific outputs, or evaluator changes. '
     'All packing and allocation stays inside gemm. Advice is unverified, not a measured fact. '
     'Do not infer causality from noisy scores or attribute joint outcomes to one advisor. '
+    'A prompt_source_patch losslessly represents a measured source: start with the full '
+    'source named by display_base_hash and apply each unique old/new replacement once '
+    'in order. Empty edits mean identical source text. All omitted text is unchanged, '
+    'including licenses. Source hashes still name complete reconstructed files. '
+    'Your returned base_source_hash and edits refer to those complete measured files, '
+    'not to the display patch object. '
 )
 
 
@@ -156,7 +163,7 @@ class KernelAdvisoryTeam:
                 'Reject discards this candidate; revise retains the incumbent and informs '
                 'your next implementation. Explain the evidence.\nCandidate under review:\n' +
                 json.dumps(dict(source_hash=trial['source_hash'], eligible=eligible)) +
-                '\nMeasured history:\n' + json.dumps(evidence), REVIEW_SCHEMA, deadline)
+                '\nMeasured history:\n' + json.dumps(compact_sources(evidence)), REVIEW_SCHEMA, deadline)
             if (decision.get('decision') not in {'adopt', 'reject', 'revise'} or
                     not isinstance(decision.get('reason'), str)):
                 raise ValueError('Malformed coordinator experiment review')
@@ -185,7 +192,7 @@ class KernelAdvisoryTeam:
         if self.proposal_count >= self.max_rounds:
             return None
         common = RULES + '\n' + self.task + '\nHardware profile:\n' + json.dumps(self.profile)
-        common += '\nMeasured history:\n' + json.dumps(evidence)
+        common += '\nMeasured history:\n' + json.dumps(compact_sources(evidence))
         dispositions = []
         for batch in self.rounds:
             proposals = {item['experiment_id']: item for item in batch.get('board', [])}

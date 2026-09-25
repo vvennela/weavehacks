@@ -362,3 +362,42 @@ def test_astra_can_select_strassen_specialist_without_increasing_swarm_size(tmp_
     assert len(state['rounds'][0]['advice']) == 15
     assert len(state['rounds'][0]['ballots']) == 15
     assert sum(settings['model'] == 'gpt-6-luna' for settings, _ in calls) == 30
+
+
+def test_all_prompt_routes_share_sources_but_apply_edits_to_full_measured_base(tmp_path):
+    import hashlib
+    body = ''.join(f'float value_{i} = {i};\n' for i in range(2000))
+    sources = [body+'float marker = 1;\n', body+'float marker = 2;\n']
+    measured = []
+    for index, source in enumerate(sources):
+        path = tmp_path/f'kernel-{index}.c'
+        path.write_text(source)
+        measured.append(dict(name=str(index),source=str(path),
+            source_hash=hashlib.sha256(source.encode()).hexdigest(),status='passed',
+            scores=[1000+index]*10,control_scores=[1000]*10,comparison_identity={'tree_hash':'frozen'}))
+    prompts = []
+    def factory(**settings):
+        class Agent:
+            def request(self, prompt, schema, *, timeout):
+                prompts.append(prompt)
+                assert 'prompt_source_patch' in prompt
+                assert json.dumps(sources[1]) not in prompt
+                if 'roles' in schema['properties']:
+                    return dict(roles=list(DEFAULT_ADVISOR_IDS),rationale='test')
+                if 'ranking' in schema['properties']:
+                    return dict(ranking=schema['properties']['ranking']['items']['enum'],reason='test')
+                if 'advice' in schema['properties']:
+                    return dict(advice='change marker',risks='test',abstain=False)
+                if 'decision' in schema['properties']:
+                    return dict(decision='reject',reason='ineligible')
+                return dict(name='edited',hypothesis='test',stop=False,source='',
+                    base_source_hash=measured[1]['source_hash'],
+                    edits=[dict(old='float marker = 2;',new='float marker = 3;')])
+        return Agent()
+    team = KernelAdvisoryTeam(work_dir=tmp_path/'team',task='test',profile={},
+                              max_rounds=1,agent_factory=factory)
+    candidate = team.propose(measured,timeout=60)
+    assert candidate.source == sources[1].replace('marker = 2','marker = 3')
+    team.adjudicate(measured,measured[1],eligible=False,timeout=60)
+    assert len(prompts) == 33
+    assert [Path(r['source']).read_text() for r in measured] == sources

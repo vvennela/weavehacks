@@ -1,0 +1,10 @@
+{
+  "old_prompt_characters": 1108459,
+  "new_prompt_characters": 437183,
+  "limit_characters": 1048576,
+  "source_count": 7,
+  "source_hashes_and_text_restored": true,
+  "all_metadata_unchanged": true,
+  "no_live_model_calls": true,
+  "no_failed_phase_records_rewritten": true
+}
