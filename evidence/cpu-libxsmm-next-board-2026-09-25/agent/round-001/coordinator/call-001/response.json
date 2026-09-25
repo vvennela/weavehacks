@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "loop_order",
+    "address_generation",
+    "tail_alignment",
+    "scratch_lifetime",
+    "prefetch_locality",
+    "transpose_fusion",
+    "b_panel_layout",
+    "streaming_region_cost",
+    "assembly_audit",
+    "za_four_tile_reuse",
+    "k_loop_schedule"
+  ],
+  "rationale": "Select these 15 roles for source-grounded proposals and review, not as a ranked implementation queue. a_transpose studies conversion work in Llibxsmm_78; panel_packing owns complete producer/consumer layout changes; cache_blocking studies working-set sizes; loop_order coordinates traversal at Llibxsmm_64 and Llibxsmm_440. b_panel_layout examines timed packing of B, while transpose_fusion examines feeding compute without a full scratch write. These are separate questions, not automatically distinct experiments. vector_access reviews packing and output stores; address_generation checks pointer advances and rewinds; tail_alignment protects bounds, general sizes and n<=0. scratch_lifetime examines keeping scratch allocated through its consumers, classified as an ABI repair rather than an established speed improvement. streaming_region_cost reviews legal SME boundaries; assembly_audit checks supplied assembly, register obligations and coordinated edits without claiming unseen compiler evidence. za_four_tile_reuse examines mappings within ZA0–ZA3. prefetch_locality considers bounded access hints with their overhead included. k_loop_schedule examines only a distinct reduction-control change, such as a fixed 256-iteration two-K loop without the prior tail logic; the two-bank schedule itself is already tested. Exclude duplicate measured schedules, sixteen-panel wrappers, constant-shape C/SME and 272-byte padding. New generated helpers are unavailable and cannot be current implementation dependencies. Preserve both complete license notices and every fixed benchmark constraint. All advice remains unverified; no supplied candidate establishes a repeatable gain or throughput strictly above 1800 GFLOP/s. Adoption requires fresh unchanged paired gates, with power source and settings fixed and historical modes kept separate."
+}

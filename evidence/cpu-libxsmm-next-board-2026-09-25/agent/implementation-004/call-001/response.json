@@ -1,0 +1,17 @@
+{
+  "name": "libxsmm-full512-distance4-bounded-prefetch",
+  "hypothesis": "Add guarded distance-4 prefetches in Llibxsmm_478 and Llibxsmm_70c. The supplied source advances B by 2048 bytes per K step, not the recommendation's 512 bytes; packed A advances by 256 bytes. Prefetch offsets are therefore 8192 and 1024 bytes. Prefetch only when x8>4, covering future K indices 4 through 511 without crossing the current panel or scratch allocation. Demand loads, pointer updates, FP32 FMOPA order, iteration counts, traversal, SME transitions, fallback and both complete license notices remain unchanged. This tests software prefetching and is distinct from the supplied measured sources. No tools or tests were run. Compilation, full-GEMM correctness and fresh paired performance gates remain required under the fixed contract and unchanged initial power settings. No speedup or throughput above 1800 GFLOP/s is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "edits": [
+    {
+      "old": "    \"Llibxsmm_478:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"",
+      "new": "    \"Llibxsmm_478:\\n\"\n    \"cmp\\tx8, #0x4\\n\"\n    \"b.ls\\tLsera_prefetch_478_done\\n\"\n    \"prfm\\tpldl1keep, [x0, #0x2000]\\n\"\n    \"prfm\\tpldl1keep, [x3, #0x400]\\n\"\n    \"Lsera_prefetch_478_done:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\""
+    },
+    {
+      "old": "    \"Llibxsmm_70c:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\"",
+      "new": "    \"Llibxsmm_70c:\\n\"\n    \"cmp\\tx8, #0x4\\n\"\n    \"b.ls\\tLsera_prefetch_70c_done\\n\"\n    \"prfm\\tpldl1keep, [x0, #0x2000]\\n\"\n    \"prfm\\tpldl1keep, [x3, #0x400]\\n\"\n    \"Lsera_prefetch_70c_done:\\n\"\n    \"ld1w\\t{ z0.s, z1.s }, pn8/z, [x0]\\n\"\n    \"ld1w\\t{ z2.s, z3.s }, pn9/z, [x3]\\n\""
+    }
+  ]
+}

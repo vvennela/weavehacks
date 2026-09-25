@@ -1,0 +1,614 @@
+{
+  "schema_version": "sera-kernel-search-v1",
+  "status": "completed",
+  "trials": [
+    {
+      "name": "libxsmm-reference-with-unused-panel32",
+      "hypothesis": "Original full512 GEMM body plus an optional unused generated panel primitive",
+      "specialist_id": null,
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-000/source/kernel.c",
+      "source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+      "status": "passed",
+      "scores": [
+        1078.2315304307879,
+        1013.5989131043257,
+        826.6954437505
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-000/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-000/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-000/validation-2.json"
+      ],
+      "control_scores": [],
+      "control_reports": [],
+      "median_gflops": 1013.5989131043257,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      }
+    },
+    {
+      "name": "libxsmm-full512-row-half-first-traversal",
+      "hypothesis": "Change traversal within each packed 64-row band: compute the first 32 output rows across all sixteen column panels, then compute the second 32 rows across all sixteen panels. Keeping one packed row half active across a complete column sweep may improve reuse; this is unverified. At 16 FP32 lanes, four ZA.S tiles form one 32x32 output block. Both K loops, FMOPA order, stores, 256-byte scratch stride, 128 KiB allocation and SME transitions remain unchanged. After each sweep, reset B by 2048 bytes and advance C by 63488 bytes from its post-sweep position. The second half uses scratch base+128. These offsets cover each output block once and preserve the next 64-row band's starting pointers. General sizes, tails, n<=0, the unused helper and both complete license notices remain unchanged. This traversal is absent from the supplied measured history. No tools or tests were run. Compilation, full-GEMM correctness and performance remain untested; throughput above 1800 GFLOP/s is not established. Use the unchanged base source for fresh paired controls under the fixed gates and unchanged power settings.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-001/source/kernel.c",
+      "source_hash": "367df33b6712e12a758295c494b013fdd2f5aaa034bf82488cf8754f349a82a0",
+      "status": "passed",
+      "scores": [
+        1031.7853284942294,
+        1071.4189963713172,
+        1095.8427540192777
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-001/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-001/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-001/validation-2.json"
+      ],
+      "control_scores": [
+        1105.4278340552573,
+        1070.176029123066,
+        1082.034515526918
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-001/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-001/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-001/control-2.json"
+      ],
+      "median_gflops": 1071.4189963713172,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "367df33b6712e12a758295c494b013fdd2f5aaa034bf82488cf8754f349a82a0",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded correctness passed, but eligible=false prohibits adoption; promoted=false confirms no promotion. Candidate throughput was 1031.8–1095.8 GFLOP/s versus paired controls of 1070.2–1105.4. Paired changes were −6.7%, +0.1%, and +1.3%; candidate and control spreads were 64.1 and 35.3 GFLOP/s. These mixed results establish no repeatable gain, and neither positive difference exceeded the control spread. No repeat exceeded 1800 GFLOP/s. Retain the unchanged incumbent. Treat row-half-first traversal as unproven; these measurements do not establish a cache or reuse mechanism. The next implementation must test a distinct source change and hypothesis under the unchanged gates, with fresh paired controls and separate power-mode records."
+      }
+    },
+    {
+      "name": "libxsmm-full512-packed-b-column-panels",
+      "hypothesis": "Pack B inside gemm as packed_b[p*16384+k*32+c] = B[k*512+p*32+c], for p=0..15, k=0..511 and c=0..31. Each panel occupies 65536 bytes; all sixteen occupy 1048576 bytes. Both K loops read two 16-lane FP32 vectors per step, advance B by 128 bytes, and rewind by 65536 bytes. Each column-panel transition advances by 65536 bytes; each completed column sweep rewinds by 1048576 bytes. Contiguous B access may offset the added packing and allocation cost; this is unverified. The original 64-row traversal, A packing, FP32 FMOPA order, C stores, single SME call, general-size fallback and both complete license notices remain unchanged. Allocation failure uses the existing fallback. This source change is distinct from the supplied measured inventory. No tools or tests were run. Compilation, full-GEMM correctness at tolerance 0.002, and fresh repeated paired performance gates remain required with power source and settings unchanged. No speedup or throughput above 1800 GFLOP/s is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-002/source/kernel.c",
+      "source_hash": "f21047135d3ab2f71b92c91cfca9546b101d4382563330f4bb375b2f94557a36",
+      "status": "passed",
+      "scores": [
+        877.1196674530383,
+        942.5700350294048,
+        738.4744258082338
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-002/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-002/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-002/validation-2.json"
+      ],
+      "control_scores": [
+        1096.4022430767989,
+        802.7976265944624,
+        1088.621079938044
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-002/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-002/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-002/control-2.json"
+      ],
+      "median_gflops": 877.1196674530383,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "f21047135d3ab2f71b92c91cfca9546b101d4382563330f4bb375b2f94557a36",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false prohibits adoption; promoted=false confirms no promotion. Candidate throughput was 738.5–942.6 GFLOP/s versus paired controls of 802.8–1096.4. Paired changes were −20.0%, +17.4%, and −32.2%. Candidate and control repeat spreads were 204.1 and 293.6 GFLOP/s. Two pairs lost, and these variable results establish no repeatable gain. No repeat exceeded 1800 GFLOP/s. Discard this candidate and retain the unchanged incumbent. These measurements do not isolate packing, allocation, or cache effects. Any future variant needs a distinct source change and hypothesis, then fresh validation under the unchanged gates."
+      }
+    },
+    {
+      "name": "libxsmm-full512-column-panel-first-traversal",
+      "hypothesis": "Interchange the full512 traversal: sixteen 32-column panels become the outer loop, with eight 64-row blocks inside each panel. Both 32-row halves stay together. Each row block packs its current A rows before both consumers, then advances A and C by 131072 bytes. After eight blocks, rewind A and C by 1048576 bytes and advance B and C by 128 bytes for the next column panel. B remains at the current panel throughout the row sweep. This tests B-panel reuse while increasing A packing from eight to 128 packs per GEMM; benefit is unverified. This differs from the measured row-half-first traversal and packed-B layout. The 512-step reductions, FP32 order, scratch layout, SME transitions, general-size fallback, n<=0 behavior, unused helper and both complete license notices remain unchanged. No tools or tests were run. Compilation, full-GEMM correctness and fresh repeated paired performance checks remain required under the unchanged gates and initial power settings. No speedup or throughput above 1800 GFLOP/s is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-003/source/kernel.c",
+      "source_hash": "7562203ea8753326f7d10004d50674912e8791c7f78ed90798d8c9e0a468ba0b",
+      "status": "passed",
+      "scores": [
+        637.6139252952198,
+        621.6172224262855,
+        642.8313853164832
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-003/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-003/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-003/validation-2.json"
+      ],
+      "control_scores": [
+        1071.598621913857,
+        1073.3854538169633,
+        1076.6142491793703
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-003/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-003/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-003/control-2.json"
+      ],
+      "median_gflops": 637.6139252952198,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "7562203ea8753326f7d10004d50674912e8791c7f78ed90798d8c9e0a468ba0b",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false prohibits adoption. Candidate throughput was 621.6–642.8 GFLOP/s versus paired controls of 1071.6–1076.6. All three pairs lost: −40.5%, −42.1%, and −40.3%. Candidate and control repeat spreads were 21.2 and 5.0 GFLOP/s; the losses greatly exceed observed variation. No repeat exceeded 1800 GFLOP/s. Discard this candidate and retain the unchanged incumbent. These results establish a consistent regression for the complete changed path, but do not isolate packing or cache effects. Any future variant requires a distinct source change and fresh validation under the unchanged gates."
+      }
+    },
+    {
+      "name": "libxsmm-full512-distance4-bounded-prefetch",
+      "hypothesis": "Add guarded distance-4 prefetches in Llibxsmm_478 and Llibxsmm_70c. The supplied source advances B by 2048 bytes per K step, not the recommendation's 512 bytes; packed A advances by 256 bytes. Prefetch offsets are therefore 8192 and 1024 bytes. Prefetch only when x8>4, covering future K indices 4 through 511 without crossing the current panel or scratch allocation. Demand loads, pointer updates, FP32 FMOPA order, iteration counts, traversal, SME transitions, fallback and both complete license notices remain unchanged. This tests software prefetching and is distinct from the supplied measured sources. No tools or tests were run. Compilation, full-GEMM correctness and fresh paired performance gates remain required under the fixed contract and unchanged initial power settings. No speedup or throughput above 1800 GFLOP/s is established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-004/source/kernel.c",
+      "source_hash": "9d1ad9bdbad475271fed38ce4dc70ae966892f5337d93fba28b183b33984fd65",
+      "status": "passed",
+      "scores": [
+        736.3636048310607,
+        764.5011292041639,
+        754.3860805682406
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-004/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-004/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-004/validation-2.json"
+      ],
+      "control_scores": [
+        1087.3334810703413,
+        1071.243661267994,
+        872.1326685852032
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-004/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-004/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-004/control-2.json"
+      ],
+      "median_gflops": 754.3860805682406,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "9d1ad9bdbad475271fed38ce4dc70ae966892f5337d93fba28b183b33984fd65",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "reject",
+        "reason": "Recorded correctness passed, but eligible=false prohibits adoption. Candidate throughput was 736.4–764.5 GFLOP/s versus paired controls of 872.1–1087.3. All three pairs lost: −32.3%, −28.6%, and −13.5%. Candidate and control repeat spreads were 28.1 and 215.2 GFLOP/s. Despite control variation, every candidate score was below every control score. No repeat exceeded 1800 GFLOP/s. Discard this candidate and retain the unchanged incumbent. These measurements do not isolate prefetch, guard-branch, or cache effects. Any future variant requires a distinct source change and fresh validation under the unchanged gates."
+      }
+    },
+    {
+      "name": "libxsmm-k-loop-joint-two-stream-end-tests",
+      "hypothesis": "Replace the countdown in Llibxsmm_478 and Llibxsmm_70c with joint two-stream termination checks. Caller-saved x4 and x5 hold the initial B pointer plus 1048576 bytes and packed-A pointer plus 131072 bytes. CMP and conditional CCMP continue only while both pointers differ from their ends. With the unchanged strides, both reach their ends after exactly 512 ordered FP32 updates, including the second row half. No additional demand loads occur. This implements the selected joint check, distinct from the historical separate single-stream checks. It does not establish reduced instruction cost or a speedup. Pointer rewinds, traversal, packing, SME transitions, general-size fallback, n<=0 behavior, unused helper and both complete license notices remain unchanged. No tools or tests were run. Compilation, full-GEMM correctness and fresh repeated paired performance validation remain required under the unchanged gates and initial power settings. Throughput above 1800 GFLOP/s is not established.",
+      "specialist_id": "astra_coordinator",
+      "source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-005/source/kernel.c",
+      "source_hash": "ef09f2a1067deb0c1160bb51dbc29457b071ef0e071ce04e01bfd586afd1dc97",
+      "status": "passed",
+      "scores": [
+        1048.7480498774569,
+        949.9349024586878,
+        1105.9971558990512
+      ],
+      "reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-005/validation-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-005/validation-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-005/validation-2.json"
+      ],
+      "control_scores": [
+        1020.830164625027,
+        1064.1643453045485,
+        839.0784298226062
+      ],
+      "control_reports": [
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-005/control-0.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-005/control-1.json",
+        "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-005/control-2.json"
+      ],
+      "median_gflops": 1048.7480498774569,
+      "public_correctness": {
+        "schema_version": "sera-cpu-correctness-v1",
+        "seed": 20260924,
+        "sizes": [
+          0,
+          1,
+          3,
+          15,
+          16,
+          17,
+          31,
+          32,
+          33,
+          63,
+          64,
+          65,
+          96,
+          127,
+          129,
+          512
+        ],
+        "input_kinds": [
+          "random",
+          "identity",
+          "zero"
+        ],
+        "tolerance": 0.002,
+        "compiler_flags": [
+          "-O3",
+          "-march=native",
+          "-ffast-math",
+          "-shared",
+          "-fPIC",
+          "-lm"
+        ],
+        "timing_claim": false,
+        "source_hash": "ef09f2a1067deb0c1160bb51dbc29457b071ef0e071ce04e01bfd586afd1dc97",
+        "passed": true,
+        "stage": "correctness",
+        "worst_relative_error": 1.0017720606112918e-06
+      },
+      "comparison_identity": {
+        "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+        "config": {
+          "n": 512,
+          "tolerance": 0.002,
+          "machine": "MacBook-Pro-8.local"
+        },
+        "runtime": {
+          "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+          "compiler_flags": [
+            "-O3",
+            "-march=native",
+            "-ffast-math",
+            "-shared",
+            "-fPIC",
+            "-lm"
+          ],
+          "architecture": "arm64",
+          "platform": "Darwin"
+        }
+      },
+      "eligible_for_promotion": false,
+      "promoted": false,
+      "adjudication": {
+        "decision": "revise",
+        "reason": "Recorded correctness passed, but eligible=false prohibits adoption; promoted=false confirms no promotion. Candidate throughput was 949.9–1106.0 GFLOP/s versus paired controls of 839.1–1064.2. Paired changes were +2.7%, −10.7%, and +31.8%; candidate and control repeat spreads were 156.1 and 225.1 GFLOP/s. These mixed, variable results establish no repeatable gain or causal explanation. No repeat exceeded 1800 GFLOP/s. Retain the unchanged incumbent and treat joint pointer-end checks as unproven. The next implementation must use a distinct source change and hypothesis, with fresh paired validation under the unchanged gates and separate power-mode records."
+      }
+    }
+  ],
+  "target_gflops": 1800,
+  "target_met": false,
+  "winner_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-000/source/kernel.c",
+  "policy": {
+    "max_candidates": 6,
+    "repeats": 3,
+    "min_improvement": 0.05,
+    "max_seconds": 1800
+  },
+  "limits": [
+    "Experimental CPU source search; not the vLLM swarm",
+    "Trusted evaluator and proposer; no native-code sandbox",
+    "No automatic resume or model deployment"
+  ],
+  "comparison_identity": {
+    "tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "config": {
+      "n": 512,
+      "tolerance": 0.002,
+      "machine": "MacBook-Pro-8.local"
+    },
+    "runtime": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "compiler_flags": [
+        "-O3",
+        "-march=native",
+        "-ffast-math",
+        "-shared",
+        "-fPIC",
+        "-lm"
+      ],
+      "architecture": "arm64",
+      "platform": "Darwin"
+    }
+  },
+  "stop_reason": "search-exhausted",
+  "selected_source": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/trial-000/source/kernel.c",
+  "final_report": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-next-board-2026-09-25/search/final.json",
+  "final_gflops": 1026.19216031659,
+  "final_minimum_gflops": 785.360671562975
+}

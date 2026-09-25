@@ -1,0 +1,33 @@
+{
+  "name": "libxsmm-full512-packed-b-column-panels",
+  "hypothesis": "Pack B inside gemm as packed_b[p*16384+k*32+c] = B[k*512+p*32+c], for p=0..15, k=0..511 and c=0..31. Each panel occupies 65536 bytes; all sixteen occupy 1048576 bytes. Both K loops read two 16-lane FP32 vectors per step, advance B by 128 bytes, and rewind by 65536 bytes. Each column-panel transition advances by 65536 bytes; each completed column sweep rewinds by 1048576 bytes. Contiguous B access may offset the added packing and allocation cost; this is unverified. The original 64-row traversal, A packing, FP32 FMOPA order, C stores, single SME call, general-size fallback and both complete license notices remain unchanged. Allocation failure uses the existing fallback. This source change is distinct from the supplied measured inventory. No tools or tests were run. Compilation, full-GEMM correctness at tolerance 0.002, and fresh repeated paired performance gates remain required with power source and settings unchanged. No speedup or throughput above 1800 GFLOP/s is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "edits": [
+    {
+      "old": "    \"Llibxsmm_440:\\n\"\n    \"mov\\tx17, x2\\n\"\n    \"add\\tx9, x2, #0x8, lsl #12\\n\"\n    \"zero\\t{za}\\n\"\n    \"mov\\tx9, #0x800\\n\"\n    \"mov\\tx10, #0x100\\n\"",
+      "new": "    \"Llibxsmm_440:\\n\"\n    \"mov\\tx17, x2\\n\"\n    \"add\\tx9, x2, #0x8, lsl #12\\n\"\n    \"zero\\t{za}\\n\"\n    \"mov\\tx9, #0x80\\n\"\n    \"mov\\tx10, #0x100\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx8, Llibxsmm_478\\n\"\n    \"sub\\tx0, x0, #0x100, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x20, lsl #12\\n\"",
+      "new": "    \"cbnz\\tx8, Llibxsmm_478\\n\"\n    \"sub\\tx0, x0, #0x10, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x20, lsl #12\\n\""
+    },
+    {
+      "old": "    \"add\\tx3, x3, #0x80\\n\"\n    \"mov\\tx17, x2\\n\"\n    \"add\\tx9, x2, #0x8, lsl #12\\n\"\n    \"zero\\t{za}\\n\"\n    \"mov\\tx9, #0x800\\n\"\n    \"mov\\tx10, #0x100\\n\"",
+      "new": "    \"add\\tx3, x3, #0x80\\n\"\n    \"mov\\tx17, x2\\n\"\n    \"add\\tx9, x2, #0x8, lsl #12\\n\"\n    \"zero\\t{za}\\n\"\n    \"mov\\tx9, #0x80\\n\"\n    \"mov\\tx10, #0x100\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx8, Llibxsmm_70c\\n\"\n    \"sub\\tx0, x0, #0x100, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x20, lsl #12\\n\"",
+      "new": "    \"cbnz\\tx8, Llibxsmm_70c\\n\"\n    \"sub\\tx0, x0, #0x10, lsl #12\\n\"\n    \"sub\\tx3, x3, #0x20, lsl #12\\n\""
+    },
+    {
+      "old": "    \"add\\tx3, x26, #0x0\\n\"\n    \"add\\tx0, x0, #0x80\\n\"\n    \"sub\\tx6, x6, #0x20\\n\"\n    \"cbnz\\tx6, Llibxsmm_440\\n\"\n    \"sub\\tx0, x0, #0x800\\n\"",
+      "new": "    \"add\\tx3, x26, #0x0\\n\"\n    \"add\\tx0, x0, #0x10, lsl #12\\n\"\n    \"sub\\tx6, x6, #0x20\\n\"\n    \"cbnz\\tx6, Llibxsmm_440\\n\"\n    \"sub\\tx0, x0, #0x100, lsl #12\\n\""
+    },
+    {
+      "old": "    /* Row-major C=A*B is column-major C^T=B^T*A^T. Argument offsets\n       are exported from the pinned LIBXSMM ABI; all other fields are zero. */\n    const void *parameters[22] = {0};\n    parameters[4] = B;\n    parameters[10] = A;\n    parameters[16] = C;\n    sera_libxsmm_512(parameters);",
+      "new": "    /* Each B panel contains 512 K slices of 32 adjacent columns. */\n    float *packed_b = malloc((size_t)512 * 512 * sizeof(float));\n    if (!packed_b) {\n        fallback_gemm(n, A, B, C);\n        return;\n    }\n    for (int panel = 0; panel < 16; ++panel) {\n        for (int k = 0; k < 512; ++k) {\n            const float *src = B + (size_t)k * 512 + panel * 32;\n            float *dst = packed_b + (size_t)panel * 16384 + k * 32;\n            for (int column = 0; column < 32; ++column) {\n                dst[column] = src[column];\n            }\n        }\n    }\n    /* Preserve C^T=B^T*A^T operand roles. The adapted B consumer reads\n       packed panels; parameter offsets retain the pinned LIBXSMM ABI. */\n    const void *parameters[22] = {0};\n    parameters[4] = packed_b;\n    parameters[10] = A;\n    parameters[16] = C;\n    sera_libxsmm_512(parameters);\n    free(packed_b);"
+    }
+  ]
+}

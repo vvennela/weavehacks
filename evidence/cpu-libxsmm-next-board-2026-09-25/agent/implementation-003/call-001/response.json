@@ -1,0 +1,21 @@
+{
+  "name": "libxsmm-full512-column-panel-first-traversal",
+  "hypothesis": "Interchange the full512 traversal: sixteen 32-column panels become the outer loop, with eight 64-row blocks inside each panel. Both 32-row halves stay together. Each row block packs its current A rows before both consumers, then advances A and C by 131072 bytes. After eight blocks, rewind A and C by 1048576 bytes and advance B and C by 128 bytes for the next column panel. B remains at the current panel throughout the row sweep. This tests B-panel reuse while increasing A packing from eight to 128 packs per GEMM; benefit is unverified. This differs from the measured row-half-first traversal and packed-B layout. The 512-step reductions, FP32 order, scratch layout, SME transitions, general-size fallback, n<=0 behavior, unused helper and both complete license notices remain unchanged. No tools or tests were run. Compilation, full-GEMM correctness and fresh repeated paired performance checks remain required under the unchanged gates and initial power settings. No speedup or throughput above 1800 GFLOP/s is established.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "edits": [
+    {
+      "old": "    \"smstart\\n\"\n    \"mov\\tx7, #0x200\\n\"\n    \"Llibxsmm_64:\\n\"",
+      "new": "    \"smstart\\n\"\n    \"mov\\tx6, #0x200\\n\"\n    \"Lsera_libxsmm_column_panel:\\n\"\n    \"mov\\tx7, #0x200\\n\"\n    \"Llibxsmm_64:\\n\""
+    },
+    {
+      "old": "    \"cbnz\\tx11, Llibxsmm_78\\n\"\n    \"sub\\tx1, x1, #0x800\\n\"\n    \"mov\\tsp, x20\\n\"\n    \"mov\\tx6, #0x200\\n\"\n    \"Llibxsmm_440:\\n\"",
+      "new": "    \"cbnz\\tx11, Llibxsmm_78\\n\"\n    \"sub\\tx1, x1, #0x800\\n\"\n    \"mov\\tsp, x20\\n\"\n    \"Llibxsmm_440:\\n\""
+    },
+    {
+      "old": "    \"mov\\tx2, x17\\n\"\n    \"sub\\tx2, x2, #0xf80\\n\"\n    \"sub\\tx2, x2, #0xf, lsl #12\\n\"\n    \"add\\tx3, x26, #0x0\\n\"\n    \"add\\tx0, x0, #0x80\\n\"\n    \"sub\\tx6, x6, #0x20\\n\"\n    \"cbnz\\tx6, Llibxsmm_440\\n\"\n    \"sub\\tx0, x0, #0x800\\n\"\n    \"add\\tx1, x1, #0x20, lsl #12\\n\"\n    \"add\\tx2, x2, #0x800\\n\"\n    \"add\\tx2, x2, #0x1f, lsl #12\\n\"\n    \"sub\\tx7, x7, #0x40\\n\"\n    \"cbnz\\tx7, Llibxsmm_64\\n\"\n    \"smstop\\n\"",
+      "new": "    \"mov\\tx2, x17\\n\"\n    \"add\\tx2, x2, #0x10, lsl #12\\n\"\n    \"add\\tx1, x1, #0x20, lsl #12\\n\"\n    \"sub\\tx7, x7, #0x40\\n\"\n    \"cbnz\\tx7, Llibxsmm_64\\n\"\n    \"sub\\tx1, x1, #0x100, lsl #12\\n\"\n    \"sub\\tx2, x2, #0x100, lsl #12\\n\"\n    \"add\\tx2, x2, #0x80\\n\"\n    \"add\\tx0, x0, #0x80\\n\"\n    \"sub\\tx6, x6, #0x20\\n\"\n    \"cbnz\\tx6, Lsera_libxsmm_column_panel\\n\"\n    \"smstop\\n\""
+    }
+  ]
+}

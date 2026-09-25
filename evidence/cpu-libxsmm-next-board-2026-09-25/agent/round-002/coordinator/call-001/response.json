@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "a_transpose",
+    "panel_packing",
+    "cache_blocking",
+    "vector_access",
+    "address_generation",
+    "tail_alignment",
+    "scratch_lifetime",
+    "prefetch_locality",
+    "transpose_fusion",
+    "streaming_region_cost",
+    "assembly_audit",
+    "k_loop_schedule",
+    "sme_fp32_tiles",
+    "register_reuse",
+    "n512_fast_path"
+  ],
+  "rationale": "Select these 15 roles to review distinct source changes against the complete supplied inventory. Retain the unchanged augmented LIBXSMM incumbent; no supplied candidate establishes the >1800 GFLOP/s target or qualifies for promotion.\n\nPacking coverage: a_transpose examines the conversion at Llibxsmm_78; panel_packing specifies bounded layouts and exact element mappings; cache_blocking coordinates allocation, consumer strides, rewinds, and traversal; transpose_fusion examines feeding converted values into computation and counts any repeated conversion. These roles must not repeat the sixteen-helper-call wrapper, packed-B column panels, 272-byte padding, or measured traversal changes.\n\nCompute coverage: sme_fp32_tiles checks alternative mappings within ZA0.S–ZA3.S; register_reuse examines operand reuse within those mappings; vector_access examines load/store forms, including the output-store blocks. address_generation covers pointer and setup arithmetic. k_loop_schedule reviews the distinct fixed-256-iteration two-K control simplification in Llibxsmm_478 and Llibxsmm_70c. The two-bank computation itself is already measured and must not be presented as new.\n\nIntegration coverage: scratch_lifetime reviews Llibxsmm_64 through the final scratch consumer, including all sixteen packing stores and SP increments in Llibxsmm_78. Keeping scratch reserved is an ABI-lifetime question, not an established speed improvement. streaming_region_cost reviews valid SME boundaries; tail_alignment checks bounds and general sizes; n512_fast_path checks guarded integration with gemm and fallback_gemm. assembly_audit checks the supplied assembly and proposal feasibility without claiming instruction counts prove timing. prefetch_locality examines bounded prefetch proposals tied to the actual operand streams.\n\nReplace loop_order, b_panel_layout, and za_four_tile_reuse from the prior roster with sme_fp32_tiles, register_reuse, and n512_fast_path. Their recent traversal and B-packing experiments are now measured and unpromoted. Deduplicate overlapping proposals before ranking. Exclude candidates requiring unavailable generated helpers. All advice remains unverified; preserve both complete license notices, the fixed ABI and benchmark gates, timed per-call work, and separate power-mode records."
+}

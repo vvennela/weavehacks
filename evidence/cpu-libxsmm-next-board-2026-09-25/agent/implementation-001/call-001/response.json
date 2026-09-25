@@ -1,0 +1,17 @@
+{
+  "name": "libxsmm-full512-row-half-first-traversal",
+  "hypothesis": "Change traversal within each packed 64-row band: compute the first 32 output rows across all sixteen column panels, then compute the second 32 rows across all sixteen panels. Keeping one packed row half active across a complete column sweep may improve reuse; this is unverified. At 16 FP32 lanes, four ZA.S tiles form one 32x32 output block. Both K loops, FMOPA order, stores, 256-byte scratch stride, 128 KiB allocation and SME transitions remain unchanged. After each sweep, reset B by 2048 bytes and advance C by 63488 bytes from its post-sweep position. The second half uses scratch base+128. These offsets cover each output block once and preserve the next 64-row band's starting pointers. General sizes, tails, n<=0, the unused helper and both complete license notices remain unchanged. This traversal is absent from the supplied measured history. No tools or tests were run. Compilation, full-GEMM correctness and performance remain untested; throughput above 1800 GFLOP/s is not established. Use the unchanged base source for fresh paired controls under the fixed gates and unchanged power settings.",
+  "source": "",
+  "stop": false,
+  "base_source_hash": "e7b5eb8a9b290651137639917a3bdca342e9a1ed767d0ff8718449b03214c200",
+  "edits": [
+    {
+      "old": "    \"mov\\tx2, x17\\n\"\n    \"add\\tx2, x2, #0x10, lsl #12\\n\"\n    \"add\\tx3, x3, #0x80\\n\"\n    \"mov\\tx17, x2\\n\"",
+      "new": "    \"mov\\tx2, x17\\n\"\n    \"add\\tx2, x2, #0x80\\n\"\n    \"add\\tx0, x0, #0x80\\n\"\n    \"sub\\tx6, x6, #0x20\\n\"\n    \"cbnz\\tx6, Llibxsmm_440\\n\"\n    \"sub\\tx0, x0, #0x800\\n\"\n    \"add\\tx2, x2, #0x800\\n\"\n    \"add\\tx2, x2, #0xf, lsl #12\\n\"\n    \"add\\tx3, x26, #0x80\\n\"\n    \"mov\\tx6, #0x200\\n\"\n    \"Lsera_libxsmm_second_half:\\n\"\n    \"mov\\tx17, x2\\n\""
+    },
+    {
+      "old": "    \"mov\\tx2, x17\\n\"\n    \"sub\\tx2, x2, #0xf80\\n\"\n    \"sub\\tx2, x2, #0xf, lsl #12\\n\"\n    \"add\\tx3, x26, #0x0\\n\"\n    \"add\\tx0, x0, #0x80\\n\"\n    \"sub\\tx6, x6, #0x20\\n\"\n    \"cbnz\\tx6, Llibxsmm_440\\n\"\n    \"sub\\tx0, x0, #0x800\\n\"\n    \"add\\tx1, x1, #0x20, lsl #12\\n\"\n    \"add\\tx2, x2, #0x800\\n\"\n    \"add\\tx2, x2, #0x1f, lsl #12\\n\"\n    \"sub\\tx7, x7, #0x40\\n\"",
+      "new": "    \"mov\\tx2, x17\\n\"\n    \"add\\tx2, x2, #0x80\\n\"\n    \"add\\tx3, x26, #0x80\\n\"\n    \"add\\tx0, x0, #0x80\\n\"\n    \"sub\\tx6, x6, #0x20\\n\"\n    \"cbnz\\tx6, Lsera_libxsmm_second_half\\n\"\n    \"sub\\tx0, x0, #0x800\\n\"\n    \"add\\tx1, x1, #0x20, lsl #12\\n\"\n    \"add\\tx2, x2, #0x800\\n\"\n    \"add\\tx2, x2, #0xf, lsl #12\\n\"\n    \"sub\\tx7, x7, #0x40\\n\""
+    }
+  ]
+}
