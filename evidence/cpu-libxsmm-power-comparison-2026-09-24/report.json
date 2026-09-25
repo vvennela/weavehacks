@@ -1,0 +1,285 @@
+{
+  "schema_version": "sera-libxsmm-power-comparison-v1",
+  "snapshot_utc": "2026-09-25T06:45:34.591969+00:00",
+  "snapshot_status": "completed_snapshot",
+  "interpretation": "Each phase is reported separately. AC and battery GFLOP/s are not pooled or treated as direct speedups. Only within-battery candidate/control pairs are paired comparisons.",
+  "frozen_benchmark": {
+    "hill_tree_hash": "76db49356748c18dccac376bed489268b047b60a",
+    "matrix_n": 512,
+    "tolerance": 0.002,
+    "machine": "MacBook-Pro-8.local",
+    "architecture": "arm64",
+    "platform": "Darwin",
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+    "compiler_flags": [
+      "-O3",
+      "-march=native",
+      "-ffast-math",
+      "-shared",
+      "-fPIC",
+      "-lm"
+    ],
+    "target_gflops": 1800.0
+  },
+  "phases": [
+    {
+      "id": "ac_reference",
+      "power": "AC",
+      "block": "evidence/cpu-libxsmm-reference-2026-09-24/baseline-run",
+      "purpose": "Fresh unchanged LIBXSMM reference baseline and final holdout",
+      "result_status": "completed",
+      "trials": [
+        {
+          "name": "existing-sme",
+          "source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+          "status": "passed",
+          "validation_gflops_in_report_order": [
+            1541.2532704114913,
+            1333.2842863403828,
+            1328.0665951598835
+          ],
+          "validation_reports": [
+            "evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/validation-0.json",
+            "evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/validation-1.json",
+            "evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/trial-000/validation-2.json"
+          ],
+          "paired_control_gflops_in_report_order": [],
+          "paired_control_reports": [],
+          "public_correctness_passed": true,
+          "correctness_case_count": 48,
+          "eligible_for_promotion": null,
+          "promoted": null,
+          "adjudication": null
+        }
+      ],
+      "final_holdout_gflops": 1533.1897399707996,
+      "final_holdout_report": "evidence/cpu-libxsmm-reference-2026-09-24/baseline-run/search/final.json",
+      "target_met": false,
+      "verification": {
+        "verification_file": "evidence/cpu-libxsmm-reference-2026-09-24/baseline-verification.json",
+        "all_signatures_valid": true,
+        "all_passed": true
+      }
+    },
+    {
+      "id": "ac_swarm_baseline_only",
+      "power": "AC",
+      "block": "evidence/cpu-libxsmm-swarm-2026-09-24",
+      "purpose": "Separate fresh baseline before swarm search; implementation timed out before any candidate source or score",
+      "result_status": "failed",
+      "trials": [
+        {
+          "name": "libxsmm-aot-reference",
+          "source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+          "status": "passed",
+          "validation_gflops_in_report_order": [
+            1643.4756775419414,
+            1276.74414125079,
+            1176.058920286144
+          ],
+          "validation_reports": [
+            "evidence/cpu-libxsmm-swarm-2026-09-24/search/trial-000/validation-0.json",
+            "evidence/cpu-libxsmm-swarm-2026-09-24/search/trial-000/validation-1.json",
+            "evidence/cpu-libxsmm-swarm-2026-09-24/search/trial-000/validation-2.json"
+          ],
+          "paired_control_gflops_in_report_order": [],
+          "paired_control_reports": [],
+          "public_correctness_passed": true,
+          "correctness_case_count": 48,
+          "eligible_for_promotion": null,
+          "promoted": null,
+          "adjudication": null
+        }
+      ],
+      "candidate_scores": [],
+      "final_holdout_gflops": null,
+      "target_met": false,
+      "verification": {
+        "verification_file": "evidence/cpu-libxsmm-swarm-2026-09-24/verification.json",
+        "baseline_reports_all_verified": true,
+        "no_candidate_source_or_score": true
+      }
+    },
+    {
+      "id": "battery_swarm",
+      "power": "Battery Power",
+      "block": "evidence/cpu-libxsmm-measure-prepared-2026-09-24",
+      "purpose": "Fresh baseline plus three distinct candidate trials with alternating paired unchanged controls",
+      "result_status": "final-performance-unconfirmed",
+      "trials": [
+        {
+          "name": "libxsmm-aot-reference",
+          "source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+          "status": "passed",
+          "validation_gflops_in_report_order": [
+            1020.5041402278307,
+            1077.3314837168991,
+            1055.9678192796828
+          ],
+          "validation_reports": [
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-000/validation-0.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-000/validation-1.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-000/validation-2.json"
+          ],
+          "paired_control_gflops_in_report_order": [],
+          "paired_control_reports": [],
+          "public_correctness_passed": true,
+          "correctness_case_count": 48,
+          "eligible_for_promotion": null,
+          "promoted": null,
+          "adjudication": null
+        },
+        {
+          "name": "libxsmm-k-loop-software-pipeline",
+          "source_sha256": "bf47e981d23289bfc6faba38d6ac5a3c8362db81f2b61e0215dd441135878685",
+          "status": "passed",
+          "validation_gflops_in_report_order": [
+            730.6016211251696,
+            778.1662624286882,
+            756.8683079169249
+          ],
+          "validation_reports": [
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-001/validation-0.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-001/validation-1.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-001/validation-2.json"
+          ],
+          "paired_control_gflops_in_report_order": [
+            795.0698209044307,
+            1015.3586799322641,
+            847.4679057889266
+          ],
+          "paired_control_reports": [
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-001/control-0.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-001/control-1.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-001/control-2.json"
+          ],
+          "public_correctness_passed": true,
+          "correctness_case_count": 48,
+          "eligible_for_promotion": false,
+          "promoted": false,
+          "adjudication": "reject"
+        },
+        {
+          "name": "libxsmm-k-loop-pointer-end-tests",
+          "source_sha256": "8b01ee298ba0f0d49915cec8e0730ff168af64562bb9d6f717f7adbaaba5ff3a",
+          "status": "passed",
+          "validation_gflops_in_report_order": [
+            765.6808535378168,
+            1018.8927819450573,
+            954.298077756665
+          ],
+          "validation_reports": [
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-002/validation-0.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-002/validation-1.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-002/validation-2.json"
+          ],
+          "paired_control_gflops_in_report_order": [
+            824.6864888803946,
+            868.4898760325931,
+            801.8983294144035
+          ],
+          "paired_control_reports": [
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-002/control-0.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-002/control-1.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-002/control-2.json"
+          ],
+          "public_correctness_passed": true,
+          "correctness_case_count": 48,
+          "eligible_for_promotion": false,
+          "promoted": false,
+          "adjudication": "revise"
+        },
+        {
+          "name": "libxsmm-k-loop-two-step-unroll",
+          "source_sha256": "ec83ff3b94f2983c17a1f7fd69aea377ed143b5993635a8770818124d4fcdd91",
+          "status": "passed",
+          "validation_gflops_in_report_order": [
+            1087.5141231535335,
+            1047.5529938845925,
+            1091.2009939850639
+          ],
+          "validation_reports": [
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-003/validation-0.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-003/validation-1.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-003/validation-2.json"
+          ],
+          "paired_control_gflops_in_report_order": [
+            947.5574885566502,
+            1040.1128771679143,
+            873.31584564557
+          ],
+          "paired_control_reports": [
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-003/control-0.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-003/control-1.json",
+            "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/trial-003/control-2.json"
+          ],
+          "public_correctness_passed": true,
+          "correctness_case_count": 48,
+          "eligible_for_promotion": false,
+          "promoted": false,
+          "adjudication": "revise"
+        }
+      ],
+      "final_holdout_gflops": 801.2998932501679,
+      "final_holdout_status": "unconfirmed; no winner selected",
+      "stop_reason": "search-exhausted",
+      "target_met": false,
+      "verification": {
+        "verification_file": "evidence/cpu-libxsmm-measure-prepared-2026-09-24/verification.json",
+        "report_count": 22,
+        "all_signatures_verified": true,
+        "all_sources_match": true,
+        "all_public_correctness_passed": true,
+        "power_before_after_unchanged": true,
+        "settings_before_after_unchanged": true
+      },
+      "final_holdout_report": "evidence/cpu-libxsmm-measure-prepared-2026-09-24/search/final.json"
+    }
+  ],
+  "source_power_cells": [
+    {
+      "source_sha256": "7e9ab1076777a40cb0ad30527e381b221d4024cd99f370708971fb652b31810e",
+      "description": "Unchanged LIBXSMM AOT reference",
+      "ac_reference": "measured: 3 validation reports + final holdout",
+      "ac_swarm_baseline_only": "measured: 3 separate validation reports",
+      "battery": "measured: 3 validation reports, 9 unchanged controls, and final holdout",
+      "promoted": false
+    },
+    {
+      "source_sha256": "bf47e981d23289bfc6faba38d6ac5a3c8362db81f2b61e0215dd441135878685",
+      "description": "K-loop software pipeline",
+      "ac_reference": "unmeasured",
+      "ac_swarm_baseline_only": "unmeasured",
+      "battery": "measured: 3 validations + 3 paired unchanged controls",
+      "promoted": false
+    },
+    {
+      "source_sha256": "8b01ee298ba0f0d49915cec8e0730ff168af64562bb9d6f717f7adbaaba5ff3a",
+      "description": "K-loop pointer end tests",
+      "ac_reference": "unmeasured",
+      "ac_swarm_baseline_only": "unmeasured",
+      "battery": "measured: 3 validations + 3 paired unchanged controls",
+      "promoted": false
+    },
+    {
+      "source_sha256": "ec83ff3b94f2983c17a1f7fd69aea377ed143b5993635a8770818124d4fcdd91",
+      "description": "K-loop two-step unroll",
+      "ac_reference": "unmeasured",
+      "ac_swarm_baseline_only": "unmeasured",
+      "battery": "measured: 3 validations + 3 paired unchanged controls",
+      "promoted": false
+    }
+  ],
+  "overall_outcome": {
+    "battery_final_gflops": 801.2998932501679,
+    "battery_result_status": "final-performance-unconfirmed",
+    "target_met": false,
+    "candidate_promoted": false,
+    "candidate_trials": 3,
+    "later_attempts": "Two final attempts abstained; they produced no source hashes or performance scores.",
+    "comparison_limit": "No candidate was measured on AC in these records. Do not infer battery-to-AC scaling, candidate speedups across power states, or a power-independent winner.",
+    "model_calls_recorded": 71,
+    "bounded_candidate_attempts": 6,
+    "candidate_sources_measured": 3
+  }
+}
