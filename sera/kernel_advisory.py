@@ -185,6 +185,18 @@ class KernelAdvisoryTeam:
             return None
         common = RULES + '\n' + self.task + '\nHardware profile:\n' + json.dumps(self.profile)
         common += '\nMeasured history:\n' + json.dumps(evidence)
+        dispositions = []
+        for batch in self.rounds:
+            proposals = {item['experiment_id']: item for item in batch.get('board', [])}
+            for attempt in batch.get('implementations', []):
+                dispositions.append(dict(
+                    round=batch['round'], proposal=proposals.get(attempt['experiment_id']),
+                    **{key: attempt[key] for key in
+                       ('experiment_id', 'status', 'reason', 'error', 'source_hash')
+                       if key in attempt}))
+        common += ('\nPrior implementation dispositions (agent explanations are not measured '
+                   'performance evidence; check against the supplied source and contract):\n'
+                   + json.dumps(dispositions))
         if self.pending:
             return self._implement(common, deadline, evidence)
         folder = self.folder / f'round-{len(self.rounds)+1:03d}'

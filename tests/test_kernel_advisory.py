@@ -289,3 +289,23 @@ def test_duplicate_source_response_advances_to_next_ranked_experiment(tmp_path):
     assert [item['status'] for item in records] == ['abstained', 'proposed']
     assert team.calls == 33
     assert team.proposal_count == 2
+
+
+def test_replacement_specialists_receive_skipped_experiment_reasons(tmp_path):
+    calls = []
+    team = KernelAdvisoryTeam(work_dir=tmp_path/'team', task='FP32 only', profile={},
+        max_rounds=2, batch_size=1, agent_factory=factory_for(calls))
+    team.rounds = [dict(round=1, roles=[], advice=[], implementations=[dict(
+        experiment_id='vector_access', status='abstained',
+        reason='Paired LD1W has no post-index writeback form')], board=[dict(
+        experiment_id='vector_access', recommendation='Fold pointer updates into paired loads',
+        risks='Instruction legality')])]
+    candidate = team.propose(history(tmp_path), timeout=60)
+    assert candidate.source == 'new source'
+    # The roster selector, every advisor, every voter, and the implementer get
+    # the skipped proposal and its disposition, even when their roles changed.
+    assert len(calls) == 32
+    for _, prompt in calls:
+        assert 'Fold pointer updates into paired loads' in prompt
+        assert 'Paired LD1W has no post-index writeback form' in prompt
+        assert 'abstained' in prompt
