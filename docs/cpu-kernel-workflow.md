@@ -19,7 +19,7 @@ python examples/optimize_cpu_kernel.py \
   --target-gflops 1800
 ```
 
-The output directory must not exist. Connect AC power before running. The example uses an Astra coordinator (`gpt-6-astra`, high reasoning effort) and 15 Luna advisors (`gpt-6-luna`, medium reasoning effort). Each planning batch makes one Astra call to select roles, 15 specialist recommendation calls, and 15 specialist ranking calls. Each selected experiment adds one Astra implementation call and one Astra measured-result review. The default batch size is three and the candidate limit is six: two full batches use 74 calls. A separate hard ceiling of 108 model calls remains in force; it also covers shortened batches, abstentions, and failures. `--batch-size` and `--max-model-calls` record explicit caller limits. The 1,800-second overall deadline remains in force. Plan usage is consumed; no dollar-cost guarantee is inferred from a call limit.
+The output directory must not exist. AC and battery runs are supported with separate fresh baselines. The example uses an Astra coordinator (`gpt-6-astra`, high reasoning effort) and 15 Luna advisors (`gpt-6-luna`, medium reasoning effort). Each planning batch makes one Astra call to select roles, 15 specialist recommendation calls, and 15 specialist ranking calls. Each selected experiment adds one Astra implementation call and one Astra measured-result review. The default batch size is three and the candidate limit is six: two full batches use 74 calls. A separate hard ceiling of 108 model calls remains in force; it also covers shortened batches, abstentions, and failures. `--batch-size` and `--max-model-calls` record explicit caller limits. The 1,800-second overall deadline remains in force. Plan usage is consumed; no dollar-cost guarantee is inferred from a call limit.
 
 The old source-producing `KernelSpecialistTeam` and single `CodexKernelProposer` remain available as Python APIs, but this example uses the new `KernelAdvisoryTeam`.
 
@@ -38,7 +38,7 @@ The catalog contains 24 fixed CPU roles, with a default roster of 15. Roles cove
 
 Specialist descriptions are fixed contracts; Astra changes the roster, not those contracts. Bounded in-run memory pairs prior advice with the joint candidate outcome and report identity. Advice is not measured evidence, and joint results do not establish which advisor caused a gain. Agents cannot rewrite the evaluator, tolerance, hardware assignment, thread limit, or budget. Cross-run learning is not implemented.
 
-Power and thermal observations are captured around every signed evaluation. AC power and unchanged power settings are required throughout the run. Earlier battery results are not treated as AC baseline measurements. FP32 arithmetic, the hill score convention, and the existing 5% separated-range promotion rule remain unchanged.
+Power and thermal observations are captured around every signed evaluation. The initial power source and power settings must remain unchanged throughout a run. Keep AC and battery results for each exact source; neither mode supplies the other mode's baseline. FP32 arithmetic, the hill score convention, and the existing 5% separated-range promotion rule remain unchanged.
 
 ## Inspect the result
 

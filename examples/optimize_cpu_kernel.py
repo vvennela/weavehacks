@@ -34,6 +34,20 @@ def require_ac(observation):
         raise RuntimeError('AC power is required for this approved benchmark run')
 
 
+def power_source(observation):
+    for source in ('AC Power', 'Battery Power'):
+        if "Now drawing from '" + source + "'" in observation['battery']:
+            return source
+    raise RuntimeError('Unknown power source')
+
+
+def check_power(observation, initial):
+    if power_source(observation) != power_source(initial):
+        raise RuntimeError('Power source changed during measurement block')
+    if observation['power_settings'] != initial['power_settings']:
+        raise RuntimeError('Power settings changed during measurement block')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline", required=True, type=Path)
@@ -47,7 +61,7 @@ def main():
     parser.add_argument("--batch-size", type=int, default=3)
     args = parser.parse_args()
     initial_host = host_observation()
-    require_ac(initial_host)
+    check_power(initial_host, initial_host)
     folder = args.output.resolve()
     folder.mkdir(parents=True, exist_ok=False)
     save_json(folder / "controls.json", dict(
@@ -102,14 +116,12 @@ def main():
     proposer = KernelAdvisoryTeam(work_dir=folder / "agent", task=task,
         timeout=args.agent_timeout, max_rounds=args.max_candidates,
         max_calls=args.max_model_calls, batch_size=args.batch_size,
-        profile=dict(capabilities=capabilities))
+        profile=dict(capabilities=capabilities, power=power_source(initial_host)))
     evaluator = HillsKernelEvaluator(workspace=args.hill_workspace)
 
     def evaluate(source_dir, report_path, *, final, timeout):
         before = host_observation()
-        require_ac(before)
-        if before['power_settings'] != initial_host['power_settings']:
-            raise RuntimeError('Power settings changed from the AC baseline')
+        check_power(before, initial_host)
         observations = dict(before=before)
         host_path = Path(report_path).with_suffix('.host.json')
         save_json(host_path, observations)
@@ -119,9 +131,7 @@ def main():
             after = host_observation()
             observations['after'] = after
             save_json(host_path, observations)
-            require_ac(after)
-            if after['power_settings'] != initial_host['power_settings']:
-                raise RuntimeError('Power settings changed during measurement')
+            check_power(after, initial_host)
 
     try:
         report = optimize_kernel(
