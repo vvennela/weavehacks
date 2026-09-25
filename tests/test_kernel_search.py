@@ -128,3 +128,9 @@ def test_public_correctness_failure_prevents_scoring(tmp_path):
     report, evaluator = run(tmp_path, {"base": 1000, "new": 9999}, validate=validate)
     assert ("new", False) not in evaluator.calls
     assert report["trials"][1]["status"] == "rejected"
+
+
+def test_default_target_does_not_accept_1790_gflops(tmp_path):
+    report, _ = run(tmp_path, {"base": 1000, "new": 1790})
+    assert report["target_met"] is False
+    assert report["target_gflops"] == 1800

@@ -60,7 +60,7 @@ def _score(report, *, final, identity):
 
 
 def optimize_kernel(*, baseline, propose, evaluate, output_dir, max_candidates=8,
-                    repeats=3, target_gflops=1780.0, min_improvement=0.05,
+                    repeats=3, target_gflops=1800.0, min_improvement=0.05,
                     max_seconds=1800.0, trial_timeout=120.0, validate=None):
     """Search standalone gemm C sources; return source only after held-out checks.
 
