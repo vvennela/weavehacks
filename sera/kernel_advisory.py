@@ -166,6 +166,16 @@ class KernelAdvisoryTeam:
 
     def propose(self, history, *, timeout):
         deadline = time.monotonic() + timeout
+        while True:
+            attempts_before = self.proposal_count
+            candidate = self._propose_batch(history, deadline)
+            if (candidate is not None or self.proposal_count >= self.max_rounds or
+                    self.proposal_count == attempts_before):
+                return candidate
+            # An exhausted duplicate batch is not an exhausted search. Ask the
+            # swarm for a fresh batch within the same deadline and call budget.
+
+    def _propose_batch(self, history, deadline):
         self._remaining(deadline)
         evidence = self._evidence(history)
         if self.proposal_count >= self.max_rounds:

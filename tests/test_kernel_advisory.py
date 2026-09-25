@@ -195,3 +195,32 @@ def test_invalid_specialist_ranking_gets_one_bounded_format_repair(tmp_path):
     assert len(calls)==47
     state=json.loads((tmp_path/'team/state.json').read_text())
     assert all(vote['format_repairs']==1 for vote in state['rounds'][0]['ballots'])
+
+
+@pytest.mark.parametrize('attempt_budget,expected_source', [(3, None), (4, 'new source')])
+def test_duplicate_batch_replans_only_with_remaining_attempts(tmp_path, attempt_budget, expected_source):
+    calls = []
+    roster = list(DEFAULT_ADVISOR_IDS)
+    base = factory_for(calls, [roster, roster])
+
+    def factory(**settings):
+        agent = base(**settings)
+        original = agent.request
+
+        def request(prompt, schema, *, timeout):
+            result = original(prompt, schema, timeout=timeout)
+            folder = Path(settings['work_dir']).name
+            if folder.startswith('implementation-') and int(folder.split('-')[1]) <= 3:
+                return dict(name='duplicate', source='', hypothesis='Already tested', stop=True)
+            return result
+
+        agent.request = request
+        return agent
+
+    team = KernelAdvisoryTeam(work_dir=tmp_path/'team', task='FP32', profile={},
+        max_rounds=attempt_budget, batch_size=3, agent_factory=factory)
+    candidate = team.propose(history(tmp_path), timeout=60)
+    assert (candidate.source if candidate else None) == expected_source
+    assert team.proposal_count == attempt_budget
+    assert len(team.rounds) == (2 if expected_source else 1)
+    assert team.calls == (66 if expected_source else 34)
