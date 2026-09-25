@@ -1,0 +1,47 @@
+{
+  "host": {
+    "timestamp_utc": "2026-09-25T19:02:26.979123+00:00",
+    "battery": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=21889123)\t16%; charging; 2:20 remaining present: true\n",
+    "power_settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n",
+    "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n"
+  },
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "AC Power",
+    "energy_mode": "Automatic",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "single-thread"
+    ]
+  },
+  "task": "Remeasure the exact baseline and four previously swarm-selected kernels\non AC Automatic with ten repetitions and fresh alternating paired controls.\nThe user goal is to beat the imported baseline peak consistently over ten runs.\nThe saved imported peak is 1668.5964359101147 GFLOP/s (Battery Automatic).\nThe choice between that historical peak and a fresh same-profile peak is pending;\nreport both comparisons without treating either as an approved replacement gate.\nSource hashes and swarm-selected order are preserved. No new proposals are needed.\nAstra reviews ONLY fresh history using the existing separated-ranges-plus-5% gate.\nThe internal search target remains the legacy 1800 setting solely to avoid silently\nchanging acceptance policy. Its target_met flag does not decide the new user goal.\nKeep the frozen full FP32 row-major GEMM, compiler, single thread, tolerance and\nheld-out checks. No previous timings enter eligibility. Imported baseline code is\nnot a Sera improvement. Do not change system settings.",
+  "prior_phase": "/Users/vishnuv/Documents/Documents/weavehacks/evidence/cpu-libxsmm-editable-panel-2026-09-25",
+  "prior_calls": 72,
+  "prior_attempts": 6,
+  "prior_state_sha256": "811919e8f91d9dbd24f06fc9ec414090ad830d007e92b178a69c0ca62c1b7414",
+  "source_hashes": [
+    "04fc3ff86669c2ca123e3b390b662637cd69c21f3d63fa26f7a5f0f0a882317c",
+    "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+    "4c6f6bb5b37bbce7638d217d3d62d15c84fda586e56dff0dd0406bdf297f5f06",
+    "872c239816f8707fe5fa1b499c2e0455b625c6a4269f2944273f79d437b7bf92",
+    "1a81c422b6b62a1d60b4476417f224565e74849d402d4d54c09692b559dfa264"
+  ],
+  "prior_scores_imported": false,
+  "reusing_selected_sources": true,
+  "new_proposals": false,
+  "max_candidates": 6,
+  "max_model_calls": 108,
+  "max_seconds": 1800,
+  "agent_timeout": 180,
+  "target_gflops": 1800,
+  "target_role": "legacy internal search gate; not new-goal adjudication",
+  "goal": "beat the imported baseline peak consistently over 10 runs",
+  "repeats": 10,
+  "min_improvement": 0.05,
+  "historical_imported_peak_gflops": 1668.5964359101147,
+  "implementation_commit": "acfda72dcb16caf2204eda1719bc758218299e67",
+  "driver_sha256": "8850635bef06d95cac2bb2408fa15ec64bcb469fb13ea0d58a166c9fc02d02e3"
+}

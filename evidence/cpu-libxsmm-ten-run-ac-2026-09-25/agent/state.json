@@ -1,0 +1,56 @@
+{
+  "schema_version": "sera-kernel-swarm-v2",
+  "coordinator": "gpt-6-astra",
+  "coordinator_reasoning": "high",
+  "advisor_model": "gpt-6-luna",
+  "advisor_count": 15,
+  "max_rounds": 6,
+  "max_model_calls": 108,
+  "calls": 4,
+  "batch_size": 3,
+  "pending": [],
+  "implementations": 0,
+  "adjudications": [
+    {
+      "source_hash": "eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Reported correctness passed, but eligible=false and promoted=false. Across ten fresh runs, candidate scores ranged from 1251.20–1701.65 GFLOP/s; paired controls ranged from 1225.26–1673.37. These ranges overlap, failing the fixed separated-ranges-plus-5% gate. The candidate won only 5/10 pairs. It exceeded the historical Battery Automatic peak of 1668.5964 in 3/10 runs and the fresh AC Automatic baseline peak of 1685.6231 in 1/10 runs. Neither comparison demonstrates the ten-run consistency goal; the peak definition remains pending. Discard this candidate and retain the incumbent. These measurements establish no causal benefit from the implementation changes. The legacy 1800 target flag does not determine this decision."
+    },
+    {
+      "source_hash": "4c6f6bb5b37bbce7638d217d3d62d15c84fda586e56dff0dd0406bdf297f5f06",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Reported correctness passed, but eligible=false and promoted=false. Across ten fresh runs, candidate scores ranged from 1077.51–1565.22 GFLOP/s; paired controls ranged from 1356.88–1662.14. The ranges overlap, failing the fixed separated-ranges-plus-5% gate. The candidate won only 1/10 pairs, by 0.31 GFLOP/s. It exceeded neither the historical Battery Automatic peak of 1668.5964 nor the fresh AC Automatic baseline peak of 1685.6231 in any run: 0/10 for both comparisons. The ten-run consistency goal is unmet under either comparison; the peak definition remains pending. Discard this candidate and retain the incumbent. These results establish no causal benefit from reserving scratch once. The legacy 1800 target flag does not determine this decision."
+    },
+    {
+      "source_hash": "872c239816f8707fe5fa1b499c2e0455b625c6a4269f2944273f79d437b7bf92",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Reported correctness passed, but eligible=false and promoted=false. Across ten fresh runs, candidate scores ranged from 1050.63–1667.73 GFLOP/s; paired controls ranged from 1147.37–1623.60. These ranges overlap, failing the fixed separated-ranges-plus-5% gate. The candidate won only 4/10 pairs. It exceeded neither the historical Battery Automatic peak of 1668.5964 nor the fresh AC Automatic baseline peak of 1685.6231: 0/10 runs for both. The ten-run consistency goal is unmet under either comparison; the peak definition remains pending. Discard this candidate and retain the incumbent. These measurements establish no causal benefit from W32 loop counters. The legacy 1800 target flag does not determine this decision."
+    },
+    {
+      "source_hash": "1a81c422b6b62a1d60b4476417f224565e74849d402d4d54c09692b559dfa264",
+      "eligible": false,
+      "status": "reviewed",
+      "decision": "reject",
+      "reason": "Reported correctness passed, but eligible=false and promoted=false. Across ten fresh AC Automatic runs, candidate scores ranged from 1197.04–1669.47 GFLOP/s; paired controls ranged from 1065.58–1635.97. These ranges overlap, failing the fixed separated-ranges-plus-5% gate. The candidate won 7/10 pairs, which does not establish a consistent gain. It exceeded the historical Battery Automatic peak of 1668.5964 in 1/10 runs and the fresh AC Automatic baseline peak of 1685.6231 in 0/10 runs. The ten-run goal is unmet under both comparisons; the peak definition remains pending. Discard this candidate and retain the incumbent. These measurements establish no causal benefit from the FMOPA order change. The legacy 1800 target flag does not determine this decision."
+    }
+  ],
+  "profile": {
+    "cpu": "Apple M4 Pro",
+    "power": "AC Power",
+    "energy_mode": "Automatic",
+    "capabilities": [
+      "cpu",
+      "arm64",
+      "sme",
+      "sme2",
+      "single-thread"
+    ]
+  },
+  "rounds": []
+}

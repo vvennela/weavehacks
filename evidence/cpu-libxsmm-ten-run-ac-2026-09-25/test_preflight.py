@@ -23,6 +23,7 @@ def test_only_approved_initial_energy_profile_can_run(source, mode, valid):
 
 def test_replay_sends_ten_repeats_and_exact_saved_sources_to_search(monkeypatch):
     import json
+    from types import SimpleNamespace
     previous = Path(__file__).resolve().parents[1] / 'cpu-libxsmm-editable-panel-2026-09-25'
     saved = json.loads((previous / 'search/result.json').read_text())
     captured = {}
@@ -31,7 +32,7 @@ def test_replay_sends_ten_repeats_and_exact_saved_sources_to_search(monkeypatch)
         return {}
     monkeypatch.setattr(module, 'optimize_kernel', search)
     monkeypatch.setattr(module, 'save_json', lambda *args: None)
-    monkeypatch.setattr(module, 'KernelAdvisoryTeam', lambda **kwargs: object())
+    monkeypatch.setattr(module, 'KernelAdvisoryTeam', lambda **kwargs: SimpleNamespace(observe=lambda history: None))
     monkeypatch.setattr(module, 'HillsKernelEvaluator', lambda **kwargs: object())
     monkeypatch.setattr(module, 'host_observation', lambda: dict(
         battery="Now drawing from 'AC Power'",
