@@ -238,3 +238,19 @@ def test_changed_job_contract_never_reaches_controller(manager):
     wait_for(lambda: manager.get('one', job['job_id'])['status'] not in service.ACTIVE)
     assert manager.get('one', job['job_id'])['status'] == 'failed'
     assert not (folder / 'environment.json').exists()
+
+
+def test_customer_measurements_include_latency_and_fresh_control():
+    def measured(peak, latency):
+        return {'runtime': {'memory': {'peak_bytes': peak}},
+                'task_quality': {'mean': 1.0},
+                'reduced': {'p95_latency_ms': latency, 'output_tokens_per_second': 42.0}}
+    report = {'baseline': measured(100, 20), 'trials': [{
+        'recipe_id': 'fp8', 'status': 'measured', 'measurement': measured(60, 30),
+        'confirmation': {'baseline': measured(90, 21), 'candidate': measured(65, 31)},
+        'repeated_decision': {'selected': 'candidate'}}]}
+    result = service._measurements(report)
+    assert result['baseline']['p95_latency_ms'] == 20
+    assert result['trials'][0]['baseline_control']['peak_bytes'] == 90
+    assert result['trials'][0]['confirmation']['p95_latency_ms'] == 31
+    assert result['trials'][0]['measurement']['output_tokens_per_second'] == 42.0

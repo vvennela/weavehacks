@@ -29,6 +29,9 @@ def main():
         print(f'[{time.monotonic() - started:5.1f}s] {message}', flush=True)
     def quality(value):
         return f'{value:.1%}' if isinstance(value, (int, float)) else 'unavailable'
+    def latency(measurement):
+        value = measurement.get('p95_latency_ms')
+        return f'; p95 latency {value:.1f} ms' if isinstance(value, (int, float)) else ''
     def update(job):
         if not seen and job['status'] == 'completed':
             say('Restored completed research. The following measurements are recorded evidence.')
@@ -45,7 +48,7 @@ def main():
         baseline = measurements.get('baseline', {})
         if baseline.get('peak_bytes') and 'baseline' not in seen:
             seen.add('baseline')
-            say(f"BF16 baseline: {baseline['peak_bytes'] / 2**30:.3f} GiB peak; quality {quality(baseline.get('quality'))}")
+            say(f"BF16 baseline: {baseline['peak_bytes'] / 2**30:.3f} GiB peak; quality {quality(baseline.get('quality'))}" + latency(baseline))
         for trial in measurements.get('trials', []):
             signature = json.dumps(trial, sort_keys=True)
             if signature in seen or trial['measurement']['peak_bytes'] is None:
@@ -54,16 +57,23 @@ def main():
             measurement = trial['measurement']
             say(f"{trial['recipe_id']}: {measurement['peak_bytes'] / 2**30:.3f} GiB peak; "
                 f"quality {quality(measurement.get('quality'))}; "
-                + ('confirmed' if trial['accepted'] else 'not promoted'))
+                + ('confirmed' if trial['accepted'] else 'not promoted') + latency(measurement))
     say('Sera will research smaller checkpoints and keep the fixed quality gate.')
     result = Sera.Optimize(args.profile, api_key=key, endpoint=args.endpoint,
                            request_id=args.request_id, on_update=update)
     selected = next((trial for trial in latest.get('trials', [])
                      if trial['recipe_id'] == result.selected_recipe_id), None)
-    if selected is not None:
+    if selected is not None and selected['accepted']:
         peak = max(selected['measurement']['peak_bytes'], selected['confirmation']['peak_bytes'])
         baseline = latest['baseline']['peak_bytes']
-        say(f'Measured peak memory fell {1 - peak / baseline:.2%} versus the initial baseline.')
+        control = selected.get('baseline_control', {}).get('peak_bytes')
+        if control:
+            baseline = min(baseline, control)
+            comparison = 'using the conservative repeated comparison'
+        else:
+            comparison = 'versus the initial baseline'
+        say(f'Measured peak memory fell {1 - peak / baseline:.2%} {comparison}.')
+        say('Confirmed checkpoint' + latency(selected['confirmation']))
     say(f'Selected {result.selected_recipe_id}; checking and loading its exported checkpoint.')
     with result.load() as model:
         output = model.generate([

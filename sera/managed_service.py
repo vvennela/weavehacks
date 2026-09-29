@@ -58,12 +58,15 @@ def _result(report):
 def _measurements(report):
     def summary(measured):
         return {'peak_bytes': measured.get('runtime', {}).get('memory', {}).get('peak_bytes'),
-                'quality': measured.get('task_quality', {}).get('mean')}
+                'quality': measured.get('task_quality', {}).get('mean'),
+                'p95_latency_ms': measured.get('reduced', {}).get('p95_latency_ms'),
+                'output_tokens_per_second': measured.get('reduced', {}).get('output_tokens_per_second')}
     trials = []
     for trial in report.get('trials', []):
         trials.append({'recipe_id': trial['recipe_id'], 'status': trial['status'],
                        'measurement': summary(trial.get('measurement', {})),
                        'confirmation': summary(trial.get('confirmation', {}).get('candidate', {})),
+                       'baseline_control': summary(trial.get('confirmation', {}).get('baseline', {})),
                        'accepted': trial.get('repeated_decision', {}).get('selected') == 'candidate'})
     return {'baseline': summary(report.get('baseline', {})), 'trials': trials,
             'scope': report.get('baseline', {}).get('runtime', {}).get('memory', {}).get('scope')}
