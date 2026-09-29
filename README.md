@@ -1,6 +1,11 @@
 # Sera
 
-Sera's goal is to be an autonomous research agent that optimizes ML workloads
+Sera's first product goal is to free GPU memory through autonomous research:
+provide credentials and a workload, start optimization, and receive a usable
+result with measured memory, quality, and speed. The one-call experience is
+in development.
+
+Sera's wider goal is to be an autonomous research agent that optimizes ML workloads
 for the user's current hardware. It should inspect the workload and hardware,
 form hypotheses, apply supported optimization techniques, measure results, and
 return a verified artifact within the user's quality and resource limits.
@@ -9,6 +14,8 @@ The current package recommends and measures inference configurations, rejects
 quality failures, and returns a live runner. General workload optimization and
 ModelOpt integration are development goals, not completed capabilities. See the
 [research direction and ModelOpt benchmark proposal](docs/modelopt-search-proposal-2026-09-28.md).
+The [production checklist and 3–5 minute demo workflow](docs/production-demo-workflow.md)
+track the remaining work and distinguish the target demo from the current recorded rehearsal.
 
 ## Start here: clone the notebook
 
