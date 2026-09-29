@@ -126,7 +126,7 @@ def _copy_bf16_reference(snapshot, destination):
                 names.add(name)
     if not names:
         return False
-    destination.mkdir()
+    destination.mkdir(parents=True)
     for path in sorted(snapshot.iterdir()):
         if path.is_file() and path.suffix in {'.json', '.safetensors', '.txt', '.jinja', '.model'}:
             # Independent files: changing an exported checkpoint cannot mutate

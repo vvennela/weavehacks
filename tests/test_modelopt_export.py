@@ -178,7 +178,7 @@ def test_bf16_reference_preserves_source_weights_without_gpu_round_trip(tmp_path
     monkeypatch.setitem(sys.modules, 'transformers', SimpleNamespace(
         AutoModelForCausalLM=SimpleNamespace(from_pretrained=unexpected_load),
         AutoTokenizer=SimpleNamespace(from_pretrained=unexpected_load)))
-    destination = tmp_path / 'export'
+    destination = tmp_path / 'artifacts' / 'export'
     result = export.prepare_modelopt(source=source, destination=destination, recipe=export.ModelOptRecipe())
     assert (destination / 'model.safetensors').read_bytes() == weights
     assert (destination / 'model.safetensors').stat().st_ino != (snapshot / 'model.safetensors').stat().st_ino
