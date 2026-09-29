@@ -103,3 +103,22 @@ def test_worker_watchdog_exits_when_parent_pipe_closes(tmp_path):
         if process.poll() is None:
             process.kill()
         process.wait()
+
+
+def test_rocm_jobs_validate_their_own_recipe_and_dispatch(monkeypatch):
+    from sera import native_worker as worker
+    calls = []
+    class Backend:
+        def prepare(self, **kwargs):
+            calls.append(kwargs)
+            return {'backend': 'rocm'}
+    monkeypatch.setattr(worker, 'ROCmBackend', Backend)
+    request = {'operation':'prepare','backend':'rocm',
+               'source':{'model_id':'Qwen/Qwen3-0.6B','revision':'a'*40},
+               'destination':'/not-written','recipe':{'bits':4,'double_quant':True}}
+    job = worker.JOB.validate_python(request)
+    assert worker._execute(job) == {'backend':'rocm'}
+    assert calls[0]['recipe'].bits == 4
+    request['recipe']['bits'] = 8
+    with pytest.raises(ValueError):
+        worker.JOB.validate_python(request)

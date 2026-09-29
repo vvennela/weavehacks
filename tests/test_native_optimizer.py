@@ -41,7 +41,7 @@ def runtime(monkeypatch):
             destination.mkdir(parents=True)
             (destination/'config.json').write_text('{}')
             (destination/'model.safetensors').write_bytes(b'fixture')
-            return {'artifact': seal_artifact(destination, backend='mlx', source=job['source'],
+            return {'artifact': seal_artifact(destination, backend=job['backend'], source=job['source'],
                 recipe=job['recipe'], versions={'mlx': 'fixture'}), 'preparation_seconds': 0.01}
         manifest = verify_artifact(job['artifact'])
         bits = manifest['recipe']['bits']
@@ -49,11 +49,15 @@ def runtime(monkeypatch):
                                                 'response_formats','response_format_version')}
         controls.update(sampling='greedy', concurrency=1)
         return {'artifact_id': manifest['artifact_id'], 'controls': controls,
-            'device': {'device_name':'fixture','memory_size':1000},
-            'runtime_versions':{name:'fixture' for name in ('mlx','mlx-lm','transformers','outlines')},
+            'device': {'device_name':'fixture','memory_size':1000, **(
+                {'backend':'rocm','hip_version':'fixture','architecture':'gfx942'} if manifest['backend']=='rocm' else {})},
+            'runtime_versions':{name:'fixture' for name in (('mlx','mlx-lm','transformers','outlines')
+                if manifest['backend']=='mlx' else ('torch','transformers','bitsandbytes','accelerate','outlines'))},
             'request_wall_seconds':0.1,
-            'memory': {'metric':'mlx-active-allocator-bytes',
-                       'scope':'MLX allocator; not system-wide unified memory or free VRAM',
+            'memory': {'metric':('mlx-active-allocator-bytes' if manifest['backend']=='mlx' else 'torch-rocm-allocated-bytes'),
+                       'scope':('MLX allocator; not system-wide unified memory or free VRAM' if manifest['backend']=='mlx'
+                                else 'PyTorch ROCm allocator; not total device memory or free VRAM'),
+                       'reserved_bytes':20, 'peak_reserved_bytes':100,
                        'resident_bytes':20,'active_bytes':20,'cache_bytes':0,
                        'peak_bytes':100 if bits == 16 else 40 if bits == 4 else 60},
             'requests':[{'repetition':r, 'prompt_index':0, 'text':json.dumps({'answer':2 if bits==4 else 1}),
@@ -263,3 +267,41 @@ def test_restart_after_research_commit_only_exports_trace(tmp_path, runtime):
                                     project='fixture/project', agent=Agent(()), resume=True)
     assert result['status'] == 'completed'
     assert len(runtime) == count
+
+
+def test_rocm_profile_dispatch_preserves_mlx_profile_serialization():
+    mlx = native.validate_native_profile(profile())
+    assert 'backend' not in mlx.model_dump()
+    value = profile()
+    value['backend'] = 'rocm'
+    value['recipes'] = {'nf4': {'bits':4, 'double_quant':True}}
+    rocm = native.validate_native_profile(value)
+    assert rocm.backend == 'rocm'
+    assert rocm.model_dump()['backend'] == 'rocm'
+    assert rocm.baseline_recipe().bits == 16
+    assert rocm.measure_job('/fixture', 'a'*64)['backend'] == 'rocm'
+    value['recipes']['nf4']['group_size'] = 64
+    with pytest.raises(ValueError):
+        native.validate_native_profile(value)
+
+
+def test_rocm_research_uses_same_quality_and_confirmation_gates(tmp_path, runtime, monkeypatch):
+    value = profile()
+    value['backend'] = 'rocm'
+    value['recipes'] = {'nf4': {'bits':4}}
+    original = native.run_native_job
+    def worker(job, **kwargs):
+        assert job['backend'] == 'rocm'
+        result = original(job, **kwargs)
+        if job['operation'] == 'measure':
+            for row in result['requests']:
+                row['text'] = '{"answer":1}'
+        return result
+    monkeypatch.setattr(native, 'run_native_job', worker)
+    result = native.optimize_native(profile=value, output_dir=tmp_path/'rocm',
+        project='fixture/project', agent=Agent(('nf4',)))
+    assert result['status'] == 'completed'
+    assert result['execution']['backend'] == 'rocm'
+    assert result['selected_recipe_id'] == 'nf4'
+    assert result['trials'][0]['confirmation']['decision']['selected'] == 'candidate'
+    assert verify_artifact(result['artifact_path'])['backend'] == 'rocm'

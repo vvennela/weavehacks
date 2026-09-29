@@ -28,13 +28,18 @@ class ManagedResult:
     artifact_path: str
     trace_url: str
     elapsed_seconds: float
+    backend: str = 'mlx'
 
     def verify(self):
-        return verify_artifact(self.artifact_path, expected_id=self.artifact_id, backend='mlx')
+        return verify_artifact(self.artifact_path, expected_id=self.artifact_id, backend=self.backend)
 
     def load(self):
         from .backends.mlx import MLXBackend
-        return MLXBackend().load(self.artifact_path, expected_id=self.artifact_id)
+        from .backends.rocm import ROCmBackend
+        adapters = {'mlx': MLXBackend, 'rocm': ROCmBackend}
+        if self.backend not in adapters:
+            raise ValueError('Unsupported checkpoint backend')
+        return adapters[self.backend]().load(self.artifact_path, expected_id=self.artifact_id)
 
 
 class SeraClient:
@@ -104,7 +109,8 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
                     raise SeraServiceError('The required trace has not been verified')
                 return ManagedResult(job_id=job['job_id'], selected_recipe_id=result['selected_recipe_id'],
                     artifact_id=result['selected_artifact_id'], artifact_path=result['artifact_path'],
-                    trace_url=result['trace']['url'], elapsed_seconds=result['elapsed_seconds'])
+                    trace_url=result['trace']['url'], elapsed_seconds=result['elapsed_seconds'],
+                    backend=result.get('backend', 'mlx'))
             if job['status'] not in {'pending', 'running', 'interrupted'}:
                 raise SeraServiceError(f"Sera job {job['job_id']} ended: {job['status']}")
             time.sleep(poll_interval)

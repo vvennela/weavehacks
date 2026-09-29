@@ -30,6 +30,12 @@ mlx = [
     "transformers==5.17.0",
     "outlines==1.3.3",
 ]
+# Install the matching ROCm PyTorch build before this extra. Device checks reject
+# CPU/CUDA builds; the AMD hardware matrix has not yet been validated by Sera.
+rocm = [
+    "transformers==5.17.0", "outlines==1.3.3",
+    "bitsandbytes==0.50.2", "accelerate>=1,<2",
+]
 # Notebook presentation layer for the two-phase loop. Weave is deliberately absent:
 # the swarm extra pins it, and a second range here would only argue with that pin.
 demo = [

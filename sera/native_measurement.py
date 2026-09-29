@@ -6,6 +6,14 @@ from copy import deepcopy
 from .measurement import reduce_requests
 from .quality import evaluate_quality
 
+BACKENDS = {
+    'mlx': ('mlx-active-allocator-bytes',
+            'MLX allocator; not system-wide unified memory or free VRAM',
+            ('mlx', 'mlx-lm', 'transformers', 'outlines')),
+    'rocm': ('torch-rocm-allocated-bytes',
+             'PyTorch ROCm allocator; not total device memory or free VRAM',
+             ('torch', 'transformers', 'bitsandbytes', 'accelerate', 'outlines')),
+}
 
 def _tokens(value):
     return isinstance(value, list) and bool(value) and all(type(x) is int and x >= 0 for x in value)
@@ -16,9 +24,12 @@ def _positive(value):
 
 
 def native_trial(raw, *, prompts, evaluator, evaluation_version, floor,
-                 artifact_id, controls, trial_id):
+                 artifact_id, controls, trial_id, backend='mlx'):
     """Retain raw evidence; malformed or incomplete measurements cannot qualify."""
     errors = []
+    if backend not in BACKENDS:
+        raise ValueError('Unsupported native measurement backend')
+    metric, scope, required_versions = BACKENDS[backend]
     rows = deepcopy(raw.get('requests', []))
     if not isinstance(rows, list):
         rows = []
@@ -32,8 +43,11 @@ def native_trial(raw, *, prompts, evaluator, evaluation_version, floor,
             or not device['device_name'].strip() or type(device.get('memory_size')) is not int
             or device['memory_size'] <= 0):
         errors.append('missing-device-identity')
+    if backend == 'rocm' and (not isinstance(device, dict) or device.get('backend') != 'rocm'
+            or not device.get('hip_version') or not device.get('architecture')):
+        errors.append('missing-rocm-device-identity')
     if not isinstance(versions, dict) or any(not isinstance(versions.get(name), str)
-        or not versions[name].strip() for name in ('mlx', 'mlx-lm', 'transformers', 'outlines')):
+        or not versions[name].strip() for name in required_versions):
         errors.append('missing-runtime-identity')
     if len(rows) != count * repetitions:
         errors.append('incomplete-request-coverage')
@@ -68,12 +82,17 @@ def native_trial(raw, *, prompts, evaluator, evaluation_version, floor,
                                version=evaluation_version, floor=floor)
     memory = raw.get('memory')
     memory = memory if isinstance(memory, dict) else {}
-    valid_memory = (memory.get('metric') == 'mlx-active-allocator-bytes'
-        and memory.get('scope') == 'MLX allocator; not system-wide unified memory or free VRAM'
+    valid_memory = (memory.get('metric') == metric
+        and memory.get('scope') == scope
         and all(type(memory.get(key)) is int and memory[key] >= 0
                 for key in ('resident_bytes', 'peak_bytes', 'active_bytes', 'cache_bytes')))
     valid_memory = valid_memory and memory['peak_bytes'] >= max(
         memory['resident_bytes'], memory['active_bytes'], 1)
+    if backend == 'rocm':
+        valid_memory = (valid_memory and type(memory.get('reserved_bytes')) is int
+            and type(memory.get('peak_reserved_bytes')) is int
+            and memory['reserved_bytes'] == memory['active_bytes'] + memory['cache_bytes']
+            and memory['peak_reserved_bytes'] >= max(memory['reserved_bytes'], memory['peak_bytes']))
     runtime = {'artifact_id': artifact_id, 'memory': deepcopy(memory),
                'device': raw.get('device'), 'versions': raw.get('runtime_versions'),
                'telemetry_errors': 0 if valid_memory else 1,

@@ -6,10 +6,12 @@ import re
 import time
 from copy import deepcopy
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, model_validator
 
 from .backends.mlx import MLXRecipe
+from .backends.rocm import ROCmRecipe
 from .config import Budget, Constraints, Objective
 from .hardware import ModelDescriptor
 from .ledger import Ledger, encode_record, read_checkpoint
@@ -35,6 +37,7 @@ class NativeProfile(BaseModel):
     """An operator-owned contract; agent output cannot modify any of these fields."""
 
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False)
+    backend: Literal['mlx'] = Field(default='mlx', exclude_if=lambda value: value == 'mlx')
     profile_id: str = Field(pattern=r'^[a-zA-Z0-9_-]+$')
     source: ModelDescriptor
     tasks: list[NativeTask] = Field(min_length=1)
@@ -75,12 +78,33 @@ class NativeProfile(BaseModel):
 
     def measure_job(self, artifact, artifact_id):
         formats = [task.response_format for task in self.tasks]
-        return {'operation': 'measure', 'backend': 'mlx', 'artifact': str(artifact),
+        return {'operation': 'measure', 'backend': self.backend, 'artifact': str(artifact),
                 'artifact_id': artifact_id, 'prompts': [task.prompt for task in self.tasks],
                 'max_tokens': self.max_tokens, 'seed': self.seed, 'warmup': self.warmup,
                 'repetitions': self.repetitions,
                 'response_formats': formats if any(x is not None for x in formats) else None,
                 'response_format_version': self.response_format_version}
+
+
+    def baseline_recipe(self):
+        return MLXRecipe()
+
+
+class ROCmProfile(NativeProfile):
+    backend: Literal['rocm'] = 'rocm'
+    recipes: dict[str, ROCmRecipe]
+
+    def baseline_recipe(self):
+        return ROCmRecipe()
+
+
+def validate_native_profile(value):
+    backend = value.backend if isinstance(value, NativeProfile) else value.get('backend', 'mlx')
+    if backend == 'mlx':
+        return NativeProfile.model_validate(value)
+    if backend == 'rocm':
+        return ROCmProfile.model_validate(value)
+    raise ValueError('Unsupported native profile backend')
 
 
 def _unique_object(pairs):
@@ -119,7 +143,7 @@ class _Research:
                        'constraints': profile.constraints.model_dump(), 'objective': profile.objective.model_dump(),
                        'evaluation': {'version': profile.evaluation_version,
                                       'task_hash': content_hash([task.model_dump() for task in profile.tasks])},
-                       'execution': {'backend': 'mlx', 'budget': profile.budget.model_dump(),
+                       'execution': {'backend': profile.backend, 'budget': profile.budget.model_dump(),
                                      'max_run_seconds': profile.max_run_seconds,
                                      'job_timeout_seconds': profile.job_timeout_seconds},
                        'started_at_unix': time.time(), 'agent_calls_used': 0,
@@ -139,8 +163,8 @@ class _Research:
 
     def recover(self):
         for name, artifact in self.artifacts.items():
-            manifest = verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend='mlx')
-            recipe = MLXRecipe() if name == 'baseline' else self.profile.recipes[name]
+            manifest = verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend=self.profile.backend)
+            recipe = self.profile.baseline_recipe() if name == 'baseline' else self.profile.recipes[name]
             if manifest['source'] != self.profile.source.model_dump() or manifest['recipe'] != recipe.model_dump():
                 raise ValueError('Recovered artifact differs from the profile')
         for job in self.report['jobs']:
@@ -205,10 +229,10 @@ class _Research:
         if name in self.artifacts:
             return
         destination = self.folder / 'artifacts' / f'{name}-{len(self.report["jobs"]):04d}'
-        result = self.job({'operation': 'prepare', 'backend': 'mlx',
+        result = self.job({'operation': 'prepare', 'backend': self.profile.backend,
                           'source': self.profile.source.model_dump(), 'destination': str(destination),
                           'recipe': recipe.model_dump()})
-        manifest = verify_artifact(destination, expected_id=result['artifact']['artifact_id'], backend='mlx')
+        manifest = verify_artifact(destination, expected_id=result['artifact']['artifact_id'], backend=self.profile.backend)
         if manifest['source'] != self.profile.source.model_dump() or manifest['recipe'] != recipe.model_dump():
             raise ValueError('Prepared artifact does not match the frozen recipe and source')
         self.artifacts[name] = {'path': str(destination), 'artifact_id': manifest['artifact_id']}
@@ -227,7 +251,7 @@ class _Research:
         result = native_trial(raw, prompts=request['prompts'],
             evaluator=lambda prompt, text: _score(text, expected[content_hash(prompt)]),
             evaluation_version=self.profile.evaluation_version, floor=self.profile.constraints.quality_floor,
-            artifact_id=artifact['artifact_id'], controls=controls, trial_id=trial_id)
+            artifact_id=artifact['artifact_id'], controls=controls, trial_id=trial_id, backend=self.profile.backend)
         result['recipe_id'] = name
         return result
 
@@ -242,7 +266,7 @@ class _Research:
 
     def select(self, name):
         artifact = self.artifacts[name]
-        verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend='mlx')
+        verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend=self.profile.backend)
         self.report.update(selected_recipe_id=name, selected_artifact_id=artifact['artifact_id'],
                            artifact_path=artifact['path'])
         self.save()
@@ -252,7 +276,7 @@ class _Research:
             return {'trial_id': trial['trial_id'], 'recipe_id': trial.get('recipe_id'),
                     'status': trial['status'], 'quality': trial.get('task_quality'),
                     'memory': trial.get('runtime', {}).get('memory'), 'performance': trial.get('reduced')}
-        return {'objective': self.report['objective'], 'constraints': self.report['constraints'],
+        return {'backend': self.profile.backend, 'objective': self.report['objective'], 'constraints': self.report['constraints'],
                 'available_recipes': [{'recipe_id': key, 'recipe': self.profile.recipes[key].model_dump()}
                                       for key in available],
                 'trials': [metrics(self.report['baseline'])] +
@@ -262,7 +286,7 @@ class _Research:
 
     def run(self):
         try:
-            self.prepare('baseline', MLXRecipe())
+            self.prepare('baseline', self.profile.baseline_recipe())
             baseline = self.measure('baseline', 'baseline')
             self.report['baseline'] = baseline
             if constraint_failures(baseline, self.profile.constraints) or objective_value(baseline, 'memory') is None:
@@ -346,7 +370,7 @@ class _Research:
 
 def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None, resume=False):
     """Run the operator's fixed profile. This function never changes its gates."""
-    profile = NativeProfile.model_validate(profile)
+    profile = validate_native_profile(profile)
     encode_record(profile.model_dump())
     folder = Path(output_dir).resolve()
     if not resume:
@@ -362,7 +386,7 @@ def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None,
                 raise ValueError('Cannot resume under a different native profile')
             if checkpoint.get('artifact_path'):
                 verify_artifact(checkpoint['artifact_path'],
-                                expected_id=checkpoint['selected_artifact_id'], backend='mlx')
+                                expected_id=checkpoint['selected_artifact_id'], backend=profile.backend)
             if checkpoint['status'] == 'completed' and checkpoint.get('trace', {}).get('remote_verified'):
                 return checkpoint
         research = _Research(profile, folder, ledger, agent or NativeRecipeAgent(project=project),

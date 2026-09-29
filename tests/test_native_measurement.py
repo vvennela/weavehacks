@@ -86,3 +86,24 @@ def test_invalid_memory_remains_unavailable(mutation):
     result = trial(raw)
     assert result['runtime']['telemetry_errors'] != 0
     assert result['runtime']['sampled_peak_memory_mib'] is None
+
+
+def test_rocm_measurements_keep_their_allocator_scope_and_runtime_identity():
+    raw = measurement()
+    raw['runtime_versions'] = {name:'fixture' for name in
+                               ('torch','transformers','bitsandbytes','accelerate','outlines')}
+    raw['device'].update(backend='rocm', hip_version='7.0', architecture='gfx942')
+    raw['memory'].update(metric='torch-rocm-allocated-bytes',
+                        scope='PyTorch ROCm allocator; not total device memory or free VRAM',
+                        reserved_bytes=60, peak_reserved_bytes=100)
+    def collect():
+        return native_trial(raw, prompts=['first','second'], evaluator=lambda p,t:True,
+            evaluation_version='fixture-v1', floor=0.99, artifact_id='a'*64,
+            controls=measurement()['controls'], trial_id='rocm', backend='rocm')
+    result = collect()
+    assert result['status'] == 'collected'
+    assert result['runtime']['telemetry_errors'] == 0
+    raw['memory']['reserved_bytes'] = 1
+    assert collect()['runtime']['sampled_peak_memory_mib'] is None
+    raw['device']['backend'] = 'cuda'
+    assert collect()['status'] != 'collected'

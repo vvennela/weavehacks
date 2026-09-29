@@ -18,6 +18,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from .backends.mlx import MLXBackend, MLXRecipe
+from .backends.rocm import ROCmBackend, ROCmRecipe
 from .hardware import ModelDescriptor
 from .placement_decoding import validate_formats
 from .process_ownership import inherit_lifetime
@@ -38,10 +39,15 @@ class PrepareJob(BaseModel):
     recipe: MLXRecipe
 
 
+class ROCmPrepareJob(PrepareJob):
+    backend: Literal['rocm']
+    recipe: ROCmRecipe
+
+
 class MeasureJob(BaseModel):
     model_config = ConfigDict(strict=True, extra='forbid')
     operation: Literal['measure']
-    backend: Literal['mlx']
+    backend: Literal['mlx', 'rocm']
     artifact: str = Field(min_length=1)
     artifact_id: str = Field(pattern=r'^[a-f0-9]{64}$')
     prompts: list[str | list[dict[str, str]]] = Field(min_length=1)
@@ -66,7 +72,8 @@ class MeasureJob(BaseModel):
         return self
 
 
-JOB = TypeAdapter(Annotated[PrepareJob | MeasureJob, Field(discriminator='operation')])
+PREPARE_JOB = Annotated[PrepareJob | ROCmPrepareJob, Field(discriminator='backend')]
+JOB = TypeAdapter(Annotated[PREPARE_JOB | MeasureJob, Field(discriminator='operation')])
 
 
 def _command(path):
@@ -74,7 +81,7 @@ def _command(path):
 
 
 def _execute(job):
-    backend = MLXBackend()
+    backend = MLXBackend() if job.backend == 'mlx' else ROCmBackend()
     if isinstance(job, PrepareJob):
         return backend.prepare(source=job.source, destination=job.destination, recipe=job.recipe)
     with backend.load(job.artifact, expected_id=job.artifact_id) as model:

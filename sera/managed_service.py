@@ -1,4 +1,4 @@
-"""Local Sera service: authenticated profiles, durable jobs and one MLX owner."""
+"""Local Sera service: authenticated profiles, durable jobs and one accelerator owner."""
 import argparse
 import fcntl
 import hashlib
@@ -18,7 +18,7 @@ from pathlib import Path
 
 from .ledger import read_checkpoint
 from .model_artifact import verify_artifact
-from .native_optimizer import NativeProfile
+from .native_optimizer import validate_native_profile
 from .process_ownership import LIFETIME_FD, terminate_group, tree_is_alive
 from .runtime import INFERENCE_ENVIRONMENT_VARIABLES
 from .storage import content_hash, save_json
@@ -34,6 +34,7 @@ class ServiceError(RuntimeError):
 
 
 def _device_lock_path():
+    # Retain the lock path used by earlier MLX deployments.
     return Path.home() / '.cache' / 'sera' / 'mlx-service.lock'
 
 
@@ -44,10 +45,11 @@ def _controller_command(folder):
 def _result(report):
     if report.get('status') != 'completed' or not report.get('trace', {}).get('remote_verified'):
         raise ValueError('Research did not complete with verified tracing')
-    verify_artifact(report['artifact_path'], expected_id=report['selected_artifact_id'], backend='mlx')
+    verify_artifact(report['artifact_path'], expected_id=report['selected_artifact_id'], backend=report['execution']['backend'])
     result = {key: report[key] for key in ('selected_recipe_id', 'selected_artifact_id',
             'artifact_path', 'trace', 'candidate_trials_used', 'elapsed_seconds')}
     result['measurements'] = _measurements(report)
+    result['backend'] = report['execution']['backend']
     return result
 
 
@@ -62,13 +64,13 @@ def _measurements(report):
                        'confirmation': summary(trial.get('confirmation', {}).get('candidate', {})),
                        'accepted': trial.get('repeated_decision', {}).get('selected') == 'candidate'})
     return {'baseline': summary(report.get('baseline', {})), 'trials': trials,
-            'scope': 'MLX allocator; not system-wide unified memory or free VRAM'}
+            'scope': report.get('baseline', {}).get('runtime', {}).get('memory', {}).get('scope')}
 
 
 class ManagedService:
     def __init__(self, *, folder, profiles, clients, project):
         self.profiles = {p.profile_id: p for item in profiles
-                         for p in [NativeProfile.model_validate(item)]}
+                         for p in [validate_native_profile(item)]}
         self.clients = clients
         if not self.profiles or not clients:
             raise ValueError('Register profiles and customers before starting the service')
@@ -92,7 +94,7 @@ class ManagedService:
             fcntl.flock(self._device_lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             self._device_lock.close()
-            raise RuntimeError('The MLX device already has a Sera service owner') from None
+            raise RuntimeError('The device already has a Sera service owner') from None
         self._mutex = threading.RLock()
         self._stop = threading.Event()
         self._thread = None
@@ -149,7 +151,7 @@ class ManagedService:
                         raise ServiceError(409, 'Request ID belongs to a different profile')
                     return self._public(job)
             if any(job['status'] in ACTIVE for job in jobs):
-                raise ServiceError(429, 'The MLX worker is busy')
+                raise ServiceError(429, 'The worker is busy')
             profile = self.profiles[profile_id]
             request = {'profile': profile.model_dump(), 'project': self.project}
             job = {'job_id': uuid.uuid4().hex, 'owner': owner, 'request_id': request_id,
@@ -351,7 +353,7 @@ def make_server(service, *, port):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Start the local Sera MLX service')
+    parser = argparse.ArgumentParser(description='Start the local Sera native service')
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--port', type=int, default=8765)
