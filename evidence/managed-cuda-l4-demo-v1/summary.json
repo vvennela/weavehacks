@@ -1,0 +1,54 @@
+{
+  "wall_seconds": 169.77529174699998,
+  "job_id": "f43f80b4ce924f85b7a21a7b2efeea48",
+  "status": "completed",
+  "result": {
+    "selected_recipe_id": "modelopt-fp8",
+    "selected_artifact_id": "630d284663c827f13a8faac411007752554aa3cfb6109aad7858cc0709236f5e",
+    "artifact_path": "/opt/sera/managed/jobs/f43f80b4ce924f85b7a21a7b2efeea48/research/artifacts/modelopt-fp8-0002",
+    "trace": {
+      "call_id": "01a0ef51-aa53-790f-ad64-f989f5ef9386",
+      "trace_id": "01a0ef51-aa51-7c6b-b32b-917d56d6b165",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef51-aa53-790f-ad64-f989f5ef9386",
+      "remote_verified": true
+    },
+    "candidate_trials_used": 1,
+    "elapsed_seconds": 145.31641571,
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 2322464768,
+        "quality": 1.0
+      },
+      "trials": [
+        {
+          "recipe_id": "modelopt-fp8",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 1930297344,
+            "quality": 1.0
+          },
+          "confirmation": {
+            "peak_bytes": 1930297344,
+            "quality": 1.0
+          },
+          "accepted": true
+        }
+      ],
+      "scope": "Sampled NVIDIA device memory including runtime and KV cache; not an exact high-water mark"
+    },
+    "backend": "cuda",
+    "runtime": {
+      "gpu_uuid": "GPU-924cc0d5-7a26-b0ab-4848-e1b0a7cfb1c4",
+      "max_model_len": 512,
+      "kv_cache_memory_bytes": 268435456,
+      "memory_sample_interval_seconds": 0.01
+    }
+  },
+  "independent_request_passed": true,
+  "customer_has_wandb_key": false,
+  "source_commit": "89cca1d43f4dec50d0c987234aad95cb08efae44",
+  "model": "Qwen/Qwen3-0.6B",
+  "hardware": "NVIDIA L4",
+  "setup_included": false,
+  "scope": "Eight fixed JSON tasks, three repetitions, one FP8 recipe; not a general quality or agent-advantage benchmark."
+}

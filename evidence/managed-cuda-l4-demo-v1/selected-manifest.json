@@ -1,0 +1,62 @@
+{
+  "schema_version": "sera-model-artifact-v1",
+  "backend": "cuda",
+  "source": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+  },
+  "recipe": {
+    "format": "fp8",
+    "calibration": {
+      "prompts": [
+        "Explain how a compiler translates a program into instructions.",
+        "Describe the water cycle and the formation of clouds.",
+        "A customer asks for a summary of the quarterly inventory report.",
+        "Write a short explanation of addition and subtraction for a beginner.",
+        "Compare a list and a dictionary as data structures.",
+        "Explain how to sort a table by its date column.",
+        "Summarize the steps used to test a software release.",
+        "Describe how an electric motor converts energy into motion."
+      ],
+      "seed": 0,
+      "max_length": 128
+    }
+  },
+  "versions": {
+    "torch": "2.13.0",
+    "transformers": "5.17.0",
+    "nvidia-modelopt": "0.46.1",
+    "safetensors": "0.8.0"
+  },
+  "files": {
+    "chat_template.jinja": {
+      "sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+      "bytes": 4168
+    },
+    "config.json": {
+      "sha256": "01019beec20c491f99d4889105be65bd45e45824d2a322d6537310abd4fa59a3",
+      "bytes": 2361
+    },
+    "generation_config.json": {
+      "sha256": "893b0dccf83626cdfdc498e5b2a255a935b4c3c693350aed18f7003c1a3f3de9",
+      "bytes": 214
+    },
+    "hf_quant_config.json": {
+      "sha256": "77eabafdf3786f47c6b213865184b069002923c816e8f44ecec08de6be85d2f4",
+      "bytes": 273
+    },
+    "model.safetensors": {
+      "sha256": "a0bdacfe854f068a6ef5e98c56696fd12a82b7e26e311a72544c85a32fd47766",
+      "bytes": 751773680
+    },
+    "tokenizer.json": {
+      "sha256": "6adb90dd2c38b281238c0f606f444f129358c61dc015dd772cf77654df557cee",
+      "bytes": 11422748
+    },
+    "tokenizer_config.json": {
+      "sha256": "1cc816812993bff176eb4f7495433b736f06fba9b6e7b05cac7b4a1780650c95",
+      "bytes": 692
+    }
+  },
+  "artifact_id": "630d284663c827f13a8faac411007752554aa3cfb6109aad7858cc0709236f5e"
+}

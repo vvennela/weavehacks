@@ -1,0 +1,23 @@
+{
+  "result": {
+    "scope": "GPU cancellation fault injection; not a benchmark",
+    "cancelled_after_allocating_bytes": 1083047936,
+    "before_bytes": 491651072,
+    "after_bytes": 491651072,
+    "remaining_compute_processes": 0,
+    "wall_seconds": 13.590409466999972,
+    "worker": {
+      "job_hash": "19b7c31f0bd2e870ef29f8a963cadda02bbb61fbea02de94f822c940f980b1ad",
+      "status": "cancelled",
+      "cleanup_pass": true,
+      "pid": 5666,
+      "elapsed_seconds": 13.588049871000067
+    }
+  },
+  "trace": {
+    "call_id": "01a0ef59-8b3b-7f1e-8102-abe5218ab096",
+    "trace_id": "01a0ef59-8b3a-7641-8484-f32aab2707d3",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef59-8b3b-7f1e-8102-abe5218ab096",
+    "remote_verified": true
+  }
+}
