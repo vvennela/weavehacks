@@ -2,10 +2,11 @@
 
 import json
 
+from test_provider_check import valid_response
+
 from sera.agent import request_schema
 from sera.managed_agent import ManagedWandbAgent
 from sera.provider_check import provider_cases
-from test_provider_check import valid_response
 
 
 def test_managed_wire_schema_avoids_incompatible_root_union_and_retains_local_rules(monkeypatch):

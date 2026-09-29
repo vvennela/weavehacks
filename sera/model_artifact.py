@@ -7,7 +7,6 @@ from pathlib import Path
 from .hardware import ModelDescriptor
 from .storage import content_hash, save_json
 
-
 MANIFEST = 'sera-artifact.json'
 SCHEMA = 'sera-model-artifact-v1'
 
@@ -44,8 +43,8 @@ def seal_artifact(folder, *, backend, source, recipe, versions):
     source = ModelDescriptor.model_validate(source).model_dump()
     if backend not in {'mlx', 'cuda', 'rocm'}:
         raise ValueError('Unsupported artifact backend')
-    record = dict(schema_version=SCHEMA, backend=backend, source=source,
-                  recipe=recipe, versions=versions, files=_checkpoint_files(root))
+    record = {'schema_version': SCHEMA, 'backend': backend, 'source': source,
+                  'recipe': recipe, 'versions': versions, 'files': _checkpoint_files(root)}
     record['artifact_id'] = content_hash(record)
     save_json(root / MANIFEST, record)
     return record

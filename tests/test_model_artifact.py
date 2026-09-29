@@ -1,12 +1,10 @@
 """Artifact identity must bind every exported file and its source/recipe."""
 
 import json
-from pathlib import Path
 
 import pytest
 
 from sera.model_artifact import seal_artifact, verify_artifact
-
 
 SOURCE = {'model_id': 'Qwen/Qwen3-0.6B', 'revision': 'a' * 40}
 
