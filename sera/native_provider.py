@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .agent import ProviderTransportError, WandbAgent
 from .native_worker import _parent_watchdog
+from .process_ownership import inherit_lifetime
 from .storage import save_json
 
 
@@ -38,7 +39,7 @@ def complete(payload, *, project, timeout_seconds, cancelled=None):
         process = None
         started = time.monotonic()
         try:
-            process = subprocess.Popen(_command(request), env=env, pass_fds=(read_fd,),
+            process = subprocess.Popen(_command(request), env=env, pass_fds=inherit_lifetime(env, (read_fd,)),
                 start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             while True:
                 if cancelled is not None and cancelled.is_set():

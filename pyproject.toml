@@ -47,6 +47,7 @@ gpu = [
 
 [project.scripts]
 sera-provider-check = "sera.provider_check:main"
+sera-serve = "sera.managed_service:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["sera", "src/sera_loop"]

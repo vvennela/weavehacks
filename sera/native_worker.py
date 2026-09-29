@@ -20,6 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 from .backends.mlx import MLXBackend, MLXRecipe
 from .hardware import ModelDescriptor
 from .placement_decoding import validate_formats
+from .process_ownership import inherit_lifetime
 from .runtime import INFERENCE_ENVIRONMENT_VARIABLES
 from .storage import content_hash, save_json
 
@@ -107,7 +108,7 @@ def run_native_job(job, *, output_dir, timeout_seconds, cancelled=None):
         with (folder / 'worker.log').open('w') as log:
             process = subprocess.Popen(_command(request_path), env=env, stdout=log,
                                        stderr=subprocess.STDOUT, start_new_session=True,
-                                       pass_fds=(read_fd,))
+                                       pass_fds=inherit_lifetime(env, (read_fd,)))
             os.close(read_fd)
             read_fd = None
             record.update(pid=process.pid, status='running')
