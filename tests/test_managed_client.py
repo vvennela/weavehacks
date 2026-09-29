@@ -50,3 +50,25 @@ def test_keyboard_interrupt_requests_cancellation(manager, endpoint):
 def test_client_never_sends_key_to_unencrypted_remote_host():
     with pytest.raises(ValueError, match='loopback'):
         SeraClient(api_key=TOKEN, endpoint='http://example.com')
+
+
+def test_cuda_result_reloads_with_registered_runtime(monkeypatch):
+    from test_cuda_backend import options
+
+    from sera.backends import cuda
+    calls = []
+    class Backend:
+        def __init__(self, runtime):
+            assert runtime == options()
+        def load(self, artifact, *, expected_id):
+            calls.append((artifact, expected_id))
+            return 'loaded'
+    monkeypatch.setattr(cuda, 'CUDABackend', Backend)
+    monkeypatch.setattr(SeraClient, 'submit', lambda *a, **k: {
+        'job_id': 'a'*32, 'status': 'completed', 'result': {
+            'backend': 'cuda', 'runtime': options(), 'selected_recipe_id': 'fp8',
+            'selected_artifact_id': 'b'*64, 'artifact_path': '/checkpoint',
+            'elapsed_seconds': 1., 'trace': {'remote_verified': True, 'url': 'fixture-trace'}}})
+    result = Optimize('fixture', api_key=TOKEN)
+    assert result.load() == 'loaded'
+    assert calls == [('/checkpoint', 'b'*64)]

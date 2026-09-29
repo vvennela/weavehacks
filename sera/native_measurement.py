@@ -3,6 +3,9 @@
 import math
 from copy import deepcopy
 
+from .backends.cuda import MEMORY_METRIC as CUDA_MEMORY_METRIC
+from .backends.cuda import MEMORY_SCOPE as CUDA_MEMORY_SCOPE
+from .backends.cuda import VERSIONS as CUDA_VERSIONS
 from .measurement import reduce_requests
 from .quality import evaluate_quality
 
@@ -13,6 +16,7 @@ BACKENDS = {
     'rocm': ('torch-rocm-allocated-bytes',
              'PyTorch ROCm allocator; not total device memory or free VRAM',
              ('torch', 'transformers', 'bitsandbytes', 'accelerate', 'outlines')),
+    'cuda': (CUDA_MEMORY_METRIC, CUDA_MEMORY_SCOPE, CUDA_VERSIONS),
 }
 
 def _tokens(value):
@@ -46,6 +50,10 @@ def native_trial(raw, *, prompts, evaluator, evaluation_version, floor,
     if backend == 'rocm' and (not isinstance(device, dict) or device.get('backend') != 'rocm'
             or not device.get('hip_version') or not device.get('architecture')):
         errors.append('missing-rocm-device-identity')
+    if backend == 'cuda' and (not isinstance(device, dict) or device.get('backend') != 'cuda'
+            or not device.get('compute_capability') or not device.get('driver')
+            or not device.get('uuid') or device['uuid'] != controls.get('runtime', {}).get('gpu_uuid')):
+        errors.append('missing-cuda-device-identity')
     if not isinstance(versions, dict) or any(not isinstance(versions.get(name), str)
         or not versions[name].strip() for name in required_versions):
         errors.append('missing-runtime-identity')
@@ -82,10 +90,13 @@ def native_trial(raw, *, prompts, evaluator, evaluation_version, floor,
                                version=evaluation_version, floor=floor)
     memory = raw.get('memory')
     memory = memory if isinstance(memory, dict) else {}
+    fields = ('resident_bytes', 'peak_bytes', 'active_bytes')
+    if backend != 'cuda':
+        fields += ('cache_bytes',)
     valid_memory = (memory.get('metric') == metric
         and memory.get('scope') == scope
         and all(type(memory.get(key)) is int and memory[key] >= 0
-                for key in ('resident_bytes', 'peak_bytes', 'active_bytes', 'cache_bytes')))
+                for key in fields))
     valid_memory = valid_memory and memory['peak_bytes'] >= max(
         memory['resident_bytes'], memory['active_bytes'], 1)
     if backend == 'rocm':
@@ -93,12 +104,21 @@ def native_trial(raw, *, prompts, evaluator, evaluation_version, floor,
             and type(memory.get('peak_reserved_bytes')) is int
             and memory['reserved_bytes'] == memory['active_bytes'] + memory['cache_bytes']
             and memory['peak_reserved_bytes'] >= max(memory['reserved_bytes'], memory['peak_bytes']))
+    if backend == 'cuda':
+        valid_memory = (valid_memory and type(memory.get('sample_count')) is int
+            and memory['sample_count'] >= 2 and type(memory.get('sample_errors')) is int
+            and memory['sample_errors'] == 0 and _positive(memory.get('sample_interval_seconds'))
+            and memory['sample_interval_seconds'] == controls.get('runtime', {}).get('memory_sample_interval_seconds')
+            and _positive(memory.get('max_sample_gap_seconds'))
+            and isinstance(device, dict) and type(device.get('memory_size')) is int
+            and memory['peak_bytes'] <= device['memory_size'])
     runtime = {'artifact_id': artifact_id, 'memory': deepcopy(memory),
                'device': raw.get('device'), 'versions': raw.get('runtime_versions'),
                'telemetry_errors': 0 if valid_memory else 1,
-               # This legacy field is an adapter value, not an external GPU sample.
+               # CUDA uses device samples; other native backends use allocator counters.
                'sampled_peak_memory_mib': memory['peak_bytes'] / (1024 ** 2) if valid_memory else None,
-               'memory_measurement_method': 'native-allocator-high-water-mark'}
+               'memory_measurement_method': ('sampled-device-memory' if backend == 'cuda'
+                                             else 'native-allocator-high-water-mark')}
     return {'trial_id': trial_id, 'status': 'collected' if not errors else 'request-errors',
             'native_measurement': raw, 'measurement_errors': errors, 'runtime': runtime,
             'input_token_ids': input_ids, 'quality': prepared, 'task_quality': quality,

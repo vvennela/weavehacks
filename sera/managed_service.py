@@ -50,6 +50,8 @@ def _result(report):
             'artifact_path', 'trace', 'candidate_trials_used', 'elapsed_seconds')}
     result['measurements'] = _measurements(report)
     result['backend'] = report['execution']['backend']
+    if result['backend'] == 'cuda':
+        result['runtime'] = report['execution']['runtime']
     return result
 
 

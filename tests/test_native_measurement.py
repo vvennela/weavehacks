@@ -107,3 +107,34 @@ def test_rocm_measurements_keep_their_allocator_scope_and_runtime_identity():
     assert collect()['runtime']['sampled_peak_memory_mib'] is None
     raw['device']['backend'] = 'cuda'
     assert collect()['status'] != 'collected'
+
+
+@pytest.mark.parametrize('mutation', [None, 'errors', 'few-samples', 'interval', 'uuid', 'gap', 'metric'])
+def test_cuda_device_samples_are_validated_without_allocator_claims(mutation):
+    from test_cuda_backend import UUID, options
+
+    from sera.backends.cuda import MEMORY_METRIC, MEMORY_SCOPE, VERSIONS
+    raw = measurement()
+    raw['runtime_versions'] = {name: 'fixture' for name in VERSIONS}
+    raw['device'].update(backend='cuda', uuid=UUID, compute_capability='9.0', driver='fixture')
+    raw['controls']['runtime'] = options()
+    raw['memory'] = {'metric': MEMORY_METRIC, 'scope': MEMORY_SCOPE, 'resident_bytes': 50,
+                     'active_bytes': 50, 'peak_bytes': 100, 'sample_count': 5, 'sample_errors': 0,
+                     'sample_interval_seconds': 0.01, 'max_sample_gap_seconds': 0.012}
+    if mutation == 'errors': raw['memory']['sample_errors'] = 1
+    if mutation == 'few-samples': raw['memory']['sample_count'] = 1
+    if mutation == 'interval': raw['memory']['sample_interval_seconds'] = 1
+    if mutation == 'uuid': raw['device']['uuid'] = 'wrong'
+    if mutation == 'gap': raw['memory']['max_sample_gap_seconds'] = float('nan')
+    if mutation == 'metric': raw['memory']['metric'] = 'torch-allocated-bytes'
+    result = native_trial(raw, prompts=['first', 'second'], evaluator=lambda p, t: True,
+        evaluation_version='fixture-v1', floor=0.99, artifact_id='a'*64,
+        controls=raw['controls'], trial_id='cuda', backend='cuda')
+    assert result['runtime']['memory_measurement_method'] == 'sampled-device-memory'
+    if mutation == 'uuid':
+        assert result['status'] != 'collected'
+    elif mutation is not None:
+        assert result['runtime']['sampled_peak_memory_mib'] is None
+    else:
+        assert result['status'] == 'collected'
+        assert result['runtime']['telemetry_errors'] == 0

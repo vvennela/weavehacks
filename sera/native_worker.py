@@ -17,10 +17,11 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
+from .backends.cuda import CUDABackend, CUDAOptions, assign_device
 from .backends.mlx import MLXBackend, MLXRecipe
 from .backends.modelopt_export import ModelOptRecipe, prepare_modelopt
 from .backends.rocm import ROCmBackend, ROCmRecipe
-from .hardware import ModelDescriptor
+from .hardware import HardwareAssignment, ModelDescriptor
 from .placement_decoding import validate_formats
 from .process_ownership import inherit_lifetime
 from .runtime import INFERENCE_ENVIRONMENT_VARIABLES
@@ -48,6 +49,12 @@ class ROCmPrepareJob(PrepareJob):
 class CUDAPrepareJob(PrepareJob):
     backend: Literal['cuda']
     recipe: ModelOptRecipe
+    gpu_uuid: str
+
+    @model_validator(mode='after')
+    def assigned_gpu(self):
+        HardwareAssignment(gpu_uuids=[self.gpu_uuid])
+        return self
 
 
 class MeasureJob(BaseModel):
@@ -78,8 +85,14 @@ class MeasureJob(BaseModel):
         return self
 
 
+class CUDAMeasureJob(MeasureJob):
+    backend: Literal['cuda']
+    runtime: CUDAOptions
+
+
 PREPARE_JOB = Annotated[PrepareJob | ROCmPrepareJob | CUDAPrepareJob, Field(discriminator='backend')]
-JOB = TypeAdapter(Annotated[PREPARE_JOB | MeasureJob, Field(discriminator='operation')])
+MEASURE_JOB = Annotated[MeasureJob | CUDAMeasureJob, Field(discriminator='backend')]
+JOB = TypeAdapter(Annotated[PREPARE_JOB | MEASURE_JOB, Field(discriminator='operation')])
 
 
 def _command(path):
@@ -88,8 +101,12 @@ def _command(path):
 
 def _execute(job):
     if isinstance(job, CUDAPrepareJob):
+        assign_device(job.gpu_uuid)
         return prepare_modelopt(source=job.source, destination=job.destination, recipe=job.recipe)
-    backend = MLXBackend() if job.backend == 'mlx' else ROCmBackend()
+    if isinstance(job, CUDAMeasureJob):
+        backend = CUDABackend(job.runtime)
+    else:
+        backend = MLXBackend() if job.backend == 'mlx' else ROCmBackend()
     if isinstance(job, PrepareJob):
         return backend.prepare(source=job.source, destination=job.destination, recipe=job.recipe)
     with backend.load(job.artifact, expected_id=job.artifact_id) as model:

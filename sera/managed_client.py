@@ -29,14 +29,18 @@ class ManagedResult:
     trace_url: str
     elapsed_seconds: float
     backend: str = 'mlx'
+    runtime: dict | None = None
 
     def verify(self):
         return verify_artifact(self.artifact_path, expected_id=self.artifact_id, backend=self.backend)
 
     def load(self):
+        from .backends.cuda import CUDABackend
         from .backends.mlx import MLXBackend
         from .backends.rocm import ROCmBackend
         adapters = {'mlx': MLXBackend, 'rocm': ROCmBackend}
+        if self.backend == 'cuda':
+            return CUDABackend(self.runtime).load(self.artifact_path, expected_id=self.artifact_id)
         if self.backend not in adapters:
             raise ValueError('Unsupported checkpoint backend')
         return adapters[self.backend]().load(self.artifact_path, expected_id=self.artifact_id)
@@ -110,7 +114,7 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
                 return ManagedResult(job_id=job['job_id'], selected_recipe_id=result['selected_recipe_id'],
                     artifact_id=result['selected_artifact_id'], artifact_path=result['artifact_path'],
                     trace_url=result['trace']['url'], elapsed_seconds=result['elapsed_seconds'],
-                    backend=result.get('backend', 'mlx'))
+                    backend=result.get('backend', 'mlx'), runtime=result.get('runtime'))
             if job['status'] not in {'pending', 'running', 'interrupted'}:
                 raise SeraServiceError(f"Sera job {job['job_id']} ended: {job['status']}")
             time.sleep(poll_interval)

@@ -36,10 +36,16 @@ rocm = [
     "transformers==5.17.0", "outlines==1.3.3",
     "bitsandbytes==0.50.2", "accelerate>=1,<2",
 ]
-# Packed CUDA export. Real-device validation and an inference loader are required
-# before these exports can participate in managed optimization.
+# Packed CUDA export; device support remains subject to real GPU validation.
 modelopt = [
     "nvidia-modelopt==0.46.1; sys_platform == 'linux'",
+    "transformers==5.17.0", "accelerate>=1,<2",
+]
+# Native ModelOpt research and sealed-checkpoint inference on Linux NVIDIA hosts.
+cuda = [
+    "nvidia-modelopt==0.46.1; sys_platform == 'linux'",
+    "vllm==0.30.0; sys_platform == 'linux'",
+    "nvidia-ml-py>=12,<14; sys_platform == 'linux'",
     "transformers==5.17.0", "accelerate>=1,<2",
 ]
 # Notebook presentation layer for the two-phase loop. Weave is deliberately absent:

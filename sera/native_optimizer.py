@@ -10,7 +10,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, model_validator
 
+from .backends.cuda import CUDAOptions
 from .backends.mlx import MLXRecipe
+from .backends.modelopt_export import ModelOptRecipe
 from .backends.rocm import ROCmRecipe
 from .config import Budget, Constraints, Objective
 from .hardware import ModelDescriptor
@@ -20,7 +22,7 @@ from .model_artifact import verify_artifact
 from .native_agent import NativeRecipeAgent
 from .native_measurement import native_trial
 from .native_trace import trace_native_job
-from .native_worker import MeasureJob, NativeWorkerError, run_native_job
+from .native_worker import JOB, NativeWorkerError, run_native_job
 from .storage import content_hash, save_json
 
 RESEARCH_TERMINAL = {'awaiting-trace', 'baseline-failed', 'agent-failed',
@@ -59,7 +61,7 @@ class NativeProfile(BaseModel):
         if self.budget.max_candidate_trials is None:
             raise ValueError('Native research requires a bounded trial budget')
         if self.objective.priority != 'memory':
-            raise ValueError('The native research objective is allocator memory')
+            raise ValueError('The native research objective is memory')
         if not self.recipes or any(not re.fullmatch(r'[a-zA-Z0-9_-]+', key)
                                   or key in {'baseline', 'stop'} for key in self.recipes):
             raise ValueError('Supply named native recipes')
@@ -73,8 +75,13 @@ class NativeProfile(BaseModel):
             if key in answers and answers[key] != answer:
                 raise ValueError('Identical prompts cannot have conflicting expected outputs')
             answers[key] = answer
-        MeasureJob.model_validate(self.measure_job('/validation-only', 'a' * 64))
+        JOB.validate_python(self.measure_job('/validation-only', 'a' * 64))
         return self
+
+    def prepare_job(self, destination, recipe):
+        return {'operation': 'prepare', 'backend': self.backend,
+                'source': self.source.model_dump(), 'destination': str(destination),
+                'recipe': recipe.model_dump()}
 
     def measure_job(self, artifact, artifact_id):
         formats = [task.response_format for task in self.tasks]
@@ -98,12 +105,29 @@ class ROCmProfile(NativeProfile):
         return ROCmRecipe()
 
 
+class CUDAProfile(NativeProfile):
+    backend: Literal['cuda'] = 'cuda'
+    recipes: dict[str, ModelOptRecipe]
+    runtime: CUDAOptions
+
+    def baseline_recipe(self):
+        return ModelOptRecipe()
+
+    def prepare_job(self, destination, recipe):
+        return super().prepare_job(destination, recipe) | {'gpu_uuid': self.runtime.gpu_uuid}
+
+    def measure_job(self, artifact, artifact_id):
+        return super().measure_job(artifact, artifact_id) | {'runtime': self.runtime.model_dump()}
+
+
 def validate_native_profile(value):
     backend = value.backend if isinstance(value, NativeProfile) else value.get('backend', 'mlx')
     if backend == 'mlx':
         return NativeProfile.model_validate(value)
     if backend == 'rocm':
         return ROCmProfile.model_validate(value)
+    if backend == 'cuda':
+        return CUDAProfile.model_validate(value)
     raise ValueError('Unsupported native profile backend')
 
 
@@ -149,6 +173,8 @@ class _Research:
                        'started_at_unix': time.time(), 'agent_calls_used': 0,
                        'trials': [], 'agent_calls': [], 'jobs': [], 'candidate_trials_used': 0,
                        'selected_recipe_id': None, 'selected_artifact_id': None, 'artifact_path': None}
+        if isinstance(profile, CUDAProfile):
+            self.report['execution']['runtime'] = profile.runtime.model_dump()
         self.previous_selected = None
         if checkpoint is not None:
             self.report = checkpoint
@@ -229,9 +255,7 @@ class _Research:
         if name in self.artifacts:
             return
         destination = self.folder / 'artifacts' / f'{name}-{len(self.report["jobs"]):04d}'
-        result = self.job({'operation': 'prepare', 'backend': self.profile.backend,
-                          'source': self.profile.source.model_dump(), 'destination': str(destination),
-                          'recipe': recipe.model_dump()})
+        result = self.job(self.profile.prepare_job(destination, recipe))
         manifest = verify_artifact(destination, expected_id=result['artifact']['artifact_id'], backend=self.profile.backend)
         if manifest['source'] != self.profile.source.model_dump() or manifest['recipe'] != recipe.model_dump():
             raise ValueError('Prepared artifact does not match the frozen recipe and source')
@@ -247,6 +271,8 @@ class _Research:
         controls = {key: request[key] for key in ('seed', 'max_tokens', 'warmup', 'repetitions',
                                                  'response_formats', 'response_format_version')}
         controls.update(sampling='greedy', concurrency=1)
+        if 'runtime' in request:
+            controls['runtime'] = request['runtime']
         expected = {content_hash(task.prompt): task.expected_json for task in self.profile.tasks}
         result = native_trial(raw, prompts=request['prompts'],
             evaluator=lambda prompt, text: _score(text, expected[content_hash(prompt)]),

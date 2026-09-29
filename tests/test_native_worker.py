@@ -125,9 +125,39 @@ def test_rocm_jobs_validate_their_own_recipe_and_dispatch(monkeypatch):
 
 
 def test_cuda_export_dispatch_uses_modelopt_recipe(monkeypatch):
+    from test_cuda_backend import UUID
+
     from sera import native_worker as worker
     monkeypatch.setattr(worker, 'prepare_modelopt', lambda **kwargs:{'recipe':kwargs['recipe'].format})
+    assigned = []
+    monkeypatch.setattr(worker, 'assign_device', lambda uuid: assigned.append(uuid))
     job = worker.JOB.validate_python({'operation':'prepare','backend':'cuda',
         'source':{'model_id':'Qwen/Qwen3-0.6B','revision':'a'*40},
-        'destination':'/not-written','recipe':{'format':'bf16'}})
+        'destination':'/not-written','recipe':{'format':'bf16'}, 'gpu_uuid': UUID})
     assert worker._execute(job) == {'recipe':'bf16'}
+    assert assigned == [UUID]
+
+
+def test_cuda_measure_dispatch_keeps_runtime_controls(monkeypatch):
+    from test_cuda_backend import options
+    calls = []
+    class Backend:
+        def __init__(self, runtime):
+            assert runtime.model_dump() == options()
+        def load(self, artifact, *, expected_id):
+            calls.append((artifact, expected_id))
+            return self
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            calls.append('closed')
+        def measure(self, prompts, **kwargs):
+            return {'controls': kwargs}
+    monkeypatch.setattr(native_worker, 'CUDABackend', Backend)
+    request = job() | {'backend': 'cuda', 'runtime': options()}
+    result = native_worker._execute(native_worker.JOB.validate_python(request))
+    assert result['controls']['max_tokens'] == 64
+    assert calls == [('/fixture/checkpoint', 'a' * 64), 'closed']
+    request.pop('runtime')
+    with pytest.raises(ValueError):
+        native_worker.JOB.validate_python(request)
