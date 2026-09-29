@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+import threading
 
 import pytest
 
@@ -64,3 +65,41 @@ def test_invalid_job_fails_before_creating_files(tmp_path, change):
     with pytest.raises(ValueError):
         native_worker.run_native_job(job() | change, output_dir=tmp_path/'job', timeout_seconds=10)
     assert not (tmp_path/'job').exists()
+
+
+def test_cancelled_job_stops_the_worker(tmp_path, monkeypatch):
+    cancelled = threading.Event()
+    command(monkeypatch, 'import time; time.sleep(30)')
+    timer = threading.Timer(0.1, cancelled.set)
+    timer.start()
+    try:
+        with pytest.raises(native_worker.NativeWorkerError, match='cancelled'):
+            native_worker.run_native_job(job(), output_dir=tmp_path/'job', timeout_seconds=10,
+                                         cancelled=cancelled)
+    finally:
+        timer.join()
+    status = json.loads((tmp_path/'job'/'status.json').read_text())
+    assert status['status'] == 'cancelled' and status['cleanup_pass']
+
+
+def test_worker_watchdog_exits_when_parent_pipe_closes(tmp_path):
+    import subprocess
+    read_fd, write_fd = os.pipe()
+    env = dict(os.environ, SERA_PARENT_FD=str(read_fd))
+    process = subprocess.Popen([sys.executable, '-c',
+        ('from sera.native_worker import _parent_watchdog; import time; '
+         '_parent_watchdog(); print("READY", flush=True); time.sleep(30)')], env=env,
+        pass_fds=(read_fd,), start_new_session=True, stdout=subprocess.PIPE, text=True)
+    os.close(read_fd)
+    try:
+        assert process.stdout.readline().strip() == 'READY'
+        os.close(write_fd)
+        assert process.wait(timeout=5) != 0
+    finally:
+        try:
+            os.close(write_fd)
+        except OSError:
+            pass
+        if process.poll() is None:
+            process.kill()
+        process.wait()

@@ -10,6 +10,7 @@ import os
 import signal
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import Annotated, Literal
@@ -82,7 +83,7 @@ def _execute(job):
                              response_format_version=job.response_format_version)
 
 
-def run_native_job(job, *, output_dir, timeout_seconds):
+def run_native_job(job, *, output_dir, timeout_seconds, cancelled=None):
     """Run one validated job with a hard deadline; keep all failure evidence."""
     request = JOB.validate_python(job).model_dump(mode='json')
     if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
@@ -99,18 +100,31 @@ def run_native_job(job, *, output_dir, timeout_seconds):
     env = {key: os.environ[key] for key in INFERENCE_ENVIRONMENT_VARIABLES if key in os.environ}
     # Use the installed package, never inherit a caller's PYTHONPATH or executable hooks.
     process = None
+    read_fd, write_fd = os.pipe()
+    env['SERA_PARENT_FD'] = str(read_fd)
     started = time.monotonic()
     try:
         with (folder / 'worker.log').open('w') as log:
             process = subprocess.Popen(_command(request_path), env=env, stdout=log,
-                                       stderr=subprocess.STDOUT, start_new_session=True)
+                                       stderr=subprocess.STDOUT, start_new_session=True,
+                                       pass_fds=(read_fd,))
+            os.close(read_fd)
+            read_fd = None
             record.update(pid=process.pid, status='running')
             save_json(folder / 'status.json', record)
-            try:
-                process.wait(timeout=timeout_seconds)
-            except subprocess.TimeoutExpired:
-                record['status'] = 'timeout'
-                raise NativeWorkerError('Native worker timeout') from None
+            while True:
+                if cancelled is not None and cancelled.is_set():
+                    record['status'] = 'cancelled'
+                    raise NativeWorkerError('Native worker cancelled')
+                remaining = timeout_seconds - (time.monotonic() - started)
+                if remaining <= 0:
+                    record['status'] = 'timeout'
+                    raise NativeWorkerError('Native worker timeout')
+                try:
+                    process.wait(timeout=min(0.1, remaining))
+                    break
+                except subprocess.TimeoutExpired:
+                    continue
             if process.returncode != 0:
                 raise NativeWorkerError('Native worker failed; inspect worker.log')
         response = json.loads((folder / 'output.json').read_text())
@@ -120,10 +134,13 @@ def run_native_job(job, *, output_dir, timeout_seconds):
         record['status'] = 'completed'
         return response['result']
     except BaseException:
-        if record['status'] != 'timeout':
+        if record['status'] not in {'timeout', 'cancelled'}:
             record['status'] = 'failed'
         raise
     finally:
+        os.close(write_fd)
+        if read_fd is not None:
+            os.close(read_fd)
         if process is not None:
             # Kill the entire group, including children left after its leader exits.
             try:
@@ -135,9 +152,25 @@ def run_native_job(job, *, output_dir, timeout_seconds):
         save_json(folder / 'status.json', record)
 
 
+def _parent_watchdog():
+    descriptor = os.environ.pop('SERA_PARENT_FD', None)
+    if descriptor is None:
+        return
+    descriptor = int(descriptor)
+    def watch():
+        try:
+            os.read(descriptor, 1)
+        finally:
+            # This worker is a session leader. EOF means its controller no
+            # longer owns the pipe, including SIGKILL and controller crashes.
+            os.killpg(os.getpid(), signal.SIGKILL)
+    threading.Thread(target=watch, name='sera-parent-watchdog', daemon=True).start()
+
+
 def main():
     if len(sys.argv) != 2:
         raise SystemExit('Usage: python -m sera.native_worker JOB.json')
+    _parent_watchdog()
     path = Path(sys.argv[1])
     request = json.loads(path.read_text())
     job = JOB.validate_python(request)

@@ -10,8 +10,8 @@ from sera.native_measurement import native_trial
 
 
 def measurement():
-    return {'artifact_id': 'a' * 64, 'device': {'device_name': 'fixture'},
-            'runtime_versions': {'mlx': 'fixture'},
+    return {'artifact_id': 'a' * 64, 'device': {'device_name': 'fixture', 'memory_size': 1000},
+            'runtime_versions': {name: 'fixture' for name in ('mlx', 'mlx-lm', 'transformers', 'outlines')},
             'controls': {'seed': 0, 'max_tokens': 64, 'warmup': 1, 'repetitions': 3,
                          'sampling': 'greedy', 'concurrency': 1,
                          'response_formats': None, 'response_format_version': None},
@@ -42,7 +42,8 @@ def test_valid_native_result_uses_all_requests_and_real_window():
 
 
 @pytest.mark.parametrize('mutation', ['missing', 'duplicate', 'empty', 'nan', 'error',
-                                    'artifact', 'tokens', 'format', 'controls', 'finish', 'window'])
+                                    'artifact', 'tokens', 'format', 'controls', 'finish', 'window',
+                                    'device', 'versions'])
 def test_invalid_measurements_cannot_pass_existing_selection_gates(mutation):
     raw = measurement()
     if mutation == 'missing': raw['requests'].pop()
@@ -56,6 +57,8 @@ def test_invalid_measurements_cannot_pass_existing_selection_gates(mutation):
     if mutation == 'controls': raw['controls']['seed'] = 42
     if mutation == 'finish': raw['requests'][-1]['finish_reason'] = 'error'
     if mutation == 'window': raw['request_wall_seconds'] = 0
+    if mutation == 'device': raw.pop('device')
+    if mutation == 'versions': raw.pop('runtime_versions')
     raw['memory']['peak_bytes'] = 70
     candidate = trial(raw)
     decision = select_candidate(trial(measurement()), candidate,

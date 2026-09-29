@@ -252,7 +252,8 @@ class WandbAgent:
         import openai
         try:
             with openai.OpenAI(base_url=PROVIDER_URL.rsplit("/chat/completions", 1)[0],
-                               api_key=api_key, project=self.project, timeout=90,
+                               api_key=api_key, project=self.project,
+                               timeout=getattr(self, 'timeout_seconds', 90),
                                max_retries=0) as client:
                 return client.chat.completions.create(**payload).model_dump(mode="json")
         except openai.APIStatusError as error:
