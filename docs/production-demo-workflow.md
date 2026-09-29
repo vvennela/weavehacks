@@ -139,8 +139,9 @@ about 52 seconds of playback at that speed. Pause to discuss actual decisions:
   The returned runner answered a known task; cleanup returned GPU use to zero.
 
 Say: “This is a replay of a completed GPU experiment on eight warmed, repeated
-prompts.” This recording used the historical OpenAI/LiteLLM agent path; new work
-uses the requested Codex ChatGPT-login path. It does not show ModelOpt, a held-out
+prompts.” This recording used the historical OpenAI/LiteLLM agent path. The new GPU
+product uses the requested API-key flow with mandatory W&B tracing; its provider
+is awaiting selection. The recording does not show ModelOpt, a held-out
 quality test, cross-backend execution, a live service, or agent superiority over
 grid/random search. The old runner is closed.
 
