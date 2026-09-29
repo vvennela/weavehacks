@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from tests.test_verify_swarm import fixture
+from test_verify_swarm import fixture
 
 
 def test_registered_adapter_keeps_shared_swarm_checks(monkeypatch, tmp_path):

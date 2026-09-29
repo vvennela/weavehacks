@@ -7,7 +7,7 @@ import pytest
 
 from benchmarks.grade import grade_case, load_cases
 from sera.config import MODEL_ID
-from tests.test_structured_quality_pilot import fake_runtime
+from test_structured_quality_pilot import fake_runtime
 
 
 def test_schema_uses_only_prompt_requested_types_not_answers():
