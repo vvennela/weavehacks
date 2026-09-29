@@ -23,7 +23,8 @@ result = Sera.Optimize(
 ```
 
 The visible flow is credentials → model and representative workload → Optimize
-→ progress → usable result. The API-key provider is awaiting clarification.
+→ progress → usable result. The user selected W&B for the provider on September 28; account access and
+an available investigator model still need verification.
 The current `sera.optimize` needs more configuration, including provider and
 trace setup. The user explicitly retained mandatory W&B tracing on September
 28. The provider decision therefore determines credential setup: W&B inference
@@ -140,8 +141,7 @@ about 52 seconds of playback at that speed. Pause to discuss actual decisions:
 
 Say: “This is a replay of a completed GPU experiment on eight warmed, repeated
 prompts.” This recording used the historical OpenAI/LiteLLM agent path. The new GPU
-product uses the requested API-key flow with mandatory W&B tracing; its provider
-is awaiting selection. The recording does not show ModelOpt, a held-out
+product uses the requested API-key flow with mandatory W&B tracing; the selected provider is W&B, with account/model access still unverified. The recording does not show ModelOpt, a held-out
 quality test, cross-backend execution, a live service, or agent superiority over
 grid/random search. The old runner is closed.
 
@@ -218,7 +218,7 @@ The existing implementation offers these concrete building blocks:
 3. `sera.api._run_traced` supplies the current Weave trace, bounded evidence
    reader, and cleanup on trace failure. Reuse this path in the target entry
    point rather than adding a second optimizer.
-4. The target entry point still needs credential-provider selection and a
+4. The target entry point still needs verified W&B account/model access and a
    concrete workload configuration. It must validate these before billable
    setup calls, retain setup time and request counts, then pass the checked
    agent and certificate into the existing traced research loop.

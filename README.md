@@ -17,6 +17,9 @@ ModelOpt integration are development goals, not completed capabilities. See the
 The [production checklist and 3–5 minute demo workflow](docs/production-demo-workflow.md)
 track the remaining work and distinguish the target demo from the current recorded rehearsal.
 
+[Competition review guide](docs/competition-review.md): organizer requirements,
+W&B evidence, resilience and build records, and a four-minute presentation draft.
+
 ## Start here: clone the notebook
 
 Open [FAST_START in Molab](https://molab.marimo.io/github/vvennela/weavehacks/blob/main/notebooks/FAST_START.py),

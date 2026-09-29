@@ -109,7 +109,8 @@ the backend-independent boundary must not require unimplemented adapters.
    Keep model loading, execution, validation, and acceptance in deterministic code.
 6. The September 28 product direction replaces the earlier GPU-product
    ChatGPT-login proposal with an API-key entry point and mandatory W&B tracing.
-   The exact provider is awaiting user selection. Preserve prompts, responses,
+   The user selected W&B; account access and an available investigator model
+   still need verification. Preserve prompts, responses,
    setup cost, and the existing acceptance gates. The separate CPU research
    contract still uses Codex through ChatGPT login and its 180-second timeout.
 
