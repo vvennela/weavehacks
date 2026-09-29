@@ -1,6 +1,7 @@
 """Operator-side native research using fixed profiles and existing quality gates."""
 
 import json
+import os
 import re
 import time
 from copy import deepcopy
@@ -11,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, JsonValue, model_validator
 from .backends.mlx import MLXRecipe
 from .config import Budget, Constraints, Objective
 from .hardware import ModelDescriptor
-from .ledger import Ledger, encode_record
+from .ledger import Ledger, encode_record, read_checkpoint
 from .measurement import constraint_failures, objective_value, select_candidate
 from .model_artifact import verify_artifact
 from .native_agent import NativeRecipeAgent
@@ -20,6 +21,8 @@ from .native_trace import trace_native_job
 from .native_worker import MeasureJob, NativeWorkerError, run_native_job
 from .storage import content_hash, save_json
 
+RESEARCH_TERMINAL = {'awaiting-trace', 'baseline-failed', 'agent-failed',
+                     'agent-budget-exhausted', 'budget-exhausted', 'cancelled'}
 
 class NativeTask(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False)
@@ -105,7 +108,7 @@ class NativeRunStopped(RuntimeError):
 
 
 class _Research:
-    def __init__(self, profile, folder, ledger, agent, cancelled):
+    def __init__(self, profile, folder, ledger, agent, cancelled, checkpoint=None):
         self.profile, self.folder, self.ledger, self.agent = profile, folder, ledger, agent
         self.cancelled = cancelled
         self.started = time.monotonic()
@@ -119,9 +122,50 @@ class _Research:
                        'execution': {'backend': 'mlx', 'budget': profile.budget.model_dump(),
                                      'max_run_seconds': profile.max_run_seconds,
                                      'job_timeout_seconds': profile.job_timeout_seconds},
+                       'started_at_unix': time.time(), 'agent_calls_used': 0,
                        'trials': [], 'agent_calls': [], 'jobs': [], 'candidate_trials_used': 0,
                        'selected_recipe_id': None, 'selected_artifact_id': None, 'artifact_path': None}
+        self.previous_selected = None
+        if checkpoint is not None:
+            self.report = checkpoint
+            spent = max(checkpoint['elapsed_seconds'],
+                        time.time() - checkpoint['started_at_unix'])
+            self.started -= spent
+            self.agent.history = deepcopy(checkpoint['agent_calls'])
+            self.artifacts = deepcopy(checkpoint.get('artifact_locations', {}))
+            self.previous_selected = checkpoint['selected_recipe_id']
+            self.recover()
         self.save()
+
+    def recover(self):
+        for name, artifact in self.artifacts.items():
+            manifest = verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend='mlx')
+            recipe = MLXRecipe() if name == 'baseline' else self.profile.recipes[name]
+            if manifest['source'] != self.profile.source.model_dump() or manifest['recipe'] != recipe.model_dump():
+                raise ValueError('Recovered artifact differs from the profile')
+        for job in self.report['jobs']:
+            if job['status'] != 'requested':
+                continue
+            path = self.folder / job['job_id'] / 'status.json'
+            if path.exists():
+                state = json.loads(path.read_text())
+                if state.get('status') in {'starting', 'running'} and state.get('pid'):
+                    try:
+                        os.kill(state['pid'], 0)
+                    except ProcessLookupError:
+                        pass
+                    else:
+                        raise RuntimeError('An interrupted worker is still alive; recovery cannot overlap it')
+            job['status'] = 'interrupted'
+        if 'pending_agent_call' in self.report:
+            self.report.setdefault('interrupted_agent_calls', []).append(self.report.pop('pending_agent_call'))
+        for trial in self.report['trials']:
+            incomplete = (trial['status'] == 'running' or (
+                trial['status'] == 'measured' and trial.get('decision', {}).get('selected') == 'candidate'
+                and 'repeated_decision' not in trial))
+            if incomplete:
+                trial.update(status='interrupted', error_type='ControllerInterrupted')
+        self.report['resume_count'] = self.report.get('resume_count', 0) + 1
 
     def save(self):
         self.report['elapsed_seconds'] = time.monotonic() - self.started
@@ -158,7 +202,9 @@ class _Research:
             self.save()
 
     def prepare(self, name, recipe):
-        destination = self.folder / 'artifacts' / name
+        if name in self.artifacts:
+            return
+        destination = self.folder / 'artifacts' / f'{name}-{len(self.report["jobs"]):04d}'
         result = self.job({'operation': 'prepare', 'backend': 'mlx',
                           'source': self.profile.source.model_dump(), 'destination': str(destination),
                           'recipe': recipe.model_dump()})
@@ -166,6 +212,7 @@ class _Research:
         if manifest['source'] != self.profile.source.model_dump() or manifest['recipe'] != recipe.model_dump():
             raise ValueError('Prepared artifact does not match the frozen recipe and source')
         self.artifacts[name] = {'path': str(destination), 'artifact_id': manifest['artifact_id']}
+        self.report['artifact_locations'] = self.artifacts
         self.report.setdefault('artifacts', {})[name] = result
         self.save()
 
@@ -224,9 +271,23 @@ class _Research:
             self.select('baseline')
             best = baseline
             controls = [baseline]
-            available = list(self.profile.recipes)
+            # Previously confirmed work needs fresh measurements after restart.
+            if self.previous_selected not in (None, 'baseline'):
+                name = self.previous_selected
+                first = self.measure(name, f'{name}-recovery')
+                second = self.measure(name, f'{name}-recovery-confirmation')
+                self.report.setdefault('recovery_confirmations', []).append([first, second])
+                if all(self.decision(baseline, item)['selected'] == 'candidate' for item in (first, second)):
+                    best = min([first, second], key=lambda t: objective_value(t, 'memory'))
+                    self.select(name)
+            used = {trial['recipe_id'] for trial in self.report['trials']}
+            available = [name for name in self.profile.recipes if name not in used]
             while available and self.report['candidate_trials_used'] < self.profile.budget.max_candidate_trials:
                 remaining = min(180, self.remaining())
+                if self.report['agent_calls_used'] >= self.profile.budget.max_candidate_trials + 1:
+                    self.report['status'] = 'agent-budget-exhausted'
+                    return self.report
+                self.report['agent_calls_used'] += 1
                 self.report['pending_agent_call'] = len(self.agent.history)
                 self.save()
                 try:
@@ -283,17 +344,39 @@ class _Research:
         return self.report
 
 
-def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None):
+def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None, resume=False):
     """Run the operator's fixed profile. This function never changes its gates."""
     profile = NativeProfile.model_validate(profile)
     encode_record(profile.model_dump())
     folder = Path(output_dir).resolve()
-    folder.mkdir(parents=True, exist_ok=False)
-    ledger = Ledger(folder)
+    if not resume:
+        folder.mkdir(parents=True, exist_ok=False)
+    ledger = Ledger(folder, existing=resume)
     research = None
     try:
-        research = _Research(profile, folder, ledger, agent or NativeRecipeAgent(project=project), cancelled)
-        verified = trace_native_job(project=project, run=research.run)
+        checkpoint = read_checkpoint(folder)[0] if resume else None
+        if checkpoint is not None:
+            if checkpoint['status'] in RESEARCH_TERMINAL:
+                checkpoint['research_status'] = checkpoint['status']
+            if checkpoint.get('profile_hash') != content_hash(profile.model_dump()):
+                raise ValueError('Cannot resume under a different native profile')
+            if checkpoint.get('artifact_path'):
+                verify_artifact(checkpoint['artifact_path'],
+                                expected_id=checkpoint['selected_artifact_id'], backend='mlx')
+            if checkpoint['status'] == 'completed' and checkpoint.get('trace', {}).get('remote_verified'):
+                return checkpoint
+        research = _Research(profile, folder, ledger, agent or NativeRecipeAgent(project=project),
+                             cancelled, checkpoint)
+        def run():
+            if checkpoint is not None and checkpoint.get('research_status') is not None:
+                research.report['status'] = checkpoint['research_status']
+                research.report['resume_action'] = 'export-saved-evidence'
+            else:
+                research.run()
+            research.report['research_status'] = research.report['status']
+            research.save()
+            return research.report
+        verified = trace_native_job(project=project, run=run)
         research.report['trace'] = verified['trace']
         if research.report['status'] == 'awaiting-trace':
             research.report['status'] = 'completed'
@@ -301,7 +384,7 @@ def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None)
         return research.report
     except BaseException:
         if research is not None:
-            research.report['status'] = 'failed'
+            research.report['status'] = 'trace-failed' if 'research_status' in research.report else 'failed'
             research.save()
         raise
     finally:

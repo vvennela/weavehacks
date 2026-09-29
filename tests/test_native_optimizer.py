@@ -121,3 +121,145 @@ def test_cancellation_during_baseline_is_reported_as_cancelled(tmp_path, runtime
         project='fixture/project',agent=Agent(),cancelled=cancelled)
     assert result['status']=='cancelled'
     assert result['selected_recipe_id'] is None
+
+
+def test_completed_resume_verifies_artifact_without_repeating_work(tmp_path, runtime):
+    folder=tmp_path/'run'
+    first=native.optimize_native(profile=profile(),output_dir=folder,
+                                 project='fixture/project',agent=Agent())
+    count=len(runtime)
+    result=native.optimize_native(profile=profile(),output_dir=folder,
+                                  project='fixture/project',agent=Agent(()),resume=True)
+    assert result['selected_artifact_id']==first['selected_artifact_id']
+    assert len(runtime)==count
+    (Path(result['artifact_path'])/'model.safetensors').write_bytes(b'changed')
+    with pytest.raises(ValueError,match='changed'):
+        native.optimize_native(profile=profile(),output_dir=folder,
+                               project='fixture/project',agent=Agent(()),resume=True)
+
+
+def test_resume_rejects_changed_quality_contract(tmp_path, runtime):
+    folder=tmp_path/'run'
+    native.optimize_native(profile=profile(),output_dir=folder,project='fixture/project',agent=Agent())
+    changed=profile();changed['constraints']['quality_floor']=0.5
+    with pytest.raises(ValueError,match='profile'):
+        native.optimize_native(profile=changed,output_dir=folder,project='fixture/project',
+                               agent=Agent(),resume=True)
+
+
+def test_trace_retry_does_not_repeat_completed_gpu_work(tmp_path, runtime, monkeypatch):
+    folder=tmp_path/'run'
+    trace=native.trace_native_job
+    def fail(project,run):
+        run()
+        raise RuntimeError('trace missing')
+    monkeypatch.setattr(native,'trace_native_job',fail)
+    with pytest.raises(RuntimeError):
+        native.optimize_native(profile=profile(),output_dir=folder,project='fixture/project',agent=Agent())
+    count=len(runtime)
+    monkeypatch.setattr(native,'trace_native_job',trace)
+    result=native.optimize_native(profile=profile(),output_dir=folder,
+                                  project='fixture/project',agent=Agent(()),resume=True)
+    assert result['status']=='completed'
+    assert len(runtime)==count
+
+
+def test_abrupt_controller_exit_retains_trial_charge_and_partial_artifact(tmp_path, runtime):
+    import subprocess
+    import sys
+    folder=tmp_path/'run'
+    script='''
+import os,sys
+from pathlib import Path
+import pytest
+sys.path.insert(0,sys.argv[2])
+from test_native_optimizer import profile,runtime,Agent,native
+runtime.__wrapped__(pytest.MonkeyPatch())
+original=native.run_native_job
+def crash(job,**kwargs):
+    if job['operation']=='prepare' and job['recipe']['bits']==4:
+        Path(job['destination']).mkdir(parents=True)
+        (Path(job['destination'])/'partial').write_text('interrupted export')
+        os._exit(77)
+    return original(job,**kwargs)
+native.run_native_job=crash
+native.optimize_native(profile=profile(),output_dir=sys.argv[1],project='fixture/project',agent=Agent())
+'''
+    stopped=subprocess.run([sys.executable,'-c',script,str(folder),str(Path(__file__).parent)],timeout=10,check=False)
+    assert stopped.returncode==77
+    before=native.read_checkpoint(folder)[0]
+    assert before['candidate_trials_used']==1 and before['jobs'][-1]['status']=='requested'
+    partial=list((folder/'artifacts').rglob('partial'))
+    assert len(partial)==1
+    result=native.optimize_native(profile=profile(),output_dir=folder,project='fixture/project',
+                                  agent=Agent(('q8',)),resume=True)
+    assert result['candidate_trials_used']==2
+    assert result['selected_recipe_id']=='q8'
+    assert result['trials'][0]['status']=='interrupted'
+    assert partial[0].read_text()=='interrupted export'
+    assert result['started_at_unix']==before['started_at_unix']
+
+
+def test_expired_interrupted_run_starts_no_worker(tmp_path, runtime):
+    folder = tmp_path / 'run'
+    native.optimize_native(profile=profile(), output_dir=folder,
+                           project='fixture/project', agent=Agent())
+    saved = native.read_checkpoint(folder)[0]
+    saved.pop('research_status')
+    saved['status'] = 'running'
+    saved['started_at_unix'] -= 100
+    ledger = native.Ledger(folder, existing=True)
+    try:
+        ledger.save(saved)
+    finally:
+        ledger.close()
+    count = len(runtime)
+    result = native.optimize_native(profile=profile(), output_dir=folder,
+                                    project='fixture/project', agent=Agent(()), resume=True)
+    assert result['status'] == 'budget-exhausted'
+    assert len(runtime) == count
+
+
+def test_recovery_refuses_overlap_with_a_live_worker(tmp_path, runtime):
+    import os
+    folder = tmp_path / 'run'
+    native.optimize_native(profile=profile(), output_dir=folder,
+                           project='fixture/project', agent=Agent())
+    saved = native.read_checkpoint(folder)[0]
+    saved.pop('research_status')
+    saved['status'] = 'running'
+    saved['jobs'][-1]['status'] = 'requested'
+    job_folder = folder / saved['jobs'][-1]['job_id']
+    job_folder.mkdir()
+    (job_folder / 'status.json').write_text(json.dumps({'status': 'running', 'pid': os.getpid()}))
+    ledger = native.Ledger(folder, existing=True)
+    try:
+        ledger.save(saved)
+    finally:
+        ledger.close()
+    count = len(runtime)
+    with pytest.raises(RuntimeError, match='still alive'):
+        native.optimize_native(profile=profile(), output_dir=folder,
+                               project='fixture/project', agent=Agent(()), resume=True)
+    assert len(runtime) == count
+
+
+def test_restart_after_research_commit_only_exports_trace(tmp_path, runtime):
+    folder = tmp_path / 'run'
+    native.optimize_native(profile=profile(), output_dir=folder,
+                           project='fixture/project', agent=Agent())
+    saved = native.read_checkpoint(folder)[0]
+    # Crash window after _Research.run saved its terminal checkpoint but
+    # before the enclosing trace operation recorded research_status.
+    saved.pop('research_status')
+    saved['status'] = 'awaiting-trace'
+    ledger = native.Ledger(folder, existing=True)
+    try:
+        ledger.save(saved)
+    finally:
+        ledger.close()
+    count = len(runtime)
+    result = native.optimize_native(profile=profile(), output_dir=folder,
+                                    project='fixture/project', agent=Agent(()), resume=True)
+    assert result['status'] == 'completed'
+    assert len(runtime) == count
