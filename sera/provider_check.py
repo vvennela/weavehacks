@@ -149,6 +149,28 @@ def check_provider(*, project, output_dir, model=AGENT_MODEL, agent=None, stop_o
     return record
 
 
+def prepare_provider_check(*, agent, output_dir):
+    """Create or verify a provider check in the caller's explicit setup folder.
+
+    A first check makes the same provider calls as ``check_provider``. Existing
+    records are fully revalidated; invalid or interrupted checks are preserved
+    and rejected, never silently replaced or retried. Use a new folder to retry.
+    The research agent's history is not changed by setup requests.
+    """
+    folder = Path(output_dir).resolve()
+    path = folder / 'result.json'
+    if not folder.exists():
+        setup_agent = agent.fork()
+        identity = ('project', 'model', 'provider', 'endpoint_fingerprint')
+        if (setup_agent is agent or setup_agent.history is agent.history
+                or any(getattr(setup_agent, field, None) != getattr(agent, field, None)
+                       for field in identity)):
+            raise ValueError('Provider setup requires a matching agent with separate history')
+        check_provider(project=agent.project, model=agent.model, agent=setup_agent,
+                       output_dir=folder, stop_on_failure=True)
+    return require_provider_check(path, agent)
+
+
 def require_provider_check(path, agent):
     """Recompute acceptance, including case/schema identity; do not trust a pass flag."""
     import json

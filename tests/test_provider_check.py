@@ -305,3 +305,95 @@ def test_format_check_accepts_explicit_agent_and_preserves_all_thirty_cases(tmp_
     assert record['passed'] and record['completed_requests'] == 34
     assert record['provider'] == 'codex-relay'
     assert require_provider_check(tmp_path / 'check/result.json', agent)['first_pass_valid'] == 34
+
+
+def test_prepare_provider_runs_existing_gate_once_and_reuses_verified_record(monkeypatch, tmp_path):
+    from sera.agent import WandbAgent
+    from sera import provider_check
+
+    calls = []
+    responses = iter(provider_cases())
+
+    def complete(self, payload):
+        case = next(responses)
+        calls.append(payload)
+        return {'choices': [{'finish_reason': 'stop', 'message': {
+            'content': json.dumps(valid_response(case))}}]}
+
+    monkeypatch.setattr(WandbAgent, '_complete', complete)
+    current = WandbAgent(project='test/project')
+    current.history.append({'existing': 'research evidence'})
+    folder = tmp_path / 'check'
+    first = provider_check.prepare_provider_check(agent=current, output_dir=folder)
+    saved = (folder / 'result.json').read_bytes()
+    second = provider_check.prepare_provider_check(agent=current, output_dir=folder)
+    assert first == second
+    assert first['path'] == str(folder / 'result.json')
+    assert first['valid_with_one_retry'] == len(provider_cases())
+    assert len(calls) == len(provider_cases())
+    assert current.history == [{'existing': 'research evidence'}]
+    assert (folder / 'result.json').read_bytes() == saved
+
+
+@pytest.mark.parametrize('invalid', ['wrong-model', 'failed-response', 'malformed', 'incomplete-folder'])
+def test_prepare_provider_preserves_invalid_records_and_makes_no_calls(monkeypatch, tmp_path, invalid):
+    from sera.agent import WandbAgent
+    from sera import provider_check
+
+    folder = tmp_path / 'check'
+    folder.mkdir()
+    record = certificate()
+    if invalid == 'wrong-model':
+        record['model'] = 'different-agent'
+    if invalid == 'failed-response':
+        record['requests'][0]['attempts'][0]['raw_response'] = {}
+    raw = b'{' if invalid == 'malformed' else json.dumps(record).encode()
+    if invalid != 'incomplete-folder':
+        (folder / 'result.json').write_bytes(raw)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError('Invalid saved checks must not trigger provider calls')
+
+    monkeypatch.setattr(WandbAgent, 'fork', forbidden)
+    with pytest.raises((ValueError, FileNotFoundError)):
+        provider_check.prepare_provider_check(agent=WandbAgent(project='test/project'), output_dir=folder)
+    if invalid != 'incomplete-folder':
+        assert (folder / 'result.json').read_bytes() == raw
+
+
+def test_prepare_provider_rejects_new_failed_check_and_retains_its_evidence(monkeypatch, tmp_path):
+    from sera.agent import WandbAgent, ProviderTransportError
+    from sera import provider_check
+
+    def deny(self, payload):
+        raise ProviderTransportError('Provider HTTP 401', http_status=401)
+
+    monkeypatch.setattr(WandbAgent, '_complete', deny)
+    current = WandbAgent(project='test/project')
+    folder = tmp_path / 'check'
+    with pytest.raises(ValueError, match='complete'):
+        provider_check.prepare_provider_check(agent=current, output_dir=folder)
+    record = json.loads((folder / 'result.json').read_text())
+    assert not record['passed']
+    assert record['requests'][0]['attempts'][0]['http_status'] == 401
+    assert current.history == []
+
+
+@pytest.mark.parametrize('change', ['same-agent', 'shared-history', 'provider', 'endpoint'])
+def test_prepare_provider_rejects_a_changed_or_shared_setup_agent(monkeypatch, tmp_path, change):
+    from sera.agent import WandbAgent
+    from sera import provider_check
+
+    current = WandbAgent(project='test/project')
+    child = current if change == 'same-agent' else current.fork()
+    if change == 'shared-history':
+        child.history = current.history
+    elif change == 'provider':
+        child.provider = 'another-provider'
+    elif change == 'endpoint':
+        child.endpoint_fingerprint = 'another-endpoint'
+    monkeypatch.setattr(current, 'fork', lambda: child)
+    monkeypatch.setattr(provider_check, 'check_provider', lambda **kwargs: pytest.fail('No provider calls'))
+    with pytest.raises(ValueError, match='Provider setup'):
+        provider_check.prepare_provider_check(agent=current, output_dir=tmp_path / 'check')
+    assert not (tmp_path / 'check').exists()
