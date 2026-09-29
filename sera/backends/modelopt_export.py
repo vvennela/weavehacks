@@ -149,7 +149,7 @@ def prepare_modelopt(*, source, destination, recipe):
             # Default unified export packs weights/scales. Never enable the
             # optional vLLM fake-quant export used for quantization research.
             with torch.inference_mode():
-                export_hf_checkpoint(model, str(destination))
+                export_hf_checkpoint(model, dtype=torch.bfloat16, export_dir=str(destination))
         tokenizer.save_pretrained(str(destination))
         torch.cuda.synchronize()
         check_modelopt_export(destination, recipe)

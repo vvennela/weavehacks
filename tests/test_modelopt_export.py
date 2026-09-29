@@ -126,9 +126,13 @@ def test_modelopt_export_pins_source_calibrates_and_seals_packed_files(tmp_path,
         assert config == {'name':'nvfp4-fixture'}
         forward_loop(model)
         return model
-    def save(model,folder):
-        Path(folder).mkdir()
-        write_checkpoint(Path(folder))
+    def save(model, dtype=None, export_dir=None, **kwargs):
+        # Match ModelOpt 0.46.1: the second positional argument is dtype,
+        # not the destination. Preserve BF16 for all unquantized parameters.
+        assert dtype == torch.bfloat16
+        assert export_dir == str(tmp_path/'export')
+        Path(export_dir).mkdir()
+        write_checkpoint(Path(export_dir))
     modules={name:ModuleType(name) for name in ('modelopt','modelopt.torch','modelopt.torch.quantization','modelopt.torch.export')}
     modules['modelopt'].torch=modules['modelopt.torch']
     modules['modelopt.torch'].quantization=modules['modelopt.torch.quantization']
