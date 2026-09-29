@@ -1,6 +1,14 @@
 # Sera
 
-Sera recommends and measures inference configurations, rejects quality failures, and returns a live runner.
+Sera's goal is to be an autonomous research agent that optimizes ML workloads
+for the user's current hardware. It should inspect the workload and hardware,
+form hypotheses, apply supported optimization techniques, measure results, and
+return a verified artifact within the user's quality and resource limits.
+
+The current package recommends and measures inference configurations, rejects
+quality failures, and returns a live runner. General workload optimization and
+ModelOpt integration are development goals, not completed capabilities. See the
+[research direction and ModelOpt benchmark proposal](docs/modelopt-search-proposal-2026-09-28.md).
 
 ## Start here: clone the notebook
 

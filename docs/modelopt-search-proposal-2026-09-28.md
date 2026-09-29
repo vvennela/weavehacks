@@ -4,6 +4,43 @@ Status: ModelOpt integration and backend-independent direction requested;
 benchmark rules pending user decision; no GPU experiments run.
 Date: 2026-09-28.
 
+## User-defined product goal
+
+Sera should be an autonomous research agent that optimizes ML workloads for the
+user's current hardware. This is the product direction, not a claim that the
+current package already supports arbitrary workloads or hardware.
+
+The user linked [Chris Short's ModelOpt post](https://x.com/ChrisShort/status/2104016943107731934),
+which lists quantization, distillation, pruning, neural architecture search, and
+speculative decoding. ModelOpt supplies implemented methods within these
+families for its supported stack. The families provide a starting vocabulary for
+Sera's research; they do not define all possible optimizations or make their
+implementations portable to every device.
+
+The intended research loop is:
+
+1. Inspect the supplied workload, available hardware, and installed runtime.
+2. Establish a reproducible baseline and identify measured bottlenecks.
+3. Use technique families and prior evidence to form concrete hypotheses.
+4. Build or configure an experiment through a compatible execution adapter.
+5. Check correctness or task quality, then measure performance and resource use.
+6. Use the result to revise hypotheses, investigate combinations, and choose the
+   next experiment within the user's fixed limits.
+7. Confirm the selected artifact on fresh measurements and return it with evidence,
+   or report that no verified improvement was found.
+
+For each technique, distinguish its purpose, its prerequisites, the available
+implementation, and measured support on the current device. For example,
+quantization is a technique family; a ModelOpt recipe and an MLX implementation
+are distinct execution paths. A smaller checkpoint alone does not establish a
+faster workload.
+
+ModelOpt is both a source of technique knowledge and an execution tool where
+supported. Sera owns the research loop across available tools. This direction
+does not authorize new compute spending, altered quality gates, or training
+budgets. Distillation and training-based methods require resources and data that
+must be part of the declared experiment contract.
+
 ## Question
 
 Does Sera choose better ModelOpt experiments than a non-agent search under the
@@ -13,6 +50,14 @@ the cost of finding and preparing that artifact?
 
 These are different comparisons. A faster model than stock AutoQuantize alone
 does not establish that agents search better than grid or random search.
+
+The fixed-candidate comparison below tests experiment selection only. It does
+not fully test the product goal of generating and revising experiments. Keep it
+as a controlled first comparison. A subsequent live research comparison must
+allow hypothesis-driven experiments and measure the full preparation and search
+cost against non-agent methods with the same allowed tools and resources. Its
+experiment rules remain pending; do not present replay results as proof of that
+broader capability.
 
 ## Findings
 
