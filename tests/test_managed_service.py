@@ -226,3 +226,15 @@ time.sleep(60)
         if process.poll() is None:
             process.kill()
         process.wait(timeout=5)
+
+
+def test_changed_job_contract_never_reaches_controller(manager):
+    with manager._mutex:
+        job = manager.submit('one', 'fixture', 'changed-contract')
+        folder = manager.folder / job['job_id']
+        request = json.loads((folder / 'request.json').read_text())
+        request['profile']['constraints']['quality_floor'] = 0.1
+        (folder / 'request.json').write_text(json.dumps(request))
+    wait_for(lambda: manager.get('one', job['job_id'])['status'] not in service.ACTIVE)
+    assert manager.get('one', job['job_id'])['status'] == 'failed'
+    assert not (folder / 'environment.json').exists()

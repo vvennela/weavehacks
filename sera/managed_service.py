@@ -21,7 +21,7 @@ from .model_artifact import verify_artifact
 from .native_optimizer import NativeProfile
 from .process_ownership import LIFETIME_FD, terminate_group, tree_is_alive
 from .runtime import INFERENCE_ENVIRONMENT_VARIABLES
-from .storage import save_json
+from .storage import content_hash, save_json
 
 ACTIVE = {'pending', 'running', 'interrupted', 'cleanup-blocked'}
 IDENTIFIER = re.compile(r'^[a-zA-Z0-9_-]{1,128}$')
@@ -151,13 +151,14 @@ class ManagedService:
             if any(job['status'] in ACTIVE for job in jobs):
                 raise ServiceError(429, 'The MLX worker is busy')
             profile = self.profiles[profile_id]
+            request = {'profile': profile.model_dump(), 'project': self.project}
             job = {'job_id': uuid.uuid4().hex, 'owner': owner, 'request_id': request_id,
                    'profile_id': profile_id, 'status': 'pending', 'result': None,
                    'created_at': time.time(), 'deadline': time.time() + profile.max_run_seconds,
-                   'cancel_requested': False, 'pid': None}
+                   'cancel_requested': False, 'pid': None, 'request_hash': content_hash(request)}
             folder = self.folder / job['job_id']
             folder.mkdir(mode=0o700)
-            save_json(folder / 'request.json', {'profile': profile.model_dump(), 'project': self.project})
+            save_json(folder / 'request.json', request)
             self._save(job)
             return self._public(job)
 
@@ -216,6 +217,8 @@ class ManagedService:
         deadline = time.monotonic() + max(0, job['deadline'] - time.time())
         outcome, result = 'failed', None
         try:
+            if content_hash(json.loads((folder / 'request.json').read_text())) != job.get('request_hash'):
+                raise ValueError('The accepted workload contract changed on disk')
             with (folder / 'controller.log').open('a') as log:
                 with self._mutex:
                     current = self._owned(job['owner'], job['job_id'])
