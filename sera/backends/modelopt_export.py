@@ -7,6 +7,7 @@ This module does not claim GPU compatibility, quality, or memory improvement.
 import gc
 import json
 import platform
+import shutil
 import time
 from copy import deepcopy
 from importlib.metadata import version
@@ -109,6 +110,38 @@ def check_modelopt_export(folder, recipe):
             raise ValueError('NVFP4 weights are missing their second scale')
 
 
+
+def _copy_bf16_reference(snapshot, destination):
+    """Copy exact BF16 source bytes without materializing weights on the GPU."""
+    from safetensors import safe_open
+    snapshot = Path(snapshot)
+    names = set()
+    for shard in sorted(snapshot.glob('*.safetensors')):
+        with safe_open(str(shard), framework='numpy') as weights:
+            for name in weights.keys():  # noqa: SIM118 - safetensors reader is not a mapping
+                if name in names:
+                    raise ValueError('Duplicate tensors across reference checkpoint shards')
+                if weights.get_slice(name).get_dtype() != 'BF16':
+                    return False
+                names.add(name)
+    if not names:
+        return False
+    destination.mkdir()
+    for path in sorted(snapshot.iterdir()):
+        if path.is_file() and path.suffix in {'.json', '.safetensors', '.txt', '.jinja', '.model'}:
+            # Independent files: changing an exported checkpoint cannot mutate
+            # the shared source cache. Never copy executable remote model code.
+            shutil.copyfile(path, destination / path.name)
+    return True
+
+
+def _seal_prepared_model(destination, source, recipe, started):
+    check_modelopt_export(destination, recipe)
+    versions = {name:version(name) for name in ('torch','transformers','nvidia-modelopt','safetensors')}
+    manifest = seal_artifact(destination, backend='cuda', source=source.model_dump(),
+                             recipe=recipe.model_dump(), versions=versions)
+    return {'artifact':manifest, 'preparation_seconds':time.perf_counter()-started}
+
 def prepare_modelopt(*, source, destination, recipe):
     source = ModelDescriptor.model_validate(source)
     recipe = ModelOptRecipe.model_validate(recipe)
@@ -122,6 +155,8 @@ def prepare_modelopt(*, source, destination, recipe):
     snapshot = snapshot_download(repo_id=source.model_id, revision=source.revision,
         allow_patterns=['*.json', '*.safetensors', '*.txt', '*.jinja', '*.model'])
     check_modelopt_export(snapshot, ModelOptRecipe())
+    if recipe.format == 'bf16' and _copy_bf16_reference(snapshot, destination):
+        return _seal_prepared_model(destination, source, recipe, started)
     model = tokenizer = None
     try:
         model = AutoModelForCausalLM.from_pretrained(snapshot, local_files_only=True,
@@ -152,11 +187,7 @@ def prepare_modelopt(*, source, destination, recipe):
                 export_hf_checkpoint(model, dtype=torch.bfloat16, export_dir=str(destination))
         tokenizer.save_pretrained(str(destination))
         torch.cuda.synchronize()
-        check_modelopt_export(destination, recipe)
-        versions = {name:version(name) for name in ('torch','transformers','nvidia-modelopt','safetensors')}
-        manifest = seal_artifact(destination, backend='cuda', source=source.model_dump(),
-                                 recipe=recipe.model_dump(), versions=versions)
-        return {'artifact':manifest, 'preparation_seconds':time.perf_counter()-started}
+        return _seal_prepared_model(destination, source, recipe, started)
     finally:
         model = tokenizer = None
         gc.collect()

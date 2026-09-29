@@ -154,3 +154,45 @@ def test_modelopt_export_pins_source_calibrates_and_seals_packed_files(tmp_path,
     assert calls[1][1]=='Calibration input.'
     assert calls[1][2]['max_length']==32
     assert calls[1][2]['add_special_tokens'] is False
+
+
+def test_bf16_reference_preserves_source_weights_without_gpu_round_trip(tmp_path, monkeypatch):
+    import struct
+    import sys
+    source = {'model_id': 'fixture/bf16', 'revision': 'a' * 40}
+    snapshot = tmp_path / 'snapshot'
+    snapshot.mkdir()
+    (snapshot / 'config.json').write_text('{"dtype":"bfloat16"}')
+    (snapshot / 'tokenizer.json').write_text('{}')
+    (snapshot / 'remote_code.py').write_text('must not be copied')
+    header = json.dumps({'weight': {'dtype': 'BF16', 'shape': [2], 'data_offsets': [0, 4]}}).encode()
+    header += b' ' * (-len(header) % 8)
+    weights = struct.pack('<Q', len(header)) + header + bytes(4)
+    (snapshot / 'model.safetensors').write_bytes(weights)
+    def unexpected_load(*args, **kwargs):
+        pytest.fail('An already BF16 reference must not load on the GPU to be copied')
+    monkeypatch.setattr(export, '_runtime', lambda recipe: SimpleNamespace(
+        bfloat16='bf16', cuda=SimpleNamespace(empty_cache=lambda: None)))
+    monkeypatch.setattr(export, 'version', lambda name: 'fixture')
+    monkeypatch.setitem(sys.modules, 'huggingface_hub', SimpleNamespace(snapshot_download=lambda **kwargs: str(snapshot)))
+    monkeypatch.setitem(sys.modules, 'transformers', SimpleNamespace(
+        AutoModelForCausalLM=SimpleNamespace(from_pretrained=unexpected_load),
+        AutoTokenizer=SimpleNamespace(from_pretrained=unexpected_load)))
+    destination = tmp_path / 'export'
+    result = export.prepare_modelopt(source=source, destination=destination, recipe=export.ModelOptRecipe())
+    assert (destination / 'model.safetensors').read_bytes() == weights
+    assert (destination / 'model.safetensors').stat().st_ino != (snapshot / 'model.safetensors').stat().st_ino
+    assert not (destination / 'remote_code.py').exists()
+    assert result['artifact']['source'] == source
+    from sera.model_artifact import verify_artifact
+    verify_artifact(destination, expected_id=result['artifact']['artifact_id'], backend='cuda')
+
+
+@pytest.mark.parametrize('dtype', [np.float16, np.float32, np.uint8])
+def test_reference_copy_does_not_mislabel_other_weight_types_as_bf16(tmp_path, dtype):
+    snapshot = tmp_path / 'snapshot'
+    snapshot.mkdir()
+    save_file({'weight': np.zeros((2,), dtype=dtype)}, str(snapshot / 'model.safetensors'))
+    destination = tmp_path / 'export'
+    assert export._copy_bf16_reference(snapshot, destination) is False
+    assert not destination.exists()
