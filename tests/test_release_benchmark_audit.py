@@ -50,3 +50,41 @@ def test_regrading_rejects_missing_or_duplicate_prompt_slots():
     result = audit_task_outputs(cases, trial)
     assert result['gate_passed'] is False
     assert result['saved_gate_matches'] is False
+
+
+def audit_fixture(tmp_path):
+    from benchmarks.release_audit import TASK_SOURCES
+
+    paths = [f'evidence/{name}/result.json' for name in TASK_SOURCES]
+    paths += ['evidence/pressure-v1/result.json', 'benchmarks/grade.py',
+              'benchmarks/search.py', 'benchmarks/release_audit.py', 'sera/measurement.py']
+    for relative in paths:
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((ROOT / relative).read_bytes())
+    return tmp_path
+
+
+def test_manifest_discovery_reports_broken_evidence_without_hiding_it(tmp_path):
+    import hashlib
+
+    root = audit_fixture(tmp_path)
+    broken = root / 'evidence/failed-response.json'
+    broken.write_bytes(b'')
+    report = audit_release(root)
+    scan = report['search_replay']
+    assert scan['manifest_scan_complete'] is False
+    assert scan['manifest_scan_errors'] == [{
+        'path': 'evidence/failed-response.json', 'error': 'JSONDecodeError',
+        'bytes': 0, 'sha256': hashlib.sha256(b'').hexdigest()}]
+    assert scan['status'] == 'blocked'
+    assert broken.read_bytes() == b''
+
+
+def test_corrupt_required_source_still_fails_the_audit(tmp_path):
+    import json
+
+    root = audit_fixture(tmp_path)
+    (root / 'evidence/verified-agent-v1/result.json').write_bytes(b'')
+    with pytest.raises(json.JSONDecodeError):
+        audit_release(root)

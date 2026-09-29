@@ -116,11 +116,18 @@ def audit_release(repo_root):
     for path in ['benchmarks/grade.py', 'benchmarks/search.py', 'benchmarks/release_audit.py',
                  'sera/measurement.py']:
         source(path)
-    manifests = []
+    manifests, scan_errors = [], []
     for path in sorted((root / 'evidence').rglob('*.json')):
         if 'release-benchmark-audit' in path.parts:
             continue
-        record = json.loads(path.read_bytes())
+        entry = dict(path=str(path.relative_to(root)))
+        try:
+            raw = path.read_bytes()
+            entry.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
+            record = json.loads(raw)
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            scan_errors.append(entry | dict(error=type(error).__name__))
+            continue
         if isinstance(record, dict) and {'manifest_hash', 'candidates', 'identity', 'baseline'} <= record.keys():
             manifests.append(str(path.relative_to(root)))
     return dict(schema_version='sera-release-benchmark-audit-v1',
@@ -132,6 +139,7 @@ def audit_release(repo_root):
         search_replay=dict(status='blocked', grid_runs=0, random_runs=0,
             manifest_scan_scope='evidence/**/*.json, excluding this audit directory',
             frozen_manifest_files=manifests,
+            manifest_scan_complete=not scan_errors, manifest_scan_errors=scan_errors,
             blockers=[
                 'No audited pre-collection frozen manifest and complete measured outcome envelopes were supplied.',
                 'The recorded strict Qwen3-0.6B baseline passes 2/8 tasks and fails its 0.99 quality floor.',
