@@ -80,7 +80,7 @@ def test_structured_generation_records_exact_format_and_uses_fresh_processor(mon
         return processor
     def stream(model, tokenizer, tokens, **kwargs):
         assert kwargs['logits_processors'] == [processors[-1]]
-        yield SimpleNamespace(text='{"answer": 17}', token=9)
+        yield SimpleNamespace(text='{"answer": 17}', token=9, finish_reason='stop')
     monkeypatch.setattr(mlx, '_json_processor', build)
     monkeypatch.setattr(mlx, '_runtime', lambda: SimpleNamespace(
         synchronize=lambda: None, random=SimpleNamespace(seed=lambda seed: None)))

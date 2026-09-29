@@ -1,0 +1,85 @@
+"""Native results must prove complete, comparable measurements before selection."""
+
+from copy import deepcopy
+
+import pytest
+
+from sera.config import Constraints, Objective
+from sera.measurement import select_candidate
+from sera.native_measurement import native_trial
+
+
+def measurement():
+    return {'artifact_id': 'a' * 64, 'device': {'device_name': 'fixture'},
+            'runtime_versions': {'mlx': 'fixture'},
+            'controls': {'seed': 0, 'max_tokens': 64, 'warmup': 1, 'repetitions': 3,
+                         'sampling': 'greedy', 'concurrency': 1,
+                         'response_formats': None, 'response_format_version': None},
+            'request_wall_seconds': 0.1,
+            'memory': {'metric': 'mlx-active-allocator-bytes', 'resident_bytes': 50,
+                       'peak_bytes': 100, 'active_bytes': 50, 'cache_bytes': 10,
+                       'scope': 'MLX allocator; not system-wide unified memory or free VRAM'},
+            'requests': [{'repetition': r, 'prompt_index': i, 'text': 'correct',
+                          'error': None, 'latency_ms': 10.0, 'token_ids': [3],
+                          'prompt_token_ids': [i + 1], 'response_format': None,
+                          'finish_reason': 'stop'} for r in range(3) for i in range(2)]}
+
+
+def trial(raw):
+    return native_trial(raw, prompts=['first', 'second'], evaluator=lambda p, t: t == 'correct',
+                        evaluation_version='fixture-v1', floor=0.99,
+                        artifact_id='a' * 64, controls=measurement()['controls'], trial_id='test')
+
+
+def test_valid_native_result_uses_all_requests_and_real_window():
+    result = trial(measurement())
+    assert result['status'] == 'collected'
+    assert result['task_quality']['mean'] == 1
+    assert len(result['task_quality']['per_prompt']) == 6
+    assert result['reduced']['output_tokens_per_second'] == 60
+    assert result['input_token_ids'] == [[1], [2]]
+    assert result['runtime']['memory']['metric'] == 'mlx-active-allocator-bytes'
+
+
+@pytest.mark.parametrize('mutation', ['missing', 'duplicate', 'empty', 'nan', 'error',
+                                    'artifact', 'tokens', 'format', 'controls', 'finish', 'window'])
+def test_invalid_measurements_cannot_pass_existing_selection_gates(mutation):
+    raw = measurement()
+    if mutation == 'missing': raw['requests'].pop()
+    if mutation == 'duplicate': raw['requests'][-1] = deepcopy(raw['requests'][0])
+    if mutation == 'empty': raw['requests'][-1]['text'] = ''
+    if mutation == 'nan': raw['requests'][-1]['latency_ms'] = float('nan')
+    if mutation == 'error': raw['requests'][-1]['error'] = 'failed'
+    if mutation == 'artifact': raw['artifact_id'] = 'b' * 64
+    if mutation == 'tokens': raw['requests'][-1]['prompt_token_ids'] = [999]
+    if mutation == 'format': raw['requests'][-1]['response_format'] = {}
+    if mutation == 'controls': raw['controls']['seed'] = 42
+    if mutation == 'finish': raw['requests'][-1]['finish_reason'] = 'error'
+    if mutation == 'window': raw['request_wall_seconds'] = 0
+    raw['memory']['peak_bytes'] = 70
+    candidate = trial(raw)
+    decision = select_candidate(trial(measurement()), candidate,
+        objective=Objective(priority='memory'), constraints=Constraints(quality_floor=0.99))
+    assert candidate['status'] != 'collected'
+    assert decision['selected'] == 'baseline'
+
+
+def test_later_quality_failure_is_not_hidden_by_first_repetition():
+    raw = measurement()
+    raw['requests'][-1]['text'] = 'wrong'
+    result = trial(raw)
+    assert result['task_quality']['mean'] == pytest.approx(5/6)
+    assert result['task_quality']['passed'] is False
+
+
+@pytest.mark.parametrize('mutation', ['missing', 'negative', 'incoherent', 'boolean', 'scope'])
+def test_invalid_memory_remains_unavailable(mutation):
+    raw = measurement()
+    if mutation == 'missing': raw['memory'].pop('cache_bytes')
+    if mutation == 'negative': raw['memory']['resident_bytes'] = -1
+    if mutation == 'incoherent': raw['memory']['peak_bytes'] = 1
+    if mutation == 'boolean': raw['memory']['peak_bytes'] = True
+    if mutation == 'scope': raw['memory']['metric'] = 'unknown'
+    result = trial(raw)
+    assert result['runtime']['telemetry_errors'] != 0
+    assert result['runtime']['sampled_peak_memory_mib'] is None

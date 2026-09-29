@@ -114,15 +114,17 @@ class MLXModel:
         processors = ([_json_processor(self.model, self.tokenizer, response_format)]
                       if response_format is not None else None)
         pieces, tokens = [], []
+        finish_reason = None
         for response in stream_generate(self.model, self.tokenizer, input_ids,
                                         max_tokens=max_tokens, sampler=make_sampler(temp=0.0),
                                         logits_processors=processors):
             pieces.append(response.text)
             tokens.append(response.token)
+            finish_reason = response.finish_reason
         mx.synchronize()
         return {'text': ''.join(pieces), 'token_ids': tokens, 'prompt_token_ids': input_ids,
                     'latency_ms': (time.perf_counter() - started) * 1000, 'error': None,
-                    'response_format': response_format}
+                    'response_format': response_format, 'finish_reason': finish_reason}
 
     def measure(self, prompts, *, max_tokens, seed, warmup, repetitions,
                 response_formats=None, response_format_version=None):
@@ -141,12 +143,16 @@ class MLXModel:
         mx.reset_peak_memory()
         resident = mx.get_active_memory()
         rows = []
+        started = time.perf_counter()
         for repetition in range(repetitions):
             for index, prompt in enumerate(prompts):
                 rows.append(dict(repetition=repetition, prompt_index=index,
                                  **generate(index, prompt)))
         mx.synchronize()
         return {'artifact_id': self.manifest['artifact_id'], 'requests': rows,
+                    'request_wall_seconds': time.perf_counter() - started,
+                    'runtime_versions': {name: version(name) for name in
+                                         ('mlx', 'mlx-lm', 'transformers', 'outlines')},
                     'controls': {'seed': seed, 'max_tokens': max_tokens, 'warmup': warmup,
                                   'repetitions': repetitions, 'sampling': 'greedy', 'concurrency': 1,
                                   'response_formats': formats,
