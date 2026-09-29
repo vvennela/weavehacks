@@ -106,7 +106,15 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
     try:
         while True:
             if on_update is not None:
-                on_update(job)
+                try:
+                    on_update(job)
+                except Exception as error:
+                    if job['status'] in {'pending', 'running', 'interrupted'}:
+                        try:
+                            client.cancel(job['job_id'])
+                        except SeraServiceError:
+                            error.add_note(f"Cancellation could not reach Sera; job ID: {job['job_id']}")
+                    raise
             if job['status'] == 'completed':
                 result = job['result']
                 if not result.get('trace', {}).get('remote_verified'):

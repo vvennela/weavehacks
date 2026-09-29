@@ -47,6 +47,17 @@ def test_keyboard_interrupt_requests_cancellation(manager, endpoint):
     wait_for(lambda: manager.get('one', jobs[0])['status'] == 'cancelled')
 
 
+def test_progress_callback_failure_cancels_owned_job(manager, endpoint):
+    (manager.folder / 'stall').touch()
+    jobs = []
+    def fail(job):
+        jobs.append(job['job_id'])
+        raise RuntimeError('Display failed')
+    with pytest.raises(RuntimeError, match='Display failed'):
+        Optimize('fixture', api_key=TOKEN, endpoint=endpoint, on_update=fail)
+    wait_for(lambda: manager.get('one', jobs[0])['status'] == 'cancelled')
+
+
 def test_client_never_sends_key_to_unencrypted_remote_host():
     with pytest.raises(ValueError, match='loopback'):
         SeraClient(api_key=TOKEN, endpoint='http://example.com')
