@@ -46,3 +46,21 @@ def test_summary_reports_tie_and_includes_agent_time():
     assert result['complete'] is True
     assert result['sera_beats_fixed'] is False
     assert result['policy_summary']['sera']['median_wall_seconds'] == 20
+
+
+def test_heldout_gate_rejects_invalid_quality_and_uses_heldout_constraints(monkeypatch):
+    from types import SimpleNamespace
+
+    from benchmarks import native_search as search
+    profile = SimpleNamespace(constraints='heldout-constraints',
+                              retention=SimpleNamespace(quality=.95, throughput=.95))
+    monkeypatch.setattr(search, 'objective_value', lambda trial, metric: trial[metric])
+    monkeypatch.setattr(search, 'constraint_failures',
+                        lambda trial, constraints: [] if constraints == 'heldout-constraints' else ['wrong'])
+    good = {'memory': 100, 'throughput': 10,
+            'task_quality': {'mean': 1., 'passed': True, 'valid_outputs': True}}
+    bad = {**good, 'task_quality': {'mean': 1., 'passed': False, 'valid_outputs': False}}
+    assert search.heldout_passes(good, good, profile)
+    assert not search.heldout_passes(good, bad, profile)
+    assert not search.heldout_passes(good, {**good, 'memory': None}, profile)
+    assert not search.heldout_passes(good, {**good, 'throughput': 9.4}, profile)

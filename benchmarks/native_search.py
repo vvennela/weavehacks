@@ -12,7 +12,7 @@ import time
 from copy import deepcopy
 from pathlib import Path
 
-from sera.measurement import objective_value
+from sera.measurement import constraint_failures, objective_value
 from sera.model_artifact import verify_artifact
 from sera.native_agent import NativeProposal
 from sera.native_measurement import native_trial
@@ -92,7 +92,27 @@ def measure_holdout(profile, artifact, folder):
         artifact_id=artifact['artifact_id'], controls=controls, trial_id=folder.name)
 
 
+def power_state():
+    battery = subprocess.check_output(['pmset', '-g', 'batt'], text=True).splitlines()[0]
+    settings = subprocess.check_output(['pmset', '-g', 'custom'], text=True)
+    return {'source': battery, 'settings': settings}
+
+
+def heldout_passes(baseline, candidate, profile):
+    quality = [item.get('task_quality', {}) for item in (baseline, candidate)]
+    speeds = [objective_value(item, 'throughput') for item in (baseline, candidate)]
+    memory = [objective_value(item, 'memory') for item in (baseline, candidate)]
+    if (any(constraint_failures(item, profile.constraints) for item in (baseline, candidate))
+            or any(not q.get('passed') or not q.get('valid_outputs') for q in quality)
+            or any(value is None or value <= 0 for value in speeds + memory)
+            or quality[0].get('mean', 0) <= 0):
+        return False
+    return (quality[1]['mean'] >= quality[0]['mean'] * profile.retention.quality
+            and speeds[1] >= speeds[0] * profile.retention.throughput)
+
+
 def run_one(args):
+    before = power_state()
     started = time.monotonic()
     profile = NativeProfile.model_validate_json(Path(args.profile).read_text())
     heldout = NativeProfile.model_validate_json(Path(args.heldout).read_text())
@@ -120,14 +140,16 @@ def run_one(args):
         bs, cs = objective_value(baseline, 'throughput'), objective_value(candidate, 'throughput')
         row.update(heldout_trace=checked['trace'], heldout_baseline_quality=bq,
             heldout_candidate_quality=cq, heldout_baseline_throughput=bs, heldout_candidate_throughput=cs,
-            heldout_passed=bool(baseline['status'] == candidate['status'] == 'collected'
-                and bq > 0 and bs and cs and cq >= bq * profile.retention.quality
-                and cs >= bs * profile.retention.throughput),
-            memory_fraction=objective_value(candidate, 'memory') / objective_value(baseline, 'memory'),
+            heldout_passed=heldout_passes(baseline, candidate, heldout),
+            memory_fraction=(objective_value(candidate, 'memory') / objective_value(baseline, 'memory')
+                if objective_value(candidate, 'memory') and objective_value(baseline, 'memory') else None),
             baseline_peak_bytes=baseline['runtime']['memory']['peak_bytes'],
             selected_peak_bytes=candidate['runtime']['memory']['peak_bytes'],
             artifact_id=chosen['artifact_id'], artifact_path=chosen['path'])
         row['native_jobs'] += 2
+    row['power_before'], row['power_after'] = before, power_state()
+    row['power_unchanged'] = row['power_before'] == row['power_after']
+    row['heldout_passed'] = row['heldout_passed'] and row['power_unchanged']
     row['wall_seconds'] = time.monotonic() - started
     save_json(folder / 'row.json', row)
 
@@ -162,7 +184,7 @@ def run_comparison(args):
         registration = {'profile': json.loads(Path(args.profile).read_text()),
             'heldout': json.loads(Path(args.heldout).read_text()), 'order': plan_blocks(3),
             'seed_by_block': [0, 1, 2], 'deadline_unix': args.deadline,
-            'start_unix': time.time(), 'power': subprocess.check_output(['pmset', '-g', 'batt'], text=True),
+            'start_unix': time.time(), 'power': power_state(),
             'claim_rule': 'All three paired blocks pass heldout gates and show >5% lower memory.'}
         registration['hash'] = content_hash(registration)
         save_json(root / 'registration.json', registration)
@@ -189,6 +211,10 @@ def run_comparison(args):
                 row = json.loads(path.read_text()) if path.exists() else {
                     'block': block, 'policy': policy, 'status': 'failed', 'exit_code': process.returncode}
                 retain_artifact(row, root, folder)
+                if row.get('power_before') != registration['power']:
+                    row['heldout_passed'] = False
+                    row['power_matches_registration'] = False
+                save_json(folder / 'row.json', row)
                 rows.append(row)
                 save_json(root / 'results.json', {'rows': rows, 'summary': summarize(rows, blocks=3)})
                 print(json.dumps(row), flush=True)

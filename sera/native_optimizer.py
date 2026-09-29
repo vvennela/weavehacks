@@ -344,7 +344,13 @@ class _Research:
             self.prepare('baseline', self.profile.baseline_recipe())
             baseline = self.measure('baseline', 'baseline')
             self.report['baseline'] = baseline
-            if constraint_failures(baseline, self.profile.constraints) or objective_value(baseline, 'memory') is None:
+            retention_values = [baseline.get('task_quality', {}).get('mean'),
+                                objective_value(baseline, 'throughput')]
+            invalid_retention = self.profile.retention is not None and any(
+                type(value) not in (int, float) or not math.isfinite(value) or value <= 0
+                for value in retention_values)
+            if (constraint_failures(baseline, self.profile.constraints)
+                    or objective_value(baseline, 'memory') is None or invalid_retention):
                 self.report['status'] = 'baseline-failed'
                 return self.report
             self.select('baseline')

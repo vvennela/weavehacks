@@ -338,3 +338,21 @@ def test_relative_quality_gate_uses_baseline_score_not_absolute_95_percent(tmp_p
                                    project='fixture/project', agent=Agent())
     assert result['selected_recipe_id'] == 'q8'
     assert result['trials'][1]['decision']['constraints']['quality_floor'] == pytest.approx(0.95 * 2/3)
+
+
+def test_relative_retention_requires_useful_baseline(tmp_path, runtime, monkeypatch):
+    value = profile()
+    value['constraints']['quality_floor'] = 0.0
+    value['retention'] = {'quality': 0.95, 'throughput': 0.95}
+    worker = native.run_native_job
+    def wrong_answers(job, **kwargs):
+        result = worker(job, **kwargs)
+        if job['operation'] == 'measure':
+            for request in result['requests']:
+                request['text'] = '{"answer":99}'
+        return result
+    monkeypatch.setattr(native, 'run_native_job', wrong_answers)
+    result = native.optimize_native(profile=value, output_dir=tmp_path/'run',
+                                    project='fixture/project', agent=Agent())
+    assert result['status'] == 'baseline-failed'
+    assert result['selected_artifact_id'] is None
