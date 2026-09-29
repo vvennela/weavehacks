@@ -122,3 +122,12 @@ def test_rocm_jobs_validate_their_own_recipe_and_dispatch(monkeypatch):
     request['recipe']['bits'] = 8
     with pytest.raises(ValueError):
         worker.JOB.validate_python(request)
+
+
+def test_cuda_export_dispatch_uses_modelopt_recipe(monkeypatch):
+    from sera import native_worker as worker
+    monkeypatch.setattr(worker, 'prepare_modelopt', lambda **kwargs:{'recipe':kwargs['recipe'].format})
+    job = worker.JOB.validate_python({'operation':'prepare','backend':'cuda',
+        'source':{'model_id':'Qwen/Qwen3-0.6B','revision':'a'*40},
+        'destination':'/not-written','recipe':{'format':'bf16'}})
+    assert worker._execute(job) == {'recipe':'bf16'}

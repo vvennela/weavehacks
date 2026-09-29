@@ -1,4 +1,4 @@
-"""Disposable local MLX jobs. This is a process boundary, not a remote service.
+"""Disposable native jobs. This is a process boundary, not a remote service.
 
 The operator supplies a deadline and owns the job directory. The worker receives
 no W&B or agent key, never grades answers, and cannot select a winning artifact.
@@ -18,6 +18,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from .backends.mlx import MLXBackend, MLXRecipe
+from .backends.modelopt_export import ModelOptRecipe, prepare_modelopt
 from .backends.rocm import ROCmBackend, ROCmRecipe
 from .hardware import ModelDescriptor
 from .placement_decoding import validate_formats
@@ -42,6 +43,11 @@ class PrepareJob(BaseModel):
 class ROCmPrepareJob(PrepareJob):
     backend: Literal['rocm']
     recipe: ROCmRecipe
+
+
+class CUDAPrepareJob(PrepareJob):
+    backend: Literal['cuda']
+    recipe: ModelOptRecipe
 
 
 class MeasureJob(BaseModel):
@@ -72,7 +78,7 @@ class MeasureJob(BaseModel):
         return self
 
 
-PREPARE_JOB = Annotated[PrepareJob | ROCmPrepareJob, Field(discriminator='backend')]
+PREPARE_JOB = Annotated[PrepareJob | ROCmPrepareJob | CUDAPrepareJob, Field(discriminator='backend')]
 JOB = TypeAdapter(Annotated[PREPARE_JOB | MeasureJob, Field(discriminator='operation')])
 
 
@@ -81,6 +87,8 @@ def _command(path):
 
 
 def _execute(job):
+    if isinstance(job, CUDAPrepareJob):
+        return prepare_modelopt(source=job.source, destination=job.destination, recipe=job.recipe)
     backend = MLXBackend() if job.backend == 'mlx' else ROCmBackend()
     if isinstance(job, PrepareJob):
         return backend.prepare(source=job.source, destination=job.destination, recipe=job.recipe)

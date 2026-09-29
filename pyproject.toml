@@ -36,6 +36,12 @@ rocm = [
     "transformers==5.17.0", "outlines==1.3.3",
     "bitsandbytes==0.50.2", "accelerate>=1,<2",
 ]
+# Packed CUDA export. Real-device validation and an inference loader are required
+# before these exports can participate in managed optimization.
+modelopt = [
+    "nvidia-modelopt==0.46.1; sys_platform == 'linux'",
+    "transformers==5.17.0", "accelerate>=1,<2",
+]
 # Notebook presentation layer for the two-phase loop. Weave is deliberately absent:
 # the swarm extra pins it, and a second range here would only argue with that pin.
 demo = [
