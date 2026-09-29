@@ -131,6 +131,9 @@ def run_native_job(job, *, output_dir, timeout_seconds, cancelled=None):
     record = {'job_hash': content_hash(request), 'status': 'starting', 'cleanup_pass': False}
     save_json(folder / 'status.json', record)
     env = {key: os.environ[key] for key in INFERENCE_ENVIRONMENT_VARIABLES if key in os.environ}
+    # Absolute Python invocation does not activate its environment. Native
+    # runtimes also execute installed helpers such as ninja by their short name.
+    env['PATH'] = os.pathsep.join((str(Path(sys.executable).parent), env.get('PATH', os.defpath)))
     # Use the installed package, never inherit a caller's PYTHONPATH or executable hooks.
     process = None
     read_fd, write_fd = os.pipe()

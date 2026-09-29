@@ -39,6 +39,21 @@ assert not any(name in os.environ for name in ('WANDB_API_KEY','OPENAI_API_KEY',
     assert record['cleanup_pass'] is True
 
 
+def test_worker_finds_tools_installed_beside_its_python(tmp_path, monkeypatch):
+    monkeypatch.setenv('PATH', '/usr/bin:/bin')
+    command(monkeypatch, '''
+import json, subprocess, sys
+from pathlib import Path
+from sera.storage import content_hash
+path = Path(sys.argv[1]); request = json.loads(path.read_text())
+version = subprocess.check_output(['pytest', '--version'], text=True).strip()
+(path.parent/'output.json').write_text(json.dumps({'job_hash':content_hash(request),
+    'result':{'tool_found':version.startswith('pytest ')}}))
+''')
+    result = native_worker.run_native_job(job(), output_dir=tmp_path/'job', timeout_seconds=10)
+    assert result['tool_found']
+
+
 def test_timeout_stops_process_and_retains_failed_attempt(tmp_path, monkeypatch):
     command(monkeypatch, 'import time; time.sleep(30)')
     with pytest.raises(native_worker.NativeWorkerError, match='timeout'):
