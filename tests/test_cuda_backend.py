@@ -149,6 +149,21 @@ def test_device_assignment_preserves_inherited_visibility(monkeypatch):
     assert os.environ['CUDA_VISIBLE_DEVICES'] == UUID
 
 
+def test_direct_loader_finds_installed_tools_without_shell_activation(monkeypatch):
+    import subprocess
+    monkeypatch.setenv('PATH', '/usr/bin:/bin')
+    monkeypatch.setattr(cuda.platform, 'system', lambda: 'Linux')
+    monkeypatch.setattr(cuda, 'version', lambda name: '0.30.0')
+    monkeypatch.setattr(cuda, 'assign_device', lambda uuid: {
+        'name': 'fixture', 'compute_capability': '9.0', 'driver': 'fixture'})
+    monkeypatch.setattr(cuda, 'check_cuda_runtime', lambda *args: None)
+    monkeypatch.setitem(sys.modules, 'torch', SimpleNamespace(cuda=SimpleNamespace(
+        is_initialized=lambda: False,
+        get_device_properties=lambda index: SimpleNamespace(uuid=UUID, total_memory=1000))))
+    cuda._runtime(cuda.CUDAOptions.model_validate(options()), cuda.ModelOptRecipe())
+    assert subprocess.check_output(['pytest', '--version'], text=True).startswith('pytest ')
+
+
 def test_measurement_covers_every_request_and_keeps_frozen_runtime(tmp_path, monkeypatch):
     checkpoint(tmp_path)
     calls = install_runtime(monkeypatch)

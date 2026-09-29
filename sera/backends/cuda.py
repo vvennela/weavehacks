@@ -7,6 +7,7 @@ import gc
 import math
 import os
 import platform
+import sys
 import threading
 import time
 from importlib.metadata import version
@@ -53,6 +54,10 @@ def _runtime(options, recipe):
         raise RuntimeError('The CUDA adapter requires Linux and an assigned NVIDIA GPU')
     if version('vllm') != '0.30.0':
         raise RuntimeError('This CUDA loader requires vLLM 0.30.0')
+    # Direct ManagedResult.load() calls need the same installed compiler helpers
+    # as disposable workers, even when Python was invoked by an absolute path.
+    os.environ['PATH'] = os.pathsep.join((str(Path(sys.executable).parent),
+                                         os.environ.get('PATH', os.defpath)))
     import torch
     if torch.cuda.is_initialized():
         raise RuntimeError('Load CUDA checkpoints in a fresh process before CUDA initialization')
