@@ -305,3 +305,36 @@ def test_rocm_research_uses_same_quality_and_confirmation_gates(tmp_path, runtim
     assert result['selected_recipe_id'] == 'nf4'
     assert result['trials'][0]['confirmation']['decision']['selected'] == 'candidate'
     assert verify_artifact(result['artifact_path'])['backend'] == 'rocm'
+
+
+def test_relative_speed_gate_rejects_smaller_but_slower_checkpoint(tmp_path, runtime, monkeypatch):
+    original = native.run_native_job
+    def worker(job, **kwargs):
+        result = original(job, **kwargs)
+        if job['operation'] == 'measure' and verify_artifact(job['artifact'])['recipe']['bits'] == 8:
+            result['request_wall_seconds'] *= 2
+        return result
+    monkeypatch.setattr(native, 'run_native_job', worker)
+    value = profile()
+    value['retention'] = {'quality': 0.95, 'throughput': 0.95}
+    result = native.optimize_native(profile=value, output_dir=tmp_path/'relative',
+                                   project='fixture/project', agent=Agent())
+    assert result['selected_recipe_id'] == 'baseline'
+    assert 'throughput-requirement-failed' in result['trials'][1]['decision']['constraint_failures']['candidate']
+
+
+def test_relative_quality_gate_uses_baseline_score_not_absolute_95_percent(tmp_path, runtime, monkeypatch):
+    original = native.run_native_job
+    def worker(job, **kwargs):
+        result = original(job, **kwargs)
+        if job['operation'] == 'measure':
+            result['requests'][0]['text'] = '{"answer":999}'
+        return result
+    monkeypatch.setattr(native, 'run_native_job', worker)
+    value = profile()
+    value['constraints']['quality_floor'] = 0.0
+    value['retention'] = {'quality': 0.95, 'throughput': 0.95}
+    result = native.optimize_native(profile=value, output_dir=tmp_path/'relative',
+                                   project='fixture/project', agent=Agent())
+    assert result['selected_recipe_id'] == 'q8'
+    assert result['trials'][1]['decision']['constraints']['quality_floor'] == pytest.approx(0.95 * 2/3)

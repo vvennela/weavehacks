@@ -1,6 +1,7 @@
 """Operator-side native research using fixed profiles and existing quality gates."""
 
 import json
+import math
 import os
 import re
 import time
@@ -35,6 +36,12 @@ class NativeTask(BaseModel):
     response_format: dict | None = None
 
 
+class BaselineRetention(BaseModel):
+    model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False)
+    quality: float = Field(gt=0, le=1)
+    throughput: float = Field(gt=0, le=1)
+
+
 class NativeProfile(BaseModel):
     """An operator-owned contract; agent output cannot modify any of these fields."""
 
@@ -47,6 +54,7 @@ class NativeProfile(BaseModel):
     response_format_version: str | None = None
     recipes: dict[str, MLXRecipe]
     constraints: Constraints
+    retention: BaselineRetention | None = Field(default=None, exclude_if=lambda value: value is None)
     objective: Objective
     budget: Budget
     max_run_seconds: float = Field(gt=0)
@@ -173,6 +181,8 @@ class _Research:
                        'started_at_unix': time.time(), 'agent_calls_used': 0,
                        'trials': [], 'agent_calls': [], 'jobs': [], 'candidate_trials_used': 0,
                        'selected_recipe_id': None, 'selected_artifact_id': None, 'artifact_path': None}
+        if profile.retention is not None:
+            self.report['retention'] = profile.retention.model_dump()
         if isinstance(profile, CUDAProfile):
             self.report['execution']['runtime'] = profile.runtime.model_dump()
         self.previous_selected = None
@@ -287,8 +297,26 @@ class _Research:
         if (not a.get('device') or not a.get('versions') or a['device'] != b.get('device')
                 or a['versions'] != b.get('versions')):
             candidate['status'] = 'incompatible-measurement'
+        constraints = self.profile.constraints
+        if self.profile.retention is not None:
+            # Keep the original BF16 floor even when comparing two compressed
+            # candidates. A fresh BF16 control can strengthen it, never relax it.
+            controls = [self.report['baseline']]
+            if reference.get('recipe_id') == 'baseline':
+                controls.append(reference)
+            quality = [item.get('task_quality', {}).get('mean') for item in controls]
+            speed = [objective_value(item, 'throughput') for item in controls]
+            if any(type(value) not in (int, float) or not math.isfinite(value) or value <= 0
+                   for value in quality + speed):
+                candidate['status'] = 'invalid-retention-reference'
+            else:
+                constraints = constraints.model_copy(update={
+                    'quality_floor': max(constraints.quality_floor,
+                                         max(quality) * self.profile.retention.quality),
+                    'min_output_tokens_per_second': max(constraints.min_output_tokens_per_second or 0,
+                                         max(speed) * self.profile.retention.throughput)})
         return select_candidate(reference, candidate, objective=self.profile.objective,
-                                constraints=self.profile.constraints)
+                                constraints=constraints)
 
     def select(self, name):
         artifact = self.artifacts[name]
@@ -303,6 +331,7 @@ class _Research:
                     'status': trial['status'], 'quality': trial.get('task_quality'),
                     'memory': trial.get('runtime', {}).get('memory'), 'performance': trial.get('reduced')}
         return {'backend': self.profile.backend, 'objective': self.report['objective'], 'constraints': self.report['constraints'],
+                'retention': self.report.get('retention'),
                 'available_recipes': [{'recipe_id': key, 'recipe': self.profile.recipes[key].model_dump()}
                                       for key in available],
                 'trials': [metrics(self.report['baseline'])] +
