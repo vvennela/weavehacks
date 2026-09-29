@@ -27,6 +27,8 @@ def main():
     latest = {}
     def say(message):
         print(f'[{time.monotonic() - started:5.1f}s] {message}', flush=True)
+    def quality(value):
+        return f'{value:.1%}' if isinstance(value, (int, float)) else 'unavailable'
     def update(job):
         if not seen and job['status'] == 'completed':
             say('Restored completed research. The following measurements are recorded evidence.')
@@ -34,12 +36,16 @@ def main():
             seen.add(job['status'])
             say('Job: ' + job['status'])
         progress = job.get('progress', {})
-        measurements = progress.get('measurements', {})
+        measurements = (job.get('result') or {}).get('measurements') or progress.get('measurements', {})
         latest.update(measurements)
+        scope = measurements.get('scope')
+        if scope and 'scope' not in seen:
+            seen.add('scope')
+            say('Measurement scope: ' + scope)
         baseline = measurements.get('baseline', {})
         if baseline.get('peak_bytes') and 'baseline' not in seen:
             seen.add('baseline')
-            say(f"BF16 baseline: {baseline['peak_bytes'] / 2**30:.3f} GiB peak; quality {baseline['quality']:.1%}")
+            say(f"BF16 baseline: {baseline['peak_bytes'] / 2**30:.3f} GiB peak; quality {quality(baseline.get('quality'))}")
         for trial in measurements.get('trials', []):
             signature = json.dumps(trial, sort_keys=True)
             if signature in seen or trial['measurement']['peak_bytes'] is None:
@@ -47,10 +53,9 @@ def main():
             seen.add(signature)
             measurement = trial['measurement']
             say(f"{trial['recipe_id']}: {measurement['peak_bytes'] / 2**30:.3f} GiB peak; "
-                f"quality {measurement['quality']:.1%}; "
+                f"quality {quality(measurement.get('quality'))}; "
                 + ('confirmed' if trial['accepted'] else 'not promoted'))
     say('Sera will research smaller checkpoints and keep the fixed quality gate.')
-    say('Measurement scope: MLX allocator memory, with fixed tasks and repetitions.')
     result = Sera.Optimize(args.profile, api_key=key, endpoint=args.endpoint,
                            request_id=args.request_id, on_update=update)
     selected = next((trial for trial in latest.get('trials', [])
@@ -58,7 +63,7 @@ def main():
     if selected is not None:
         peak = max(selected['measurement']['peak_bytes'], selected['confirmation']['peak_bytes'])
         baseline = latest['baseline']['peak_bytes']
-        say(f'Peak allocator memory fell {1 - peak / baseline:.2%} versus the initial baseline.')
+        say(f'Measured peak memory fell {1 - peak / baseline:.2%} versus the initial baseline.')
     say(f'Selected {result.selected_recipe_id}; checking and loading its exported checkpoint.')
     with result.load() as model:
         output = model.generate([
