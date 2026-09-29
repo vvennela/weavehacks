@@ -21,7 +21,8 @@ dependencies = [
 dev = ["pytest>=8,<10", "ruff>=0.6"]
 agent = ["openai>=2,<4"]
 litellm = ["litellm==1.82.0"]
-swarm = ["weave==0.53.2", "openai>=2,<4"]
+# Weave creates httpx.BasicAuth. gql 4.4 can select httpx2 and reject that object.
+swarm = ["weave==0.53.2", "gql[httpx]==4.0.0", "openai>=2,<4"]
 # Tested native Apple runtime; inference workers do not need the swarm extra.
 mlx = [
     "mlx==0.32.3; sys_platform == 'darwin' and platform_machine == 'arm64'",

@@ -5490,6 +5490,7 @@ mlx = [
     { name = "transformers" },
 ]
 swarm = [
+    { name = "gql", extra = ["httpx"] },
     { name = "openai" },
     { name = "weave" },
 ]
@@ -5497,6 +5498,7 @@ swarm = [
 [package.metadata]
 requires-dist = [
     { name = "altair", marker = "extra == 'demo'", specifier = ">=5.0" },
+    { name = "gql", extras = ["httpx"], marker = "extra == 'swarm'", specifier = "==4.0.0" },
     { name = "litellm", marker = "extra == 'litellm'", specifier = "==1.82.0" },
     { name = "marimo", marker = "extra == 'demo'", specifier = ">=0.9" },
     { name = "mlx", marker = "platform_machine == 'arm64' and sys_platform == 'darwin' and extra == 'mlx'", specifier = "==0.32.3" },
