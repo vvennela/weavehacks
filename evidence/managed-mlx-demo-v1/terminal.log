@@ -1,0 +1,13 @@
+[  0.0s] Sera will research smaller checkpoints and keep the fixed quality gate.
+[  0.0s] Live measurements: MLX allocator memory, with fixed tasks and repetitions.
+[  0.0s] Job: pending
+[  1.0s] Job: running
+[ 24.1s] BF16 baseline: 1.295 GiB peak; quality 100.0%
+[ 44.3s] mlx-int4: 0.521 GiB peak; quality 87.5%; not promoted
+[ 66.5s] mlx-int8: 0.800 GiB peak; quality 100.0%; not promoted
+[ 94.7s] mlx-int8: 0.800 GiB peak; quality 100.0%; confirmed
+[ 99.8s] Job: completed
+[ 99.8s] Selected mlx-int8; checking and loading its exported checkpoint.
+[101.8s] Independent request: 7 + 8 → {"answer": 15}
+[101.8s] W&B trace: https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eecd-933f-72e2-bbe9-d5ec2f4120d9
+[101.8s] This demo shows the measured workflow. It does not establish an advantage over fixed search.

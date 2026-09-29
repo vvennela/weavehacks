@@ -1,0 +1,48 @@
+{
+  "schema_version": "sera-managed-demo-evidence-v1",
+  "job_id": "0fb5e98f54014514ac0c8d54b7f3508b",
+  "source_commit": "80e13aa",
+  "installation": "fresh venv; built wheel; execution from /tmp",
+  "wheel_sha256": "47291ffb856c16ed26b31a1bd98fa7d51fd948a0744e954451d1d5af01863dab",
+  "profile_id": "mlx-easy-compatibility-v1",
+  "profile_hash": "e65e118db5642b11dc896cf195751db1edd2d8aba9f41bb1146a32582a848563",
+  "memory_scope": "MLX allocator; not system-wide unified memory or free VRAM",
+  "baseline_peak_bytes": 1391002320,
+  "fresh_control_peak_bytes": 1390969552,
+  "candidate_peak_bytes": [
+    858981084,
+    858981084
+  ],
+  "conservative_peak_reduction_fraction": 0.38245874414366765,
+  "selected_recipe_id": "mlx-int8",
+  "selected_artifact_id": "57c2068daa7bf8566d5bb000519d495bc27745289e7ee0ecd391bed67100e1a8",
+  "quality": {
+    "mlx-int4": 0.875,
+    "mlx-int8": 1.0
+  },
+  "independent_request": {
+    "prompt": "What is 7 + 8?",
+    "result": {
+      "answer": 15
+    },
+    "passed": true
+  },
+  "client_demo_seconds": 101.8,
+  "research_seconds": 97.03836037497967,
+  "trace": {
+    "call_id": "01a0eecd-933f-72e2-bbe9-d5ec2f4120d9",
+    "trace_id": "01a0eecd-933e-7536-aba5-484aee386faa",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eecd-933f-72e2-bbe9-d5ec2f4120d9",
+    "remote_verified": true
+  },
+  "validation": {
+    "passed": 1931,
+    "skipped": 1,
+    "skip": "optional marimo notebook dependency"
+  },
+  "limitations": [
+    "Eight-case JSON workload; not broad model quality",
+    "No agent-versus-fixed-search advantage established",
+    "Local MLX service only; CUDA and ROCm unverified"
+  ]
+}
