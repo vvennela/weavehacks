@@ -219,7 +219,13 @@ def token_agreement(reference, candidate):
 
 def objective_value(trial, priority):
     if priority == "memory":
-        value = trial.get("runtime", {}).get("sampled_peak_memory_mib")
+        runtime = trial.get("runtime", {})
+        errors = runtime.get("telemetry_errors")
+        # A retained peak after a failed sample cannot establish a memory limit.
+        # Missing or malformed coverage information is not evidence of success.
+        if type(errors) is not int or errors != 0:
+            return None
+        value = runtime.get("sampled_peak_memory_mib")
     else:
         key = "p95_latency_ms" if priority == "latency" else "output_tokens_per_second"
         value = trial.get("reduced", {}).get(key)

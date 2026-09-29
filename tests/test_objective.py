@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from sera import Objective
+from sera import Constraints, Objective
 from sera.measurement import measured_frontier, select_candidate
 
 
@@ -12,7 +12,7 @@ def trial(trial_id, *, latency=100.0, throughput=100.0, memory=1000, token=7):
               "prompt_token_ids": [1], "error": None}
     return {"trial_id": trial_id, "status": "collected", "input_token_ids": [[1]],
             "quality": [output], "self_check": [output],
-            "runtime": {"sampled_peak_memory_mib": memory},
+            "runtime": {"sampled_peak_memory_mib": memory, "telemetry_errors": 0},
             "reduced": {"p95_latency_ms": latency, "output_tokens_per_second": throughput}}
 
 
@@ -51,6 +51,34 @@ def test_missing_or_invalid_objective_metric_does_not_approve_candidate(memory):
                                 objective=Objective(priority="memory"))
     assert decision["selected"] == "baseline"
     assert decision["reason"] == "objective-metric-unavailable"
+
+
+@pytest.mark.parametrize('telemetry', [{}, {'telemetry_errors': None},
+    {'telemetry_errors': 1}, {'telemetry_errors': -1}, {'telemetry_errors': False},
+    {'telemetry_errors': 0.0}, {'telemetry_errors': '0'}])
+def test_unverified_memory_cannot_approve_a_smaller_or_faster_candidate(telemetry):
+    baseline = trial('baseline')
+    candidate = trial('candidate', memory=500, latency=50.0)
+    candidate['runtime'] = {'sampled_peak_memory_mib': 500, **telemetry}
+
+    decision = select_candidate(baseline, candidate, objective=Objective(priority='memory'))
+    assert decision['selected'] == 'baseline'
+    assert decision['reason'] == 'objective-metric-unavailable'
+    assert decision['objective_improvement_fraction'] is None
+
+    for record in (baseline, candidate):
+        record['task_quality'] = {'valid_outputs': True, 'mean': 1.0}
+    constraints = Constraints(quality_floor=1.0, max_memory_mib=1100)
+    decision = select_candidate(baseline, candidate, constraints=constraints)
+    assert decision['selected'] == 'baseline'
+    assert 'memory-requirement-failed' in decision['constraint_failures']['candidate']
+    assert measured_frontier(baseline, candidate, constraints=constraints) == [baseline]
+
+
+def test_memory_sampling_failure_does_not_invalidate_unconstrained_latency_measurement():
+    baseline, candidate = trial('baseline'), trial('candidate', latency=50.0)
+    candidate['runtime']['telemetry_errors'] = 1
+    assert select_candidate(baseline, candidate)['selected'] == 'candidate'
 
 
 def test_frontier_excludes_dominated_candidates_but_keeps_incomplete_evidence():

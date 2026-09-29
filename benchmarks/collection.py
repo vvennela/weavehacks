@@ -7,7 +7,7 @@ import time
 
 from sera.config import (BASELINE_NAME, MODEL_ID, MODEL_REVISION, LARGE_MODEL_ID,
                          LARGE_MODEL_REVISION, RuntimeConfig, Workload)
-from sera.measurement import collect_trial, nearest_rank
+from sera.measurement import collect_trial, nearest_rank, objective_value
 from sera.quality import evaluate_quality
 from sera.runtime import GENERATION, SeraModel, gpu_snapshot
 from sera.storage import content_hash, save_json
@@ -194,6 +194,7 @@ def normalize_trial(bundle, entry, trial):
     errors = sum(bool(row.get('error')) for load in loads for row in load.get('requests', []))
     errors += sum(bool(row.get('error')) for phase in ('warmup', 'quality', 'self_check')
                   for row in trial.get(phase, []))
+    memory = objective_value(trial, 'memory')
     if trial.get('generation_errors') is not None and trial['generation_errors'] != errors:
         raise ValueError('Saved generation error count does not match source requests')
     telemetry = {}
@@ -205,14 +206,14 @@ def normalize_trial(bundle, entry, trial):
         'manifest_hash': manifest['manifest_hash'], 'identity': manifest['identity'], **entry,
         'evidence_kind': manifest['evidence_kind'], 'source_evidence_hash': content_hash(trial),
         'status': status, 'feasibility_passed': collected,
-        'reliability_passed': collected and cleanup and errors == 0,
+        'reliability_passed': collected and cleanup and errors == 0 and memory is not None,
         'quality_passed': quality['passed'],
         'quality_valid_outputs': quality['valid_outputs'],
         'quality_score': quality['mean'] if len(trial.get('quality', [])) == len(cases) else None,
         'quality_floor': records['quality_gate']['floor'],
         'generation_errors': errors, 'error_type': trial.get('error_type'), 'telemetry': telemetry,
         'p95_latency_ms': latency, 'per_load_p95_latency_ms': per_load,
-        'peak_memory_mib': runtime.get('sampled_peak_memory_mib') or None,
+        'peak_memory_mib': memory,
         'startup_seconds': runtime['startup_seconds'], 'gpu_collection_seconds': trial['collection_seconds'],
     }
     return {'record': record, 'artifact_hash': content_hash(record)}

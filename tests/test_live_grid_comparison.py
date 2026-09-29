@@ -106,7 +106,7 @@ def campaign(tmp_path):
                             'config_hash': entry['config_hash'],
                             'revision': LARGE_MODEL_REVISION, 'generation': GENERATION,
                             'enable_thinking': False, 'gpu': records['hardware'], 'versions': records['runtime'],
-                            'cleanup_pass': True, 'sampled_peak_memory_mib': 2000,
+                            'cleanup_pass': True, 'sampled_peak_memory_mib': 2000, 'telemetry_errors': 0,
                             'startup_seconds': 2, 'benchmark_timing': {'owned_seconds': 5, 'start_call_seconds': 2}},
                 'input_token_ids': records['input_token_ids'], 'generation_errors': 0,
                 'quality': [{'prompt_index': index, 'text': json.dumps({'answer': case['expected']}), 'error': None}

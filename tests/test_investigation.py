@@ -19,7 +19,7 @@ def install_fakes(monkeypatch, *, startup_failure=False, cleanup_failure=False, 
         def __init__(self, *, artifact_dir, configuration, model_id, revision):
             self.configuration, self.artifact_dir = configuration, artifact_dir
             self.record = dict(configuration=configuration.model_dump(), model_id=model_id,
-                               revision=revision, sampled_peak_memory_mib=2000)
+                               revision=revision, sampled_peak_memory_mib=2000, telemetry_errors=0)
             self.ready = False
             runners.append(self)
 
@@ -337,7 +337,8 @@ def test_objective_plateau_respects_metric_direction_and_boundary(priority, valu
             task_quality=dict(mean=1, valid_outputs=True),
             reduced=dict(p95_latency_ms=metric if priority == 'latency' else 100,
                          output_tokens_per_second=metric if priority == 'throughput' else 100),
-            runtime=dict(sampled_peak_memory_mib=metric if priority == 'memory' else 100))
+            runtime=dict(sampled_peak_memory_mib=metric if priority == 'memory' else 100,
+                         telemetry_errors=0))
     plateau = dict(best_quality_valid_value=100, consecutive_no_progress_rounds=1,
                    confirmation_round_pending=True, history=[])
     result = objective_progress(plateau, trial('baseline', 100), [trial('candidate', value)],

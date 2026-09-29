@@ -42,6 +42,14 @@ resolver or binary install succeeds. No such install was run for this audit.
 
 ## What remains environment-specific
 
+Memory selection and declared memory constraints require a positive finite peak
+and an explicit integer `telemetry_errors` value of zero. Failed sampling or
+missing coverage metadata makes memory unavailable, even if an earlier positive
+peak remains in the raw record. Such records cannot establish a memory gain or
+satisfy a memory limit. Latency and throughput remain usable when they passed
+their own checks and the caller did not require a memory limit. Error-free
+sampling is still an observed peak, not an enforced allocation cap.
+
 Inference workers inherit only the explicit runtime environment names in
 `sera.runtime.INFERENCE_ENVIRONMENT_VARIABLES`. This covers compiler paths,
 CUDA settings, selected distributed-runtime controls, caches, certificate/proxy

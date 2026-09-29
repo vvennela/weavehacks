@@ -41,7 +41,7 @@ def fixture_measure(entry, folder, bundle):
         'status': 'collected', 'config_hash': entry['config_hash'],
         'input_token_ids': [[1, 2]], 'generation_errors': 0,
         'runtime': {'configuration': entry['configuration'], 'cleanup_pass': True,
-                    'sampled_peak_memory_mib': 2000, 'startup_seconds': 2,
+                    'sampled_peak_memory_mib': 2000, 'telemetry_errors': 0, 'startup_seconds': 2,
                     'model_id': bundle['manifest']['identity']['model_id'],
                     'revision': bundle['manifest']['identity']['model_revision'],
                     'generation': GENERATION, 'enable_thinking': False},
@@ -58,6 +58,28 @@ def fixture_measure(entry, folder, bundle):
                   for level in [1, 2]],
         'collection_seconds': 5,
     }
+
+
+@pytest.mark.parametrize('telemetry', [{}, {'telemetry_errors': 1},
+                                    {'telemetry_errors': False}])
+def test_collection_cannot_build_a_comparison_from_unverified_baseline_memory(tmp_path, telemetry):
+    bundle = freeze_collection(plan())
+    seen = []
+
+    def measure(entry, folder, frozen):
+        seen.append(entry['candidate_id'])
+        trial = fixture_measure(entry, folder, frozen)
+        trial['runtime'].pop('telemetry_errors')
+        trial['runtime'].update(telemetry)
+        return trial
+
+    summary = collect(bundle, tmp_path / 'run', measure=measure)
+    assert seen == [bundle['manifest']['baseline']['candidate_id']]
+    assert summary['baseline_valid'] is False
+    assert summary['complete'] is False
+    assert summary['oracle'] is None
+    assert summary['rows'][0]['peak_memory_mib'] is None
+    assert summary['rows'][0]['reliability_passed'] is False
 
 
 def test_collection_freezes_sources_collects_once_and_replays_twenty_seeds(tmp_path):

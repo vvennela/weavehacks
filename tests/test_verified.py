@@ -11,7 +11,7 @@ def trial(trial_id, text="correct", latency=100.0):
               "prompt_token_ids": [1], "error": None}
     return {"trial_id": trial_id, "status": "collected", "input_token_ids": [[1]],
             "quality": [output], "self_check": [output],
-            "runtime": {"sampled_peak_memory_mib": 1000},
+            "runtime": {"sampled_peak_memory_mib": 1000, "telemetry_errors": 0},
             "reduced": {"p95_latency_ms": latency, "output_tokens_per_second": 100.0}}
 
 
