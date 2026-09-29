@@ -3,7 +3,7 @@
 Sera's first product goal is to free GPU memory through autonomous research:
 provide credentials and a workload, start optimization, and receive a usable
 result with measured memory, quality, and speed. The one-call experience is
-in development.
+in development. W&B tracing remains required by the current product design.
 
 Sera's wider goal is to be an autonomous research agent that optimizes ML workloads
 for the user's current hardware. It should inspect the workload and hardware,

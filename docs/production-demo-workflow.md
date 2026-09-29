@@ -25,10 +25,12 @@ result = Sera.Optimize(
 The visible flow is credentials → model and representative workload → Optimize
 → progress → usable result. The API-key provider is awaiting clarification.
 The current `sera.optimize` needs more configuration, including provider and
-trace setup. One agent API key must be sufficient for the target flow; optional
-tracing services must not require another key before optimization can start.
-Model access credentials remain necessary for private or gated weights. Do not
-present this target call as a working entry point yet.
+trace setup. The user explicitly retained mandatory W&B tracing on September
+28. The provider decision therefore determines credential setup: W&B inference
+can use the W&B credential; OpenAI or another compatible provider also needs
+W&B credentials for tracing. Model access credentials remain necessary for
+private or gated weights. Do not present this target call as a working entry
+point yet.
 
 The headline result is GPU memory recovered in GiB and percent under the same
 workload. Keep quality and latency requirements visible. A smaller checkpoint,
@@ -194,3 +196,38 @@ lockfile versions of HTTPX (0.28.1) and OpenAI (2.54.0) in that temporary
 environment, all **27 API-client tests passed**, including those 14 cases.
 The notebook-render test remains unrun in this environment. No paid provider
 calls or GPU trials were made for these checks.
+
+## One-call setup implementation order
+
+Mandatory W&B tracing is the user-selected design. Keep Weave evidence reads,
+the provider compatibility gate, failed-trial inspection, and trace flush checks.
+Do not replace these with local-only logs to simplify onboarding.
+
+The existing implementation offers these concrete building blocks:
+
+1. `prepare_provider_check(agent=..., output_dir=...)` in
+   `sera.provider_check` creates the existing 34-case check using a separate
+   agent history, or revalidates an existing saved check without provider calls.
+   The caller chooses the folder. Invalid, interrupted, or mismatched records
+   stop setup and remain on disk; retry requires a new folder. This helper does
+   not yet run automatically from `sera.optimize`.
+2. `experiments/example_run.py` demonstrates explicit W&B credential setup and
+   environment restoration, plus existing agent routes. Its fixed Qwen72B tasks
+   and thresholds are demo-specific and must not become generic defaults.
+3. `sera.api._run_traced` supplies the current Weave trace, bounded evidence
+   reader, and cleanup on trace failure. Reuse this path in the target entry
+   point rather than adding a second optimizer.
+4. The target entry point still needs credential-provider selection and a
+   concrete workload configuration. It must validate these before billable
+   setup calls, retain setup time and request counts, then pass the checked
+   agent and certificate into the existing traced research loop.
+
+The setup helper preserves the existing certificate acceptance rule. Reuse does
+not prove that an endpoint remains healthy or that a model alias has not changed;
+it only rechecks the saved compatibility evidence. No new expiration or provider
+acceptance policy was selected. Live provider and GPU checks remain required.
+
+Provider setup validation: **118 related tests passed** across provider checks,
+OpenAI-compatible and LiteLLM clients, the public API, and the recording helper.
+The tests use simulated provider responses; no paid requests were made. The new
+helper is implemented, but the target `Sera.Optimize` entry point is still pending.

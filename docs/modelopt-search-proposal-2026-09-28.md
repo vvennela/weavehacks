@@ -107,8 +107,11 @@ the backend-independent boundary must not require unimplemented adapters.
    this deployed model; simulated quantization timing is not inference speed.
 5. Let agents select complete legal candidate IDs with reasons and evidence.
    Keep model loading, execution, validation, and acceptance in deterministic code.
-6. Use Codex through ChatGPT login, retain the 180-second call timeout, and save
-   prompts and responses. Do not substitute a hosted API-key provider.
+6. The September 28 product direction replaces the earlier GPU-product
+   ChatGPT-login proposal with an API-key entry point and mandatory W&B tracing.
+   The exact provider is awaiting user selection. Preserve prompts, responses,
+   setup cost, and the existing acceptance gates. The separate CPU research
+   contract still uses Codex through ChatGPT login and its 180-second timeout.
 
 Recommendation: start with post-training quantization. Pruning, training,
 distillation, and speculative-decoding deployment are later experiments.
@@ -206,3 +209,39 @@ failing behavior tests first, then targeted tests and a real GPU smoke test.
 - [Support matrix](https://nvidia.github.io/Model-Optimizer/guides/0_support_matrix.html)
 - [Unified export and vLLM deployment](https://nvidia.github.io/Model-Optimizer/deployment/3_unified_hf.html)
 - [ModelOpt 0.47.0 release](https://github.com/NVIDIA/Model-Optimizer/releases/tag/0.47.0)
+
+## Concrete adapter boundary for review
+
+The current control schema cannot identify an exported checkpoint:
+`Candidate` contains only `RuntimeConfig`, proposals change one serving setting,
+and both the public API and pipeline admit only `PortableRuntimeFactory` for
+external models. The portable runner rejects prequantized metadata and launches
+BF16 from a Hub revision. Adding a recipe name to that config cannot implement
+ModelOpt export or deployment.
+
+The proposed change is one opt-in artifact path through the existing optimizer:
+
+- Preparation takes a pinned base model/tokenizer, a complete legal recipe,
+  calibration input identity and seed, and an explicit hardware assignment.
+- Its output is a durable local checkpoint plus a manifest containing source
+  revisions, recipe, calibration identity, package versions, preparation time,
+  file hashes and size. A partial export is never a serving candidate.
+- A ModelOpt-aware runner verifies the manifest and starts the exported local
+  path with its supported vLLM loader. It records the actual command, tokenizer,
+  GPU identity, quality, memory, timing, and cleanup through existing contracts.
+- Search chooses immutable candidate IDs and reads evidence. Backend details
+  stay inside preparation and serving. A changed recipe or checkpoint requires
+  a different identity; it cannot reuse a prior measurement.
+- The returned result contains the selected artifact and reproduction command,
+  plus the prior usable artifact when there is no verified improvement.
+
+This changes candidate identity, serving input, and result persistence, so it is
+an architecture decision for user review before implementation. It does not
+require changing the CPU path or existing frozen control-search manifests.
+
+Validation must cover export failure and cancellation, checkpoint modification,
+wrong tokenizer/loader, illegal recipe selection, quality failure, failed memory
+sampling, trial accounting, resume, and worker cleanup. The live acceptance
+sequence is baseline → actual export → fresh-process serving → fixed-quality
+checks and paired measurements → cleanup → independent reload of the selected
+artifact. Workload, GPU access, budgets, and acceptance rules remain unresolved.
