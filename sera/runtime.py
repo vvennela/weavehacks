@@ -24,6 +24,28 @@ from .storage import save_json
 
 GENERATION = {"temperature": 0, "top_p": 1, "top_k": -1, "seed": 0, "max_tokens": 64}
 SERVED_MODEL = "sera-model"
+# Model downloads may need HF_TOKEN; optimizer/provider credentials are never
+# runtime settings. Keep explicit names so new application secrets stay private.
+# This limits environment inheritance, not filesystem access or native code.
+INFERENCE_ENVIRONMENT_VARIABLES = frozenset({
+    "PATH", "HOME", "TMPDIR", "TMP", "TEMP", "LANG", "LANGUAGE", "LC_ALL",
+    "LC_CTYPE", "TZ", "XDG_CACHE_HOME",
+    "SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE", "CURL_CA_BUNDLE",
+    "HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy",
+    "HF_TOKEN", "HUGGING_FACE_HUB_TOKEN", "HF_TOKEN_PATH", "HF_HOME", "HF_HUB_CACHE",
+    "HUGGINGFACE_HUB_CACHE", "HF_ASSETS_CACHE", "HF_XET_CACHE", "HF_ENDPOINT",
+    "HF_HUB_OFFLINE", "HF_HUB_DISABLE_IMPLICIT_TOKEN", "HF_HUB_DISABLE_TELEMETRY",
+    "HF_HUB_ENABLE_HF_TRANSFER", "TRANSFORMERS_CACHE", "TRANSFORMERS_OFFLINE",
+    "CUDA_HOME", "CUDA_PATH", "CUDA_DEVICE_ORDER", "CUDA_MODULE_LOADING",
+    "CUDA_CACHE_PATH", "CUDA_CACHE_MAXSIZE", "CUDA_CACHE_DISABLE",
+    "LD_LIBRARY_PATH", "LIBRARY_PATH", "CPATH", "C_INCLUDE_PATH", "CPLUS_INCLUDE_PATH",
+    "NVCC_PREPEND_FLAGS", "NVCC_APPEND_FLAGS", "CC", "CXX",
+    "TORCH_HOME", "TORCH_EXTENSIONS_DIR", "TRITON_CACHE_DIR",
+    "PYTORCH_CUDA_ALLOC_CONF", "PYTORCH_ALLOC_CONF",
+    "NCCL_DEBUG", "NCCL_P2P_DISABLE", "NCCL_IB_DISABLE", "NCCL_SOCKET_IFNAME",
+    "GLOO_SOCKET_IFNAME", "TORCH_NCCL_ASYNC_ERROR_HANDLING",
+    "VLLM_USE_V1", "VLLM_ATTENTION_BACKEND", "VLLM_WORKER_MULTIPROC_METHOD",
+})
 STARTUP_FAILURE_MESSAGES = {
     "cutlass-internal-error": "cutlass_gemm_caller reported Error Internal.",
     "cuda-out-of-memory": "The server log reports CUDA out of memory.",
@@ -121,7 +143,9 @@ def _cuda13_include_dirs(cuda_root: Path) -> list[Path]:
 
 
 def _child_environment(folder: Path, gpu_uuid: str) -> dict:
-    env = dict(os.environ, CUDA_VISIBLE_DEVICES=gpu_uuid, OMP_NUM_THREADS="2")
+    env = {name: os.environ[name] for name in INFERENCE_ENVIRONMENT_VARIABLES
+           if name in os.environ}
+    env.update(CUDA_VISIBLE_DEVICES=gpu_uuid, OMP_NUM_THREADS="2")
     # Apply the smoke-checked CUDA wheel linker fix only when that wheel exists.
     try:
         package = importlib.metadata.distribution("nvidia-cuda-nvcc")

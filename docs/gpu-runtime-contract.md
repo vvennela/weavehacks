@@ -42,6 +42,20 @@ resolver or binary install succeeds. No such install was run for this audit.
 
 ## What remains environment-specific
 
+Inference workers inherit only the explicit runtime environment names in
+`sera.runtime.INFERENCE_ENVIRONMENT_VARIABLES`. This covers compiler paths,
+CUDA settings, selected distributed-runtime controls, caches, certificate/proxy
+settings, and Hugging Face download authentication. Optimizer credentials such
+as `OPENAI_API_KEY`, `WANDB_API_KEY`, and unrelated application variables are not
+passed to model workers. The parent process is unchanged. Unknown variables,
+`PYTHONPATH`, and `LD_PRELOAD` are not forwarded.
+
+The Hugging Face token and home/cache paths remain available because a worker
+may need to download pinned weights. This environment boundary is not a sandbox:
+it does not restrict worker filesystem or network access. These changes have
+local child-process tests; GPU startup under this environment still needs a live
+compatibility check before release.
+
 - The constraints are not a full dependency lock. They do not pin every CUDA
   component, package hash, wheel index, or operating-system library.
 - The runner has a checked CUDA 13 compiler/header/linker setup path. When the

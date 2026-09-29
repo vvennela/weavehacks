@@ -1,16 +1,63 @@
 """CUDA wheel headers can live outside the compiler's virtual environment."""
 
 import importlib.metadata
+import json
 import os
 from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 from types import SimpleNamespace
 
 import pytest
 
 from sera.runtime import _child_environment
+
+
+@pytest.mark.parametrize('compiler_wheel', [False, True])
+def test_inference_child_receives_runtime_settings_without_optimizer_secrets(
+        monkeypatch, tmp_path, compiler_wheel):
+    if compiler_wheel:
+        installed_wheels(monkeypatch, tmp_path)
+    else:
+        def missing(name):
+            raise importlib.metadata.PackageNotFoundError(name)
+        monkeypatch.setattr(importlib.metadata, 'distribution', missing)
+
+    private_names = ('OPENAI_API_KEY', 'WANDB_API_KEY', 'AWS_SECRET_ACCESS_KEY',
+                     'DATABASE_URL', 'SERA_RELAY_DIR', 'CODEX_HOME',
+                     'UNRELATED_APPLICATION_CREDENTIAL', 'PYTHONPATH', 'LD_PRELOAD')
+    for name in private_names:
+        monkeypatch.setenv(name, 'private-test-value')
+    runtime_settings = {'HF_TOKEN': 'model-download-test-token',
+                        'HF_HOME': str(tmp_path / 'model-cache'),
+                        'SSL_CERT_FILE': '/runtime/ca.pem',
+                        'NCCL_SOCKET_IFNAME': 'eth0',
+                        'TORCH_EXTENSIONS_DIR': str(tmp_path / 'extensions'),
+                        'VLLM_WORKER_MULTIPROC_METHOD': 'spawn'}
+    for name, value in runtime_settings.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', 'unassigned-gpu')
+    monkeypatch.setenv('OMP_NUM_THREADS', '99')
+    before = dict(os.environ)
+    folder = tmp_path / 'run'
+    folder.mkdir()
+
+    environment = _child_environment(folder, 'GPU-test')
+    # Inspect the actual child environment, not only the function's dictionary.
+    result = subprocess.run(
+        [sys.executable, '-I', '-c',
+         'import json, os; print(json.dumps(dict(os.environ)))'],
+        env=environment, capture_output=True, text=True, check=True, timeout=10)
+    received = json.loads(result.stdout)
+
+    assert not set(private_names).intersection(received)
+    assert {name: received[name] for name in runtime_settings} == runtime_settings
+    assert received['CUDA_VISIBLE_DEVICES'] == 'GPU-test'
+    assert received['OMP_NUM_THREADS'] == '2'
+    assert received['PATH'] == environment['PATH']
+    assert dict(os.environ) == before
 
 
 def wheel(root, name, files):
@@ -84,18 +131,23 @@ def test_uninstalled_or_missing_header_metadata_is_not_enough(monkeypatch, tmp_p
         _child_environment(folder, 'GPU-test')
 
 
-def test_no_compiler_wheel_keeps_existing_fallback(monkeypatch, tmp_path):
+def test_no_compiler_wheel_preserves_runtime_paths_without_scanning(monkeypatch, tmp_path):
     def missing(name):
         raise importlib.metadata.PackageNotFoundError(name)
 
     def no_scan():
-        pytest.fail('No compiler wheel must preserve the existing environment fallback')
+        pytest.fail('No compiler wheel must preserve configured runtime paths without a scan')
 
     monkeypatch.setattr(importlib.metadata, 'distribution', missing)
     monkeypatch.setattr(importlib.metadata, 'distributions', no_scan)
-    before = dict(os.environ)
-    assert _child_environment(tmp_path, 'GPU-test') == {
-        **before, 'CUDA_VISIBLE_DEVICES': 'GPU-test', 'OMP_NUM_THREADS': '2'}
+    settings = {'PATH': '/runtime/bin', 'CUDA_HOME': '/runtime/cuda',
+                'LD_LIBRARY_PATH': '/runtime/lib', 'NVCC_PREPEND_FLAGS': '-lineinfo'}
+    for name, value in settings.items():
+        monkeypatch.setenv(name, value)
+    env = _child_environment(tmp_path, 'GPU-test')
+    assert {name: env[name] for name in settings} == settings
+    assert env['CUDA_VISIBLE_DEVICES'] == 'GPU-test'
+    assert env['OMP_NUM_THREADS'] == '2'
     assert not (tmp_path / 'cuda-link').exists()
 
 
