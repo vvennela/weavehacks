@@ -3,7 +3,9 @@
 Status: draft submission material. This guide is not a submission receipt or a
 production certification. The one-call API and ModelOpt integration remain
 unfinished. W&B inference and mandatory Weave tracing are the selected direction;
-account access and the investigator model still need verification.
+account access and the W&B investigator model now pass the 34-case provider
+check. Native MLX traces have been written and read back. See the
+[September 29 native evidence](../evidence/native-mlx-smoke-v1/README.md).
 
 ## Organizer requirements
 
@@ -30,6 +32,7 @@ verified.
 
 | Topic | Open this evidence | What it establishes |
 | --- | --- | --- |
+| Current native checkpoint | [MLX checks and trace links](../evidence/native-mlx-smoke-v1/README.md) | 8-bit export and fresh-process loading, 24/24 repeated easy checks, and about 38% lower peak allocator memory. Fixed adapter smoke, not agent-led optimization or general task quality. |
 | W&B usage | [Project](https://wandb.ai/vvennela-n-a/wandb_agent_default_project) and [completed trace](https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a09c11-ca49-7d43-94cf-e56c54f98ac4) | Saved audit records 746 completed calls, zero call exceptions, and eight cited record hashes checked against cloud records. Confirm judge access before submission; this review did not reauthenticate the project. |
 | Autonomous experiments | [Direct-API run](../evidence/openai-example-v2/README.md) | Three investigators, shared findings, three measured rounds, 19.77% lower worst-load p95 on eight warmed repeated prompts. Historical OpenAI/LiteLLM route; not a new W&B-inference run. |
 | GPU capacity | [72B deployment](../evidence/large-fit-v1/README.md) | Online FP8 deployed with 86.38 GiB sampled peak and 8/8 fixed task checks. BF16 did not run; its 149.43 GiB runtime figure is an estimate. This is a fit result, not measured before/after memory savings. |

@@ -1,10 +1,20 @@
 # Sera completion checkpoint
 
-Updated 2026-09-13. **Single-model swarm and constrained two-model placement demonstrated; full specification not complete.**
+Updated 2026-09-29. **Single-model swarm and constrained two-model placement demonstrated; full specification not complete.**
 This file separates implementation from measured acceptance. It does not mark
 unproven features complete because their tests pass.
 
-Latest check: the final installed-wheel joint repeat failed GLM's latency gate
+Current work: the repository remains public and the product will use a
+Sera-managed agent with our W&B key. Native MLX checkpoint exports, strict
+artifact hashes, disposable workers, and remotely verified required traces now
+work. [September 29 evidence](evidence/native-mlx-smoke-v1/README.md) records
+24/24 repeated easy checks for 8-bit weights and 38.25% lower peak MLX allocator
+memory than BF16. The 4-bit export failed quality. The full local suite passed
+1,879 tests with one optional skip. This is adapter evidence; the native agent
+loop, formal agent/control comparison, managed service, and CUDA/ROCm acceptance
+are still incomplete. The deployment host has been requested.
+
+Historical GPU acceptance check: the final installed-wheel joint repeat failed GLM's latency gate
 (192.68 ms versus the fixed 187.93 ms ceiling). Both models passed task quality,
 memory stayed below 24 GiB, and cleanup returned the GPU to zero usage. The older
 passing joint run below remains valid historical evidence, not a guarantee that

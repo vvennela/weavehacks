@@ -1,0 +1,133 @@
+{
+  "wheel_sha256": "dbb61391ca79ff5f24f315676cd8a248ac4eaac052db4d35a365130bdf6d883a",
+  "installed_package": "/tmp/sera-native-wheel-check/lib/python3.12/site-packages/sera/__init__.py",
+  "scope": "Fresh installed-wheel request on an independently loaded export; not a quality benchmark.",
+  "result": {
+    "artifact_id": "57c2068daa7bf8566d5bb000519d495bc27745289e7ee0ecd391bed67100e1a8",
+    "requests": [
+      {
+        "repetition": 0,
+        "prompt_index": 0,
+        "text": "{\"answer\": 15}",
+        "token_ids": [
+          4913,
+          9217,
+          788,
+          220,
+          16,
+          20,
+          92,
+          151645
+        ],
+        "prompt_token_ids": [
+          151644,
+          8948,
+          198,
+          5598,
+          1172,
+          264,
+          4718,
+          1633,
+          448,
+          1376,
+          4226,
+          13,
+          151645,
+          198,
+          151644,
+          872,
+          198,
+          3838,
+          374,
+          220,
+          22,
+          488,
+          220,
+          23,
+          30,
+          3411,
+          279,
+          7546,
+          304,
+          4226,
+          13,
+          151645,
+          198,
+          151644,
+          77091,
+          198,
+          151667,
+          271,
+          151668,
+          271
+        ],
+        "latency_ms": 1167.8910839837044,
+        "error": null,
+        "response_format": {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "answer",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    ],
+    "controls": {
+      "seed": 0,
+      "max_tokens": 32,
+      "warmup": 0,
+      "repetitions": 1,
+      "sampling": "greedy",
+      "concurrency": 1,
+      "response_formats": [
+        {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "answer",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "answer"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "response_format_version": "new-request-integer-v1"
+    },
+    "memory": {
+      "metric": "mlx-active-allocator-bytes",
+      "resident_bytes": 633372680,
+      "peak_bytes": 778240416,
+      "active_bytes": 633372680,
+      "cache_bytes": 32041218,
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "device": {
+      "device_name": "Apple M4 Pro",
+      "max_recommended_working_set_size": 19069665280,
+      "memory_size": 25769803776,
+      "architecture": "applegpu_g16s",
+      "max_buffer_length": 14302248960,
+      "resource_limit": 499000
+    }
+  },
+  "passed": true
+}

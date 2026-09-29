@@ -1,8 +1,14 @@
 # Sera production work and 3–5 minute demo
 
 Status: implementation in progress. Sera is not yet production ready for the
-user-defined autonomous ML research goal. ModelOpt is not integrated and no new
-GPU results have been collected for this work.
+user-defined autonomous ML research goal. ModelOpt is not integrated. Native MLX
+checkpoint checks now run on the local Apple GPU; see the
+[measured evidence](../evidence/native-mlx-smoke-v1/README.md).
+
+September 29 decisions: keep the repository public; provide a Sera-managed agent
+using our service-owned W&B key; use native MLX first, then CUDA/ROCm adapters;
+allow optimized checkpoint export. The website is outside this implementation.
+The managed deployment host is still needed. No service has been deployed.
 
 ## Intended outcome
 
@@ -16,22 +22,19 @@ Target user experience (proposed API; not available in the current package):
 
 ```python
 result = Sera.Optimize(
-    api_key=agent_api_key,
+    api_key=sera_access_token,
     model=model,
     workload=workload,
 )
 ```
 
-The visible flow is credentials → model and representative workload → Optimize
-→ progress → usable result. The user selected W&B for the provider on September 28; account access and
-an available investigator model still need verification.
-The current `sera.optimize` needs more configuration, including provider and
-trace setup. The user explicitly retained mandatory W&B tracing on September
-28. The provider decision therefore determines credential setup: W&B inference
-can use the W&B credential; OpenAI or another compatible provider also needs
-W&B credentials for tracing. Model access credentials remain necessary for
-private or gated weights. Do not present this target call as a working entry
-point yet.
+The target flow is Sera access → model and representative workload → Optimize
+→ progress → usable result. The service holds our W&B key. W&B inference with
+`openai/gpt-oss-20b` passed all 34 compatibility cases on the first attempt.
+Required MLX traces have also been uploaded and read back from W&B. Native
+worker processes receive no W&B or agent key. Model access credentials can still
+be required for private or gated weights. The current `sera.optimize` remains
+the earlier configured vLLM flow; do not present the target call as available.
 
 The headline result is GPU memory recovered in GiB and percent under the same
 workload. Keep quality and latency requirements visible. A smaller checkpoint,
@@ -86,7 +89,8 @@ not describe the replay duration as research duration.
 
 1. Freeze the approved model, data splits, metric, quality scorer, hardware,
    recipes, control methods, and total resource budget before experiments.
-2. Complete the ModelOpt adapter and actual checkpoint export/serving path.
+2. Connect the native MLX export/serving path to the research controller, then
+   complete compatible CUDA/ROCm adapters and ModelOpt's CUDA execution path.
    Save hashes for weights, tokenizer, calibration data, recipes, evaluator,
    runtime, and trial artifacts. Simulated quantization is not serving speed.
 3. Collect the agent and non-agent comparisons using the same allowed tools,
@@ -141,7 +145,8 @@ about 52 seconds of playback at that speed. Pause to discuss actual decisions:
 
 Say: “This is a replay of a completed GPU experiment on eight warmed, repeated
 prompts.” This recording used the historical OpenAI/LiteLLM agent path. The new GPU
-product uses the requested API-key flow with mandatory W&B tracing; the selected provider is W&B, with account/model access still unverified. The recording does not show ModelOpt, a held-out
+product uses Sera access with mandatory service-owned W&B tracing; W&B account,
+model access, and native trace export are now verified. The recording does not show ModelOpt, a held-out
 quality test, cross-backend execution, a live service, or agent superiority over
 grid/random search. The old runner is closed.
 
@@ -164,7 +169,7 @@ acceptance item, and an adapter interface does not establish hardware support.
 | Hard resource bounds and cancellation | Trials, setup, agents, workers, retries, and cleanup obey the approved global limits | Explicit caps exist in some paths; configured swarm is uncapped by default |
 | Worker isolation and data handling | Resource/filesystem/network limits; credential separation; trace/retention controls | Environment allowlist implemented and tested locally; native-code sandbox and data controls pending |
 | Durable recovery | Real worker/controller interruption, restart, budget accounting, verified cleanup | Local checkpoint/fault tests exist; live outage and sustained-load validation pending |
-| Portable usable artifacts and fallback | Export hashes, fresh-process loading, reproduction command, previous artifact retained | Current GPU path returns a live runner; ModelOpt artifact lifecycle pending |
+| Portable usable artifacts and fallback | Export hashes, fresh-process loading, reproduction command, previous artifact retained | MLX exports are hashed and independently reloaded; ModelOpt and cross-runtime export remain pending |
 | Evidence for agent value | Same-resource non-agent comparisons and cost accounting on representative workloads | Unproven; no superiority claim |
 | Timed demonstration | Rehearsed 3–5 minute workflow with trace-backed numbers and usable output | Run-of-show prepared; current recorded rehearsal available; target demo pending |
 
@@ -232,3 +237,19 @@ Provider setup validation: **118 related tests passed** across provider checks,
 OpenAI-compatible and LiteLLM clients, the public API, and the recording helper.
 The tests use simulated provider responses; no paid requests were made. The new
 helper is implemented, but the target `Sera.Optimize` entry point is still pending.
+
+## September 29 native implementation checkpoint
+
+The complete local suite passed **1,879 tests, with one optional notebook-render
+skip** in the native MLX environment. Two shared-fixture imports were corrected
+to avoid a dependency's unrelated `tests` package shadowing the local suite.
+Native jobs run in disposable processes with explicit deadlines and retained
+failures. The controller requires a completed trace to be read back from W&B
+before returning a verified trace record. Actual MLX export and fresh-process
+checks are in [the evidence package](../evidence/native-mlx-smoke-v1/README.md).
+
+The 8-bit checkpoint passed the repeated easy checks; the 4-bit checkpoint did
+not. The native backend has not been integrated into the agent research loop.
+Managed service authentication, tenant/job ownership, remote worker dispatch,
+formal comparison rules, CUDA/ROCm acceptance, and deployment remain open.
+These are release blockers, not completed features.

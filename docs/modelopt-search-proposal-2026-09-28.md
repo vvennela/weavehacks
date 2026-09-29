@@ -4,6 +4,13 @@ Status: ModelOpt integration and backend-independent direction requested;
 benchmark rules pending user decision; no GPU experiments run.
 Date: 2026-09-28.
 
+Update, September 29: the user approved native MLX first, followed by CUDA and
+ROCm runtime adapters, and optimized checkpoint export. The product is managed
+by Sera with our W&B key; the repository stays public. These decisions supersede
+the earlier CUDA-first proposal. Formal agent-versus-control benchmark rules
+still need a decision. [Native MLX smoke results](../evidence/native-mlx-smoke-v1/README.md)
+are compatibility evidence, not that comparison.
+
 ## User-defined product goal
 
 Sera should be an autonomous research agent that optimizes ML workloads for the
@@ -84,7 +91,8 @@ techniques, prepare artifacts, run measurements, report evidence, and clean up
 their resources. The core controls budgets, evidence access, quality checks, and
 selection. Backend-specific configuration remains explicit and hash-bound.
 
-ModelOpt is the first proposed adapter for this comparison. It does not provide
+The original CUDA comparison below is retained as a proposal for the later
+CUDA adapter; native MLX is now first. It does not provide
 AMD ROCm or Apple MLX support. Those need separate adapters and compatibility
 tests; a shared interface alone is not working multi-backend support. Agent versus
 non-agent comparisons run on the same backend and hardware. Do not pool timing
@@ -109,8 +117,8 @@ the backend-independent boundary must not require unimplemented adapters.
    Keep model loading, execution, validation, and acceptance in deterministic code.
 6. The September 28 product direction replaces the earlier GPU-product
    ChatGPT-login proposal with an API-key entry point and mandatory W&B tracing.
-   The user selected W&B; account access and an available investigator model
-   still need verification. Preserve prompts, responses,
+   The user selected W&B; its account access and investigator model are now
+   verified by the September 29 provider check. Preserve prompts, responses,
    setup cost, and the existing acceptance gates. The separate CPU research
    contract still uses Codex through ChatGPT login and its 180-second timeout.
 

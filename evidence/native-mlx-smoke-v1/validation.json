@@ -1,0 +1,14 @@
+{
+  "command": "python -m pytest -q",
+  "passed": 1879,
+  "skipped": 1,
+  "skip": "optional notebook-render dependency not installed",
+  "elapsed_seconds": 95.87,
+  "targeted_lint": "passed for new native backend, worker, trace, script, and tests",
+  "lockfile_check": "passed",
+  "build": "wheel and source distribution built",
+  "wheel_sha256": "dbb61391ca79ff5f24f315676cd8a248ac4eaac052db4d35a365130bdf6d883a",
+  "clean_wheel_install_and_new_request": "passed outside checkout",
+  "repeat_wheel_sha256": "dbb61391ca79ff5f24f315676cd8a248ac4eaac052db4d35a365130bdf6d883a",
+  "wheel_builds_identical": true
+}

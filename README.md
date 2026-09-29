@@ -1,9 +1,10 @@
 # Sera
 
-Sera's first product goal is to free GPU memory through autonomous research:
-provide credentials and a workload, start optimization, and receive a usable
-result with measured memory, quality, and speed. The one-call experience is
-in development. W&B tracing remains required by the current product design.
+Sera's product goal is to free GPU memory through autonomous research: submit a
+workload to a Sera-managed agent and receive a usable result with measured
+memory, quality, and speed. The repository stays public. The service owns the
+W&B credential; customers do not supply or receive it. Mandatory W&B tracing and
+the managed one-call experience are part of the product design.
 
 Sera's wider goal is to be an autonomous research agent that optimizes ML workloads
 for the user's current hardware. It should inspect the workload and hardware,
@@ -20,7 +21,20 @@ track the remaining work and distinguish the target demo from the current record
 [Competition review guide](docs/competition-review.md): organizer requirements,
 W&B evidence, resilience and build records, and a four-minute presentation draft.
 
-## Start here: clone the notebook
+## Current native MLX work
+
+The [native MLX evidence](evidence/native-mlx-smoke-v1/README.md) records real
+checkpoint export, fresh-process loading, and required W&B trace verification.
+On eight short tasks repeated three times, 8-bit weights passed 24/24 checks and
+used 38.25% less peak MLX allocator memory than BF16. The 4-bit checkpoint failed
+quality and remains rejected. This is an adapter check, not an agent-search win.
+The full native research loop, managed deployment, and CUDA/ROCm adapters remain
+unfinished. ModelOpt is not an MLX runtime.
+
+## Historical Molab rehearsal
+
+The following notebook preserves the earlier customer-configured workflow. It
+is not the onboarding flow for the planned managed product.
 
 Open [FAST_START in Molab](https://molab.marimo.io/github/vvennela/weavehacks/blob/main/notebooks/FAST_START.py),
 then clone it into your own workspace and select the RTX PRO 6000 GPU runtime.

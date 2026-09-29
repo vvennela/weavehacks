@@ -1,0 +1,63 @@
+{
+  "scope": "MLX adapter compatibility only; not an agent benchmark, promotion, or general quality claim.",
+  "source_commit": "b34a69733d01bed534b38dc6410ba0c49c8597e7",
+  "versions": {
+    "mlx": "0.32.3",
+    "mlx-lm": "0.31.3",
+    "transformers": "5.17.0",
+    "outlines": "1.3.3",
+    "outlines-core": "0.2.14",
+    "weave": "0.53.2",
+    "gql": "4.0.0",
+    "openai": "3.21.0"
+  },
+  "source_files": {
+    "sera/backends/mlx.py": "46f555ad552eba82ca017dc24f3effcf8bbcd8eea232f0f07b01d9302893ad4f",
+    "sera/model_artifact.py": "b557ae8d1ae6240224feb02a60f14f536d0bd653b89567b1a2b902d52cef7214",
+    "sera/native_worker.py": "eec2be7ebd140feb2d6f95793091c3a8d0ce4514a91f570eabf159f0585f7fc5",
+    "sera/native_trace.py": "123ca7f38ea6e5e86666b749637e2f59940c751d5285fca60584914607855037",
+    "benchmarks/easy_cases.json": "2b4a93663298c763791e0637b77a924b3fac807c564a6913381edff80b812807",
+    "benchmarks/grade.py": "a7099dcbfcbb6e0bb51c74445a144dfd068338dccb262cdc70b7a47b125e9db3"
+  },
+  "measurements": {
+    "bf16": {
+      "passed": 24,
+      "requests": 24,
+      "peak_allocator_bytes": 1390969552,
+      "resident_allocator_bytes": 1192099848,
+      "latency_ms": {
+        "min": 357.2261660010554,
+        "median": 390.1776249986142,
+        "max": 416.7743750149384
+      },
+      "unique_tasks": 8,
+      "repetitions": 3
+    },
+    "int4": {
+      "passed": 21,
+      "requests": 24,
+      "peak_allocator_bytes": 558105356,
+      "resident_allocator_bytes": 335380488,
+      "latency_ms": {
+        "min": 325.08733397116885,
+        "median": 363.1463540077675,
+        "max": 391.198874975089
+      },
+      "unique_tasks": 8,
+      "repetitions": 3
+    },
+    "int8": {
+      "passed": 24,
+      "requests": 24,
+      "peak_allocator_bytes": 858948316,
+      "resident_allocator_bytes": 633372680,
+      "latency_ms": {
+        "min": 320.92491700313985,
+        "median": 347.0777290058322,
+        "max": 388.61487503163517
+      },
+      "unique_tasks": 8,
+      "repetitions": 3
+    }
+  }
+}
