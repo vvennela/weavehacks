@@ -9,7 +9,7 @@ from .config import LARGE_MODEL_ID, LARGE_MODEL_REVISION, RuntimeConfig, Workloa
 from .agent import ArbiterDecision
 from .diagnosis import export_trial_diagnosis, trial_diagnosis
 from .memory import fits_memory
-from .measurement import collect_trial, select_candidate
+from .measurement import collect_trial, objective_value, select_candidate
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel, gpu_snapshot
 from .storage import content_hash
@@ -125,7 +125,7 @@ def fit_review_evidence(plan, trial, decision):
             "candidate_tested": True, "candidate_status": trial["status"],
             "candidate_metrics": trial.get("reduced"),
             "candidate_task_quality": trial.get("task_quality"),
-            "candidate_peak_memory_mib": trial.get("runtime", {}).get("sampled_peak_memory_mib"),
+            "candidate_peak_memory_mib": objective_value(trial, "memory"),
             "eligible_trial_ids": [decision["selected"] or "no-safe-configuration"]}
 
 

@@ -7,7 +7,7 @@ import uuid
 import threading
 
 from .config import BASELINE_NAME, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, Budget, Candidate, Constraints, Objective, RuntimeConfig, Workload, resolve_investigation_space, validate_candidate
-from .measurement import collect_trial, measured_frontier, select_candidate, token_agreement
+from .measurement import collect_trial, measured_frontier, objective_value, select_candidate, token_agreement
 from .quality import evaluate_quality
 from .runtime import CleanupError, GENERATION, SeraModel
 from .storage import content_hash, save_json
@@ -49,7 +49,7 @@ def agent_evidence(baseline, objective=None, constraints=None, *, prompts=()):
     metrics.update(mean_queue_ms=snapshot.get("mean_queue_ms"),
                    mean_ttft_ms=snapshot.get("mean_ttft_ms"),
                    preemptions=snapshot.get("preemptions"),
-                   sampled_peak_memory_mib=baseline["runtime"].get("sampled_peak_memory_mib"))
+                   sampled_peak_memory_mib=objective_value(baseline, "memory"))
     metrics.update(load_snapshot_metrics(baseline))
     model_id = baseline["runtime"].get("model_id", MODEL_ID)
     portable = baseline['runtime'].get('adapter') == 'explicit-single-host-v1'
@@ -172,7 +172,7 @@ def render_summary(report, output_dir):
             lines.append(f"{label}: {trial['status']}; requests={reduced.get('request_count', 'unavailable')}; "
                          f"p95={reduced.get('p95_latency_ms', 'unavailable')} ms; "
                          f"throughput={reduced.get('output_tokens_per_second', 'unavailable')} output tokens/s; "
-                         f"peak memory={trial.get('runtime', {}).get('sampled_peak_memory_mib', 'unavailable')} MiB; "
+                         f"peak memory={objective_value(trial, 'memory') or 'unavailable'} MiB; "
                          f"output tokens={reduced.get('output_tokens', 'unavailable')}; "
                          f"startup={trial.get('runtime', {}).get('startup_seconds', 'unavailable')} s.")
             for load in trial.get("loads", []):

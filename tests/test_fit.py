@@ -64,7 +64,7 @@ def test_verified_candidate_needs_no_output_reference_from_an_infeasible_baselin
 @pytest.mark.parametrize('selected,status', [('candidate', 'collected'), (None, 'startup-failed')])
 def test_fit_review_assesses_deployment_not_an_unmeasured_speedup(selected, status):
     decision = {'selected': selected, 'outcome': 'feasible' if selected else 'no-safe-configuration'}
-    trial = {'status': status, 'runtime': {'sampled_peak_memory_mib': 88449},
+    trial = {'status': status, 'runtime': {'sampled_peak_memory_mib': 88449, 'telemetry_errors': 0},
              'task_quality': {'mean': 1.0 if selected else 0.0, 'passed': bool(selected)},
              'reduced': {'p95_latency_ms': 573.0} if selected else None}
     feedback = fit_review_evidence({'plan_id': 'weight-fp8'}, trial, decision)

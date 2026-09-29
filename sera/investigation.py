@@ -107,7 +107,7 @@ def round_evidence(initial, search, trials, remaining, *, prompts=()):
         requests = request_evidence(trial, prompts)
         metrics.update(trace_failed_task_count=requests['failed_task_count'],
                        trace_measured_request_count=requests['measured_request_count'])
-        metrics['sampled_peak_memory_mib'] = trial['runtime'].get('sampled_peak_memory_mib')
+        metrics['sampled_peak_memory_mib'] = objective_value(trial, 'memory')
         metrics.update(load_snapshot_metrics(trial))
         for key, value in metrics.items():
             evidence['metrics'][f'trial_{index}_{key}'] = value

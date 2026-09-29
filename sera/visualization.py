@@ -13,6 +13,8 @@ from importlib.resources import files
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from .measurement import objective_value
+
 
 _MAX_HTML_BYTES = 1_000_000
 _METRICS = ('p95_latency_ms', 'output_tokens_per_second', 'sampled_peak_memory_mib')
@@ -75,7 +77,7 @@ def _trial(value):
     reduced = _mapping(value.get('reduced'))
     runtime = _mapping(value.get('runtime'))
     metrics = {key: _number(reduced.get(key)) for key in _METRICS}
-    metrics['sampled_peak_memory_mib'] = _number(runtime.get('sampled_peak_memory_mib'))
+    metrics['sampled_peak_memory_mib'] = objective_value({'runtime': runtime}, 'memory')
     return dict(trial_id=_scalar(value.get('trial_id')), status=_scalar(value.get('status')),
                 metrics=metrics, quality=_pick(value.get('task_quality'),
                     ('passed', 'mean', 'floor', 'valid_outputs')),

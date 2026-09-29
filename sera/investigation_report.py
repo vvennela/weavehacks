@@ -1,6 +1,9 @@
 """Plain-English views of saved investigation evidence; no execution or inference."""
 
 
+from .measurement import objective_value
+
+
 MISSING = 'not recorded'
 
 
@@ -147,7 +150,7 @@ def _trial_lines(trial):
              f"Quality gate: {quality}; score={_value(gate.get('mean'))}; floor={_value(gate.get('floor'))}.",
              f"p95: {_value(metrics.get('p95_latency_ms'))} ms; "
              f"throughput: {_value(metrics.get('output_tokens_per_second'))} output tokens/s; "
-             f"peak memory: {_value((trial.get('runtime') or {}).get('sampled_peak_memory_mib'))} MiB.",
+             f"peak memory: {_value(objective_value(trial, 'memory'))} MiB.",
              f"Gate selection: {_value(decision.get('selected'))}; reason: {decision.get('reason', MISSING)}."]
     if decision.get('constraint_failures'):
         lines.append(f"Constraint failures: {decision['constraint_failures']}.")
