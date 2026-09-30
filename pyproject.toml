@@ -89,6 +89,12 @@ sera-serve = "sera.managed_service:main"
 [tool.hatch.build.targets.wheel]
 packages = ["sera", "src/sera_loop"]
 
+[tool.hatch.build]
+exclude = ["**/__pycache__", "**/*.pyc", "**/.env", "**/.env.*", "**/*.key", "**/*.pem"]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["sera", "src/sera_loop", "pyproject.toml", "README.md", "LICENSE", "NOTICE", ".gitignore"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # "." resolves `sera` (the swarm line), "src" resolves `sera_loop` (the two-phase

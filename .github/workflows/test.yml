@@ -20,27 +20,20 @@ jobs:
       - uses: astral-sh/setup-uv@v10.2.0
         with:
           version: '0.11.13'
-      - run: uv sync --locked --python 3.12 --extra dev --extra swarm
-      - name: Full test suite without live credentials or accelerator access
-        run: uv run --locked --extra dev --extra swarm pytest -q
-      - name: Check native service code
-        run: >-
-          uv run --locked --extra dev ruff check
-          sera/native_*.py sera/managed_*.py sera/model_artifact.py
-          sera/__main__.py sera/onboarding.py sera/workload_intake.py sera/intent_contract.py
-          sera/runtime_model.py sera/rag_intake.py sera/placement_decoding.py
-          tests/test_onboarding.py tests/test_workload_intake.py tests/test_runtime_model.py
-          sera/owned_command.py sera/process_ownership.py sera/codex_agent.py
-          tests/test_native_*.py tests/test_managed_*.py
-          tests/test_model_artifact.py tests/test_owned_command.py
-      - run: uv build --wheel
+      - name: Tests, lint, source build, and wheel checks
+        env:
+          UV_PYTHON: '3.12'
+        run: bash check.sh
       - name: Import the installed wheel outside the checkout
         run: |
           uv venv /tmp/sera-wheel-check --python 3.12
           uv pip install --python /tmp/sera-wheel-check/bin/python dist/*.whl
           cd /tmp
-          /tmp/sera-wheel-check/bin/python -I -c 'import sera; assert callable(sera.Optimize); print(sera.__file__)'
+          /tmp/sera-wheel-check/bin/python -I -c 'import sera, sera_loop; from importlib.resources import files; assert callable(sera.Optimize); assert callable(sera_loop.optimize); assert files("sera").joinpath("replay.html").read_text(); assert files("sera").joinpath("demo_cases.json").read_text(); print(sera.__file__)'
+          /tmp/sera-wheel-check/bin/sera --help
       - uses: actions/upload-artifact@v4
         with:
           name: wheel-${{ matrix.os }}
-          path: dist/*.whl
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
