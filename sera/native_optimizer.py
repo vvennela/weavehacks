@@ -166,10 +166,10 @@ class NativeRunStopped(RuntimeError):
 
 
 class _Research:
-    def __init__(self, profile, folder, ledger, agent, cancelled, checkpoint=None):
+    def __init__(self, profile, folder, ledger, agent, cancelled, checkpoint=None, started=None):
         self.profile, self.folder, self.ledger, self.agent = profile, folder, ledger, agent
         self.cancelled = cancelled
-        self.started = time.monotonic()
+        self.started = started if started is not None and checkpoint is None else time.monotonic()
         self.artifacts = {}
         self.report = {'schema_version': 'sera-native-research-v1', 'status': 'running',
                        'profile_id': profile.profile_id, 'profile_hash': content_hash(profile.model_dump()),
@@ -181,7 +181,8 @@ class _Research:
                                      'max_run_seconds': profile.max_run_seconds,
                                      'finalization_reserve_seconds': min(15.0, profile.max_run_seconds * 0.1),
                                      'job_timeout_seconds': profile.job_timeout_seconds},
-                       'started_at_unix': time.time(), 'agent_calls_used': 0,
+                       'started_at_unix': time.time() - (time.monotonic() - self.started),
+                       'agent_calls_used': 0,
                        'trials': [], 'agent_calls': [], 'jobs': [], 'candidate_trials_used': 0,
                        'selected_recipe_id': None, 'selected_artifact_id': None, 'artifact_path': None}
         if profile.retention is not None:
@@ -491,6 +492,7 @@ class _Research:
 
 def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None, resume=False):
     """Run the operator's fixed profile. This function never changes its gates."""
+    started = time.monotonic()
     profile = validate_native_profile(profile)
     encode_record(profile.model_dump())
     folder = Path(output_dir).resolve()
@@ -512,12 +514,23 @@ def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None,
                 return checkpoint
         if agent is None:
             board_folder = folder / 'advisor'
-            agent = NativeBoard(board_folder,
-                max_model_calls=46 * math.ceil(profile.budget.max_candidate_trials / 2)
-                                + profile.budget.max_candidate_trials,
-                resume=resume and (board_folder / 'state.json').exists())
+            max_calls = (46 * math.ceil(profile.budget.max_candidate_trials / 2)
+                         + profile.budget.max_candidate_trials)
+            endpoint = os.environ.get('SERA_ADVISOR_ENDPOINT')
+            token = os.environ.get('SERA_ADVISOR_TOKEN')
+            if endpoint or token:
+                if not endpoint or not token:
+                    raise ValueError('Configure both operator advisor endpoint and token')
+                from .native_advisor import NativeAdvisorClient
+                agent = NativeAdvisorClient(board_folder, max_model_calls=max_calls,
+                                            endpoint=endpoint, token=token, cancelled=cancelled,
+                                            timeout_seconds=min(10, max(0.001, profile.max_run_seconds
+                                                - (time.monotonic() - started))))
+            else:
+                agent = NativeBoard(board_folder, max_model_calls=max_calls,
+                    resume=resume and (board_folder / 'state.json').exists())
         research = _Research(profile, folder, ledger, agent,
-                             cancelled, checkpoint)
+                             cancelled, checkpoint, started=started)
         def run():
             if checkpoint is not None and checkpoint.get('research_status') is not None:
                 research.report['status'] = checkpoint['research_status']

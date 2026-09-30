@@ -32,6 +32,8 @@ def manager(tmp_path, monkeypatch):
     monkeypatch.setattr(service, '_device_lock_path', lambda: tmp_path / 'gpu.lock')
     monkeypatch.setenv('WANDB_API_KEY', 'operator-test-key')
     monkeypatch.setenv('SERA_ACCESS_KEY', TOKEN)
+    monkeypatch.setenv('SERA_ADVISOR_ENDPOINT', 'http://127.0.0.1:8766')
+    monkeypatch.setenv('SERA_ADVISOR_TOKEN', 'private-advisor-token')
     # This is a real process, but it uses deterministic model/agent fixtures.
     script = tmp_path / 'controller.py'
     script.write_text('''
@@ -76,6 +78,8 @@ def test_one_job_idempotency_ownership_and_private_credentials(manager):
     environment = json.loads((manager.folder / first['job_id'] / 'environment.json').read_text())
     assert 'WANDB_API_KEY' in environment
     assert 'SERA_ACCESS_KEY' not in environment
+    assert 'SERA_ADVISOR_ENDPOINT' in environment
+    assert 'SERA_ADVISOR_TOKEN' in environment
     assert TOKEN not in (manager.folder / first['job_id'] / 'request.json').read_text()
 
 

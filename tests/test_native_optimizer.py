@@ -542,3 +542,28 @@ def test_restart_preserves_original_relative_quality_floor(tmp_path, runtime, mo
                                     project='fixture/project', agent=Agent(()), resume=True)
     assert result['selected_recipe_id'] != 'q8'
     assert result['initial_baseline']['task_quality']['mean'] == 1.0
+
+
+def test_operator_advisor_bridge_is_explicit_and_used_by_default(tmp_path, runtime, monkeypatch):
+    from sera import native_advisor
+    made = []
+    import time
+    class RemoteBoard(Agent):
+        stateful = True
+        def __init__(self, folder, **kwargs):
+            super().__init__()
+            self.model_calls = []
+            made.append(kwargs)
+            time.sleep(0.5)
+        def review(self, result, *, timeout_seconds):
+            return {'decision': 'adopt', 'reason': 'Remote board passed.'}
+    monkeypatch.setattr(native_advisor, 'NativeAdvisorClient', RemoteBoard)
+    monkeypatch.setenv('SERA_ADVISOR_ENDPOINT', 'http://127.0.0.1:9876')
+    monkeypatch.setenv('SERA_ADVISOR_TOKEN', 'fixture-private-token')
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path / 'remote', project='fixture/project')
+    assert result['selected_recipe_id'] == 'q8'
+    assert made[0]['endpoint'] == 'http://127.0.0.1:9876'
+    assert made[0]['token'] == 'fixture-private-token'
+    assert result['elapsed_seconds'] >= 0.5
+    assert made[0]['max_model_calls'] == 48
+    assert 'fixture-private-token' not in json.dumps(result)
