@@ -1,6 +1,6 @@
 {
   "scope": "Operator-managed local Apple silicon MLX worker; registered workload; one customer call",
-  "source_commit": "57df885f3f415245831f5f3e828df5d90d321aac",
+  "source_commit": "58b0678e505b76319571cb33257cc1d78a5259c7",
   "model": "Qwen/Qwen3-0.6B",
   "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
   "job_id": "414a1b05f9b747d2acac89e6ae7275d3",
@@ -33,10 +33,11 @@
     "no_repeated_optimization": true,
     "independent_output": "{\"answer\": 15}"
   },
-  "wheel_sha256": "5f0f9616b80e6410d84ba75005292d665736ba944a183fe37229aa493811fec0",
+  "wheel_sha256": "e7a3825630eba5d123f0ed9eb0cf64a756cb59f73316e13b6f362cf29b45bc99",
   "initial_live_wheel_sha256": "55add215ff831a3c4edb3d6a3c3ff331cde4fa98f62017623a613465c0f50cbe",
   "source_changes_between_live_run_and_final_reconnect": [
-    "sera/managed_client.py"
+    "sera/managed_client.py",
+    "sera/runtime.py"
   ],
   "wheel_source_hashes": {
     "sera/__init__.py": "3e8f683b9a08d7b90ae5dd3f63760cb77c8aa52dbccc84f18bbdf7955ae92d21",
@@ -95,7 +96,7 @@
     "sera/quality.py": "00280261a0a89c1a47138c8966ac0ae1b2e16dc31a76b26b7c3e4cda3d12271c",
     "sera/recovery.py": "313ff1d8399c2a6117a8e1e3ecf337cfea8fd99040c5e23fe21fe7a5c4fd5694",
     "sera/relay.py": "7e718cbd3ce4950fabaa7aa7a51e56386da6e8ecc8a4545161d08f9922ac8bf8",
-    "sera/runtime.py": "e7865a3d906800ba440fcf4dd71fab864182244245d8b290db975a7ff050b27c",
+    "sera/runtime.py": "098c0526a4728b01f6714d8d855e63ca0664aed53eee13bb9fbc157490b2ad62",
     "sera/search_policy.py": "7df61ed9ecac333ce7d86fa9c899059089428a9e4465fae8c62bf002ad2210c5",
     "sera/stage_config.py": "e08e9ceb8407b718ab125f43467637d6f577d4365e4a8ca29afea608792737e9",
     "sera/stages.py": "114b6b4eba1f7a51177512eb4c8d4b7ff253f60c10f19cffa0b04df39c53c28f",

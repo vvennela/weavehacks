@@ -2,10 +2,12 @@
   "source_suite": {
     "passed": 2037,
     "skipped": 1,
-    "skip_reason": "Optional marimo notebook dependency is not installed"
+    "skip_reason": "Optional marimo notebook dependency is not installed",
+    "source_commit": "57df885f3f415245831f5f3e828df5d90d321aac"
   },
   "installed_wheel_suite": {
-    "passed": 85
+    "passed": 94,
+    "source_commit": "58b0678e505b76319571cb33257cc1d78a5259c7"
   },
   "weave_transport_suite": {
     "passed": 7
@@ -15,5 +17,28 @@
   "live_model_execution": "passed",
   "service_restart_and_same_request_recovery": "passed",
   "owned_process_tree_released": true,
-  "profile_hash": "e65e118db5642b11dc896cf195751db1edd2d8aba9f41bb1146a32582a848563"
+  "profile_hash": "e65e118db5642b11dc896cf195751db1edd2d8aba9f41bb1146a32582a848563",
+  "runtime_regression_suite": {
+    "passed": 125,
+    "source_commit": "58b0678e505b76319571cb33257cc1d78a5259c7"
+  },
+  "ci": {
+    "source_commit": "58b0678e505b76319571cb33257cc1d78a5259c7",
+    "url": "https://github.com/vvennela/weavehacks/actions/runs/36658876895",
+    "status": "success",
+    "jobs": [
+      {
+        "platform": "test (macos-latest)",
+        "conclusion": "success",
+        "url": "https://github.com/vvennela/weavehacks/actions/runs/36658876895/job/109709001099"
+      },
+      {
+        "platform": "test (ubuntu-latest)",
+        "conclusion": "success",
+        "url": "https://github.com/vvennela/weavehacks/actions/runs/36658876895/job/109709001272"
+      }
+    ],
+    "linux_tests_passed": 2038,
+    "linux_tests_skipped": 1
+  }
 }
