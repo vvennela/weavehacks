@@ -206,8 +206,13 @@ def test_bandwidth_is_reported_unmeasured_not_zero(spec):
     assert out.measurements[m.name].mem_bandwidth_util is None
 
 
-def test_footprint_responds_to_quantization(spec):
+def test_footprint_responds_to_quantization(spec, monkeypatch):
     """If every config reported the same memory, the Pareto frontier would collapse."""
+    from sera_loop.runner.vllm_runner import _EngineSampler
+
+    # Hold cache occupancy equal to isolate weight quantization. Short fake
+    # requests can fall entirely between polls in either configuration.
+    monkeypatch.setattr(_EngineSampler, 'mean_kv', lambda self, name: 0.01)
     m = spec.model("qwen3_06b")
     wl = _short(spec.workload("qwen3_06b"))
     runner = VllmRunner(launcher=fake_launcher)
@@ -292,8 +297,8 @@ def test_trust_remote_code_is_opt_in_per_model():
     """
     gpu = GpuSpec(id="g0", name="RTX PRO 6000 Blackwell", vram_gb=96.0,
                   mem_bandwidth_gbs=1792.0, tflops_bf16=126.0)
-    fields = dict(name="m", hf_id="org/m", params_b=1.0, num_layers=2, hidden_size=64,
-                  num_attn_heads=4, num_kv_heads=2, max_model_len=512)
+    fields = {"name": "m", "hf_id": "org/m", "params_b": 1.0, "num_layers": 2,
+              "hidden_size": 64, "num_attn_heads": 4, "num_kv_heads": 2, "max_model_len": 512}
 
     plain = ModelSpec(**fields)
     custom = ModelSpec(**fields, trust_remote_code=True)
