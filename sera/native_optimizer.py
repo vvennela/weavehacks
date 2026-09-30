@@ -253,6 +253,7 @@ class _Research:
         return remaining
 
     def job(self, request):
+        started = time.monotonic()
         timeout = min(self.profile.job_timeout_seconds, self.remaining())
         index = len(self.report['jobs'])
         operation = {'job_id': f'job-{index:04d}', 'job_hash': content_hash(request),
@@ -271,6 +272,7 @@ class _Research:
                 self.remaining()  # Classify cancellation/global deadline before a job failure.
             raise
         finally:
+            operation['wall_seconds'] = time.monotonic() - started
             self.save()
 
     def prepare(self, name, recipe):
@@ -371,6 +373,14 @@ class _Research:
                     'memory': trial.get('runtime', {}).get('memory'), 'performance': trial.get('reduced')}
         return {'backend': self.profile.backend, 'objective': self.report['objective'], 'constraints': self.report['constraints'],
                 'workload_description': self.profile.workload_description,
+                'model': self.profile.source.model_dump(),
+                'hardware': self.report['baseline'].get('runtime', {}).get('device'),
+                'workload': {'tasks': len(self.profile.tasks), 'max_tokens': self.profile.max_tokens,
+                             'warmup': self.profile.warmup, 'repetitions': self.profile.repetitions,
+                             'evaluation_version': self.profile.evaluation_version},
+                'timing': {'remaining_seconds': self.remaining(),
+                           'measurement_seconds': max((j.get('wall_seconds', 0) for j in self.report['jobs']
+                               if j['operation'] == 'measure' and j['status'] == 'completed'), default=0)},
                 'retention': self.report.get('retention'),
                 'available_recipes': [{'recipe_id': key, 'recipe': self.profile.recipes[key].model_dump()}
                                       for key in available],

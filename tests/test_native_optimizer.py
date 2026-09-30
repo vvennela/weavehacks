@@ -581,3 +581,19 @@ def test_native_tasks_accept_only_predeclared_json_variants(tmp_path, runtime):
     value['tasks'].append(value['tasks'][0] | {'accepted_json': [{'answer': 2}]})
     with pytest.raises(ValueError, match='conflicting'):
         native.validate_native_profile(value)
+
+
+def test_board_receives_model_hardware_and_remaining_measurement_budget(tmp_path, runtime):
+    class InformedAgent(Agent):
+        def propose(self, evidence, **kwargs):
+            assert evidence['model'] == profile()['source']
+            assert evidence['hardware']['device_name'] == 'fixture'
+            assert evidence['workload']['tasks'] == 1
+            assert evidence['workload']['repetitions'] == 3
+            assert 0 < evidence['timing']['remaining_seconds'] < profile()['max_run_seconds']
+            assert evidence['timing']['measurement_seconds'] >= 0
+            return super().propose(evidence, **kwargs)
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path / 'informed',
+                                    project='fixture/project', agent=InformedAgent())
+    assert result['selected_recipe_id'] == 'q8'
+    assert all(job['wall_seconds'] >= 0 for job in result['jobs'])
