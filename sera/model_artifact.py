@@ -30,7 +30,9 @@ def _checkpoint_files(root):
         return path.relative_to(root).as_posix(), {
             'sha256': digest.hexdigest(), 'bytes': path.stat().st_size}
 
+    files.sort(key=lambda path: (-path.stat().st_size, path.as_posix()))
     records = {}
+    # Start large shards together so small metadata files do not delay them.
     # Bound open files, queued work, and read buffers while hashing large shards.
     # Ordered results preserve the existing portable manifest and artifact ID.
     with ThreadPoolExecutor(max_workers=4) as pool:
@@ -38,7 +40,7 @@ def _checkpoint_files(root):
             records.update(pool.map(hash_file, files[offset:offset + 4]))
     if 'config.json' not in records or not any(name.endswith('.safetensors') for name in records):
         raise ValueError('Checkpoint requires config.json and safetensors weights')
-    return records
+    return dict(sorted(records.items()))
 
 
 def seal_artifact(folder, *, backend, source, recipe, versions):
