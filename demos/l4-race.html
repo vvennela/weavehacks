@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sera L4 Race</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #12161b;
+    --panel-edge: #232a33;
+    --text: #e6e9ee;
+    --muted: #8a94a3;
+    --sera: #3ddc97;
+    --slow: #f2b441;
+    --error: #ff5c5c;
+    --code-key: #7cc4ff;
+    --code-str: #f2c879;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 28px 12px;
+    flex-wrap: wrap;
+  }
+  h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.01em; }
+  h1 span { color: var(--muted); font-weight: 600; }
+  .controls { display: flex; gap: 10px; align-items: center; }
+  .replay-tag {
+    font-size: 12px; color: var(--muted);
+    border: 1px solid var(--panel-edge); border-radius: 999px; padding: 4px 10px;
+  }
+  button {
+    font: 600 15px Inter, sans-serif;
+    background: var(--sera); color: #06140d;
+    border: 0; border-radius: 8px; padding: 10px 22px; cursor: pointer;
+  }
+  button:disabled { opacity: 0.4; cursor: default; }
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 8px 28px 28px;
+  }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; padding: 8px 16px 16px; } }
+  .pane {
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    min-height: 560px; overflow: hidden;
+  }
+  .pane-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 14px 18px; border-bottom: 1px solid var(--panel-edge);
+  }
+  .pane-title { font-weight: 800; font-size: 18px; }
+  .sera .pane-title { color: var(--sera); }
+  .manual .pane-title { color: var(--slow); }
+  .pane-sub { color: var(--muted); font-size: 13px; }
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    padding: 12px 18px; gap: 8px; border-bottom: 1px solid var(--panel-edge);
+  }
+  .stat-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-value { font: 600 22px 'JetBrains Mono', monospace; }
+  .memory { padding: 10px 18px 14px; border-bottom: 1px solid var(--panel-edge); }
+  .memory-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .memory-row strong { color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .bar { height: 10px; background: #1d232b; border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; width: 0; border-radius: 5px; transition: width 0.8s ease; }
+  .sera .bar-fill { background: var(--sera); }
+  .manual .bar-fill { background: var(--slow); }
+  .console {
+    flex: 1; margin: 0; padding: 14px 18px;
+    font: 13px/1.6 'JetBrains Mono', monospace;
+    white-space: pre-wrap; overflow-y: auto; max-height: 420px;
+  }
+  .line { display: block; }
+  .prompt-sign { color: var(--muted); }
+  .kw { color: var(--code-key); }
+  .str { color: var(--code-str); }
+  .ok { color: var(--sera); }
+  .slow-ok { color: var(--slow); }
+  .muted { color: var(--muted); }
+  .err { color: var(--error); }
+  .dramatization {
+    display: inline-block; margin: 6px 0;
+    font: 600 11px Inter, sans-serif; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 2px 8px;
+  }
+  .summary {
+    display: none;
+    margin: 0 28px 28px; padding: 18px 22px;
+    background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 12px;
+  }
+  .summary.visible { display: block; }
+  .summary h2 { margin: 0 0 12px; font-size: 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--panel-edge); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  td.win { color: var(--sera); font-weight: 800; }
+  .footnote { color: var(--muted); font-size: 12px; margin-top: 10px; }
+  .footnote a { color: var(--code-key); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Qwen3-8B on one NVIDIA L4 <span>· same 24 questions, same vLLM runtime</span></h1>
+  <div class="controls">
+    <span class="replay-tag">Recorded L4 timings</span>
+    <button id="start-button">Start</button>
+  </div>
+</header>
+
+<main>
+  <section class="pane sera">
+    <div class="pane-head">
+      <div class="pane-title">With Sera · FP8</div>
+      <div class="pane-sub">ModelOpt FP8 checkpoint chosen by Sera</div>
+    </div>
+    <div class="stats">
+      <div><div class="stat-label">Answered</div><div class="stat-value" id="sera-count">0/24</div></div>
+      <div><div class="stat-label">Correct</div><div class="stat-value" id="sera-correct">0</div></div>
+      <div><div class="stat-label">Elapsed</div><div class="stat-value" id="sera-time">0.00 s</div></div>
+    </div>
+    <div class="memory">
+      <div class="memory-row"><span>GPU memory (of 22.04 GiB)</span><strong id="sera-memory">—</strong></div>
+      <div class="bar"><div class="bar-fill" id="sera-bar"></div></div>
+    </div>
+    <pre class="console" id="sera-console"></pre>
+  </section>
+
+  <section class="pane manual">
+    <div class="pane-head">
+      <div class="pane-title">Without Sera · BF16</div>
+      <div class="pane-sub">Original model, then tuning by hand</div>
+    </div>
+    <div class="stats">
+      <div><div class="stat-label">Answered</div><div class="stat-value" id="manual-count">0/24</div></div>
+      <div><div class="stat-label">Correct</div><div class="stat-value" id="manual-correct">0</div></div>
+      <div><div class="stat-label">Elapsed</div><div class="stat-value" id="manual-time">0.00 s</div></div>
+    </div>
+    <div class="memory">
+      <div class="memory-row"><span>GPU memory (of 22.04 GiB)</span><strong id="manual-memory">—</strong></div>
+      <div class="bar"><div class="bar-fill" id="manual-bar"></div></div>
+    </div>
+    <pre class="console" id="manual-console"></pre>
+  </section>
+</main>
+
+<section class="summary" id="summary">
+  <h2>Sera freed 6.39 GiB and increased throughput by 57.63%. Every answer stayed correct.</h2>
+  <table>
+    <thead><tr><th>Measurement</th><th>BF16</th><th>Sera FP8</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td>GPU memory, including runtime and KV cache</td><td>16.31 GiB</td><td>9.92 GiB</td><td class="win">39.19% less</td></tr>
+      <tr><td>Output throughput</td><td>14.13 tokens/s</td><td>22.28–22.33 tokens/s</td><td class="win">57.63% higher</td></tr>
+      <tr><td>p95 request latency</td><td>556.1–556.2 ms</td><td>350.3–351.4 ms</td><td class="win">36.81% lower</td></tr>
+      <tr><td>Correct JSON answers</td><td>48/48</td><td>48/48</td><td>Both passed</td></tr>
+    </tbody>
+  </table>
+  <p class="footnote">
+    Sera research: 4 min 42 s on the L4. Changes use the worse of two measured runs.
+    Manual tuning errors: illustration.
+    <a href="https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f044-430a-7ef5-a982-990de8a75f9c">W&amp;B trace</a> ·
+    <a href="../evidence/managed-cuda-release-v1/release.json">release.json</a>
+  </p>
+</section>
+
+<script>
+// Recorded data: evidence/managed-cuda-release-v1/research.json.gz and release.json.
+// Each request is [question index, answer text, latency in ms], in the recorded order.
+const QUESTIONS = [
+  "What is 2 + 3?",
+  "Which integer is larger: 4 or 9?",
+  "len(['red', 'blue', 'green'])?",
+  "items = [10, 20]; items[0]?",
+  "x = 2; x = x + 1; final x?",
+  "Record {\"name\":\"job\",\"count\":4}: count?",
+  "IDs with ok == true?",
+  "'cat'.upper()?",
+];
+
+const BF16_REQUESTS = [
+  [0, '{"answer": 5}', 495.4], [1, '{"answer": 9}', 495.5], [2, '{"answer": 3}', 495.5], [3, '{"answer": 10}', 555.9],
+  [4, '{"answer": 3}', 496.2], [5, '{"answer": 4}', 495.7], [6, '{"answer": ["a"]}', 496.8], [7, '{"answer": "CAT"}', 495.5],
+  [0, '{"answer": 5}', 495.2], [1, '{"answer": 9}', 495.8], [2, '{"answer": 3}', 495.7], [3, '{"answer": 10}', 556.4],
+  [4, '{"answer": 3}', 496.7], [5, '{"answer": 4}', 496.3], [6, '{"answer": ["a"]}', 497.2], [7, '{"answer": "CAT"}', 495.8],
+  [0, '{"answer": 5}', 495.7], [1, '{"answer": 9}', 496.1], [2, '{"answer": 3}', 496.1], [3, '{"answer": 10}', 556.1],
+  [4, '{"answer": 3}', 496.9], [5, '{"answer": 4}', 495.9], [6, '{"answer": ["a"]}', 497.0], [7, '{"answer": "CAT"}', 495.7],
+];
+
+const FP8_REQUESTS = [
+  [0, '{"answer":5}', 274.0], [1, '{"answer": 9}', 312.2], [2, '{"answer": 3}', 313.2], [3, '{"answer": 10}', 350.2],
+  [4, '{"answer": 3}', 314.1], [5, '{"answer": 4}', 313.1], [6, '{"answer": ["a"]}', 313.4], [7, '{"answer": "CAT"}', 312.4],
+  [0, '{"answer":5}', 274.8], [1, '{"answer": 9}', 312.6], [2, '{"answer": 3}', 312.8], [3, '{"answer": 10}', 350.3],
+  [4, '{"answer": 3}', 313.2], [5, '{"answer": 4}', 313.0], [6, '{"answer": ["a"]}', 313.4], [7, '{"answer": "CAT"}', 313.0],
+  [0, '{"answer":5}', 275.0], [1, '{"answer": 9}', 312.8], [2, '{"answer": 3}', 312.7], [3, '{"answer": 10}', 350.9],
+  [4, '{"answer": 3}', 313.4], [5, '{"answer": 4}', 313.2], [6, '{"answer": ["a"]}', 313.8], [7, '{"answer": "CAT"}', 312.7],
+];
+
+const GPU_TOTAL_GIB = 22.04;
+const BF16_MEMORY_GIB = 16.31;
+const FP8_MEMORY_GIB = 9.92;
+
+const SERA_CODE_LINES = [
+  '<span class="kw">import</span> sera <span class="kw">as</span> Sera',
+  'result = Sera.Optimize(<span class="str">"cuda-qwen3-8b-demo-v1"</span>, api_key=key)',
+  'result.verify()',
+  '<span class="kw">print</span>(result.selected_recipe_id)',
+];
+
+// Illustration of manual tuning. These lines are not from a recorded run.
+const MANUAL_TUNING_SCRIPT = [
+  ["cmd", "python quantize_fp8.py --model Qwen/Qwen3-8B --calib 512"],
+  ["err", "torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.16 GiB.\nGPU 0 has a total capacity of 22.04 GiB of which 402.00 MiB is free."],
+  ["cmd", "python quantize_fp8.py --model Qwen/Qwen3-8B --calib 64 --device-map auto"],
+  ["err", "terminate called after throwing an instance of 'c10::Error'\n  what():  CUDA error: an illegal memory access was encountered\nException raised from c10_cuda_check_implementation at c10/cuda/CUDAException.cpp:43\nAborted (core dumped)"],
+  ["cmd", "vllm serve ./qwen3-8b-fp8 --gpu-memory-utilization 0.95"],
+  ["err", "ValueError: No available memory for the cache blocks.\nTry increasing `gpu_memory_utilization` when initializing the engine."],
+  ["cmd", "vllm serve ./qwen3-8b-fp8 --kv-cache-dtype fp8 --enforce-eager"],
+  ["err", "RuntimeError: CUBLAS_STATUS_NOT_SUPPORTED when calling cublasLtMatmul(...)\ncudaErrorMemoryAllocation: out of memory"],
+  ["cmd", "python eval.py --model ./qwen3-8b-fp8"],
+  ["err", "FAIL  expected {\"answer\": 5}  got {\"answer\": \"5\"}\nquality 7/8 below floor"],
+  ["note", "attempt 6 · 2 h 40 m · still no verified FP8 build"],
+];
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function addLine(consoleId, html) {
+  const consoleElement = document.getElementById(consoleId);
+  const line = document.createElement("span");
+  line.className = "line";
+  line.innerHTML = html;
+  consoleElement.appendChild(line);
+  consoleElement.scrollTop = consoleElement.scrollHeight;
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function showMemory(side, gib) {
+  document.getElementById(`${side}-memory`).textContent = `${gib.toFixed(2)} GiB`;
+  document.getElementById(`${side}-bar`).style.width = `${(gib / GPU_TOTAL_GIB) * 100}%`;
+}
+
+function startTimer(side) {
+  const startTime = performance.now();
+  const element = document.getElementById(`${side}-time`);
+  const intervalId = setInterval(() => {
+    element.textContent = `${((performance.now() - startTime) / 1000).toFixed(2)} s`;
+  }, 30);
+  return () => {
+    clearInterval(intervalId);
+    element.textContent = `${((performance.now() - startTime) / 1000).toFixed(2)} s`;
+  };
+}
+
+async function typeSeraCode() {
+  for (const codeLine of SERA_CODE_LINES) {
+    addLine("sera-console", `<span class="prompt-sign">&gt;&gt;&gt; </span>${codeLine}`);
+    await sleep(450);
+  }
+  addLine("sera-console", '<span class="ok">modelopt-fp8</span>  <span class="muted">researched in 4 m 42 s · verified · W&amp;B traced</span>');
+  addLine("sera-console", "");
+}
+
+async function replayRequests(side, requests, answerClass) {
+  const consoleId = `${side}-console`;
+  const stopTimer = startTimer(side);
+  let correctCount = 0;
+  for (let index = 0; index < requests.length; index++) {
+    const [questionIndex, answerText, latencyMs] = requests[index];
+    await sleep(latencyMs);
+    correctCount += 1;
+    addLine(
+      consoleId,
+      `<span class="${answerClass}">✓</span> ${escapeHtml(QUESTIONS[questionIndex])} ` +
+      `<span class="${answerClass}">${escapeHtml(answerText)}</span> <span class="muted">${latencyMs.toFixed(0)} ms</span>`
+    );
+    document.getElementById(`${side}-count`).textContent = `${index + 1}/24`;
+    document.getElementById(`${side}-correct`).textContent = `${correctCount}`;
+  }
+  stopTimer();
+}
+
+async function runManualTuning() {
+  addLine("manual-console", "");
+  addLine("manual-console", '<span class="slow-ok">Correct, slow, and memory-hungry. Now match Sera by hand:</span>');
+  await sleep(2500);
+  addLine("manual-console", '<span class="dramatization">Illustration</span>');
+  for (const [kind, text] of MANUAL_TUNING_SCRIPT) {
+    if (kind === "cmd") {
+      await sleep(700);
+      addLine("manual-console", `<span class="prompt-sign">$ </span>${escapeHtml(text)}`);
+    } else if (kind === "err") {
+      await sleep(900);
+      addLine("manual-console", `<span class="err">${escapeHtml(text)}</span>`);
+    } else {
+      await sleep(800);
+      addLine("manual-console", `<span class="muted">${escapeHtml(text)}</span>`);
+    }
+  }
+}
+
+async function runSeraSide() {
+  await typeSeraCode();
+  showMemory("sera", FP8_MEMORY_GIB);
+  await replayRequests("sera", FP8_REQUESTS, "ok");
+  addLine("sera-console", "");
+  addLine("sera-console", '<span class="ok">24/24 correct · 6.39 GiB freed · done</span>');
+}
+
+async function runManualSide() {
+  addLine("manual-console", '<span class="prompt-sign">$ </span>vllm serve Qwen/Qwen3-8B --dtype bfloat16');
+  await sleep(SERA_CODE_LINES.length * 450);
+  showMemory("manual", BF16_MEMORY_GIB);
+  await replayRequests("manual", BF16_REQUESTS, "slow-ok");
+  await runManualTuning();
+}
+
+document.getElementById("start-button").addEventListener("click", async (event) => {
+  event.target.disabled = true;
+  await Promise.all([runSeraSide(), runManualSide()]);
+  await sleep(600);
+  const summary = document.getElementById("summary");
+  summary.classList.add("visible");
+  summary.scrollIntoView({ behavior: "smooth" });
+});
+</script>
+</body>
+</html>
