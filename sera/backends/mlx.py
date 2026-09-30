@@ -31,9 +31,13 @@ class MLXRecipe(BaseModel):
     bits: Literal[2, 3, 4, 8, 16] = 16
     group_size: Literal[32, 64, 128] = 64
     protected_bits: Literal[3, 4, 6, 8] | None = Field(default=None, exclude_if=lambda v: v is None)
+    protection_pattern: Literal['all-v-down', 'all-except-mlp-expansion'] | None = Field(
+        default=None, exclude_if=lambda value: value is None)
 
     @model_validator(mode='after')
     def validate_precision(self):
+        if self.protection_pattern is not None and self.protected_bits is None:
+            raise ValueError('A protection pattern requires protected bits')
         if self.protected_bits is not None and self.protected_bits <= self.bits:
             raise ValueError('Protected modules require higher precision')
         return self
@@ -52,6 +56,10 @@ def mixed_quantization_predicate(recipe, num_layers):
             or (index - num_layers // 8) % 3 == 2)
         protected = parts[-1] in {'embed_tokens', 'lm_head'} or (
             sensitive and parts[-1] in {'v_proj', 'down_proj'})
+        if recipe.protection_pattern == 'all-v-down':
+            protected = parts[-1] in {'embed_tokens', 'lm_head', 'v_proj', 'down_proj'}
+        elif recipe.protection_pattern == 'all-except-mlp-expansion':
+            protected = not ('mlp' in parts and parts[-1] in {'gate_proj', 'up_proj'})
         return {'bits': recipe.protected_bits if protected else recipe.bits,
                 'group_size': recipe.group_size, 'mode': 'affine'}
     return choose

@@ -129,3 +129,29 @@ def test_mixed_recipe_preserves_sensitive_modules_and_serializes_identity():
 def test_mixed_recipe_rejects_non_increasing_precision():
     with pytest.raises(ValueError):
         MLXRecipe(bits=4, protected_bits=3)
+
+
+def test_expansion_only_low_precision_preserves_attention_and_output():
+    from sera.backends.mlx import mixed_quantization_predicate
+    recipe = MLXRecipe(bits=3, protected_bits=4, group_size=128,
+                       protection_pattern='all-except-mlp-expansion')
+    choose = mixed_quantization_predicate(recipe, 36)
+    for name in ('gate_proj', 'up_proj'):
+        assert choose('model.layers.10.mlp.' + name, None)['bits'] == 3
+    for name in ('q_proj', 'k_proj', 'v_proj', 'o_proj', 'down_proj', 'embed_tokens', 'lm_head'):
+        assert choose('model.layers.10.' + name, None)['bits'] == 4
+
+
+def test_all_value_and_down_projections_are_protected():
+    from sera.backends.mlx import mixed_quantization_predicate
+    choose = mixed_quantization_predicate(MLXRecipe(bits=3, protected_bits=4,
+        protection_pattern='all-v-down'), 36)
+    for index in range(36):
+        assert choose(f'model.layers.{index}.mlp.down_proj', None)['bits'] == 4
+        assert choose(f'model.layers.{index}.self_attn.v_proj', None)['bits'] == 4
+        assert choose(f'model.layers.{index}.self_attn.q_proj', None)['bits'] == 3
+
+
+def test_protection_pattern_requires_higher_precision():
+    with pytest.raises(ValueError):
+        MLXRecipe(bits=3, protection_pattern='all-v-down')
