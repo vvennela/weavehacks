@@ -13,6 +13,8 @@ Get more inference from the hardware you already have. Describe your workload; S
 
 ## The numbers
 
+The CUDA, summarization, extraction, classification, and RAG gains compare quantized inference with **the same model in BF16 on the same hardware and workload**. The 4B search comparison names both its fixed-recipe and BF16 baselines.
+
 | Workload | Hardware | Measured result | Evidence |
 | --- | --- | --- | --- |
 | **Qwen3-8B · ModelOpt FP8** | NVIDIA L4 | **+57.63% output throughput**, **−36.81% p95 latency**, **−39.19% device memory**. **6.39 GiB freed.** | [Run](evidence/managed-cuda-release-v1/release.json) · [Throughput](evidence/managed-cuda-release-v1/throughput.json) |
