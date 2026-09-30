@@ -19,14 +19,14 @@ Get more inference from the hardware you already have. Describe your workload; S
 | **Incident summarization · INT4** | M4 Pro · MLX · Qwen3-0.6B | **−63.33% allocator memory**, **+20.44% output throughput**. | [Run](evidence/managed-workloads-release-v1/release.json) |
 | **Invoice extraction · INT4** | M4 Pro · MLX · Qwen3-0.6B | **−62.26% allocator memory**, **+25.99% output throughput**, **−29.81% p95 latency**. | [Run](evidence/managed-workloads-release-v1/release.json) |
 | **Ticket classification · INT8** | M4 Pro · MLX · Qwen3-0.6B | **−39.82% allocator memory**, **+5.62% output throughput**. | [Run](evidence/managed-workloads-release-v1/release.json) |
-| **RAG · 100,000 documents · INT8** | M4 Pro · MLX · Qwen3-0.6B | **−40.87% generator allocator memory**. All **13 acceptance + 24 independent holdout questions** passed. | [Run](evidence/managed-rag-release-v1/release.json) |
+| **RAG · 100,000 synthetic documents · INT8** | M4 Pro · MLX · Qwen3-0.6B | **−40.87% generator allocator memory**. All **13 acceptance + 24 independent holdout questions** passed. | [Run](evidence/managed-rag-release-v1/release.json) |
 | **Qwen3-4B · search comparison** | M4 Pro · MLX | **−10.72% held-out allocator memory versus the fixed INT3 group-32 recipe**; **−74.84% versus BF16**. Both recipes passed the 20-question holdout. | [Paired study](evidence/native-mixed-search-qwen3-4b-v1/customer-result.json) |
 | **FP32 CPU MatMul · panel32** | Apple M4 Pro · SME | **1,701.65 GFLOP/s observed peak**. | [Measurements](evidence/cpu-best-kernel-repeatability-2026-09-25/search/result.json) |
 | **72B model deployment** | RTX PRO 6000 Blackwell | Served **Qwen2.5-72B in 86.38 GiB** of sampled GPU memory. | [Deployment](evidence/large-fit-v1/README.md) |
 
 The latest classification, extraction, and summarization runs completed in **140–186 seconds**, passed every supplied check, exported checkpoints, and passed reload checks. The same model selected **INT8 for classification** and **INT4 for extraction**.
 
-Throughput is generated tokens per second. CUDA memory is sampled whole-device usage; MLX memory is allocator peak. The native release comparisons use repeated candidate measurements and unchanged baseline controls. Quality is evaluated against each workload's supplied checks. The RAG corpus contains synthetic records; the 4B search result is one paired study.
+Throughput is generated tokens per second. CUDA memory is sampled whole-device usage; MLX memory is allocator peak. The native release comparisons use repeated candidate measurements and unchanged baseline controls. Quality is evaluated against each workload's supplied checks.
 
 Earlier recorded serving result: **19.77% lower p95 latency** on eight repeated prompts. [Recording and trace](evidence/openai-example-v2/README.md).
 

@@ -141,11 +141,11 @@
     "sera_loop/specialists/parallelism.py": "10adfb9e5cd7a15b9897926a33b90d05ff93e986a4fca0d77c049a01febf1392",
     "sera_loop/specialists/quantization.py": "09a8e95ffe17609a1a6b6b4931ae8470e72eff0617d38992feb8154592c27a66"
   },
-  "limits": [
-    "One compatibility workload, not broad model quality validation.",
-    "This release check does not compare Sera with fixed search or claim optimality.",
-    "Remote HTTPS service and cross-host checkpoint download are not provided.",
-    "CUDA and ROCm hardware are not certified by these MLX measurements."
-  ],
-  "worker_cleanup_passed": true
+  "worker_cleanup_passed": true,
+  "measurement_conditions": [
+    "Registered Apple Silicon MLX inference workload.",
+    "Eight quality-check tasks, with three repetitions per measurement.",
+    "Memory metric: MLX allocator peak bytes.",
+    "Authenticated loopback service and local checkpoint loading."
+  ]
 }

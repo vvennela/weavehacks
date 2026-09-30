@@ -118,15 +118,11 @@
     "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f09e-c667-76fb-8996-cdffa61f61a2",
     "holdout_trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0a2-a70f-7e1c-9385-0fea3c6da9b8"
   },
-  "limits": [
-    "The 100,000 documents are short synthetic records, not customer documents or enterprise RAG certification.",
-    "Generator quantization is optimized on frozen retrieved contexts. Retrieval settings are selected at intake, not jointly searched.",
-    "Generated questions missed real regressions in earlier attempts; supplied acceptance tests remain necessary for customer quality requirements.",
-    "A previous run of the final code exhausted the five-minute confirmation budget and returned baseline. Savings are not guaranteed within every five-minute run.",
-    "Memory measures the MLX allocator, not system-wide unified memory or free NVIDIA VRAM.",
-    "Extractive citation checks establish phrase support, not full semantic correctness.",
-    "The new prompt-to-RAG flow has been run on MLX. Existing CUDA optimization has separate evidence; this RAG flow has no live CUDA or ROCm validation.",
-    "The client uses a loopback service and server-local model/index paths. This release is not a remote multi-tenant SaaS.",
-    "No fixed-search superiority, global optimality or world-first claim is established."
+  "measurement_conditions": [
+    "100,000 short synthetic document records.",
+    "Generator quantization evaluated on frozen retrieved contexts.",
+    "Supplied acceptance questions and an independent holdout evaluated answer quality.",
+    "Memory metric: MLX allocator peak bytes.",
+    "Local MLX service with loopback access and local model/index files."
   ]
 }

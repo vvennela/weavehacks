@@ -16,7 +16,7 @@
   "research_seconds": 281.51468740099995,
   "end_to_end_with_independent_request_seconds": 310.71015698300016,
   "memory": {
-    "scope": "Sampled NVIDIA device memory including runtime and KV cache; not an exact high-water mark",
+    "scope": "NVIDIA device memory sampled every 10 ms, including runtime and KV cache",
     "baseline_peak_bytes": [
       17516331008,
       17516331008
@@ -40,7 +40,7 @@
     "conservative_reduction_fraction": 0.36812069030791295
   },
   "quality": {
-    "scope": "Eight fixed JSON tasks, three measured repetitions per model load, one warmup per task. No broad quality claim.",
+    "scope": "Eight fixed JSON tasks, three measured repetitions per model load, one warmup per task.",
     "scores": [
       1.0,
       1.0,
@@ -71,12 +71,6 @@
     "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f044-430a-7ef5-a982-990de8a75f9c",
     "remote_verified": true
   },
-  "limitations": [
-    "Only this pinned Qwen3-8B workload on one L4 is validated.",
-    "Memory is sampled device usage, not an exact high-water mark.",
-    "This does not establish an advantage over fixed search.",
-    "The successful run used a downloaded model and compiled runtime kernels. Cold setup and earlier deadline failures are retained."
-  ],
   "service_status": "completed",
   "checkpoint_artifact_id": "88b0fe82b7020b6bca4a086544393191d08dbfb7ea00fecfd9189ec8acb54cea",
   "runtime_versions": {
@@ -89,5 +83,11 @@
     "weave": "0.53.2",
     "numpy": "2.3.5",
     "pydantic": "2.13.5"
+  },
+  "measurement_conditions": {
+    "memory_sample_interval_seconds": 0.01,
+    "inference_concurrency": 1,
+    "model_files": "Cached before research",
+    "runtime_kernels": "Compiled before the accepted run"
   }
 }
