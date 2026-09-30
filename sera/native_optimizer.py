@@ -192,6 +192,8 @@ class _Research:
         self.selection_validated = False
         if checkpoint is not None:
             self.report = checkpoint
+            if 'baseline' in checkpoint:
+                self.report.setdefault('initial_baseline', deepcopy(checkpoint['baseline']))
             spent = max(checkpoint['elapsed_seconds'],
                         time.time() - checkpoint['started_at_unix'])
             self.started -= spent
@@ -308,7 +310,7 @@ class _Research:
         if self.profile.retention is not None:
             # Keep the original BF16 floor even when comparing two compressed
             # candidates. A fresh BF16 control can strengthen it, never relax it.
-            controls = [self.report['baseline']]
+            controls = [self.report['initial_baseline'], self.report['baseline']]
             if reference.get('recipe_id') == 'baseline':
                 controls.append(reference)
             quality = [item.get('task_quality', {}).get('mean') for item in controls]
@@ -333,6 +335,30 @@ class _Research:
         self.selection_validated = True
         self.save()
 
+    def review(self, name, candidate, decision):
+        review = getattr(self.agent, 'review', None)
+        if review is None:
+            return {'decision': 'adopt', 'reason': 'Injected advisor has no review method.'}
+        try:
+            response = review({
+                'recipe_id': name, 'software_gates_passed': True,
+                'quality': candidate['task_quality'],
+                'memory_mib': objective_value(candidate, 'memory'),
+                'throughput': objective_value(candidate, 'throughput'),
+                'repeated_decision': decision}, timeout_seconds=min(180, self.remaining()))
+            if not isinstance(response, dict) or response.get('decision') not in {'adopt', 'reject', 'revise'}:
+                return {'decision': 'reject', 'error_type': 'InvalidAdvisorReview'}
+            return response
+        except NativeRunStopped:
+            raise
+        except Exception as error:  # noqa: BLE001 - keep the last safe checkpoint
+            return {'decision': 'reject', 'error_type': type(error).__name__}
+        finally:
+            self.report['advisor_model_calls'] = deepcopy(getattr(self.agent, 'model_calls', []))
+            self.report['advisor_model_calls_used'] = len(self.report['advisor_model_calls'])
+            self.save()
+            self.remaining()
+
     def evidence(self, available):
         def metrics(trial):
             return {'trial_id': trial['trial_id'], 'recipe_id': trial.get('recipe_id'),
@@ -353,6 +379,7 @@ class _Research:
             self.prepare('baseline', self.profile.baseline_recipe())
             baseline = self.measure('baseline', 'baseline')
             self.report['baseline'] = baseline
+            self.report.setdefault('initial_baseline', deepcopy(baseline))
             retention_values = [baseline.get('task_quality', {}).get('mean'),
                                 objective_value(baseline, 'throughput')]
             invalid_retention = self.profile.retention is not None and any(
@@ -372,8 +399,12 @@ class _Research:
                 second = self.measure(name, f'{name}-recovery-confirmation')
                 self.report.setdefault('recovery_confirmations', []).append([first, second])
                 if all(self.decision(baseline, item)['selected'] == 'candidate' for item in (first, second)):
-                    best = min([first, second], key=lambda t: objective_value(t, 'memory'))
-                    self.select(name)
+                    worst = max([first, second], key=lambda t: objective_value(t, 'memory'))
+                    review = self.review(name, worst, self.decision(baseline, worst))
+                    self.report.setdefault('recovery_reviews', []).append(review)
+                    if review['decision'] == 'adopt':
+                        best = worst
+                        self.select(name)
             used = {trial['recipe_id'] for trial in self.report['trials']}
             available = [name for name in self.profile.recipes if name not in used]
             while available and self.report['candidate_trials_used'] < self.profile.budget.max_candidate_trials:
@@ -423,29 +454,13 @@ class _Research:
                     trial['repeated_decision'] = self.decision(best_control, worst_candidate)
                     if (trial['repeated_decision']['selected'] == 'candidate'
                             and self.decision(best, worst_candidate)['selected'] == 'candidate'):
-                        review = getattr(self.agent, 'review', None)
-                        if review is not None:
-                            try:
-                                trial['advisor_review'] = review({
-                                    'recipe_id': name, 'software_gates_passed': True,
-                                    'quality': worst_candidate['task_quality'],
-                                    'memory_mib': objective_value(worst_candidate, 'memory'),
-                                    'throughput': objective_value(worst_candidate, 'throughput'),
-                                    'repeated_decision': trial['repeated_decision']},
-                                    timeout_seconds=min(180, self.remaining()))
-                            except NativeRunStopped:
-                                raise
-                            except Exception as error:  # noqa: BLE001 - advisor failure must retain the safe selection
-                                trial['advisor_review'] = {'decision': 'reject', 'error_type': type(error).__name__}
-                            finally:
-                                self.report['advisor_model_calls'] = deepcopy(getattr(self.agent, 'model_calls', []))
-                                self.report['advisor_model_calls_used'] = len(self.report['advisor_model_calls'])
-                                self.save()
-                            self.remaining()
-                            if trial['advisor_review'].get('decision') != 'adopt':
-                                continue
-                        best = min([measured, confirmation], key=lambda t: objective_value(t, 'memory'))
+                        trial['advisor_review'] = self.review(name, worst_candidate,
+                                                               trial['repeated_decision'])
+                        if trial['advisor_review']['decision'] != 'adopt':
+                            continue
+                        best = worst_candidate
                         self.select(name)
+                        trial['adopted'] = True
                 except (NativeWorkerError, ValueError, OSError) as error:
                     trial.update(status='failed', error_type=type(error).__name__)
                 finally:

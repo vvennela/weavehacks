@@ -493,4 +493,52 @@ def test_coordinator_cannot_promote_without_adoption(tmp_path, runtime, decision
     result = native.optimize_native(profile=profile(), output_dir=tmp_path / decision,
                                     project='fixture/project', agent=Board())
     assert result['selected_recipe_id'] == 'baseline'
-    assert result['trials'][1]['advisor_review']['decision'] == decision
+    assert result['trials'][1]['advisor_review']['decision'] == ('reject' if decision == 'invalid' else decision)
+
+
+def test_recovery_requires_fresh_coordinator_adoption(tmp_path, runtime):
+    class Board(Agent):
+        def review(self, result, *, timeout_seconds):
+            return {'decision': 'reject', 'reason': 'Fresh evidence is not sufficient.'}
+
+    folder = tmp_path / 'run'
+    native.optimize_native(profile=profile(), output_dir=folder,
+                           project='fixture/project', agent=Agent())
+    saved = native.read_checkpoint(folder)[0]
+    saved.pop('research_status')
+    saved['status'] = 'running'
+    ledger = native.Ledger(folder, existing=True)
+    try:
+        ledger.save(saved)
+    finally:
+        ledger.close()
+    result = native.optimize_native(profile=profile(), output_dir=folder,
+                                    project='fixture/project', agent=Board(()), resume=True)
+    assert result['selected_recipe_id'] == 'baseline'
+    assert result['recovery_reviews'][-1]['decision'] == 'reject'
+
+
+def test_restart_preserves_original_relative_quality_floor(tmp_path, runtime, monkeypatch):
+    contract = profile() | {'retention': {'quality': 0.95, 'throughput': 0.95}}
+    contract['constraints'] = {'quality_floor': 0.5}
+    folder = tmp_path / 'run'
+    native.optimize_native(profile=contract, output_dir=folder,
+                           project='fixture/project', agent=Agent())
+    saved = native.read_checkpoint(folder)[0]
+    saved.pop('research_status')
+    saved['status'] = 'running'
+    ledger = native.Ledger(folder, existing=True)
+    try:
+        ledger.save(saved)
+    finally:
+        ledger.close()
+    measure = native._Research.measure
+    def degraded(self, *args):
+        result = measure(self, *args)
+        result['task_quality']['mean'] = 0.6
+        return result
+    monkeypatch.setattr(native._Research, 'measure', degraded)
+    result = native.optimize_native(profile=contract, output_dir=folder,
+                                    project='fixture/project', agent=Agent(()), resume=True)
+    assert result['selected_recipe_id'] != 'q8'
+    assert result['initial_baseline']['task_quality']['mean'] == 1.0

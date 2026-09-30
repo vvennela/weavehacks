@@ -94,3 +94,16 @@ def test_customer_receives_reason_when_confirmed_search_stops_at_budget(monkeypa
             'trace': {'remote_verified': True, 'url': 'fixture-trace'}}})
     result = Optimize('fixture', api_key=TOKEN)
     assert result.stop_reason == 'budget-exhausted'
+
+
+def test_lost_submit_response_preserves_generated_request_id(monkeypatch):
+    submitted = []
+    def lost(self, profile_id, *, request_id):
+        submitted.append(request_id)
+        raise SeraServiceError('Connection lost after acceptance')
+    monkeypatch.setattr(SeraClient, 'submit', lost)
+    with pytest.raises(SeraServiceError) as caught:
+        Optimize('fixture', api_key=TOKEN)
+    assert caught.value.request_id == submitted[0]
+    assert submitted[0] in str(caught.value)
+    assert TOKEN not in str(caught.value)

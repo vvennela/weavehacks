@@ -103,7 +103,13 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
     if type(poll_interval) not in (int, float) or not math.isfinite(poll_interval) or poll_interval <= 0:
         raise ValueError('Supply a positive finite poll interval')
     client = SeraClient(api_key=api_key, endpoint=endpoint)
-    job = client.submit(profile_id, request_id=request_id or uuid.uuid4().hex)
+    request_id = request_id if request_id is not None else uuid.uuid4().hex
+    try:
+        job = client.submit(profile_id, request_id=request_id)
+    except SeraServiceError as error:
+        recovered = SeraServiceError(f'{error}; retry with request_id={request_id!r}')
+        recovered.request_id = request_id
+        raise recovered from None
     try:
         while True:
             if on_update is not None:

@@ -68,7 +68,9 @@ def _measurements(report):
                        'measurement': summary(trial.get('measurement', {})),
                        'confirmation': summary(trial.get('confirmation', {}).get('candidate', {})),
                        'baseline_control': summary(trial.get('confirmation', {}).get('baseline', {})),
-                       'accepted': trial.get('repeated_decision', {}).get('selected') == 'candidate'})
+                       'accepted': bool(trial.get('adopted', report.get('selected_recipe_id') == trial['recipe_id'])
+                           and trial.get('repeated_decision', {}).get('selected') == 'candidate'
+                           and trial.get('advisor_review', {}).get('decision', 'adopt') == 'adopt')})
     return {'baseline': summary(report.get('baseline', {})), 'trials': trials,
             'scope': report.get('baseline', {}).get('runtime', {}).get('memory', {}).get('scope')}
 

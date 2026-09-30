@@ -254,3 +254,18 @@ def test_customer_measurements_include_latency_and_fresh_control():
     assert result['trials'][0]['baseline_control']['peak_bytes'] == 90
     assert result['trials'][0]['confirmation']['p95_latency_ms'] == 31
     assert result['trials'][0]['measurement']['output_tokens_per_second'] == 42.0
+
+
+def test_customer_progress_does_not_call_rejected_checkpoint_accepted():
+    report = {'selected_recipe_id': 'baseline', 'trials': [{
+        'recipe_id': 'q8', 'status': 'measured',
+        'repeated_decision': {'selected': 'candidate'},
+        'advisor_review': {'decision': 'reject'}}]}
+    assert service._measurements(report)['trials'][0]['accepted'] is False
+
+
+def test_customer_progress_waits_for_committed_adoption():
+    report = {'selected_recipe_id': 'baseline', 'trials': [{
+        'recipe_id': 'q8', 'status': 'measured',
+        'repeated_decision': {'selected': 'candidate'}}]}
+    assert service._measurements(report)['trials'][0]['accepted'] is False
