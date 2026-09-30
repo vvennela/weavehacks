@@ -1,0 +1,119 @@
+[
+  {
+    "prompt": [
+      {
+        "role": "user",
+        "content": "Extract invoice, vendor, and total as JSON. Invoice: INV-101. Vendor: Acme. Total: 120 dollars."
+      }
+    ],
+    "expected_json": {
+      "invoice": "INV-101",
+      "vendor": "Acme",
+      "total": 120
+    },
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "invoice",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "string"
+            },
+            "vendor": {
+              "type": "string"
+            },
+            "total": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "invoice",
+            "vendor",
+            "total"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  {
+    "prompt": [
+      {
+        "role": "user",
+        "content": "Extract invoice, vendor, and total as JSON. Invoice: INV-202. Vendor: Northwind. Total: 85 dollars."
+      }
+    ],
+    "expected_json": {
+      "invoice": "INV-202",
+      "vendor": "Northwind",
+      "total": 85
+    },
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "invoice",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "string"
+            },
+            "vendor": {
+              "type": "string"
+            },
+            "total": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "invoice",
+            "vendor",
+            "total"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  {
+    "prompt": [
+      {
+        "role": "user",
+        "content": "Extract invoice, vendor, and total as JSON. Invoice: INV-303. Vendor: Orion. Total: 240 dollars."
+      }
+    ],
+    "expected_json": {
+      "invoice": "INV-303",
+      "vendor": "Orion",
+      "total": 240
+    },
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "invoice",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "invoice": {
+              "type": "string"
+            },
+            "vendor": {
+              "type": "string"
+            },
+            "total": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "invoice",
+            "vendor",
+            "total"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+]

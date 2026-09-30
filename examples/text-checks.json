@@ -1,0 +1,22 @@
+[
+  {
+    "prompt": [
+      {
+        "role": "user",
+        "content": "Summarize this incident in one sentence under 20 words: An outage interrupted the website. Engineers restored service after ten minutes."
+      }
+    ],
+    "expected_json": null,
+    "text_checks": {
+      "required": [
+        "outage",
+        "service",
+        "ten minutes"
+      ],
+      "forbidden": [
+        "data loss"
+      ],
+      "max_words": 20
+    }
+  }
+]

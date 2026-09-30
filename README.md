@@ -32,8 +32,9 @@ checks = json.load(open("checks.json"))
 result = sera.Optimize("Minimize memory for support-ticket classification", examples=checks)
 
 with result.load() as model:
-    answer = model.generate("Classify this ticket: my package arrived broken",
-                            max_tokens=64, seed=0)
+    answer = model.generate(
+        [{"role": "user", "content": "Classify this ticket: my package arrived broken"}],
+        max_tokens=64, seed=0)
     print(answer["text"])
 ```
 

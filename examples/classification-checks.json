@@ -1,5 +1,116 @@
 [
-  {"prompt": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: My package arrived broken.", "expected_json": {"category": "delivery"}},
-  {"prompt": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: I was charged twice for my order.", "expected_json": {"category": "billing"}},
-  {"prompt": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: The application crashes when I sign in.", "expected_json": {"category": "technical"}}
+  {
+    "prompt": [
+      {
+        "role": "system",
+        "content": "You classify support tickets. Category delivery includes shipping delays and damaged packages. Category billing includes payments, charges, and refunds. Category technical includes software errors, crashes, and login problems. Return only JSON with one key category."
+      },
+      {
+        "role": "user",
+        "content": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: My package arrived broken."
+      }
+    ],
+    "expected_json": {
+      "category": "delivery"
+    },
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "ticket_category",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": [
+                "billing",
+                "delivery",
+                "technical"
+              ]
+            }
+          },
+          "required": [
+            "category"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  {
+    "prompt": [
+      {
+        "role": "system",
+        "content": "You classify support tickets. Category delivery includes shipping delays and damaged packages. Category billing includes payments, charges, and refunds. Category technical includes software errors, crashes, and login problems. Return only JSON with one key category."
+      },
+      {
+        "role": "user",
+        "content": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: I was charged twice for my order."
+      }
+    ],
+    "expected_json": {
+      "category": "billing"
+    },
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "ticket_category",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": [
+                "billing",
+                "delivery",
+                "technical"
+              ]
+            }
+          },
+          "required": [
+            "category"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  {
+    "prompt": [
+      {
+        "role": "system",
+        "content": "You classify support tickets. Category delivery includes shipping delays and damaged packages. Category billing includes payments, charges, and refunds. Category technical includes software errors, crashes, and login problems. Return only JSON with one key category."
+      },
+      {
+        "role": "user",
+        "content": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: The application crashes when I sign in."
+      }
+    ],
+    "expected_json": {
+      "category": "technical"
+    },
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "ticket_category",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": [
+                "billing",
+                "delivery",
+                "technical"
+              ]
+            }
+          },
+          "required": [
+            "category"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  }
 ]

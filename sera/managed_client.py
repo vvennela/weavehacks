@@ -203,6 +203,9 @@ def Optimize(profile_id, *, api_key=None, endpoint=None, request_id=None,
             if job['status'] == 'needs-input':
                 raise SeraNeedsInput(job['job_id'], job['result']['questions'])
             if job['status'] not in {'pending', 'running', 'interrupted'}:
+                if (job.get('progress') or {}).get('research_status') == 'baseline-failed':
+                    raise SeraServiceError('Baseline failed the workload checks. Choose a model that passes your '
+                                           'examples before optimizing it; inspect the job measurements for details.')
                 raise SeraServiceError(f"Sera job {job['job_id']} ended: {job['status']}")
             time.sleep(poll_interval)
             job = client.status(job['job_id'])

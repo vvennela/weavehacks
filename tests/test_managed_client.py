@@ -123,3 +123,10 @@ def test_required_format_failure_is_explicit_and_keeps_baseline_access(monkeypat
     with pytest.raises(SeraRequirementsNotMet) as error:
         Optimize('Run at INT4', api_key=TOKEN)
     assert error.value.result.selected_recipe_id == 'baseline'
+
+
+def test_baseline_failure_explains_the_customer_action(monkeypatch):
+    monkeypatch.setattr(SeraClient, 'submit_intent', lambda *args, **kwargs: {
+        'job_id': 'a'*32, 'status': 'failed', 'progress': {'research_status': 'baseline-failed'}})
+    with pytest.raises(SeraServiceError, match='Baseline failed the workload checks'):
+        Optimize('Optimize ticket classification', api_key=TOKEN)
