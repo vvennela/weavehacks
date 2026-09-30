@@ -45,15 +45,22 @@ class Corpus:
             raise ValueError('Corpus symlinks are not supported')
         if self.path.is_dir():
             def records():
-                for path in sorted(self.path.rglob('*')):
+                paths = []
+                for path in self.path.rglob('*'):
                     if path.is_symlink():
                         raise ValueError('Corpus symlinks are not supported')
                     if path.is_file():
                         if path.suffix.lower() not in {'.txt', '.md'}:
                             raise ValueError('Document directories support only UTF-8 .txt and .md files')
-                        if path.stat().st_size > MAX_DOCUMENT_BYTES:
-                            raise ValueError('Document exceeds the 1 MiB limit')
-                        yield {'id': path.relative_to(self.path).as_posix(), 'text': path.read_text(encoding='utf-8')}
+                        paths.append(path)
+                        if len(paths) > MAX_DOCUMENTS:
+                            raise ValueError('Corpus exceeds configured ingestion limits')
+                for path in sorted(paths):
+                    with path.open('rb') as handle:
+                        data = handle.read(MAX_DOCUMENT_BYTES + 1)
+                    if len(data) > MAX_DOCUMENT_BYTES:
+                        raise ValueError('Document exceeds the 1 MiB limit')
+                    yield {'id': path.relative_to(self.path).as_posix(), 'text': data.decode('utf-8')}
         elif self.path.is_file() and self.path.suffix == '.jsonl':
             def records():
                 with self.path.open(encoding='utf-8') as handle:
@@ -76,7 +83,9 @@ class Corpus:
                 raise ValueError('Corpus exceeds configured ingestion limits')
             yield record
 
-    def inspect(self):
+    def inspect(self, *, sample_count=8):
+        if type(sample_count) is not int or not 1 <= sample_count <= 32:
+            raise ValueError('Sample count must be between 1 and 32')
         digest, seen, samples = hashlib.sha256(), set(), []
         total = 0
         for doc in self.documents():
@@ -89,7 +98,7 @@ class Corpus:
             priority = -int(hashlib.sha256(doc['id'].encode()).hexdigest(), 16)
             item = (priority, doc['id'], doc['text'][:2400])
             heapq.heappush(samples, item)
-            if len(samples) > 8:
+            if len(samples) > sample_count:
                 heapq.heappop(samples)
         if not seen:
             raise ValueError('Corpus is empty')

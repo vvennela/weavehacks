@@ -110,3 +110,17 @@ def test_pipeline_cites_retrieved_text_and_abstains_on_unsupported_output(tmp_pa
         assert not pipeline.answer('Cedar backup')['supported']
         assert pipeline.answer('zzzzzzz')['reason'] == 'no-retrieval-match'
     assert model.closed
+
+
+def test_directory_enumeration_obeys_document_limit(tmp_path, monkeypatch):
+    monkeypatch.setattr('sera.rag.MAX_DOCUMENTS', 2)
+    folder = tmp_path / 'docs'
+    folder.mkdir()
+    for i in range(3):
+        (folder / f'{i}.txt').write_text('A document.')
+    def oversized_tree(self, pattern):
+        yield from [folder / f'{i}.txt' for i in range(3)]
+        raise RuntimeError('The rest of this oversized tree must not be enumerated')
+    monkeypatch.setattr(type(folder), 'rglob', oversized_tree)
+    with pytest.raises(ValueError, match='limits'):
+        list(Corpus(folder).documents())

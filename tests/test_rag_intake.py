@@ -10,7 +10,9 @@ from sera.rag_intake import IntakeNeedsInput, prepare_rag
 
 def setup(tmp_path):
     source = tmp_path / 'docs.jsonl'
-    source.write_text(json.dumps({'id': 'cedar', 'text': 'Cedar daily backup starts at 03:00 UTC.'}) + '\n')
+    source.write_text('\n'.join(json.dumps(doc) for doc in [
+        {'id': 'cedar', 'text': 'Cedar daily backup starts at 03:00 UTC.'},
+        {'id': 'birch', 'text': 'Birch daily backup starts at 06:00 UTC.'}]))
     return {'intent': 'Run RAG over my backup documents', 'source': str(source),
             'profiles': [profile()], 'evaluation': None, 'deadline': time.time() + 60,
             'project': 'fixture/project'}
@@ -23,6 +25,9 @@ class Planner:
         assert kwargs['reasoning_effort'] == 'high'
     def request(self, prompt, schema, **kwargs):
         Planner.calls += 1
+        if 'INDEPENDENT VALIDATION' in prompt:
+            return {'examples': [{'question': 'When does Birch back up?', 'answer': '06:00 UTC',
+                                  'document_id': 'birch', 'evidence': '06:00 UTC'}]}
         assert '03:00 UTC' in prompt
         return {'status': 'ready', 'questions': [], 'profile_id': 'fixture', 'chunk_words': 128,
                 'top_k': 1, 'reason': 'Grounded document questions.', 'examples': [
@@ -47,11 +52,13 @@ def test_intake_creates_grounded_profile_preserves_gates_and_resumes(tmp_path):
     for key in ['constraints', 'objective', 'budget', 'source', 'recipes']:
         assert value['profile'][key] == validate_native_profile(profile()).model_dump()[key]
     assert value['rag']['quality_scope'] == 'generated-smoke-tests'
+    assert value['rag']['validation_questions'] == 1
+    assert len(value['profile']['tasks']) == 2
     assert value['rag']['retrieval']['evidence_recall'] == 1.0
     assert value['rag']['intake_trace']['remote_verified']
     again = prepare_rag(request, folder, agent_factory=Planner, hardware=hardware)
     assert value == again
-    assert Planner.calls == 1
+    assert Planner.calls == 2
 
 
 def test_no_hardware_fit_never_calls_agent(tmp_path):
@@ -133,3 +140,27 @@ def test_expired_intake_does_not_request_a_plan(tmp_path):
     request = setup(tmp_path) | {'deadline': time.time() - 1}
     with pytest.raises(TimeoutError):
         prepare_rag(request, tmp_path / 'job', agent_factory=Planner, hardware={'backends': ['mlx']})
+
+
+def test_validation_cannot_reuse_planning_documents(tmp_path):
+    class Reused(Planner):
+        def request(self, prompt, *args, **kwargs):
+            result = super().request(prompt, *args, **kwargs)
+            if 'INDEPENDENT VALIDATION' in prompt:
+                result['examples'][0]['document_id'] = 'cedar'
+            return result
+    with pytest.raises(ValueError, match='independent'):
+        prepare_rag(setup(tmp_path), tmp_path / 'job', agent_factory=Reused,
+                    hardware={'backends': ['mlx']})
+
+
+def test_validation_never_sees_planning_tests_or_results(tmp_path):
+    class Blind(Planner):
+        def request(self, prompt, *args, **kwargs):
+            if 'INDEPENDENT VALIDATION' in prompt:
+                assert '03:00 UTC' not in prompt
+                assert 'Cedar' not in prompt
+                assert 'recipe_id' not in prompt
+            return super().request(prompt, *args, **kwargs)
+    prepare_rag(setup(tmp_path), tmp_path / 'job', agent_factory=Blind,
+                hardware={'backends': ['mlx']})
