@@ -30,6 +30,7 @@ class ManagedResult:
     elapsed_seconds: float
     backend: str = 'mlx'
     runtime: dict | None = None
+    stop_reason: str | None = None
 
     def verify(self):
         return verify_artifact(self.artifact_path, expected_id=self.artifact_id, backend=self.backend)
@@ -122,7 +123,8 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
                 return ManagedResult(job_id=job['job_id'], selected_recipe_id=result['selected_recipe_id'],
                     artifact_id=result['selected_artifact_id'], artifact_path=result['artifact_path'],
                     trace_url=result['trace']['url'], elapsed_seconds=result['elapsed_seconds'],
-                    backend=result.get('backend', 'mlx'), runtime=result.get('runtime'))
+                    backend=result.get('backend', 'mlx'), runtime=result.get('runtime'),
+                    stop_reason=result.get('stop_reason'))
             if job['status'] not in {'pending', 'running', 'interrupted'}:
                 raise SeraServiceError(f"Sera job {job['job_id']} ended: {job['status']}")
             time.sleep(poll_interval)

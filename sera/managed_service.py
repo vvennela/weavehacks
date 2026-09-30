@@ -48,6 +48,7 @@ def _result(report):
     verify_artifact(report['artifact_path'], expected_id=report['selected_artifact_id'], backend=report['execution']['backend'])
     result = {key: report[key] for key in ('selected_recipe_id', 'selected_artifact_id',
             'artifact_path', 'trace', 'candidate_trials_used', 'elapsed_seconds')}
+    result['stop_reason'] = report.get('stop_reason')
     result['measurements'] = _measurements(report)
     result['backend'] = report['execution']['backend']
     if result['backend'] == 'cuda':

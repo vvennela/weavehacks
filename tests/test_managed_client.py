@@ -83,3 +83,14 @@ def test_cuda_result_reloads_with_registered_runtime(monkeypatch):
     result = Optimize('fixture', api_key=TOKEN)
     assert result.load() == 'loaded'
     assert calls == [('/checkpoint', 'b'*64)]
+
+
+def test_customer_receives_reason_when_confirmed_search_stops_at_budget(monkeypatch):
+    monkeypatch.setattr(SeraClient, 'submit', lambda *a, **k: {
+        'job_id': 'a'*32, 'status': 'completed', 'result': {
+            'selected_recipe_id': 'q8', 'selected_artifact_id': 'b'*64,
+            'artifact_path': '/checkpoint', 'elapsed_seconds': 55.,
+            'stop_reason': 'budget-exhausted',
+            'trace': {'remote_verified': True, 'url': 'fixture-trace'}}})
+    result = Optimize('fixture', api_key=TOKEN)
+    assert result.stop_reason == 'budget-exhausted'

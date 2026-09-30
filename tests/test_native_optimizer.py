@@ -356,3 +356,97 @@ def test_relative_retention_requires_useful_baseline(tmp_path, runtime, monkeypa
                                     project='fixture/project', agent=Agent())
     assert result['status'] == 'baseline-failed'
     assert result['selected_artifact_id'] is None
+
+
+@pytest.mark.parametrize(('stop_reason', 'expected_status'), [
+    ('budget-exhausted', 'completed'), ('cancelled', 'cancelled')])
+def test_budget_returns_confirmed_artifact_but_cancellation_stays_cancelled(
+        tmp_path, runtime, monkeypatch, stop_reason, expected_status):
+    remaining = native._Research.remaining
+    def stop_after_confirmation(research):
+        if research.report['selected_recipe_id'] == 'q8':
+            raise native.NativeRunStopped(stop_reason)
+        return remaining(research)
+    monkeypatch.setattr(native._Research, 'remaining', stop_after_confirmation)
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path/'run',
+                                    project='fixture/project', agent=Agent(('q8', 'q4')))
+    assert result['status'] == expected_status
+    assert result['selected_recipe_id'] == 'q8'
+    assert result['trials'][0]['repeated_decision']['selected'] == 'candidate'
+    assert verify_artifact(result['artifact_path'])['artifact_id'] == result['selected_artifact_id']
+    if stop_reason == 'budget-exhausted':
+        assert result['stop_reason'] == stop_reason
+        assert result['trace']['remote_verified']
+        from sera.managed_service import _result
+        assert _result(result)['stop_reason'] == stop_reason
+
+
+def test_budget_during_next_export_returns_only_previous_confirmed_selection(tmp_path, runtime, monkeypatch):
+    worker = native.run_native_job
+    def expire_next_export(job, **kwargs):
+        if job['operation'] == 'prepare' and job['recipe']['bits'] == 4:
+            raise native.NativeRunStopped('budget-exhausted')
+        return worker(job, **kwargs)
+    monkeypatch.setattr(native, 'run_native_job', expire_next_export)
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path/'run',
+                                    project='fixture/project', agent=Agent(('q8', 'q4')))
+    assert result['status'] == 'completed'
+    assert result['selected_recipe_id'] == 'q8'
+    assert result['trials'][1]['status'] == 'budget-exhausted'
+    assert 'q4' not in result['artifact_locations']
+
+
+def test_budget_during_confirmation_never_promotes_unconfirmed_artifact(tmp_path, runtime, monkeypatch):
+    worker = native.run_native_job
+    measured = 0
+    def expire_control(job, **kwargs):
+        nonlocal measured
+        if job['operation'] == 'measure':
+            measured += 1
+            if measured == 3:
+                raise native.NativeRunStopped('budget-exhausted')
+        return worker(job, **kwargs)
+    monkeypatch.setattr(native, 'run_native_job', expire_control)
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path/'run',
+                                    project='fixture/project', agent=Agent(('q8',)))
+    assert result['status'] == 'completed'
+    assert result['selected_recipe_id'] == 'baseline'
+    assert result['trials'][0]['status'] == 'budget-exhausted'
+    assert 'repeated_decision' not in result['trials'][0]
+
+
+def test_cancellation_wins_when_deadline_expires_during_worker(tmp_path, runtime, monkeypatch):
+    import threading
+    cancelled = threading.Event()
+    worker = native.run_native_job
+    def cancel_and_expire(job, **kwargs):
+        if job['operation'] == 'prepare' and job['recipe']['bits'] == 4:
+            cancelled.set()
+            raise native.NativeRunStopped('budget-exhausted')
+        return worker(job, **kwargs)
+    monkeypatch.setattr(native, 'run_native_job', cancel_and_expire)
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path/'run',
+        project='fixture/project', agent=Agent(('q8', 'q4')), cancelled=cancelled)
+    assert result['status'] == 'cancelled'
+    assert result['selected_recipe_id'] == 'q8'
+    assert result['trials'][1]['status'] == 'cancelled'
+
+
+def test_research_leaves_time_for_trace_inside_the_existing_deadline(tmp_path, runtime, monkeypatch):
+    clock = [0.0]
+    monkeypatch.setattr(native.time, 'monotonic', lambda: clock[0])
+    worker = native.run_native_job
+    def consume_research_window(job, **kwargs):
+        result = worker(job, **kwargs)
+        if job['operation'] == 'prepare' and job['recipe']['bits'] == 4:
+            clock[0] = 55.0
+        return result
+    monkeypatch.setattr(native, 'run_native_job', consume_research_window)
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path/'run',
+                                    project='fixture/project', agent=Agent(('q8', 'q4')))
+    assert result['status'] == 'completed'
+    assert result['stop_reason'] == 'budget-exhausted'
+    assert result['selected_recipe_id'] == 'q8'
+    assert result['elapsed_seconds'] < profile()['max_run_seconds']
+    assert result['execution']['finalization_reserve_seconds'] == 6.0
+    assert result['trials'][1]['status'] == 'budget-exhausted'

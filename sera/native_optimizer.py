@@ -177,6 +177,7 @@ class _Research:
                                       'task_hash': content_hash([task.model_dump() for task in profile.tasks])},
                        'execution': {'backend': profile.backend, 'budget': profile.budget.model_dump(),
                                      'max_run_seconds': profile.max_run_seconds,
+                                     'finalization_reserve_seconds': min(15.0, profile.max_run_seconds * 0.1),
                                      'job_timeout_seconds': profile.job_timeout_seconds},
                        'started_at_unix': time.time(), 'agent_calls_used': 0,
                        'trials': [], 'agent_calls': [], 'jobs': [], 'candidate_trials_used': 0,
@@ -186,6 +187,7 @@ class _Research:
         if isinstance(profile, CUDAProfile):
             self.report['execution']['runtime'] = profile.runtime.model_dump()
         self.previous_selected = None
+        self.selection_validated = False
         if checkpoint is not None:
             self.report = checkpoint
             spent = max(checkpoint['elapsed_seconds'],
@@ -235,7 +237,9 @@ class _Research:
     def remaining(self):
         if self.cancelled is not None and self.cancelled.is_set():
             raise NativeRunStopped('cancelled')
-        remaining = self.profile.max_run_seconds - (time.monotonic() - self.started)
+        # Leave time inside the same deadline for required tracing and delivery.
+        reserve = min(15.0, self.profile.max_run_seconds * 0.1)
+        remaining = self.profile.max_run_seconds - reserve - (time.monotonic() - self.started)
         if remaining <= 0:
             raise NativeRunStopped('budget-exhausted')
         return remaining
@@ -323,6 +327,7 @@ class _Research:
         verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend=self.profile.backend)
         self.report.update(selected_recipe_id=name, selected_artifact_id=artifact['artifact_id'],
                            artifact_path=artifact['path'])
+        self.selection_validated = True
         self.save()
 
     def evidence(self, available):
@@ -420,7 +425,20 @@ class _Research:
                     self.save()
             self.report['status'] = 'awaiting-trace'
         except NativeRunStopped as error:
-            self.report['status'] = str(error)
+            stopped = ('cancelled' if self.cancelled is not None and self.cancelled.is_set()
+                       else str(error))
+            self.report['status'] = stopped
+            for trial in self.report['trials']:
+                pending_confirmation = (trial['status'] == 'measured'
+                    and trial.get('decision', {}).get('selected') == 'candidate'
+                    and 'confirmation' not in trial)
+                if trial['status'] == 'running' or pending_confirmation:
+                    trial['status'] = stopped
+            if stopped == 'budget-exhausted' and self.selection_validated:
+                # A search deadline stops further experiments. The last selected
+                # artifact already passed the fixed gates and remains usable.
+                self.report['stop_reason'] = 'budget-exhausted'
+                self.report['status'] = 'awaiting-trace'
         except BaseException as error:
             self.report.update(status='failed', error_type=type(error).__name__)
             raise
