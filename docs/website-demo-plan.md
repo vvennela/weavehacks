@@ -27,7 +27,7 @@ for this review.
 
 Sources: [website guide](../web/README.md), [server](../web/server.py),
 [dashboard code](../output/sera-lab.js), [notebook launcher](../output/sera-notebook.js),
-[GPU notebook](../notebooks/molab_lab.py), [current evidence demo](../demo.py).
+[GPU notebook](../notebooks/molab_lab.py), [current evidence demo](internal/demo.py).
 
 The repository contains two separate systems, as the [root README](../README.md)
 states. The website's `sera_loop` specialists use rule-based Python policies.
@@ -59,7 +59,7 @@ Fix these presentation risks before using the website:
 - Keep metrics bound to one configuration. Lowest latency, peak throughput, and
   lowest memory can belong to three different trials.
 - Use actual investigator names and no fixed trial cap for the measured swarm.
-- Do not use the old [demo script](../demo-script.md) unchanged. Its 35% improvement
+- Do not use the old [demo script](internal/demo-script.md) unchanged. Its 35% improvement
   and rejected FP8 example are fixed example data, not the current measured run.
 - Mark two-model and multi-GPU claims by their own evidence status. Do not infer
   them from the single-model recording.

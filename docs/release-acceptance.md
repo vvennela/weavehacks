@@ -5,7 +5,7 @@ setup. It is a controlled deployment release, not a claim of general production
 readiness. The independent `sera_loop` package and partner website remain in the
 repository; these measurements do not certify that separate implementation.
 
-See [completion.md](../completion.md) for the full product status. Historical
+See [completion.md](release.md) for the full product status. Historical
 recordings remain unchanged, including failed experiments.
 
 ## Release gates

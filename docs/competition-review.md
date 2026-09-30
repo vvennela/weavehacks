@@ -11,7 +11,7 @@ Sera runs as a local service. `sera setup` installs the hardware runtime, connec
 3. [General workload results](../evidence/managed-workloads-release-v1/release.json): classification, extraction, and incident summarization, with up to 63.33% lower allocator memory.
 4. [RAG result](../evidence/managed-rag-release-v1/release.json): 100,000 synthetic documents, 40.87% lower generator allocator memory, and separate holdout checks.
 5. [W&B project](https://wandb.ai/vvennela-n-a/wandb_agent_default_project): experiment traces and measured decisions.
-6. [Linux/macOS CI](https://github.com/vvennela/weavehacks/actions/workflows/test.yml), [Apache 2.0 license](../LICENSE), and [release status](../completion.md).
+6. [Linux/macOS CI](https://github.com/vvennela/weavehacks/actions/workflows/test.yml), [Apache 2.0 license](../LICENSE), and [release status](release.md).
 
 ## Present
 

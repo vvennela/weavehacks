@@ -1,6 +1,6 @@
 # ModelOpt search comparison proposal
 
-Historical proposal. Implementation and measured results are in the [current release status](../completion.md).
+Historical proposal. Implementation and measured results are in the [current release status](release.md).
 
 Status: ModelOpt integration and backend-independent direction requested;
 benchmark rules pending user decision; no GPU experiments run.

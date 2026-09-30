@@ -47,3 +47,34 @@ deploy/vercel/api/__pycache__/
 
 # wrangler local cache (account id, no secrets, but not ours to share)
 .wrangler/
+
+# Local transcript trees retained in verified research-history archives.
+/evidence/cpu-astra-luna-2026-09-24/agent/
+/evidence/cpu-kernel-codex-2026-09-24/agent/
+/evidence/cpu-kernel-codex-2026-09-24-v2/agent/
+/evidence/cpu-libxsmm-automatic-2026-09-25/agent/
+/evidence/cpu-libxsmm-compiler-board-2026-09-25/agent/
+/evidence/cpu-libxsmm-dataflow-board-2026-09-25/agent/
+/evidence/cpu-libxsmm-editable-panel-2026-09-25/agent/
+/evidence/cpu-libxsmm-measure-prepared-2026-09-24/agent/
+/evidence/cpu-libxsmm-next-2026-09-25/agent/
+/evidence/cpu-libxsmm-next-board-2026-09-25/agent/
+/evidence/cpu-libxsmm-next-continue-2026-09-25/agent/
+/evidence/cpu-libxsmm-panel-swarm-2026-09-25/agent/
+/evidence/cpu-libxsmm-strassen-swarm-2026-09-25/agent/
+/evidence/cpu-libxsmm-swarm-2026-09-24/agent/
+/evidence/cpu-libxsmm-swarm-edits-2026-09-24/agent/
+/evidence/cpu-libxsmm-ten-run-ac-2026-09-25/agent/
+/evidence/cpu-libxsmm-transpose-swarm-2026-09-25/agent/
+/evidence/cpu-specialists-codex-2026-09-24/agent/
+/evidence/cpu-swarm-ac-2026-09-24/agent/
+/evidence/cpu-swarm-ac-idle-2026-09-24/agent/
+/evidence/cpu-swarm-plan-2026-09-24/agent/
+/evidence/cpu-swarm-sme2-2026-09-24/agent/
+/evidence/cpu-swarm-sme2-followup-2026-09-24/agent/
+/evidence/live-astra-controller-v2/[0-9a-f]*/
+/evidence/live-astra-plateau-controller-v1/[0-9a-f]*/
+/evidence/live-luna-controller-v2/[0-9a-f]*/
+/evidence/live-luna-expanded-controller-v2/[0-9a-f]*/
+/evidence/live-luna-plateau-controller-v1/[0-9a-f]*/
+/evidence/live-luna-plateau-controller-v2/[0-9a-f]*/

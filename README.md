@@ -11,6 +11,25 @@
 
 Get more inference from the hardware you already have. Describe your workload; Sera runs experiments, checks quality and performance, and returns a verified checkpoint. These are measured results from the workloads below.
 
+## For reviewers
+
+- **Resilience:** [recovery](tests/test_native_optimizer.py), [service cancellation and restart](tests/test_managed_service.py), [worker deadlines and cleanup](tests/test_native_worker.py), and [process ownership](tests/test_owned_command.py).
+- **Tests and CI:** install [uv](https://docs.astral.sh/uv/), then run `bash check.sh`. This runs the full suite, lint, source and wheel builds, and package checks without live credentials or a GPU. [GitHub Actions](https://github.com/vvennela/weavehacks/actions/workflows/test.yml) runs the same checks on Linux and macOS; the badge above shows its status.
+- **Architecture:** `Sera.Optimize` submits to an authenticated local service. Astra and 15 Luna specialists rank experiments; the Python controller runs isolated hardware workers and enforces quality and budget limits. A passing run returns a verified checkpoint and W&B trace. [Service](sera/managed_service.py) · [Controller](sera/native_optimizer.py) · [Agent board](sera/native_board.py).
+
+```mermaid
+flowchart LR
+    A["Sera.Optimize"] --> B["Local service"]
+    B --> C["Research controller"]
+    C <--> D["Astra + 15 Luna via Codex"]
+    C --> E["Isolated MLX / CUDA workers"]
+    E --> F["Quality and performance checks"]
+    F --> C
+    C --> G["Verified checkpoint + W&B trace"]
+```
+
+**Review scope:** `sera/`, `tests/`, and the [release evidence index](evidence/README.md). CPU kernel modules are a separate research path. `src/sera_loop`, `experiments/`, notebooks, and the Molab website/deployment are labeled legacy; `sera_loop` remains installed and tested for existing callers. Working notes and old pitches are in [`docs/internal/`](docs/internal/).
+
 ## The numbers
 
 The CUDA, summarization, extraction, classification, and RAG gains compare quantized inference with **the same model in BF16 on the same hardware and workload**. The 4B search comparison names both its fixed-recipe and BF16 baselines.
@@ -80,4 +99,4 @@ sera stop
 
 **Built to run:** authenticated local service, cancellation, hard deadlines, request recovery, checkpoint verification, and process cleanup. [Installed-package and CI checks](evidence/managed-workloads-release-v1/validation.json) · [Restart and recovery checks](evidence/managed-workloads-release-v1/lifecycle.json).
 
-[Release status](completion.md) · [Demo workflow](docs/production-demo-workflow.md) · [Apache 2.0 license](LICENSE)
+[Release status](docs/release.md) · [Demo workflow](docs/production-demo-workflow.md) · [Apache 2.0 license](LICENSE)

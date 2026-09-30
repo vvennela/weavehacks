@@ -1,3 +1,7 @@
+# Legacy Molab website
+
+This website and proxy preserve the earlier Molab demo. The v1 deployment is the [local Sera service](../README.md#one-setup-one-call).
+
 # Sera local frontend
 
 From the repository root, run `python3 web/server.py` and open

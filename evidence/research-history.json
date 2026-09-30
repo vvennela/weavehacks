@@ -1,0 +1,239 @@
+{
+  "source_commit": "24c4286c0e9f0aceda213d9b064ded17207edb8d",
+  "description": "Lossless historical agent records. Measurement results, failures, source provenance, and current CPU repeatability records remain in place. Archive members retain their original paths relative to restore_directory.",
+  "restore": "tar -xzf evidence/<archive> -C <restore_directory>",
+  "archives": [
+    {
+      "archive": "history/cpu-astra-luna-2026-09-24-agent.tar.gz",
+      "sha256": "395cd89502f239b0f7f21c08db14efd51ca5963e93405fb97a9350a4471b0cb0",
+      "files": 86,
+      "uncompressed_bytes": 1839058,
+      "compressed_bytes": 286086,
+      "restore_directory": "evidence/cpu-astra-luna-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-kernel-codex-2026-09-24-agent.tar.gz",
+      "sha256": "5357e2f3ae9ad8e4849f7df2c5c79ae8361e81d33d73740e4ce7ad90b716d9d1",
+      "files": 1,
+      "uncompressed_bytes": 339,
+      "compressed_bytes": 247,
+      "restore_directory": "evidence/cpu-kernel-codex-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-kernel-codex-2026-09-24-v2-agent.tar.gz",
+      "sha256": "497d873290c8679ab0335819479911040f81fff88fa779db215a6a8635a97eee",
+      "files": 19,
+      "uncompressed_bytes": 391957,
+      "compressed_bytes": 30772,
+      "restore_directory": "evidence/cpu-kernel-codex-2026-09-24-v2"
+    },
+    {
+      "archive": "history/cpu-libxsmm-automatic-2026-09-25-agent.tar.gz",
+      "sha256": "462d0e9ee865bd059c72b88a43a3cb99bff03eb0f3ca7718c863041fead84a4a",
+      "files": 16,
+      "uncompressed_bytes": 855345,
+      "compressed_bytes": 103724,
+      "restore_directory": "evidence/cpu-libxsmm-automatic-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-compiler-board-2026-09-25-agent.tar.gz",
+      "sha256": "e284d8386bda6d801c197e0c18ef4e1e0ca51134230b7cdd1689d08f492b4a33",
+      "files": 366,
+      "uncompressed_bytes": 101085826,
+      "compressed_bytes": 10668400,
+      "restore_directory": "evidence/cpu-libxsmm-compiler-board-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-dataflow-board-2026-09-25-agent.tar.gz",
+      "sha256": "1960a86b532b9cb4b86943a541bb9b0f012706865ec4a633c3ca4a6b3e81637a",
+      "files": 6,
+      "uncompressed_bytes": 1010107,
+      "compressed_bytes": 130005,
+      "restore_directory": "evidence/cpu-libxsmm-dataflow-board-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-editable-panel-2026-09-25-agent.tar.gz",
+      "sha256": "b732435d9e7fe264a4d6f03439f923aba4e096a8b436ca4f4bbc8f379d2733dd",
+      "files": 361,
+      "uncompressed_bytes": 27831938,
+      "compressed_bytes": 4974595,
+      "restore_directory": "evidence/cpu-libxsmm-editable-panel-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-measure-prepared-2026-09-24-agent.tar.gz",
+      "sha256": "b16249cf2f1343d8d7ba8d93dc0b2027844f56b6fc18c2ecca564a944f151ac6",
+      "files": 191,
+      "uncompressed_bytes": 12121575,
+      "compressed_bytes": 2002150,
+      "restore_directory": "evidence/cpu-libxsmm-measure-prepared-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-libxsmm-next-2026-09-25-agent.tar.gz",
+      "sha256": "a651ee92d6c19d2e558c775eb6dc83f26d94f864d0bb130b30bca702fa201130",
+      "files": 161,
+      "uncompressed_bytes": 5933816,
+      "compressed_bytes": 1487507,
+      "restore_directory": "evidence/cpu-libxsmm-next-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-next-board-2026-09-25-agent.tar.gz",
+      "sha256": "71b05e2275cb3bc9fac933652a6701627ffc0d50de4ee6e0e8caa31314018f08",
+      "files": 366,
+      "uncompressed_bytes": 30161878,
+      "compressed_bytes": 5180211,
+      "restore_directory": "evidence/cpu-libxsmm-next-board-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-next-continue-2026-09-25-agent.tar.gz",
+      "sha256": "f7614fef6fe5f834b4dc63a6693e7ca6a6a703d149d5257f88fcd87ab5b35555",
+      "files": 201,
+      "uncompressed_bytes": 10857290,
+      "compressed_bytes": 2352381,
+      "restore_directory": "evidence/cpu-libxsmm-next-continue-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-panel-swarm-2026-09-25-agent.tar.gz",
+      "sha256": "a807c1c05f65aa9b6f677ea4d3013604a926cd96a49bade5d1560d8d4ae152c9",
+      "files": 511,
+      "uncompressed_bytes": 27999991,
+      "compressed_bytes": 5282758,
+      "restore_directory": "evidence/cpu-libxsmm-panel-swarm-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-strassen-swarm-2026-09-25-agent.tar.gz",
+      "sha256": "c94e8344ae7af7eb93be5000772b4c742aee6595f4d9d65b506c412b95e56326",
+      "files": 356,
+      "uncompressed_bytes": 44000575,
+      "compressed_bytes": 5832708,
+      "restore_directory": "evidence/cpu-libxsmm-strassen-swarm-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-swarm-2026-09-24-agent.tar.gz",
+      "sha256": "1f54bd563970473068900b4ce9b9f8d030f0759b92c7f27bf9d2016220d4f7f5",
+      "files": 161,
+      "uncompressed_bytes": 3993129,
+      "compressed_bytes": 948904,
+      "restore_directory": "evidence/cpu-libxsmm-swarm-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-libxsmm-swarm-edits-2026-09-24-agent.tar.gz",
+      "sha256": "007c96f79541b7b56d7cad50d050d2633aeb66342522dc46ac35473f610f060a",
+      "files": 6,
+      "uncompressed_bytes": 182847,
+      "compressed_bytes": 42130,
+      "restore_directory": "evidence/cpu-libxsmm-swarm-edits-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-libxsmm-ten-run-ac-2026-09-25-agent.tar.gz",
+      "sha256": "d941554b9323102fdbfdfbc40273e67eb13ea254d1334ed2e753fc9b891a4be8",
+      "files": 21,
+      "uncompressed_bytes": 1439067,
+      "compressed_bytes": 116667,
+      "restore_directory": "evidence/cpu-libxsmm-ten-run-ac-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-libxsmm-transpose-swarm-2026-09-25-agent.tar.gz",
+      "sha256": "0c6b4e531776b5f2911863130f6f7b8ee96d0c5ec881e0abb9bdd8d1dcfb7379",
+      "files": 416,
+      "uncompressed_bytes": 52023232,
+      "compressed_bytes": 6054966,
+      "restore_directory": "evidence/cpu-libxsmm-transpose-swarm-2026-09-25"
+    },
+    {
+      "archive": "history/cpu-specialists-codex-2026-09-24-agent.tar.gz",
+      "sha256": "18829314c88bf8a2a133b56e6d39cfab25b481e517a075ae409910b6739ceffa",
+      "files": 25,
+      "uncompressed_bytes": 319721,
+      "compressed_bytes": 37461,
+      "restore_directory": "evidence/cpu-specialists-codex-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-swarm-ac-2026-09-24-agent.tar.gz",
+      "sha256": "334ef06be53b6699b8e4629e2fb0f21295274cc20234da75e9d52ec5f7d1ebe6",
+      "files": 211,
+      "uncompressed_bytes": 3235665,
+      "compressed_bytes": 476046,
+      "restore_directory": "evidence/cpu-swarm-ac-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-swarm-ac-idle-2026-09-24-agent.tar.gz",
+      "sha256": "6dae2dcd34b00e11d748b721a8098e10331582cd46a9b855a93c0668366ba04d",
+      "files": 161,
+      "uncompressed_bytes": 2538131,
+      "compressed_bytes": 380646,
+      "restore_directory": "evidence/cpu-swarm-ac-idle-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-swarm-plan-2026-09-24-agent.tar.gz",
+      "sha256": "6fc7d29a9ef24ce4d8cfac5bd6f73aa9e4949349c0fc7e6b0ac0646868566248",
+      "files": 156,
+      "uncompressed_bytes": 4376757,
+      "compressed_bytes": 746391,
+      "restore_directory": "evidence/cpu-swarm-plan-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-swarm-sme2-2026-09-24-agent.tar.gz",
+      "sha256": "24c2ad0e567f03bae6ee6527766987ba585cf787a6c9dd0303e168d9b71fdf25",
+      "files": 176,
+      "uncompressed_bytes": 4529432,
+      "compressed_bytes": 970212,
+      "restore_directory": "evidence/cpu-swarm-sme2-2026-09-24"
+    },
+    {
+      "archive": "history/cpu-swarm-sme2-followup-2026-09-24-agent.tar.gz",
+      "sha256": "a78c9c83767c423ce4d2a49068640dd19d9c9201f05849732fbe8a375172b849",
+      "files": 186,
+      "uncompressed_bytes": 7313796,
+      "compressed_bytes": 1383800,
+      "restore_directory": "evidence/cpu-swarm-sme2-followup-2026-09-24"
+    },
+    {
+      "archive": "history/live-astra-controller-v2-calls.tar.gz",
+      "sha256": "6c5113014d7de8aa6dc93bb0157c501769b8e44e9f08c9d07e027523c371b331",
+      "files": 308,
+      "uncompressed_bytes": 899513,
+      "compressed_bytes": 122252,
+      "restore_directory": "evidence/live-astra-controller-v2"
+    },
+    {
+      "archive": "history/live-astra-plateau-controller-v1-calls.tar.gz",
+      "sha256": "c09decf775d9da7f9dee6acdbe482aa62f1b36da224a6d117f707677fcbb1d51",
+      "files": 105,
+      "uncompressed_bytes": 554947,
+      "compressed_bytes": 89386,
+      "restore_directory": "evidence/live-astra-plateau-controller-v1"
+    },
+    {
+      "archive": "history/live-luna-controller-v2-calls.tar.gz",
+      "sha256": "f143e7148f57225d7b9927a47b203f21ff741d134eba2a7e6f09552c72aaf515",
+      "files": 329,
+      "uncompressed_bytes": 1003693,
+      "compressed_bytes": 140097,
+      "restore_directory": "evidence/live-luna-controller-v2"
+    },
+    {
+      "archive": "history/live-luna-expanded-controller-v2-calls.tar.gz",
+      "sha256": "dd011c39e424e19f7de728194149a0af336c22fbbc01cbbb79956994ec06d3c7",
+      "files": 321,
+      "uncompressed_bytes": 3305927,
+      "compressed_bytes": 554944,
+      "restore_directory": "evidence/live-luna-expanded-controller-v2"
+    },
+    {
+      "archive": "history/live-luna-plateau-controller-v1-calls.tar.gz",
+      "sha256": "7ce9f6e3e7e3cc94f60ecc59ad23696e95e75743e55a482f44349b59419b57d5",
+      "files": 203,
+      "uncompressed_bytes": 1257249,
+      "compressed_bytes": 190402,
+      "restore_directory": "evidence/live-luna-plateau-controller-v1"
+    },
+    {
+      "archive": "history/live-luna-plateau-controller-v2-calls.tar.gz",
+      "sha256": "e67947b3c49c9e12cd17f7c1442d219428954fcc533be2ecc5a186e89f768636",
+      "files": 217,
+      "uncompressed_bytes": 1373494,
+      "compressed_bytes": 199882,
+      "restore_directory": "evidence/live-luna-plateau-controller-v2"
+    }
+  ]
+}

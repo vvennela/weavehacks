@@ -1,1 +1,0 @@
-{"ranked_proposal_ids":[],"reason":"No legal proposals are eligible."}

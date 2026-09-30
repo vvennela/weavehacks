@@ -27,7 +27,7 @@ The wheel contains both `sera` and the partner's independent `sera_loop` package
 The investigator swarm and placement evidence above concern `import sera`;
 they do not certify the other package's loop. See the
 [current release checklist](release-acceptance.md) and
-[completion checkpoint](../completion.md) for scope and unproven acceptance.
+[completion checkpoint](release.md) for scope and unproven acceptance.
 Use the wheel hash, not only version 0.2.0, to identify the tested artifact.
 
 ## Historical merged API candidate

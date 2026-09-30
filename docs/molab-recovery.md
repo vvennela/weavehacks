@@ -1,6 +1,6 @@
 # molab recovery — what to do when the live GPU misbehaves
 
-Companion to `STAGE.md` §0. `STAGE.md` tells you which opening to give;
+Companion to `docs/internal/STAGE.md` §0. `docs/internal/STAGE.md` tells you which opening to give;
 this file tells you what is actually wrong, what fixing it costs, and — for
 almost every case — why you should not try to fix it while people are watching.
 
@@ -26,7 +26,7 @@ It never restarts vLLM, kills a process, installs anything, or writes a file.
 It is safe to run while an optimization run is driving the card. It returns in
 about a second and is hard-capped so it cannot hang.
 
-| Verdict | Exit | Means | STAGE.md |
+| Verdict | Exit | Means | docs/internal/STAGE.md |
 |---|---|---|---|
 | `READY` | 0 | Sandbox up, Blackwell attached, vLLM answering on `127.0.0.1:8000` | Opening A, badge **LIVE** |
 | `GPU-BUT-NOT-SERVING` | 3 | Sandbox up, card present, no vLLM on 8000 | Opening B, badge **RECORDED** |
@@ -86,7 +86,7 @@ is far likelier to answer again than one that has only been probed.
 **Cause.** vLLM was never started, exited, was killed, or died on the missing
 `nvcc` (fact 2 above).
 
-**Do.** Opening B. Show `nvidia-smi` (STAGE.md §3B), say the engine loads and
+**Do.** Opening B. Show `nvidia-smi` (docs/internal/STAGE.md §3B), say the engine loads and
 that it is not serving this second, and move on.
 
 **Cost of recovery.** ~3 minutes minimum if the weights are cached and you get
@@ -144,10 +144,10 @@ execution on the sandbox.
 ### 7. marimo will not start locally for the recorded demo
 
 This is the one that actually loses the demo, because the recorded run is the
-fallback for everything above. In order (STAGE.md §3C):
+fallback for everything above. In order (docs/internal/STAGE.md §3C):
 
 ```sh
-.venv/bin/marimo edit demo.py                  # normal
+.venv/bin/marimo edit docs/internal/demo.py                  # normal
 uvx marimo@0.24.0 edit demo.py --sandbox       # if that fails
 open evidence/live-astra-expanded-v1/README.md # no network needed
 ```
@@ -169,7 +169,7 @@ Everything except re-opening a closed notebook tab.
 
 **So the move on stage is to switch to the recorded demo, not to debug.** The
 recorded run is not a consolation prize — it is a real GPU run on this same
-card, real vLLM, saved with the Weave trace that produced it, and STAGE.md §5
+card, real vLLM, saved with the Weave trace that produced it, and docs/internal/STAGE.md §5
 already has the answer for a judge who asks whether it is live. Debugging in
 front of an audience costs you the body of the talk, which is the part that
 carries the argument, in exchange for a badge.

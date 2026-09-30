@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Podium health check for the live molab Blackwell. READ-ONLY.
 #
-# Answers one question in a few seconds: which STAGE.md opening do I use?
+# Answers one question in a few seconds: which docs/internal/STAGE.md opening do I use?
 #
-#   READY                -> STAGE.md Opening A (badge LIVE)
-#   GPU-BUT-NOT-SERVING  -> STAGE.md Opening B (badge RECORDED)
-#   SANDBOX-DOWN         -> STAGE.md Opening C (badge RECORDED)
+#   READY                -> docs/internal/STAGE.md Opening A (badge LIVE)
+#   GPU-BUT-NOT-SERVING  -> docs/internal/STAGE.md Opening B (badge RECORDED)
+#   SANDBOX-DOWN         -> docs/internal/STAGE.md Opening C (badge RECORDED)
 #
 # This script only reads. It never restarts vLLM, kills a process, installs
 # anything, or writes a file — on the sandbox or here. Another agent may be
@@ -80,7 +80,7 @@ if [ "$reachable" != yes ]; then
     echo "GPU   not probed (sandbox unreachable)"
     echo "VLLM  not probed (sandbox unreachable)"
     echo
-    echo "VERDICT: SANDBOX-DOWN -> STAGE.md Opening C (badge RECORDED). Do not debug on stage."
+    echo "VERDICT: SANDBOX-DOWN -> docs/internal/STAGE.md Opening C (badge RECORDED). Do not debug on stage."
     exit 4
 fi
 
@@ -126,13 +126,13 @@ printf '%s\n' "$remote"
 # ------------------------------------------------------------------ d) verdict
 echo
 if printf '%s' "$remote" | grep -q '^VLLM  SERVING'; then
-    echo "VERDICT: READY -> STAGE.md Opening A (badge LIVE). Run scripts/prove_blackwell.sh once to warm it."
+    echo "VERDICT: READY -> docs/internal/STAGE.md Opening A (badge LIVE). Run scripts/prove_blackwell.sh once to warm it."
     exit 0
 elif printf '%s' "$remote" | grep -q '^GPU   ' && \
      ! printf '%s' "$remote" | grep -q '^GPU   NONE'; then
-    echo "VERDICT: GPU-BUT-NOT-SERVING -> STAGE.md Opening B (badge RECORDED). Show nvidia-smi, do not restart vLLM."
+    echo "VERDICT: GPU-BUT-NOT-SERVING -> docs/internal/STAGE.md Opening B (badge RECORDED). Show nvidia-smi, do not restart vLLM."
     exit 3
 else
-    echo "VERDICT: SANDBOX-DOWN -> STAGE.md Opening C (badge RECORDED). Do not debug on stage."
+    echo "VERDICT: SANDBOX-DOWN -> docs/internal/STAGE.md Opening C (badge RECORDED). Do not debug on stage."
     exit 4
 fi

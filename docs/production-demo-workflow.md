@@ -23,4 +23,4 @@ Use the saved evidence when presenting these measurements. A new live run produc
 
 ## Review the repository
 
-[README](../README.md) · [Release status](../completion.md) · [CI](https://github.com/vvennela/weavehacks/actions/workflows/test.yml)
+[README](../README.md) · [Release status](release.md) · [CI](https://github.com/vvennela/weavehacks/actions/workflows/test.yml)
