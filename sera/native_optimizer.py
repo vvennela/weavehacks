@@ -20,7 +20,7 @@ from .hardware import ModelDescriptor
 from .ledger import Ledger, encode_record, read_checkpoint
 from .measurement import constraint_failures, objective_value, select_candidate
 from .model_artifact import verify_artifact
-from .native_agent import NativeRecipeAgent
+from .native_board import NativeBoard
 from .native_measurement import native_trial
 from .native_trace import trace_native_job
 from .native_worker import JOB, NativeWorkerError, run_native_job
@@ -195,7 +195,8 @@ class _Research:
             spent = max(checkpoint['elapsed_seconds'],
                         time.time() - checkpoint['started_at_unix'])
             self.started -= spent
-            self.agent.history = deepcopy(checkpoint['agent_calls'])
+            if not getattr(self.agent, 'stateful', False):
+                self.agent.history = deepcopy(checkpoint['agent_calls'])
             self.artifacts = deepcopy(checkpoint.get('artifact_locations', {}))
             self.previous_selected = checkpoint['selected_recipe_id']
             self.recover()
@@ -388,6 +389,8 @@ class _Research:
                                                    cancelled=self.cancelled)
                 finally:
                     self.report['agent_calls'] = self.agent.history
+                    self.report['advisor_model_calls'] = deepcopy(getattr(self.agent, 'model_calls', []))
+                    self.report['advisor_model_calls_used'] = len(self.report['advisor_model_calls'])
                     self.report.pop('pending_agent_call', None)
                     self.save()
                 self.remaining()
@@ -420,6 +423,27 @@ class _Research:
                     trial['repeated_decision'] = self.decision(best_control, worst_candidate)
                     if (trial['repeated_decision']['selected'] == 'candidate'
                             and self.decision(best, worst_candidate)['selected'] == 'candidate'):
+                        review = getattr(self.agent, 'review', None)
+                        if review is not None:
+                            try:
+                                trial['advisor_review'] = review({
+                                    'recipe_id': name, 'software_gates_passed': True,
+                                    'quality': worst_candidate['task_quality'],
+                                    'memory_mib': objective_value(worst_candidate, 'memory'),
+                                    'throughput': objective_value(worst_candidate, 'throughput'),
+                                    'repeated_decision': trial['repeated_decision']},
+                                    timeout_seconds=min(180, self.remaining()))
+                            except NativeRunStopped:
+                                raise
+                            except Exception as error:  # noqa: BLE001 - advisor failure must retain the safe selection
+                                trial['advisor_review'] = {'decision': 'reject', 'error_type': type(error).__name__}
+                            finally:
+                                self.report['advisor_model_calls'] = deepcopy(getattr(self.agent, 'model_calls', []))
+                                self.report['advisor_model_calls_used'] = len(self.report['advisor_model_calls'])
+                                self.save()
+                            self.remaining()
+                            if trial['advisor_review'].get('decision') != 'adopt':
+                                continue
                         best = min([measured, confirmation], key=lambda t: objective_value(t, 'memory'))
                         self.select(name)
                 except (NativeWorkerError, ValueError, OSError) as error:
@@ -471,7 +495,13 @@ def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None,
                                 expected_id=checkpoint['selected_artifact_id'], backend=profile.backend)
             if checkpoint['status'] == 'completed' and checkpoint.get('trace', {}).get('remote_verified'):
                 return checkpoint
-        research = _Research(profile, folder, ledger, agent or NativeRecipeAgent(project=project),
+        if agent is None:
+            board_folder = folder / 'advisor'
+            agent = NativeBoard(board_folder,
+                max_model_calls=31 * math.ceil(profile.budget.max_candidate_trials / 2)
+                                + profile.budget.max_candidate_trials,
+                resume=resume and (board_folder / 'state.json').exists())
+        research = _Research(profile, folder, ledger, agent,
                              cancelled, checkpoint)
         def run():
             if checkpoint is not None and checkpoint.get('research_status') is not None:

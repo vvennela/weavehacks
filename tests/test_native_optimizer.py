@@ -462,3 +462,35 @@ def test_workload_description_guides_advisor_but_cannot_change_gates(tmp_path, r
     assert result['selected_recipe_id'] == 'q8'
     assert result['trials'][0]['decision']['selected'] == 'baseline'
     assert 'workload_description' not in native.NativeProfile.model_validate(profile()).model_dump()
+
+
+def test_default_advisor_is_chatgpt_board_and_reviews_before_adoption(tmp_path, runtime, monkeypatch):
+    made = []
+    class Board(Agent):
+        stateful = True
+        def __init__(self, folder, **options):
+            super().__init__()
+            self.model_calls = [{'model': 'gpt-6-astra', 'status': 'completed'}]
+            self.reviews = []
+            made.append((folder, options, self))
+        def review(self, result, *, timeout_seconds):
+            assert result['software_gates_passed'] is True
+            self.reviews.append(result)
+            return {'decision': 'adopt', 'reason': 'Confirmed software gates.'}
+    monkeypatch.setattr(native, 'NativeBoard', Board)
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path / 'default', project='fixture/project')
+    assert result['selected_recipe_id'] == 'q8'
+    assert len(made[0][2].reviews) == 1
+    assert result['advisor_model_calls_used'] == 1
+    assert result['trials'][1]['advisor_review']['decision'] == 'adopt'
+
+
+@pytest.mark.parametrize('decision', ['reject', 'revise', 'invalid'])
+def test_coordinator_cannot_promote_without_adoption(tmp_path, runtime, decision):
+    class Board(Agent):
+        def review(self, result, *, timeout_seconds):
+            return {'decision': decision, 'reason': 'Do not adopt.'}
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path / decision,
+                                    project='fixture/project', agent=Board())
+    assert result['selected_recipe_id'] == 'baseline'
+    assert result['trials'][1]['advisor_review']['decision'] == decision

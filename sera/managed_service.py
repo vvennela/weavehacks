@@ -218,7 +218,7 @@ class ManagedService:
         read_fd, write_fd = os.pipe()
         lifetime = (folder / 'process-tree.lock').open('a+')
         fcntl.flock(lifetime.fileno(), fcntl.LOCK_SH)
-        env = {key: os.environ[key] for key in INFERENCE_ENVIRONMENT_VARIABLES | {'WANDB_API_KEY'}
+        env = {key: os.environ[key] for key in INFERENCE_ENVIRONMENT_VARIABLES | {'WANDB_API_KEY', 'CODEX_HOME'}
                if key in os.environ}
         env['SERA_PARENT_FD'] = str(read_fd)
         env[LIFETIME_FD] = str(lifetime.fileno())

@@ -6,16 +6,18 @@ as the current user. A process timeout is not a native-code security sandbox.
 
 import json
 import os
-from pathlib import Path
-import signal
 import shutil
+import signal
 import subprocess
+import sys
 import tempfile
 import time
+from contextlib import nullcontext
+from pathlib import Path
 
 from .kernel_search import KernelCandidate
+from .process_ownership import inherit_lifetime
 from .storage import save_json
-
 
 DEFAULT_KERNEL_MODEL = "gpt-6-luna"
 
@@ -32,16 +34,26 @@ def research_environment():
 
 def run_command(args, *, cwd, timeout, input_text=None, log_path=None):
     """Bound the whole process group, including compiler/agent descendants."""
-    log = Path(log_path).open("w") if log_path is not None else None
-    try:
+    with (Path(log_path).open("w") if log_path is not None else nullcontext()) as log:
         return _communicate(args, cwd=cwd, timeout=timeout, input_text=input_text, log=log)
-    finally:
-        if log is not None:
-            log.close()
 
 
 def _communicate(args, *, cwd, timeout, input_text, log):
-    with subprocess.Popen(args, cwd=cwd, env=research_environment(),
+    environment = research_environment()
+    read_fd, write_fd = os.pipe()
+    environment['SERA_COMMAND_PARENT_FD'] = str(read_fd)
+    try:
+        descriptors = inherit_lifetime(environment, (read_fd,))
+        return _owned_communicate(args, cwd=cwd, timeout=timeout, input_text=input_text,
+                                  log=log, environment=environment, descriptors=descriptors)
+    finally:
+        os.close(read_fd)
+        os.close(write_fd)
+
+
+def _owned_communicate(args, *, cwd, timeout, input_text, log, environment, descriptors):
+    command = [sys.executable, '-m', 'sera.owned_command', *args]
+    with subprocess.Popen(command, cwd=cwd, env=environment, pass_fds=descriptors,
                           stdin=subprocess.PIPE, stdout=log if log is not None else subprocess.PIPE,
                           stderr=subprocess.STDOUT, text=True, start_new_session=True) as process:
         try:
@@ -109,10 +121,10 @@ class CodexKernelProposer:
         self.executable = executable
         self.calls = 0
         self.schema = self.work_dir / "response-schema.json"
-        save_json(self.schema, dict(type="object", additionalProperties=False,
-            properties={"name": {"type": "string"}, "hypothesis": {"type": "string"},
+        save_json(self.schema, {"type": "object", "additionalProperties": False,
+            "properties": {"name": {"type": "string"}, "hypothesis": {"type": "string"},
                         "source": {"type": "string"}, "stop": {"type": "boolean"}},
-            required=["name", "hypothesis", "source", "stop"]))
+            "required": ["name", "hypothesis", "source", "stop"]})
 
     def propose(self, history, *, timeout):
         deadline = time.monotonic() + min(timeout, self.timeout)
