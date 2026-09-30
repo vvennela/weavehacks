@@ -43,3 +43,9 @@ def test_missing_controls_cannot_confirm_a_candidate():
 def test_invalid_memory_cannot_establish_a_win():
     rows = [{'block': i, 'qualified': True, 'sera_peak_mib': -1, 'fixed_peak_mib': 20} for i in range(3)]
     assert comparison_summary(rows)['sera_beats_fixed'] is None
+
+
+def test_declared_single_pair_is_distinct_from_three_pair_study():
+    rows = [{'block': 0, 'qualified': True, 'sera_peak_mib': 10, 'fixed_peak_mib': 20}]
+    assert comparison_summary(rows)['complete'] is False
+    assert comparison_summary(rows, blocks=1)['sera_beats_fixed'] is True

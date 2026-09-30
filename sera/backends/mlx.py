@@ -31,13 +31,17 @@ class MLXRecipe(BaseModel):
     bits: Literal[2, 3, 4, 8, 16] = 16
     group_size: Literal[32, 64, 128] = 64
     protected_bits: Literal[3, 4, 6, 8] | None = Field(default=None, exclude_if=lambda v: v is None)
-    protection_pattern: Literal['all-v-down', 'all-except-mlp-expansion'] | None = Field(
+    protection_pattern: Literal['all-v-down', 'all-except-mlp-expansion', 'mlp-and-query-output'] | None = Field(
+        default=None, exclude_if=lambda value: value is None)
+    attention_group_size: Literal[32, 64, 128] | None = Field(
         default=None, exclude_if=lambda value: value is None)
 
     @model_validator(mode='after')
     def validate_precision(self):
         if self.protection_pattern is not None and self.protected_bits is None:
             raise ValueError('A protection pattern requires protected bits')
+        if (self.protection_pattern == 'mlp-and-query-output') != (self.attention_group_size is not None):
+            raise ValueError('Query/output precision requires its explicit attention group size')
         if self.protected_bits is not None and self.protected_bits <= self.bits:
             raise ValueError('Protected modules require higher precision')
         return self
@@ -60,8 +64,13 @@ def mixed_quantization_predicate(recipe, num_layers):
             protected = parts[-1] in {'embed_tokens', 'lm_head', 'v_proj', 'down_proj'}
         elif recipe.protection_pattern == 'all-except-mlp-expansion':
             protected = not ('mlp' in parts and parts[-1] in {'gate_proj', 'up_proj'})
+        elif recipe.protection_pattern == 'mlp-and-query-output':
+            protected = not (('mlp' in parts and parts[-1] in {'gate_proj', 'up_proj'})
+                or ('self_attn' in parts and parts[-1] in {'q_proj', 'o_proj'}))
+        group_size = (recipe.attention_group_size if recipe.attention_group_size is not None
+            and 'self_attn' in parts and parts[-1] in {'q_proj', 'o_proj'} else recipe.group_size)
         return {'bits': recipe.protected_bits if protected else recipe.bits,
-                'group_size': recipe.group_size, 'mode': 'affine'}
+                'group_size': group_size, 'mode': 'affine'}
     return choose
 
 

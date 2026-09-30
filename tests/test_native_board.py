@@ -94,3 +94,21 @@ def test_board_cannot_start_a_batch_without_31_requests_left(tmp_path):
     with pytest.raises(RuntimeError, match='budget'):
         board.plan({'available_recipes': [{'recipe_id': 'a'}]}, timeout_seconds=10)
     assert not board.model_calls
+
+
+def test_invalid_ballot_gets_one_counted_repair(tmp_path):
+    from sera.native_board import NativeBoard
+    class RepairAgent(SchemaAgent):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.break_once = kwargs['work_dir'].name == 'specialist-00'
+        def request(self, prompt, schema, *, timeout):
+            result = super().request(prompt, schema, timeout=timeout)
+            if 'ranking' in result and self.break_once:
+                self.break_once = False
+                return {'ranking': ['a', 'a'], 'reason': 'Invalid fixture ballot.'}
+            return result
+    board = NativeBoard(tmp_path / 'board', agent_factory=RepairAgent, max_model_calls=33)
+    assert board.plan({'available_recipes': [{'recipe_id': 'a'}, {'recipe_id': 'b'}]}, timeout_seconds=10) == ['a','b']
+    assert len(board.model_calls) == 32
+    assert len(board.history[0]['ballot_repairs']) == 1

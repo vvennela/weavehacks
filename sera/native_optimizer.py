@@ -498,7 +498,7 @@ def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None,
         if agent is None:
             board_folder = folder / 'advisor'
             agent = NativeBoard(board_folder,
-                max_model_calls=31 * math.ceil(profile.budget.max_candidate_trials / 2)
+                max_model_calls=46 * math.ceil(profile.budget.max_candidate_trials / 2)
                                 + profile.budget.max_candidate_trials,
                 resume=resume and (board_folder / 'state.json').exists())
         research = _Research(profile, folder, ledger, agent,

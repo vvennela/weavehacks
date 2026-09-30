@@ -131,17 +131,25 @@ class NativeBoard:
         ballot_schema = schema({'ranking': {'type': 'array', 'items': {'type': 'string', 'enum': options},
                                            'minItems': len(options), 'maxItems': len(options)},
                                 'reason': {'type': 'string'}})
-        def vote(pair):
+        def vote(pair, previous=None):
             role, agent = pair
             return self._request(agent, f'Your role is {role}. Review the shared board and rank '
                 'every recipe exactly once. Only two candidate trials are available. Prioritize '
                 'a useful quality-safe memory reduction. Evidence: ' + json.dumps(evidence)
-                + '\nShared proposal board: ' + json.dumps(proposals), ballot_schema, deadline)
+                + '\nShared proposal board: ' + json.dumps(proposals)
+                + ('\nYour previous ballot was invalid. Return each listed recipe exactly once: '
+                   + json.dumps(previous) if previous is not None else ''), ballot_schema, deadline)
         with ThreadPoolExecutor(max_workers=15) as pool:
             ballots = list(pool.map(vote, zip(plan['roles'], agents)))
+        repairs = []
+        for index, ballot in enumerate(ballots):
+            if len(ballot['ranking']) != len(options) or set(ballot['ranking']) != set(options):
+                repairs.append({'specialist': index, 'invalid_ballot': ballot})
+                ballots[index] = vote((plan['roles'][index], agents[index]), previous=ballot)
         ranking = rank_ballots([item['ranking'] for item in ballots], options)
         record.update({'evidence': evidence, 'role_plan': plan, 'proposals': proposals,
-                  'ballots': ballots, 'ranking': ranking, 'wall_seconds': time.monotonic() - started,
+                  'ballots': ballots, 'ballot_repairs': repairs, 'ranking': ranking,
+                  'wall_seconds': time.monotonic() - started,
                   'coordinator': 'gpt-6-astra/high', 'specialists': '15 x gpt-6-luna/medium',
                   'transport': 'Codex ChatGPT login', 'status': 'ranked'})
         self.pending = ranking[:2]

@@ -52,8 +52,8 @@ def choose_confirmed(controls, trials, profile, *, gate=same_contract_passes, me
     return min(valid, key=lambda name: (valid[name], name)) if valid else None
 
 
-def comparison_summary(rows):
-    complete = (len(rows) == 3 and {r['block'] for r in rows} == {0, 1, 2}
+def comparison_summary(rows, *, blocks=3):
+    complete = (len(rows) == blocks and {r['block'] for r in rows} == set(range(blocks))
                 and all(r.get('qualified') and all(type(r.get(key)) in (int, float)
                     and math.isfinite(r[key]) and r[key] > 0
                     for key in ('sera_peak_mib', 'fixed_peak_mib')) for r in rows))
@@ -82,11 +82,11 @@ def run(args):
                  if name == 'baseline' or name in catalog}
     registration = {'profile': profile.model_dump(), 'heldout': heldout.model_dump(),
         'catalog': catalog, 'fixed_order': fixed, 'candidate_trials_per_policy': 2,
-        'blocks': 3, 'policy_order': [['fixed', 'sera'], ['sera', 'fixed'], ['fixed', 'sera']],
+        'blocks': args.blocks, 'policy_order': [['fixed', 'sera'], ['sera', 'fixed'], ['fixed', 'sera']][:args.blocks],
         'power': power_state(), 'deadline_unix': args.deadline, 'start_unix': time.time(),
         'workload_description': WORKLOAD,
         'controls': 'Fresh shared BF16 before and after each paired block; each selected candidate independently confirmed.',
-        'claim_rule': 'All 3 blocks and independent heldout pass 95% quality/speed gates; Sera uses >5% less peak memory in every block.',
+        'claim_rule': f'All {args.blocks} blocks and independent heldout pass 95% quality/speed gates; Sera uses >5% less peak memory in every block.',
         'time_rule': 'Report full board + own candidate + own confirmation seconds; all catalog exports are shared setup, reported separately. Shared BF16 controls excluded symmetrically.',
         'heldout_rule': 'Validate each unique selected artifact after all choices freeze; no heldout feedback to search.',
         'prior': prior}
@@ -149,7 +149,7 @@ def run(args):
                 evidence = {'workload': WORKLOAD, 'prior': registration['prior'],
                     'available_recipes': [{'recipe_id': key, 'recipe': value} for key, value in catalog.items()],
                     'candidate_budget': 2, 'quality_retention': .95, 'throughput_retention': .95,
-                    'pattern_definitions': {'all-v-down': 'All value and down projections plus embedding/head use protected bits; other modules use base bits.', 'all-except-mlp-expansion': 'Only MLP gate_proj and up_proj use base bits; all other quantizable modules use protected bits.', 'default': 'Sparse boundary/every-third v/down plus embedding/head protection.'},
+                    'pattern_definitions': {'mlp-and-query-output': 'MLP gate/up projections use base bits/group_size. Attention q_proj and o_proj use base bits with attention_group_size. All remaining quantizable modules use protected_bits/group_size.', 'all-v-down': 'All value and down projections plus embedding/head use protected bits; other modules use base bits.', 'all-except-mlp-expansion': 'Only MLP gate_proj and up_proj use base bits; all other quantizable modules use protected bits.', 'default': 'Sparse boundary/every-third v/down plus embedding/head protection.'},
                     'selection': 'Jointly rank all recipes, top two will be measured with identical software gates.'}
                 board = NativeBoard(root / f'board-{block}')
                 boards.append(board)
@@ -217,7 +217,7 @@ def run(args):
                     'sera_recipe': arms['sera']['selected'], 'fixed_recipe': arms['fixed']['selected'],
                     'sera_seconds': arms['sera']['search_seconds'], 'fixed_seconds': arms['fixed']['search_seconds'],
                     'heldout_passed': passed, 'coordinator_review': review})
-                save_json(root / 'results.json', {'rows': rows, 'summary': comparison_summary(rows),
+                save_json(root / 'results.json', {'rows': rows, 'summary': comparison_summary(rows, blocks=args.blocks),
                     'setup': setup, 'traces': traces, 'registration_hash': registration['hash']})
         finally:
             os.environ.pop('SERA_LIFETIME_FD', None)
@@ -229,6 +229,7 @@ def main():
     parser.add_argument('--profile', default='benchmarks/profiles/qwen3-4b-search.json')
     parser.add_argument('--heldout', default='benchmarks/profiles/qwen3-4b-heldout.json')
     parser.add_argument('--artifacts', default='.local/sera-customer-pilot/retained-candidates/index.json')
+    parser.add_argument('--blocks', type=int, choices=[1, 2, 3], default=3)
     parser.add_argument('--catalog')
     parser.add_argument('--fixed', nargs=2)
     parser.add_argument('--prior-evidence')

@@ -155,3 +155,16 @@ def test_all_value_and_down_projections_are_protected():
 def test_protection_pattern_requires_higher_precision():
     with pytest.raises(ValueError):
         MLXRecipe(bits=3, protection_pattern='all-v-down')
+
+
+def test_attention_extension_uses_its_own_group_and_protects_keys_values():
+    from sera.backends.mlx import mixed_quantization_predicate
+    recipe = MLXRecipe(bits=3, protected_bits=4, group_size=128,
+        protection_pattern='mlp-and-query-output', attention_group_size=64)
+    choose = mixed_quantization_predicate(recipe, 36)
+    assert choose('model.layers.4.self_attn.q_proj', None) == {'bits':3,'group_size':64,'mode':'affine'}
+    assert choose('model.layers.4.self_attn.o_proj', None)['group_size'] == 64
+    assert choose('model.layers.4.self_attn.k_proj', None)['bits'] == 4
+    assert choose('model.layers.4.self_attn.v_proj', None)['bits'] == 4
+    assert choose('model.layers.4.mlp.down_proj', None)['bits'] == 4
+    assert choose('model.layers.4.mlp.up_proj', None) == {'bits':3,'group_size':128,'mode':'affine'}
