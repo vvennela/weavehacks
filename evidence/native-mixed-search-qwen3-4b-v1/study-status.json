@@ -18,9 +18,13 @@
     "reason": "Specialist 12 duplicated int4-g128 and omitted int2-g128. First block fell below registered 5% win target. No heldout or three-block claim."
   },
   "final_batch": {
-    "status": "running",
+    "status": "passed",
     "registered_blocks": 1,
-    "reason": "One paired two-trial search plus independent candidate confirmation and heldout validation, registered before new measurements."
+    "sera_recipe": "int3-g64",
+    "fixed_recipe": "int3-g32",
+    "heldout_memory_reduction": 0.1072465544854645,
+    "quality_both": 1.0,
+    "search_faster": false
   },
   "scope": "Qwen3-4B synthetic document extraction on Apple M4 Pro. MLX active allocator memory, not total unified memory or free GPU VRAM.",
   "sources": {

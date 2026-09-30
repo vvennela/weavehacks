@@ -1,0 +1,202 @@
+{
+  "records": [
+    {
+      "source": ".local/sera-mixed-pilot/prepare-int2-g128.json",
+      "recipe": {
+        "bits": 2,
+        "group_size": 128
+      },
+      "seconds": 3.561895499995444,
+      "trace": {
+        "call_id": "01a0efd3-0fce-790e-975f-acbd69c28527",
+        "trace_id": "01a0efd3-0fce-7aff-ba21-76c15d598a22",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efd3-0fce-790e-975f-acbd69c28527",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-mixed-pilot-v2/prepare-mixed2-4-g128.json",
+      "recipe": {
+        "bits": 2,
+        "group_size": 128,
+        "protected_bits": 4
+      },
+      "seconds": 4.084537166985683,
+      "trace": {
+        "call_id": "01a0efd4-fffe-7346-9a3f-50132883ec85",
+        "trace_id": "01a0efd4-fffe-773f-8bd3-90f237461070",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efd4-fffe-7346-9a3f-50132883ec85",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-mixed-pilot-v2/prepare-int3-g128.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 128
+      },
+      "seconds": 4.614078290993348,
+      "trace": {
+        "call_id": "01a0efd4-c3a9-78d0-8da7-4c91874504c5",
+        "trace_id": "01a0efd4-c3a9-7117-a937-ee3c71dd8641",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efd4-c3a9-78d0-8da7-4c91874504c5",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-mixed-pilot-v2/prepare-mixed2-3-g128.json",
+      "recipe": {
+        "bits": 2,
+        "group_size": 128,
+        "protected_bits": 3
+      },
+      "seconds": 4.085529833973851,
+      "trace": {
+        "call_id": "01a0efd4-e0f9-7592-93fd-c47e45765e43",
+        "trace_id": "01a0efd4-e0f9-7bbf-8cb3-196f1338519f",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efd4-e0f9-7592-93fd-c47e45765e43",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-mixed-pilot-v2/prepare-mixed2-6-g128.json",
+      "recipe": {
+        "bits": 2,
+        "group_size": 128,
+        "protected_bits": 6
+      },
+      "seconds": 4.226835541019682,
+      "trace": {
+        "call_id": "01a0efd5-1c21-7c4b-a62a-50a67b3d6b0e",
+        "trace_id": "01a0efd5-1c21-7685-b34b-d745104c7434",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efd5-1c21-7c4b-a62a-50a67b3d6b0e",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-mixed-pilot-v2/prepare-mixed3-4-g128.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 128,
+        "protected_bits": 4
+      },
+      "seconds": 4.744160959031433,
+      "trace": {
+        "call_id": "01a0efd5-3b9e-7f47-8aa4-f86d5e4b7779",
+        "trace_id": "01a0efd5-3b9e-7a41-8795-06cbb8c99306",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efd5-3b9e-7f47-8aa4-f86d5e4b7779",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-targeted-preparation/int3-g64.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 64
+      },
+      "seconds": 4.926290749979671,
+      "trace": {
+        "call_id": "01a0efde-6724-7517-b419-f3f56fa83a56",
+        "trace_id": "01a0efde-6724-78a6-9ef6-400edc170f7d",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efde-6724-7517-b419-f3f56fa83a56",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-targeted-preparation/mlp3-rest4-g128.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 128,
+        "protected_bits": 4,
+        "protection_pattern": "all-except-mlp-expansion"
+      },
+      "seconds": 4.530086415994447,
+      "trace": {
+        "call_id": "01a0efde-0728-730e-9bf4-31510e43f5fd",
+        "trace_id": "01a0efde-0728-7335-b34e-3fed79127d50",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efde-0728-730e-9bf4-31510e43f5fd",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-targeted-preparation/int3-g32.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 32
+      },
+      "seconds": 5.113114999956451,
+      "trace": {
+        "call_id": "01a0efde-454e-7ff2-905e-c7956d82ca3e",
+        "trace_id": "01a0efde-454e-732d-a467-64cc6b596ce9",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efde-454e-7ff2-905e-c7956d82ca3e",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-targeted-preparation/mixed3-4-g64.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 64,
+        "protected_bits": 4
+      },
+      "seconds": 8.304473040974699,
+      "trace": {
+        "call_id": "01a0efde-869c-7c33-a336-916f5a09a3a1",
+        "trace_id": "01a0efde-869c-7e4d-a987-f36f4e409503",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efde-869c-7c33-a336-916f5a09a3a1",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-targeted-preparation/vdown4-rest3-g128.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 128,
+        "protected_bits": 4,
+        "protection_pattern": "all-v-down"
+      },
+      "seconds": 4.234574583999347,
+      "trace": {
+        "call_id": "01a0efde-286c-78d9-8d9d-68ff27b27d7c",
+        "trace_id": "01a0efde-286b-7009-b9c4-aa0d03e3d6dc",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efde-286c-78d9-8d9d-68ff27b27d7c",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-final-preparation/mlp-query-output3-ag32.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 128,
+        "protected_bits": 4,
+        "protection_pattern": "mlp-and-query-output",
+        "attention_group_size": 32
+      },
+      "seconds": 5.959473957947921,
+      "trace": {
+        "call_id": "01a0efee-248c-7591-9797-ddd67f431a61",
+        "trace_id": "01a0efee-248c-7ddd-8f59-91ee67996a56",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efee-248c-7591-9797-ddd67f431a61",
+        "remote_verified": true
+      }
+    },
+    {
+      "source": ".local/sera-final-preparation/mlp-query-output3-ag64.json",
+      "recipe": {
+        "bits": 3,
+        "group_size": 128,
+        "protected_bits": 4,
+        "protection_pattern": "mlp-and-query-output",
+        "attention_group_size": 64
+      },
+      "seconds": 5.082351624965668,
+      "trace": {
+        "call_id": "01a0efee-4891-70aa-8e2a-6f04ee1b3021",
+        "trace_id": "01a0efee-4891-72f9-8ba8-0ab628aa0735",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efee-4891-70aa-8e2a-6f04ee1b3021",
+        "remote_verified": true
+      }
+    }
+  ],
+  "scope": "Cached exports shared by both policies; BF16 and int4 exports retained from the previous session."
+}

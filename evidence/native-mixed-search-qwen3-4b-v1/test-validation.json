@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "tests_passed": 163,
+  "seconds": 8.99,
+  "command": "python -m pytest tests/test_native_*.py tests/test_managed_*.py tests/test_mlx_backend.py tests/test_model_artifact.py tests/test_codex_agent.py tests/test_kernel_tools.py tests/test_owned_command.py -q",
+  "implementation_commit": "c0af163",
+  "runtime": "/tmp/sera-mlx-native/bin/python"
+}

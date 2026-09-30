@@ -1,0 +1,499 @@
+{
+  "evidence": {
+    "workload": "Short document field extraction into constrained JSON, one request at a time, 32-token output limit, greedy decoding. Minimize memory while retaining 95% of BF16 extraction accuracy and throughput. User wants to fit AI on current hardware. Mixed recipes protect token embeddings, output head, and value/down projections in the first/last eighth of layers and every third middle layer. Other layers use base bits.",
+    "prior": {
+      "source": "Completed first search block; no heldout tasks measured in this batch.",
+      "reference_quality": 1.0,
+      "quality_retention": 0.95,
+      "trials": [
+        {
+          "recipe_id": "int4-g128",
+          "quality": 1.0,
+          "peak_mib": 2299.483985900879,
+          "throughput": 16.312697126153935
+        },
+        {
+          "recipe_id": "int4-g128",
+          "quality": 1.0,
+          "peak_mib": 2299.483985900879,
+          "throughput": 16.824907196206002
+        },
+        {
+          "recipe_id": "int3-g128",
+          "quality": 0.8,
+          "peak_mib": 1818.6089973449707,
+          "throughput": 16.390451535720732
+        },
+        {
+          "recipe_id": "mixed2-4-g128",
+          "quality": 0.0,
+          "peak_mib": 1551.358985900879,
+          "throughput": 37.932117998224754
+        },
+        {
+          "recipe_id": "mixed3-4-g128",
+          "quality": 0.85,
+          "peak_mib": 1925.421485900879,
+          "throughput": 17.248044622057055
+        },
+        {
+          "recipe_id": "int4-g128",
+          "quality": 1.0,
+          "peak_mib": 2299.483985900879,
+          "throughput": 16.555558081496997
+        },
+        {
+          "recipe_id": "int3-g32",
+          "quality": 1.0,
+          "peak_mib": 2177.655860900879,
+          "throughput": 17.064374819638008
+        },
+        {
+          "recipe_id": "int3-g32",
+          "quality": 1.0,
+          "peak_mib": 2177.655860900879,
+          "throughput": 17.003180830800172
+        },
+        {
+          "recipe_id": "mlp3-rest4-g128",
+          "quality": 1.0,
+          "peak_mib": 2085.733985900879,
+          "throughput": 16.95486984756343
+        },
+        {
+          "recipe_id": "mlp3-rest4-g128",
+          "quality": 1.0,
+          "peak_mib": 2085.733985900879,
+          "throughput": 17.421473553226416
+        },
+        {
+          "recipe_id": "mixed3-4-g128",
+          "quality": 0.85,
+          "peak_mib": 1925.421485900879,
+          "throughput": 16.859288413600495
+        }
+      ]
+    },
+    "available_recipes": [
+      {
+        "recipe_id": "int2-g128",
+        "recipe": {
+          "bits": 2,
+          "group_size": 128
+        }
+      },
+      {
+        "recipe_id": "mixed2-3-g128",
+        "recipe": {
+          "bits": 2,
+          "protected_bits": 3,
+          "group_size": 128
+        }
+      },
+      {
+        "recipe_id": "mixed2-6-g128",
+        "recipe": {
+          "bits": 2,
+          "protected_bits": 6,
+          "group_size": 128
+        }
+      },
+      {
+        "recipe_id": "vdown4-rest3-g128",
+        "recipe": {
+          "bits": 3,
+          "protected_bits": 4,
+          "group_size": 128,
+          "protection_pattern": "all-v-down"
+        }
+      },
+      {
+        "recipe_id": "int3-g64",
+        "recipe": {
+          "bits": 3,
+          "group_size": 64
+        }
+      },
+      {
+        "recipe_id": "mixed3-4-g64",
+        "recipe": {
+          "bits": 3,
+          "protected_bits": 4,
+          "group_size": 64
+        }
+      },
+      {
+        "recipe_id": "mlp-query-output3-ag32",
+        "recipe": {
+          "bits": 3,
+          "protected_bits": 4,
+          "group_size": 128,
+          "protection_pattern": "mlp-and-query-output",
+          "attention_group_size": 32
+        }
+      },
+      {
+        "recipe_id": "mlp-query-output3-ag64",
+        "recipe": {
+          "bits": 3,
+          "protected_bits": 4,
+          "group_size": 128,
+          "protection_pattern": "mlp-and-query-output",
+          "attention_group_size": 64
+        }
+      }
+    ],
+    "candidate_budget": 2,
+    "quality_retention": 0.95,
+    "throughput_retention": 0.95,
+    "pattern_definitions": {
+      "mlp-and-query-output": "MLP gate/up projections use base bits/group_size. Attention q_proj and o_proj use base bits with attention_group_size. All remaining quantizable modules use protected_bits/group_size.",
+      "all-v-down": "All value and down projections plus embedding/head use protected bits; other modules use base bits.",
+      "all-except-mlp-expansion": "Only MLP gate_proj and up_proj use base bits; all other quantizable modules use protected bits.",
+      "default": "Sparse boundary/every-third v/down plus embedding/head protection."
+    },
+    "selection": "Jointly rank all recipes, top two will be measured with identical software gates."
+  },
+  "status": "ranked",
+  "role_plan": {
+    "roles": [
+      "weight memory",
+      "embedding precision",
+      "attention precision",
+      "MLP precision",
+      "quantization error",
+      "group size",
+      "decode latency",
+      "prefill latency",
+      "structured extraction",
+      "quality gates",
+      "measurement noise",
+      "search efficiency",
+      "hardware fit",
+      "artifact integrity",
+      "failure analysis"
+    ],
+    "reason": "These 15 specialist perspectives form a proposed board. Proposals and the joint ranking are hypotheses derived only from supplied evidence; no separate agents or measurements were run.\n\nSpecialist proposals:\n1. Weight memory: propose int3-g64 to test lower grouping overhead than int3-g32.\n2. Embedding precision: propose vdown4-rest3-g128 to retain explicit 4-bit embedding/head protection.\n3. Attention precision: propose mlp-query-output3-ag32 to test 3-bit query/output projections with small attention groups.\n4. MLP precision: propose mlp-query-output3-ag32, using the successful mlp3-rest4-g128 trials as supporting evidence for selective MLP compression; their exact pattern is not supplied.\n5. Quantization error: propose mixed3-4-g64 to test whether smaller groups repair the quality loss seen with mixed3-4-g128.\n6. Group size: propose int3-g64 to probe between int3-g128 quality 0.8 and int3-g32 quality 1.0.\n7. Decode latency: propose mlp-query-output3-ag64 as a hypothesis for reducing group overhead during serial decoding.\n8. Prefill latency: propose mlp-query-output3-ag64; its prefill effect remains unknown because no phase-specific timings are supplied.\n9. Structured extraction: propose mlp-query-output3-ag32 for evaluation on the unchanged constrained-JSON task and 32-token limit.\n10. Quality gates: propose mlp-query-output3-ag32 while retaining the 0.95 quality and throughput gates exactly.\n11. Measurement noise: propose int3-g64 with the existing identical measurement procedure; interpret throughput against the spread in supplied repeated trials.\n12. Search efficiency: propose int3-g64 because it tests an unresolved group-size boundary within the two-candidate budget.\n13. Hardware fit: propose int3-g64 and judge actual peak allocated memory; hardware capacity and candidate memory are not supplied.\n14. Artifact integrity: propose mlp-query-output3-ag32 with its exact supplied module pattern, bit widths, and group sizes preserved.\n15. Failure analysis: propose vdown4-rest3-g128 to test broader value/down protection after sparse protection yielded only 0.85 quality.\n\nJoint proposed ranking, highest priority first:\n1. mlp-query-output3-ag32\n2. int3-g64\n3. mlp-query-output3-ag64\n4. mixed3-4-g64\n5. vdown4-rest3-g128\n6. mixed2-6-g128\n7. mixed2-3-g128\n8. int2-g128\n\nMeasure only the top two. They test selective precision protection and the unresolved 3-bit group-size boundary. The 2-bit recipes rank last because mixed2-4-g128 scored 0.0 quality; that result does not establish their outcomes.\n\nThe lowest observed memory among supplied quality-passing recipes is mlp3-rest4-g128 at 2085.734 MiB, with throughput 16.955–17.421. BF16 throughput is absent, so throughput-gate compliance cannot be established from this evidence. No heldout tasks were measured. Final selection must minimize measured peak allocated memory among candidates passing both unchanged gates; the ranking predicts neither qualification nor a memory gain."
+  },
+  "proposals": [
+    {
+      "role": "weight memory",
+      "recipe_id": "mlp-query-output3-ag64",
+      "reason": "Hypothesis: this pattern can retain extraction quality by protecting most modules at 4 bits while using 3 bits for MLP gate/up and attention q/o. The 64-sized attention groups should use less memory than ag32. Measure it against both 95% gates and compare peak memory with other passing candidates.",
+      "risk": "No trial measured this exact recipe or heldout tasks. It may fail either gate; the prior mixed3-4-g128 trials retained only 85% quality."
+    },
+    {
+      "role": "embedding precision",
+      "recipe_id": "mixed2-6-g128",
+      "reason": "Hypothesis: 2-bit weights minimize memory, while 6-bit protection for token embeddings, the output head, and the specified attention and MLP projections may preserve extraction accuracy above the 0.95 retention gate. It targets lower memory than the observed passing int3-g32 trial (2177.7 MiB).",
+      "risk": "This recipe has no measured quality, memory, or throughput results. It passes only if a trial retains at least 0.95 quality and throughput and uses less peak memory than the feasible alternatives; the available evidence does not establish that."
+    },
+    {
+      "role": "attention precision",
+      "recipe_id": "vdown4-rest3-g128",
+      "reason": "This is the strongest low-memory hypothesis supported by the trials: 3-bit base quantization reduced peak memory substantially, while the tested 3-bit mixed recipe retained 85% quality. Protecting all value and down projections plus the embedding and head may recover the remaining quality with less memory than 3-bit quantization at group size 32. Test it against both 95% gates.",
+      "risk": "No supplied trial measures this recipe. Quality may remain below 95%, or throughput may miss its gate; the measured 85% mixed-recipe result does not establish that this protection pattern will pass."
+    },
+    {
+      "role": "MLP precision",
+      "recipe_id": "mlp-query-output3-ag32",
+      "reason": "Hypothesis: keeping MLP gate/up at 3 bits while using 32-element groups for q_proj and o_proj preserves extraction quality, with less memory than broader 3-bit quantization. Measure quality against the 0.95 retention gate and peak memory; reject the hypothesis if either the quality or throughput gate fails.",
+      "risk": "No supplied trial measures this recipe or reports the BF16 throughput reference. Its quality, throughput, and peak memory are unknown; the smaller attention groups may also increase memory overhead."
+    },
+    {
+      "role": "quantization error",
+      "recipe_id": "mixed3-4-g64",
+      "reason": "Hypothesis: the prior mixed3-4-g128 result retained only 85% of BF16 quality, below the 95% gate. Keeping its sparse 4-bit protection pattern while reducing group size to 64 may reduce quantization error enough to pass, with lower memory than uniform 3-bit quantization. Measure quality, peak memory, and throughput against the stated gates.",
+      "risk": "No supplied result tests this recipe. Smaller groups add scale metadata and may reduce throughput; the quality gain may still be insufficient."
+    },
+    {
+      "role": "group size",
+      "recipe_id": "int3-g64",
+      "reason": "Hypothesis: 3-bit weights with group size 64 will retain at least 95% of BF16 extraction accuracy while using less memory than the 3-bit group-32 trials. The supplied group-128 3-bit trial retained only 80%, while group-32 trials retained 100%; group size 64 tests whether an intermediate setting clears the quality gate. Measure it against the same throughput gate.",
+      "risk": "No group-64 result is supplied, so quality, memory, and throughput are unknown. The mixed 3-bit group-128 trial retained only 85%, which does not establish that protection will meet the gate."
+    },
+    {
+      "role": "decode latency",
+      "recipe_id": "int3-g64",
+      "reason": "Hypothesis: 3-bit weights with 64-element groups will reduce peak memory below the observed 2,177.7 MiB for int3-g32 while retaining its measured quality (1.0) and decode throughput (about 17 tokens/s). It is the best-supported low-memory candidate because int3-g32 is the only 3-bit recipe in the evidence that met both quality and throughput gates. Falsify this by measuring int3-g64 on heldout extraction tasks: reject it if quality retention is below 0.95 or throughput is below 95% of BF16.",
+      "risk": "int3-g64 has no measured results here. Larger groups may reduce quality, and the prior batch has no heldout-task measurements or BF16 throughput measurement to establish the gates."
+    },
+    {
+      "role": "prefill latency",
+      "recipe_id": "vdown4-rest3-g128",
+      "reason": "Hypothesis: protecting all value/down projections and the embedding/head can preserve extraction quality at 3-bit base precision, while group size 128 keeps peak memory below finer-group 3-bit recipes. It also avoids the 2-bit base precision that failed quality in the supplied trials. Measure peak memory, extraction accuracy, and prefill throughput against BF16 using the stated gates.",
+      "risk": "This recipe has no supplied measurements. The 3-bit mixed trial retained only 85% quality, so protecting all value/down projections may still fail the 95% quality gate. Its prefill throughput is also unknown."
+    },
+    {
+      "role": "structured extraction",
+      "recipe_id": "vdown4-rest3-g128",
+      "reason": "This is a testable low-memory hypothesis: it keeps most weights at 3 bits and protects value/down projections plus the embedding and head, which may preserve extraction quality better than uniform 3-bit quantization. The supplied trials contain no result for this recipe, so measure it against both 95% retention gates before recommending adoption.",
+      "risk": "No supplied evidence establishes its quality, throughput, or peak memory. It may miss either retention gate; the prior mixed3-4 result retained only 85% of reference quality."
+    },
+    {
+      "role": "quality gates",
+      "recipe_id": "vdown4-rest3-g128",
+      "reason": "Hypothesis: protecting value and down projections plus the embedding and head at 4 bits will recover extraction quality while keeping most layers at 3 bits. This targets the stated protection pattern with lower expected memory than full 4-bit. Measure it against both 95% gates; the supplied results do not establish that it will pass.",
+      "risk": "No trial for this recipe is supplied. The closest evidence, mixed3-4-g128, retained only 85% quality, so this recipe may also fail the quality gate. Its peak memory and throughput are unknown."
+    },
+    {
+      "role": "measurement noise",
+      "recipe_id": "int3-g64",
+      "reason": "Hypothesis: 3-bit weights with group size 64 will use less peak memory than the passing int3-g32 trial (2177.7 MiB), while retaining at least 95% of BF16 accuracy and throughput. The supplied evidence does not confirm either gate for this recipe.",
+      "risk": "The int3-g128 trial retained only 80% of reference quality, so int3-g64 may also fail the quality gate. Reject it if either measured retention falls below 95%."
+    },
+    {
+      "role": "search efficiency",
+      "recipe_id": "mlp-query-output3-ag32",
+      "reason": "Hypothesis: MLP gate/up and query/output projections at 3 bits, with other quantizable modules protected at 4 bits, will retain at least 95% BF16 extraction accuracy and throughput while using less peak memory than the all-4-bit baseline. The 32-element attention groups may help preserve accuracy under short constrained extraction.",
+      "risk": "No heldout tasks were measured, and the prior 3-bit mixed recipe reached only 85% quality. Reject this recipe if either retention gate falls below 95%, or if its peak memory is not lower than the passing alternatives."
+    },
+    {
+      "role": "hardware fit",
+      "recipe_id": "int3-g64",
+      "reason": "Recommend int3-g64 as a hypothesis: int3-g32 met the quality gate in two trials, while int3-g128 missed it. Group size 64 is a plausible middle point that may retain quality with less memory than g32. Measure it against both gates before accepting it.",
+      "risk": "No trial measured int3-g64, and the BF16 throughput reference is not supplied. Its quality, peak memory, and throughput are unverified."
+    },
+    {
+      "role": "artifact integrity",
+      "recipe_id": "mixed2-6-g128",
+      "reason": "Hypothesis: 2-bit base weights with 6-bit protection could reduce peak memory while preserving extraction quality in sensitive modules. Measure quality and throughput against both 95% gates; no held-out evidence confirms it yet.",
+      "risk": "The measured mixed2-4-g128 recipe retained 0% quality, so raising protected precision may still fail the quality gate. Its memory and throughput are unmeasured."
+    },
+    {
+      "role": "failure analysis",
+      "recipe_id": "mlp-query-output3-ag64",
+      "reason": "Prior MLP-focused 3-bit evidence retained full quality at 2,085.7 MiB, while uniform 3-bit G128 retained only 80% and mixed 2-bit G128 retained 0%. This recipe is the closest available analogue to the quality-retaining MLP recipe, with larger attention groups than the G32 variant to limit metadata overhead. Hypothesis: it will retain at least 95% of BF16 quality and throughput while using less peak memory than a qualifying uniform 3-bit recipe.",
+      "risk": "The prior MLP result used a different protection pattern and was not measured on heldout tasks. This recipe may miss either 95% gate; reject it if either quality or throughput retention falls below 0.95, or if its measured peak memory is not lower than the qualifying alternative."
+    }
+  ],
+  "ballots": [
+    {
+      "ranking": [
+        "mlp-query-output3-ag64",
+        "int3-g64",
+        "mlp-query-output3-ag32",
+        "vdown4-rest3-g128",
+        "mixed3-4-g64",
+        "mixed2-6-g128",
+        "mixed2-3-g128",
+        "int2-g128"
+      ],
+      "reason": "Prioritize mlp-query-output3-ag64: the closest measured analogue, mlp3-rest4-g128, retained full quality at 2,085.7 MiB, below the 2,177.7 MiB measured for passing int3-g32. The exact recipe remains untested. Rank int3-g64 next because measured int3-g32 passed quality and throughput, while int3-g128 failed quality; g64 is an unverified memory-reduction hypothesis between them. The remaining recipes have less support: mixed3-4-g128 retained only 85% quality, and mixed2-4-g128 retained 0%. No supplied evidence establishes the throughput gate against BF16 or heldout quality, so these are trial priorities, not claims that either candidate passes."
+    },
+    {
+      "ranking": [
+        "mixed2-6-g128",
+        "int3-g64",
+        "vdown4-rest3-g128",
+        "mlp-query-output3-ag32",
+        "mlp-query-output3-ag64",
+        "mixed3-4-g64",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize mixed2-6-g128: it tests whether stronger protection can make the 2-bit base recipe quality-safe, offering the clearest route to a useful memory reduction if it clears both gates. Rank int3-g64 second: measured int3-g32 passed quality and throughput while int3-g128 missed quality, so group size 64 is a useful interpolation hypothesis. Remaining recipes have weaker support or likely higher memory. No supplied data establishes that any unmeasured recipe passes both gates."
+    },
+    {
+      "ranking": [
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "int3-g64",
+        "vdown4-rest3-g128",
+        "mixed3-4-g64",
+        "mixed2-6-g128",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize mlp-query-output3-ag64 and mlp-query-output3-ag32 for the two trials. The closest measured analogue, mlp3-rest4-g128, retained full quality at 2,085.7 MiB, below the passing int3-g32 result at 2,177.7 MiB. The proposed patterns differ, so this supports hypotheses only; neither candidate has measured throughput or quality. Rank ag64 first because its larger attention groups are expected to use less memory. int3-g64 is next because measured int3-g32 passed quality and the larger group may reduce memory, but quality could fall. The remaining recipes have weaker support: the 3-bit mixed recipe reached only 0.85 quality, and the 2-bit mixed recipe reached 0."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "vdown4-rest3-g128",
+        "mixed3-4-g64",
+        "mixed2-6-g128",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize int3-g64: it interpolates between int3-g32, which passed quality in two trials, and int3-g128, which failed, while plausibly reducing memory versus g32. Rank mlp-query-output3-ag64 second because prior MLP-focused 3-bit trials retained full quality with lower memory than int3-g32; ag64 may reduce attention metadata versus ag32. Both are hypotheses: no heldout quality or BF16 throughput reference is supplied, so neither is known to pass the gates. The remaining candidates have weaker quality evidence, or use 2-bit base precision despite the supplied 2-bit mixed failure."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "mixed3-4-g64",
+        "vdown4-rest3-g128",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "mixed2-6-g128",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize int3-g64 and mixed3-4-g64: int3-g32 passed quality twice at 1.0, while int3-g128 and mixed3-4-g128 missed the gate. Group size 64 is a plausible memory-saving step between those measured settings; the mixed recipe may gain quality from smaller groups, though that is unverified. Next favor the 3-bit recipe protecting all value/down projections, then the MLP/query/output recipes, based on plausible protection of sensitive modules and 3-bit base weights. Rank 2-bit recipes last because int3-g128 missed quality and mixed2-4-g128 scored 0. No candidate's quality or throughput is established; use the two trials on the leading hypotheses and judge both against the unchanged gates."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "vdown4-rest3-g128",
+        "mixed3-4-g64",
+        "int2-g128",
+        "mixed2-6-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Use the two trials on int3-g64 and mlp-query-output3-ag64. Int3-g32 is the strongest evidence that 3-bit weights can retain quality, and group size 64 tests for a memory reduction. The prior MLP-focused 3-bit recipe retained full quality at lower memory than int3-g32, making the ag64 recipe a quality-oriented second hypothesis. Neither candidate has measured results, and the supplied evidence does not establish the BF16 throughput reference, so both must pass the stated quality and throughput gates before adoption."
+    },
+    {
+      "ranking": [
+        "mlp-query-output3-ag64",
+        "int3-g64",
+        "mlp-query-output3-ag32",
+        "mixed3-4-g64",
+        "vdown4-rest3-g128",
+        "mixed2-6-g128",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize mlp-query-output3-ag64 for trial one: the closest evidence is mlp3-rest4-g128, which retained full measured quality at 2,085.7 MiB, and 64-element attention groups should have less metadata overhead than ag32. It may still differ enough to miss either gate. Rank int3-g64 second: it tests a plausible memory reduction from the passing int3-g32 result, but group size 64 has no measured quality or throughput. The supplied evidence supports neither candidate as a guaranteed pass, and no heldout results are available."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "vdown4-rest3-g128",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "mixed2-6-g128",
+        "mixed3-4-g64",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prefill latency has one slot, and vdown4-rest3-g128 has the strongest low-memory hypothesis: 3-bit base weights with targeted 4-bit protection. But the board provides no results for it. int3-g64 is the most useful quality-safe comparison: int3-g32 passed quality and throughput in two trials, while int3-g128 did not. It tests whether a larger group can cut memory while still clearing both gates. Rank vdown4-rest3-g128 first as the prefill proposal and int3-g64 second for measurement. All rankings are hypotheses; no recipe is established as passing on heldout tasks."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "vdown4-rest3-g128",
+        "mlp-query-output3-ag64",
+        "mixed3-4-g64",
+        "mlp-query-output3-ag32",
+        "mixed2-6-g128",
+        "mixed2-3-g128",
+        "int2-g128"
+      ],
+      "reason": "Prioritize int3-g64 because int3-g32 retained full quality in two trials at 2177.7 MiB, while int3-g128 missed the quality gate; g64 is an untested memory-reduction hypothesis between them. Rank vdown4-rest3-g128 second because it keeps most weights at 3 bits and protects value/down projections, embedding, and head, but its quality and throughput are unmeasured and the closest mixed 3-bit result retained only 85%. No recipe has supplied evidence that it passes both gates. The BF16 throughput reference and heldout-task results are absent, so neither candidate's gate status can be established from this evidence."
+    },
+    {
+      "ranking": [
+        "vdown4-rest3-g128",
+        "int3-g64",
+        "mixed3-4-g64",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "mixed2-6-g128",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize two quality-safe memory hypotheses: vdown4-rest3-g128 protects value/down projections plus embedding/head while keeping most weights at 3 bits; int3-g64 tests whether the known quality pass at 3-bit group 32 can use less memory at group 64. Both are unmeasured, so neither is known to pass. Mixed3-4-g64 and the MLP/query-output recipes follow based on quality-preserving 3-bit evidence, though the tested mixed3-4-g128 recipe reached only 0.85 retention. The tested mixed2-4 recipe reached 0 quality, so the 2-bit options rank last despite possible memory savings. Throughput cannot be confirmed from the supplied evidence because the BF16 throughput reference is absent."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "vdown4-rest3-g128",
+        "mixed2-6-g128",
+        "mixed3-4-g64",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize int3-g64 because int3-g32 passed quality in two trials at 2177.7 MiB, while int3-g128 failed quality; g64 tests a plausible lower-memory middle point. Next, vdown4-rest3-g128 has a plausible quality-safe 3-bit path. mixed2-6-g128 may reduce memory further, but mixed2-4-g128 scored 0 quality. The remaining recipes have weaker quality evidence or higher metadata and memory risk. All are hypotheses; no supplied result establishes either gate for these candidates."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "vdown4-rest3-g128",
+        "mixed3-4-g64",
+        "mixed2-6-g128",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize int3-g64: int3-g32 passed the quality gate in two trials and used 2,177.7 MiB, while int3-g128 failed quality. Group size 64 tests whether memory can be reduced without losing quality or throughput. Next, test mlp-query-output3-ag64: the prior MLP-focused 3-bit recipe retained full quality at 2,085.7 MiB, though this pattern is unmeasured. The remaining recipes have weaker evidence for passing both gates or offer less promising memory reduction. These are trial priorities, not predicted results."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "vdown4-rest3-g128",
+        "mixed3-4-g64",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "mixed2-6-g128",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize int3-g64: int3-g32 passed the observed quality and throughput gates at 2177.7 MiB, while int3-g128 failed quality, so g64 is the strongest memory-reduction interpolation to test. Next, vdown4-rest3-g128 targets 3-bit memory with selective 4-bit protection. It is supported only as a hypothesis; mixed3-4-g128 reached 85% quality, so both candidates need gate measurements. The remaining recipes have weaker fit to the evidence: finer grouping or higher protection may cost memory, and 2-bit base recipes have poor quality evidence. No supplied results establish heldout performance or the BF16 throughput reference."
+    },
+    {
+      "ranking": [
+        "int3-g64",
+        "vdown4-rest3-g128",
+        "mixed2-6-g128",
+        "mlp-query-output3-ag64",
+        "mlp-query-output3-ag32",
+        "mixed3-4-g64",
+        "int2-g128",
+        "mixed2-3-g128"
+      ],
+      "reason": "Prioritize int3-g64: the measured g32 variant passed quality and throughput twice, while g128 failed quality, so g64 is a useful memory-reduction hypothesis between them. Put vdown4-rest3-g128 second because it keeps most weights at 3 bits and adds targeted protection, though mixed3-4-g128 at 85% quality leaves that gate uncertain. No exact candidate has measured evidence for both gates, and the absent BF16 throughput reference prevents confirming throughput retention. Rank these as trial hypotheses, not established results."
+    },
+    {
+      "ranking": [
+        "mlp-query-output3-ag64",
+        "int3-g64",
+        "mlp-query-output3-ag32",
+        "vdown4-rest3-g128",
+        "mixed3-4-g64",
+        "mixed2-6-g128",
+        "mixed2-3-g128",
+        "int2-g128"
+      ],
+      "reason": "Prioritize mlp-query-output3-ag64 for a trial: the closest quality evidence is mlp3-rest4-g128, which retained full quality at 2,085.7 MiB, though its protection pattern differs and this recipe's gates remain unverified. Rank int3-g64 second: int3-g32 passed quality twice at 2,177.7 MiB, but int3-g128 retained only 80%, so the intermediate group size is uncertain. Other candidates have weaker quality evidence: mixed3-4-g128 retained 85%, mixed2-4-g128 retained 0%, and none of the exact recipes in this ranking has measured results. Throughput retention cannot be established from the supplied evidence because no BF16 throughput reference is given."
+    }
+  ],
+  "ballot_repairs": [
+    {
+      "specialist": 10,
+      "invalid_ballot": {
+        "ranking": [
+          "int3-g64",
+          "vdown4-rest3-g128",
+          "mixed2-6-g128",
+          "mixed3-4-g64",
+          "mlp-query-output3-ag64",
+          "mlp-query-output3-ag32",
+          "int2-g128",
+          "int3-g64"
+        ],
+        "reason": "Correction: the ranking must include each recipe exactly once, so int3-g64 cannot appear twice. Use this order instead: int3-g64, vdown4-rest3-g128, mixed2-6-g128, mixed3-4-g64, mlp-query-output3-ag64, mlp-query-output3-ag32, int2-g128. There are eight recipes; the full ranking is int3-g64, vdown4-rest3-g128, mixed2-6-g128, mixed3-4-g64, mlp-query-output3-ag64, mlp-query-output3-ag32, int2-g128, mixed2-3-g128. Wait, int3-g64 was duplicated in the initial list. Final intended rank: int3-g64, vdown4-rest3-g128, mixed2-6-g128, mixed3-4-g64, mlp-query-output3-ag64, mlp-query-output3-ag32, int2-g128, mixed2-3-g128."
+      }
+    }
+  ],
+  "ranking": [
+    "int3-g64",
+    "mlp-query-output3-ag64",
+    "vdown4-rest3-g128",
+    "mlp-query-output3-ag32",
+    "mixed3-4-g64",
+    "mixed2-6-g128",
+    "int2-g128",
+    "mixed2-3-g128"
+  ],
+  "wall_seconds": 115.93817916698754,
+  "coordinator": "gpt-6-astra/high",
+  "specialists": "15 x gpt-6-luna/medium",
+  "transport": "Codex ChatGPT login"
+}

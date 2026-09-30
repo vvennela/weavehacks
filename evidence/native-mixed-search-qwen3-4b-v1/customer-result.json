@@ -1,0 +1,125 @@
+{
+  "status": "passed",
+  "model": {
+    "model_id": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c"
+  },
+  "device": {
+    "device_name": "Apple M4 Pro",
+    "max_recommended_working_set_size": 19069665280,
+    "memory_size": 25769803776,
+    "architecture": "applegpu_g16s",
+    "max_buffer_length": 14302248960,
+    "resource_limit": 499000
+  },
+  "runtime_versions": {
+    "mlx": "0.32.3",
+    "mlx-lm": "0.31.3",
+    "transformers": "5.17.0",
+    "outlines": "1.3.3"
+  },
+  "power": {
+    "source": "Now drawing from 'AC Power'",
+    "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "measurements": {
+    "sera": {
+      "recipe": "int3-g64",
+      "search_peak_mib": 1941.8746223449707,
+      "heldout_peak_bytes": 2055601804,
+      "heldout_peak_gb": 2.055601804,
+      "search_quality": [
+        1.0,
+        1.0
+      ],
+      "heldout_quality": 1.0,
+      "heldout_output_tokens_per_second": 17.496032535398015,
+      "heldout_p95_latency_ms": 569.2901670117863,
+      "search_seconds_including_planning_and_review": 269.21898549899925,
+      "artifact": {
+        "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-targeted-preparation/int3-g64",
+        "artifact_id": "d116330b4ff2f304355efc5d43b668c767ad517dd6369d81bd40b72b56db977e"
+      },
+      "search_throughput_range": [
+        17.707388555816287,
+        17.715654597068635
+      ]
+    },
+    "fixed": {
+      "recipe": "int3-g32",
+      "search_peak_mib": 2177.655860900879,
+      "heldout_peak_bytes": 2302541440,
+      "heldout_peak_gb": 2.30254144,
+      "search_quality": [
+        1.0,
+        1.0
+      ],
+      "heldout_quality": 1.0,
+      "heldout_output_tokens_per_second": 17.245629288212356,
+      "heldout_p95_latency_ms": 574.3252920219675,
+      "search_seconds_including_planning_and_review": 143.59933433291735,
+      "artifact": {
+        "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-targeted-preparation/int3-g32",
+        "artifact_id": "e5644973f5bd08caa5b9016ee7838161ed4ac9ca1c2080c087280d094c5d09ca"
+      },
+      "search_throughput_range": [
+        17.42617256868722,
+        17.458930728851605
+      ]
+    }
+  },
+  "heldout_memory_reduction_vs_fixed": 0.1072465544854645,
+  "heldout_memory_reduction_vs_bf16": 0.7483583727990939,
+  "bf16_heldout_peak_gb": 8.168766936,
+  "sera_is_faster_at_search": false,
+  "comparison": {
+    "complete": true,
+    "sera_beats_fixed": true
+  },
+  "registration_hash": "67cb501fbb50940fd3c3631272bc8744205fcbd7adf24b6471b498e23bdd07d0",
+  "validation": {
+    "paired_search_blocks": 1,
+    "candidate_trials_per_policy": 2,
+    "search_tasks": 20,
+    "heldout_tasks": 20,
+    "repetitions_per_measurement": 3,
+    "quality_retention_required": 0.95,
+    "throughput_retention_required": 0.95,
+    "memory_win_required": 0.05,
+    "heldout_passed": {
+      "fixed": true,
+      "sera": true
+    },
+    "coordinator_review": {
+      "decision": "adopt",
+      "reason": "int3-g64 passed the software gates and held-out checks, with measured peak allocation of 1941.8746 MiB. The supplied evidence does not establish that this is the minimum achievable memory."
+    }
+  },
+  "scope": [
+    "Apple MLX active allocator peak; not total system memory or free VRAM.",
+    "Final comparison followed two development studies whose failures are retained alongside this result.",
+    "Both policies received the same prior evidence and cached exports. Fixed order was int4-g128 then int3-g32.",
+    "Search time includes policy planning, candidate measurement, selection confirmation, and coordinator review. Shared BF16 controls, export preparation, heldout checks and engineering work are additional.",
+    "This is one paired search with repeated checkpoint measurements, not three independent successful searches.",
+    "The small inference-speed difference is inside the observed BF16 timing drift; no inference-speed superiority claim.",
+    "No universal win over other search policies, models or hardware is established."
+  ],
+  "trace_urls": {
+    "board-0": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efee-e228-79b0-8d35-a59c6e81bc7c",
+    "block-0-control-before": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff0-ae47-752c-a376-9fa0799b3ed8",
+    "block-0-fixed-trial-0": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff1-e123-791d-b3df-04cb980434eb",
+    "block-0-fixed-trial-1": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff2-a3bf-7625-afc2-0a9cad156980",
+    "block-0-sera-trial-0": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff3-5a00-724b-955c-e8a306ae8d9c",
+    "block-0-sera-trial-1": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff4-0d52-727f-9128-2ac9919463a7",
+    "block-0-control-after": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff4-c16f-72e8-856a-3b7c59f1e3c9",
+    "block-0-fixed-confirm-0": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff5-e7e3-7026-b575-7d7412a8ce9f",
+    "block-0-sera-confirm-0": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff6-9ffa-7677-9947-4452fb7e0918",
+    "heldout-control-before": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff7-564e-797c-8a8f-82460582c660",
+    "heldout-int3-g32": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff8-80c6-7204-9a9b-b4144962c4e1",
+    "heldout-int3-g64": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff9-3913-7d31-9039-c8442c9c0ae1",
+    "heldout-control-after": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff9-ed92-7d45-bdcb-2af6823e7376",
+    "review-0": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0effb-1129-754a-9f65-25deed878c60"
+  },
+  "new_aws_spend_usd": 0,
+  "implementation_commit": "c0af163"
+}

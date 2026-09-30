@@ -1,0 +1,13 @@
+{
+  "result": {
+    "decision": "adopt",
+    "reason": "int3-g64 passed the software gates and held-out checks, with measured peak allocation of 1941.8746 MiB. The supplied evidence does not establish that this is the minimum achievable memory."
+  },
+  "trace": {
+    "call_id": "01a0effb-1129-754a-9f65-25deed878c60",
+    "trace_id": "01a0effb-1129-7199-aad6-50bbafc888c8",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0effb-1129-754a-9f65-25deed878c60",
+    "remote_verified": true
+  },
+  "wall_seconds": 11.215568665997125
+}

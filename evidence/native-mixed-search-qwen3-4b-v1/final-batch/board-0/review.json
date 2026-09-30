@@ -1,0 +1,4 @@
+{
+  "decision": "adopt",
+  "reason": "int3-g64 passed the software gates and held-out checks, with measured peak allocation of 1941.8746 MiB. The supplied evidence does not establish that this is the minimum achievable memory."
+}

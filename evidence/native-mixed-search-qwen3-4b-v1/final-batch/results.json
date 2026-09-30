@@ -1,0 +1,128 @@
+{
+  "rows": [
+    {
+      "block": 0,
+      "qualified": true,
+      "sera_peak_mib": 1941.8746223449707,
+      "fixed_peak_mib": 2177.655860900879,
+      "sera_recipe": "int3-g64",
+      "fixed_recipe": "int3-g32",
+      "sera_seconds": 269.21898549899925,
+      "fixed_seconds": 143.59933433291735,
+      "heldout_passed": {
+        "fixed": true,
+        "sera": true
+      },
+      "coordinator_review": {
+        "decision": "adopt",
+        "reason": "int3-g64 passed the software gates and held-out checks, with measured peak allocation of 1941.8746 MiB. The supplied evidence does not establish that this is the minimum achievable memory."
+      }
+    }
+  ],
+  "summary": {
+    "complete": true,
+    "sera_beats_fixed": true
+  },
+  "setup": [],
+  "traces": [
+    {
+      "name": "board-0",
+      "call_id": "01a0efee-e228-79b0-8d35-a59c6e81bc7c",
+      "trace_id": "01a0efee-e228-78f8-9734-9e8463d99757",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efee-e228-79b0-8d35-a59c6e81bc7c",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-control-before",
+      "call_id": "01a0eff0-ae47-752c-a376-9fa0799b3ed8",
+      "trace_id": "01a0eff0-ae47-70ad-b2d3-6a8fbebfe9c2",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff0-ae47-752c-a376-9fa0799b3ed8",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-fixed-trial-0",
+      "call_id": "01a0eff1-e123-791d-b3df-04cb980434eb",
+      "trace_id": "01a0eff1-e123-7662-9521-8c72bd9a7337",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff1-e123-791d-b3df-04cb980434eb",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-fixed-trial-1",
+      "call_id": "01a0eff2-a3bf-7625-afc2-0a9cad156980",
+      "trace_id": "01a0eff2-a3bf-7144-bc92-578a29b9ece8",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff2-a3bf-7625-afc2-0a9cad156980",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-sera-trial-0",
+      "call_id": "01a0eff3-5a00-724b-955c-e8a306ae8d9c",
+      "trace_id": "01a0eff3-59ff-71e5-acfd-3b03f66bd01c",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff3-5a00-724b-955c-e8a306ae8d9c",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-sera-trial-1",
+      "call_id": "01a0eff4-0d52-727f-9128-2ac9919463a7",
+      "trace_id": "01a0eff4-0d52-7b92-9de3-ed48bdebb524",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff4-0d52-727f-9128-2ac9919463a7",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-control-after",
+      "call_id": "01a0eff4-c16f-72e8-856a-3b7c59f1e3c9",
+      "trace_id": "01a0eff4-c16f-70d4-a07e-5caf80ca0657",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff4-c16f-72e8-856a-3b7c59f1e3c9",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-fixed-confirm-0",
+      "call_id": "01a0eff5-e7e3-7026-b575-7d7412a8ce9f",
+      "trace_id": "01a0eff5-e7e3-7244-b861-51852b2f21d4",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff5-e7e3-7026-b575-7d7412a8ce9f",
+      "remote_verified": true
+    },
+    {
+      "name": "block-0-sera-confirm-0",
+      "call_id": "01a0eff6-9ffa-7677-9947-4452fb7e0918",
+      "trace_id": "01a0eff6-9ffa-7407-81e4-a40abf216b94",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff6-9ffa-7677-9947-4452fb7e0918",
+      "remote_verified": true
+    },
+    {
+      "name": "heldout-control-before",
+      "call_id": "01a0eff7-564e-797c-8a8f-82460582c660",
+      "trace_id": "01a0eff7-564e-71e9-81e3-3f86c3675641",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff7-564e-797c-8a8f-82460582c660",
+      "remote_verified": true
+    },
+    {
+      "name": "heldout-int3-g32",
+      "call_id": "01a0eff8-80c6-7204-9a9b-b4144962c4e1",
+      "trace_id": "01a0eff8-80c6-7990-8731-0bbd5011ff84",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff8-80c6-7204-9a9b-b4144962c4e1",
+      "remote_verified": true
+    },
+    {
+      "name": "heldout-int3-g64",
+      "call_id": "01a0eff9-3913-7d31-9039-c8442c9c0ae1",
+      "trace_id": "01a0eff9-3913-7b37-a5aa-17c421c25aee",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff9-3913-7d31-9039-c8442c9c0ae1",
+      "remote_verified": true
+    },
+    {
+      "name": "heldout-control-after",
+      "call_id": "01a0eff9-ed92-7d45-bdcb-2af6823e7376",
+      "trace_id": "01a0eff9-ed92-7c39-890b-a5608532e5b7",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0eff9-ed92-7d45-bdcb-2af6823e7376",
+      "remote_verified": true
+    },
+    {
+      "name": "review-0",
+      "call_id": "01a0effb-1129-754a-9f65-25deed878c60",
+      "trace_id": "01a0effb-1129-7199-aad6-50bbafc888c8",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0effb-1129-754a-9f65-25deed878c60",
+      "remote_verified": true
+    }
+  ],
+  "registration_hash": "67cb501fbb50940fd3c3631272bc8744205fcbd7adf24b6471b498e23bdd07d0"
+}
