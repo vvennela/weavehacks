@@ -119,3 +119,23 @@ def test_runtime_install_reuses_callers_virtual_environment(monkeypatch, tmp_pat
     monkeypatch.setattr(onboarding.subprocess, 'run', lambda args, **kwargs: calls.append(args))
     assert onboarding.install_runtime(tmp_path, 'mlx') == sys.executable
     assert calls[0] == ['uv', 'pip', 'install', '--python', sys.executable, 'sera-inference[mlx,swarm]']
+
+
+def test_cuda_setup_requires_examples_before_collecting_budgets(tmp_path, monkeypatch):
+    examples = tmp_path / 'checks.json'
+    examples.write_text(json.dumps([{'prompt': 'Extract a field', 'expected_json': {'field': 'value'}}]))
+    answers = iter(['', str(examples)])
+    prompts = []
+    def answer(prompt):
+        prompts.append(prompt)
+        return next(answers)
+    monkeypatch.setattr('builtins.input', answer)
+    tasks = onboarding._model_examples('cuda')
+    assert tasks[0]['expected_json'] == {'field': 'value'}
+    assert len(prompts) == 2
+    assert all('required for CUDA' in prompt for prompt in prompts)
+
+
+def test_mlx_setup_can_defer_examples_to_each_workload(monkeypatch):
+    monkeypatch.setattr('builtins.input', lambda _: '')
+    assert onboarding._model_examples('mlx') is None

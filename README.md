@@ -32,6 +32,8 @@ Earlier recorded serving result: **19.77% lower p95 latency** on eight repeated 
 
 ## One setup. One call.
 
+Use Python 3.11+ and Codex CLI. Setup can install Codex CLI through Node.js when needed.
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate

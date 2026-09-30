@@ -195,6 +195,20 @@ def _ask(label, default=None):
     return answer or default
 
 
+def _model_examples(backend):
+    from .workload_intake import read_examples
+    required = backend == 'cuda'
+    label = ('Quality examples JSON path (required for CUDA calibration)' if required else
+             'Quality examples JSON path (Enter to supply examples per workload)')
+    while True:
+        path = _ask(label, '')
+        if path:
+            return read_examples(Path(path).expanduser())
+        if not required:
+            return None
+        print('CUDA needs representative examples to calibrate quantization.', flush=True)
+
+
 def setup(*, home=None, operator_config=None, start=True, install=True):
     home = Path(home or home_path()).resolve()
     print('Sera — the autonomous auto-research harness for inference', flush=True)
@@ -217,9 +231,7 @@ def setup(*, home=None, operator_config=None, start=True, install=True):
         model = _ask('Model repository', DEFAULT_MODEL)
         revision = _ask('Pinned model revision', DEFAULT_REVISION if model == DEFAULT_MODEL else None)
         name = _ask('Local model name', f'model-{len(profiles)+1}')
-        examples_path = _ask('Quality examples JSON path (Enter to supply examples per workload)', '')
-        from .workload_intake import read_examples
-        tasks = read_examples(Path(examples_path).expanduser()) if examples_path else None
+        tasks = _model_examples(backend)
         seconds = float(_ask('Maximum seconds per research job', '300'))
         trials = int(_ask('Maximum candidate experiments', '2'))
         floor = float(_ask('Minimum fraction of quality checks passed', '0.99'))
