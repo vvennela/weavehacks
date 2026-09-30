@@ -131,6 +131,7 @@ def test_modelopt_export_pins_source_calibrates_and_seals_packed_files(tmp_path,
         # not the destination. Preserve BF16 for all unquantized parameters.
         assert dtype == torch.bfloat16
         assert export_dir == str(tmp_path/'export')
+        assert kwargs['max_shard_size'] == '2GB'
         Path(export_dir).mkdir()
         write_checkpoint(Path(export_dir))
     modules={name:ModuleType(name) for name in ('modelopt','modelopt.torch','modelopt.torch.quantization','modelopt.torch.export')}
