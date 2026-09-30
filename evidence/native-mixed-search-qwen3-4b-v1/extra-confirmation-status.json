@@ -1,0 +1,20 @@
+{
+  "status": "incomplete",
+  "reason": "The optional follow-up BF16 control reached the global deadline. It is excluded from the completed primary study.",
+  "jobs": {
+    "sera": {
+      "job_hash": "121edb51816d402f61a4b615f43194b1afa1fb24879033f7df375f2db4ad4a39",
+      "status": "completed",
+      "cleanup_pass": true,
+      "pid": 95659,
+      "elapsed_seconds": 44.38858158397488
+    },
+    "baseline": {
+      "job_hash": "26ff2e6fdf167c071b091e82b36a044d6ecb11a22dcb2b90d4b01f23e76d134d",
+      "status": "timeout",
+      "cleanup_pass": true,
+      "pid": 95774,
+      "elapsed_seconds": 68.98568304197397
+    }
+  }
+}

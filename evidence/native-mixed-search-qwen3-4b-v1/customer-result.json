@@ -121,5 +121,9 @@
     "review-0": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0effb-1129-754a-9f65-25deed878c60"
   },
   "new_aws_spend_usd": 0,
-  "implementation_commit": "c0af163"
+  "implementation_commit": "c0af163",
+  "additional_confirmation_attempt": {
+    "status": "incomplete",
+    "reason": "The optional follow-up BF16 control reached the global deadline. It is excluded from the completed primary study."
+  }
 }
