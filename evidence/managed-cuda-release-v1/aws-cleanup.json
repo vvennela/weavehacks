@@ -1,0 +1,26 @@
+{
+  "approved_total_budget_usd": 50,
+  "new_instance_type": "g6.8xlarge",
+  "new_instance_hourly_usd": 2.0144,
+  "launch_time": "2026-09-30T02:34:58+00:00",
+  "termination_confirmed_at": "2026-09-30T03:22:28.573178+00:00",
+  "cleanup_completed_at": "2026-09-30T03:22:38.786351+00:00",
+  "forced_shutdown_after_local_checkpoint_verification": true,
+  "estimated_new_compute_usd": 1.5950540582675556,
+  "prior_cost_reserve_usd": 10,
+  "billing_note": "Compute estimate from elapsed time and live AWS list price. Final storage and transfer charges are not yet verified. The prior-cost reserve exceeds observed prior compute cost.",
+  "checks": {
+    "instance_state": "terminated",
+    "remaining_volumes": [],
+    "remaining_security_groups": []
+  },
+  "temporary_resources_removed": [
+    "EC2 instance",
+    "tagged EBS volumes",
+    "security group",
+    "private S3 artifact bucket and objects",
+    "SSM instance role and instance profile",
+    "scheduled termination and scheduler role"
+  ],
+  "checkpoint_retained_locally": true
+}
