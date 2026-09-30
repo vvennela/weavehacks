@@ -1,13 +1,11 @@
 """Owned vLLM server lifecycle for the smoke-checked single-GPU runtime."""
 
-from dataclasses import asdict, dataclass
 import hashlib
 import importlib.metadata
 import json
 import os
-from pathlib import Path
-import shlex
 import re
+import shlex
 import signal
 import socket
 import subprocess
@@ -16,11 +14,20 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from dataclasses import asdict, dataclass
+from pathlib import Path
 
-from .config import GLM_MODEL_ID, GLM_MODEL_REVISION, LARGE_MODEL_ID, LARGE_MODEL_REVISION, MODEL_ID, MODEL_REVISION, RuntimeConfig
+from .config import (
+    GLM_MODEL_ID,
+    GLM_MODEL_REVISION,
+    LARGE_MODEL_ID,
+    LARGE_MODEL_REVISION,
+    MODEL_ID,
+    MODEL_REVISION,
+    RuntimeConfig,
+)
 from .metrics import parse_vllm_metrics
 from .storage import save_json
-
 
 GENERATION = {"temperature": 0, "top_p": 1, "top_k": -1, "seed": 0, "max_tokens": 64}
 SERVED_MODEL = "sera-model"
@@ -56,9 +63,9 @@ STARTUP_FAILURE_MESSAGES = {
 
 def classify_startup_failure(artifact_dir):
     """Classify fixed signatures, retaining source hashes instead of arbitrary log text."""
-    result = dict(category="unclassified", stage="startup", callsite=None,
-                  kernel_source=None, kernel_line=None, source=None,
-                  root_cause_status="not-established")
+    result = {"category": "unclassified", "stage": "startup", "callsite": None,
+              "kernel_source": None, "kernel_line": None, "source": None,
+              "root_cause_status": "not-established"}
     digest = hashlib.sha256()
     matches = []
     try:
@@ -83,9 +90,9 @@ def classify_startup_failure(artifact_dir):
                         result.update(kernel_source="cutlass_gemm_caller.cuh", kernel_line=int(location[1]))
                 matches.append((number, hashlib.sha256(raw).hexdigest()))
                 matches = matches[-8:]
-        result["source"] = dict(path="server.log", sha256=digest.hexdigest(),
-            line_numbers=[number for number, _ in matches],
-            matched_line_sha256=[digest for _, digest in matches])
+        result["source"] = {"path": "server.log", "sha256": digest.hexdigest(),
+            "line_numbers": [number for number, _ in matches],
+            "matched_line_sha256": [digest for _, digest in matches]}
     except OSError:
         # Missing/unreadable source is explicit and must not mask the startup error.
         result.update(category="unclassified", callsite=None, kernel_source=None, kernel_line=None)
@@ -175,7 +182,8 @@ def _child_environment(folder: Path, gpu_uuid: str) -> dict:
     for name, paths in {"PATH": [compiler.parent],
                         "LIBRARY_PATH": [link_dir, library.parent],
                         "LD_LIBRARY_PATH": [library.parent]}.items():
-        env[name] = os.pathsep.join([*(str(path) for path in paths), env.get(name, "")])
+        inherited = [path for path in env.get(name, "").split(os.pathsep) if path]
+        env[name] = os.pathsep.join([*(str(path) for path in paths), *inherited])
     return env
 
 
@@ -330,7 +338,7 @@ class SeraModel:
         elif isinstance(prompt, list):
             messages = prompt
         else:
-            raise ValueError("Expected text or a list of text chat messages")
+            raise ValueError("Expected text or a list of text chat messages")  # noqa: TRY004 - retain the public input-error contract
         if not messages or any(not isinstance(item, dict) or set(item) != {"role", "content"}
                                or item["role"] not in {"system", "user", "assistant"}
                                or not isinstance(item["content"], str) or not item["content"].strip()

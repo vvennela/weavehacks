@@ -3,11 +3,11 @@
 import importlib.metadata
 import json
 import os
-from pathlib import Path
 import shlex
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -151,6 +151,15 @@ def test_no_compiler_wheel_preserves_runtime_paths_without_scanning(monkeypatch,
     assert not (tmp_path / 'cuda-link').exists()
 
 
+def test_cuda_paths_do_not_add_implicit_current_directory(monkeypatch, tmp_path):
+    installed_wheels(monkeypatch, tmp_path)
+    for name in ('PATH', 'LIBRARY_PATH', 'LD_LIBRARY_PATH'):
+        monkeypatch.delenv(name, raising=False)
+    env = _child_environment(tmp_path, 'GPU-test')
+    for name in ('PATH', 'LIBRARY_PATH', 'LD_LIBRARY_PATH'):
+        assert '' not in env[name].split(os.pathsep)
+
+
 def test_vllm_duplicate_system_include_does_not_let_base_headers_shadow_compiler(monkeypatch, tmp_path):
     host_compiler = shutil.which('cc') or shutil.which('gcc') or shutil.which('clang')
     if host_compiler is None:
@@ -174,6 +183,6 @@ def test_vllm_duplicate_system_include_does_not_let_base_headers_shadow_compiler
                '-E', '-P', '-x', 'c', '-']
     result = subprocess.run(command, input='#include <crt/host_runtime.h>\n'
                             '#include <curand.h>\n__cudaLaunch(1,2)\n',
-                            capture_output=True, text=True, timeout=10, env=child_env)
+                            capture_output=True, text=True, timeout=10, env=child_env, check=False)
     assert result.returncode == 0, result.stderr
     assert result.stdout.split() == ['curand_available', 'compiler_core']
