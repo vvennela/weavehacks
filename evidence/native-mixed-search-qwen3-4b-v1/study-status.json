@@ -1,0 +1,33 @@
+{
+  "first_batch": {
+    "status": "stopped-after-failed-first-block",
+    "sera_quality": [
+      0.0,
+      0.85
+    ],
+    "fixed_recipe": "int4-g128",
+    "reason": "No Sera candidate passed the unchanged 95% gate. No three-block claim."
+  },
+  "targeted_batch": {
+    "status": "interrupted-in-second-advisory-board",
+    "completed_blocks": 1,
+    "sera_recipe": "mlp3-rest4-g128",
+    "fixed_recipe": "int3-g32",
+    "search_quality_both": 1.0,
+    "memory_reduction_fraction": 0.042211387322684035,
+    "reason": "Specialist 12 duplicated int4-g128 and omitted int2-g128. First block fell below registered 5% win target. No heldout or three-block claim."
+  },
+  "final_batch": {
+    "status": "running",
+    "registered_blocks": 1,
+    "reason": "One paired two-trial search plus independent candidate confirmation and heldout validation, registered before new measurements."
+  },
+  "scope": "Qwen3-4B synthetic document extraction on Apple M4 Pro. MLX active allocator memory, not total unified memory or free GPU VRAM.",
+  "sources": {
+    "first_benchmark": "45809fe",
+    "targeted_benchmark": "5e173d4",
+    "first_and_targeted_board": "a5d8675",
+    "final_benchmark_and_board": "c0af163"
+  },
+  "setup": "Exports are reused symmetrically. Prior known outcomes are supplied to both policies. GPU jobs are serialized. Planning is charged to Sera. No new AWS resources were used."
+}

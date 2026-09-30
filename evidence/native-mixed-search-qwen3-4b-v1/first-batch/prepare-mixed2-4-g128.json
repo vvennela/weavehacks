@@ -1,0 +1,65 @@
+{
+  "result": {
+    "artifact": {
+      "schema_version": "sera-model-artifact-v1",
+      "backend": "mlx",
+      "source": {
+        "model_id": "Qwen/Qwen3-4B",
+        "revision": "1cfa9a7208912126459214e8b04321603b3df60c"
+      },
+      "recipe": {
+        "bits": 2,
+        "group_size": 128,
+        "protected_bits": 4
+      },
+      "versions": {
+        "mlx": "0.32.3",
+        "mlx-lm": "0.31.3",
+        "transformers": "5.17.0"
+      },
+      "files": {
+        "README.md": {
+          "sha256": "748c964f9b7e5f2c3770ce013bbc0153be7c54311d9692c343b6188eefe77ac6",
+          "bytes": 81
+        },
+        "chat_template.jinja": {
+          "sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+          "bytes": 4168
+        },
+        "config.json": {
+          "sha256": "40c4f8208a1fadc8265d34d4e09d50615896f34c77d6c1e72b2a88eab63b7af4",
+          "bytes": 70903
+        },
+        "generation_config.json": {
+          "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+          "bytes": 239
+        },
+        "model.safetensors": {
+          "sha256": "b1aa6b5723cbdae8ad9ceef5f341e1595a486993fd3ebeb3c709a47c0588f8dc",
+          "bytes": 1352859671
+        },
+        "model.safetensors.index.json": {
+          "sha256": "023ff68739b26ceef025701ddf934d4128b0ef7813045c0f3a16112c6a568e51",
+          "bytes": 63964
+        },
+        "tokenizer.json": {
+          "sha256": "be75606093db2094d7cd20f3c2f385c212750648bd6ea4fb2bf507a6a4c55506",
+          "bytes": 11422650
+        },
+        "tokenizer_config.json": {
+          "sha256": "ee8f6d44bf2353e6d3686c3adaf70e1ccfe9e6ed6822d0ab2f28cafdd7754792",
+          "bytes": 729
+        }
+      },
+      "artifact_id": "8298550512aed7aec485d3c74bee0ccba82e7b9040d3a17f411149f7f52e3e94"
+    },
+    "preparation_seconds": 4.084537166985683
+  },
+  "trace": {
+    "call_id": "01a0efd4-fffe-7346-9a3f-50132883ec85",
+    "trace_id": "01a0efd4-fffe-773f-8bd3-90f237461070",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efd4-fffe-7346-9a3f-50132883ec85",
+    "remote_verified": true
+  },
+  "wall_seconds": 7.201514457992744
+}

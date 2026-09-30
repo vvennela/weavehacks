@@ -1,0 +1,34 @@
+{
+  "int4-g128": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-customer-pilot/retained-candidates/4f07a387ea77d19c57e3b3fe4d9ff132f5f602636dff7daf0eea26ec85b5d117",
+    "artifact_id": "4f07a387ea77d19c57e3b3fe4d9ff132f5f602636dff7daf0eea26ec85b5d117"
+  },
+  "baseline": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-customer-pilot/retained-candidates/6ad3a31f1ad272ad633a73a89bfca9d428d15736646a4781c6eaa2d176d42d8f",
+    "artifact_id": "6ad3a31f1ad272ad633a73a89bfca9d428d15736646a4781c6eaa2d176d42d8f"
+  },
+  "int2-g128": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-mixed-pilot/artifacts/int2-g128",
+    "artifact_id": "445080d4373aabfab953654a48ae50bf5cdbd23b986a56611ce15fc440083168"
+  },
+  "int3-g128": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-mixed-pilot-v2/artifacts/int3-g128",
+    "artifact_id": "179aa39a51ceac3b1dd1b7b14da5a3d2ce7068212e726565cfede7054b9f1341"
+  },
+  "mixed2-3-g128": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-mixed-pilot-v2/artifacts/mixed2-3-g128",
+    "artifact_id": "e01f58a40723f6b9a2b784c3b9ffc8a82f038d41534d2dda685d0305ef41867c"
+  },
+  "mixed2-4-g128": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-mixed-pilot-v2/artifacts/mixed2-4-g128",
+    "artifact_id": "8298550512aed7aec485d3c74bee0ccba82e7b9040d3a17f411149f7f52e3e94"
+  },
+  "mixed2-6-g128": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-mixed-pilot-v2/artifacts/mixed2-6-g128",
+    "artifact_id": "dd4b6d40a107f97a5ebdd4916677db44daf8a5b9355f25730285ad4a4b8f3498"
+  },
+  "mixed3-4-g128": {
+    "path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-mixed-pilot-v2/artifacts/mixed3-4-g128",
+    "artifact_id": "06588c4e1885447954fa6f931e586e3d83deae7d860ad0d2851a7d1562631967"
+  }
+}

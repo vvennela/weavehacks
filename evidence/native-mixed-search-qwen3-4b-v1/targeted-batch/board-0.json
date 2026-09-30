@@ -1,0 +1,550 @@
+{
+  "result": {
+    "selected": [
+      "mlp3-rest4-g128",
+      "mixed3-4-g128"
+    ],
+    "history": [
+      {
+        "evidence": {
+          "workload": "Short document field extraction into constrained JSON, one request at a time, 32-token output limit, greedy decoding. Minimize memory while retaining 95% of BF16 extraction accuracy and throughput. User wants to fit AI on current hardware. Mixed recipes protect token embeddings, output head, and value/down projections in the first/last eighth of layers and every third middle layer. Other layers use base bits.",
+          "prior": {
+            "source": "Completed first search block; no heldout tasks measured in this batch.",
+            "reference_quality": 1.0,
+            "quality_retention": 0.95,
+            "trials": [
+              {
+                "recipe_id": "int4-g128",
+                "quality": 1.0,
+                "peak_mib": 2299.483985900879,
+                "throughput": 16.312697126153935
+              },
+              {
+                "recipe_id": "int4-g128",
+                "quality": 1.0,
+                "peak_mib": 2299.483985900879,
+                "throughput": 16.824907196206002
+              },
+              {
+                "recipe_id": "int3-g128",
+                "quality": 0.8,
+                "peak_mib": 1818.6089973449707,
+                "throughput": 16.390451535720732
+              },
+              {
+                "recipe_id": "mixed2-4-g128",
+                "quality": 0.0,
+                "peak_mib": 1551.358985900879,
+                "throughput": 37.932117998224754
+              },
+              {
+                "recipe_id": "mixed3-4-g128",
+                "quality": 0.85,
+                "peak_mib": 1925.421485900879,
+                "throughput": 17.248044622057055
+              }
+            ]
+          },
+          "available_recipes": [
+            {
+              "recipe_id": "int2-g128",
+              "recipe": {
+                "bits": 2,
+                "group_size": 128
+              }
+            },
+            {
+              "recipe_id": "int3-g128",
+              "recipe": {
+                "bits": 3,
+                "group_size": 128
+              }
+            },
+            {
+              "recipe_id": "int4-g128",
+              "recipe": {
+                "bits": 4,
+                "group_size": 128
+              }
+            },
+            {
+              "recipe_id": "mixed2-3-g128",
+              "recipe": {
+                "bits": 2,
+                "protected_bits": 3,
+                "group_size": 128
+              }
+            },
+            {
+              "recipe_id": "mixed2-4-g128",
+              "recipe": {
+                "bits": 2,
+                "protected_bits": 4,
+                "group_size": 128
+              }
+            },
+            {
+              "recipe_id": "mixed2-6-g128",
+              "recipe": {
+                "bits": 2,
+                "protected_bits": 6,
+                "group_size": 128
+              }
+            },
+            {
+              "recipe_id": "mixed3-4-g128",
+              "recipe": {
+                "bits": 3,
+                "protected_bits": 4,
+                "group_size": 128
+              }
+            },
+            {
+              "recipe_id": "mlp3-rest4-g128",
+              "recipe": {
+                "bits": 3,
+                "protected_bits": 4,
+                "group_size": 128,
+                "protection_pattern": "all-except-mlp-expansion"
+              }
+            },
+            {
+              "recipe_id": "vdown4-rest3-g128",
+              "recipe": {
+                "bits": 3,
+                "protected_bits": 4,
+                "group_size": 128,
+                "protection_pattern": "all-v-down"
+              }
+            },
+            {
+              "recipe_id": "int3-g32",
+              "recipe": {
+                "bits": 3,
+                "group_size": 32
+              }
+            },
+            {
+              "recipe_id": "int3-g64",
+              "recipe": {
+                "bits": 3,
+                "group_size": 64
+              }
+            },
+            {
+              "recipe_id": "mixed3-4-g64",
+              "recipe": {
+                "bits": 3,
+                "protected_bits": 4,
+                "group_size": 64
+              }
+            }
+          ],
+          "candidate_budget": 2,
+          "quality_retention": 0.95,
+          "throughput_retention": 0.95,
+          "pattern_definitions": {
+            "all-v-down": "All value and down projections plus embedding/head use protected bits; other modules use base bits.",
+            "all-except-mlp-expansion": "Only MLP gate_proj and up_proj use base bits; all other quantizable modules use protected bits.",
+            "default": "Sparse boundary/every-third v/down plus embedding/head protection."
+          },
+          "selection": "Jointly rank all recipes, top two will be measured with identical software gates."
+        },
+        "role_plan": {
+          "roles": [
+            "weight memory",
+            "embedding precision",
+            "attention precision",
+            "MLP precision",
+            "quantization error",
+            "group size",
+            "decode latency",
+            "prefill latency",
+            "structured extraction",
+            "quality gates",
+            "measurement noise",
+            "search efficiency",
+            "hardware fit",
+            "artifact integrity",
+            "failure analysis"
+          ],
+          "reason": "These are 15 assigned specialist perspectives. Their proposals and shared ranking are a synthesis, not independent agent votes. All recommendations are hypotheses.\n\nSpecialist proposals:\n1. Weight memory: propose mixed3-4-g64; test whether a mostly 3-bit recipe reduces peak memory while passing both gates.\n2. Embedding precision: propose mlp3-rest4-g128, which retains 4-bit embedding/head protection.\n3. Attention precision: propose vdown4-rest3-g128 to test protection of every value projection.\n4. MLP precision: propose mlp3-rest4-g128, limiting 3-bit weights to gate/up projections.\n5. Quantization error: propose int3-g32 to test whether smaller groups recover accuracy.\n6. Group size: propose mixed3-4-g64 to compare with the measured g128 recipe.\n7. Decode latency: propose mlp3-rest4-g128; assess throughput under the unchanged greedy, 32-token workload.\n8. Prefill latency: propose mixed3-4-g64; assess it with the existing short-document timing procedure.\n9. Structured extraction: propose mlp3-rest4-g128; broader protection may preserve field values and constrained JSON output.\n10. Quality gates: support mlp3-rest4-g128 for measurement; require the unchanged 0.95 quality and BF16 throughput-retention gates.\n11. Measurement noise: support mixed3-4-g64 provisionally; the two identical int4 recipes produced different throughput, so small differences do not establish gains.\n12. Search efficiency: propose the pair mlp3-rest4-g128 and mixed3-4-g64 to test two distinct recovery mechanisms within two candidates.\n13. Hardware fit: propose mixed3-4-g64; use measured peak MLX memory, not nominal bit width, to assess fit.\n14. Artifact integrity: support mlp3-rest4-g128 only with its exact supplied protection pattern and unchanged model/runtime.\n15. Failure analysis: propose vdown4-rest3-g128 as a protection-coverage hypothesis; deprioritize 2-bit recipes after mixed2-4-g128 scored zero quality.\n\nShared ranking of all recipes for this next batch:\n1. mlp3-rest4-g128\n2. mixed3-4-g64\n3. vdown4-rest3-g128\n4. int3-g32\n5. int3-g64\n6. int4-g128\n7. mixed3-4-g128\n8. int3-g128\n9. mixed2-6-g128\n10. mixed2-4-g128\n11. mixed2-3-g128\n12. int2-g128\n\nMeasure ranks 1 and 2 only. Rank 1 tests broader 4-bit protection; rank 2 tests smaller groups with the existing sparse protection. Neither has measured results. This is an experiment-priority ranking, not a demonstrated performance ranking.\n\nInt4-g128 is the only observed quality-passing recipe, at 2299.484 MiB peak. Int3-g128 and mixed3-4-g128 fall below the 0.95 quality gate. BF16 throughput is absent, so throughput eligibility cannot be established for any recipe. No heldout tasks were measured, and hardware capacity is unspecified. Keep tasks, gates, budget, model, and runtime unchanged; select lower measured peak memory only among candidates that pass both existing gates."
+        },
+        "proposals": [
+          {
+            "role": "weight memory",
+            "recipe_id": "int4-g128",
+            "reason": "It is the smallest-memory observed recipe with measured quality at or above 95%: quality 1.0 and peak memory 2299.48 MiB. Int3-g128 used less memory but reached only 0.8 quality. Int4 throughput observations are 16.31 and 16.82; no BF16 throughput reference is supplied, so 95% throughput retention is not established. Recommend measuring int4-g128 against the fixed gates.",
+            "risk": "Evidence comes only from the first search block with no heldout tasks, and repeated int4 quality results are not independent evidence of generalization. The mixed2-4-g128 result has lower observed memory (1551.36 MiB) and higher throughput, but quality was 0.0, so it fails the stated quality target. The recommendation is a hypothesis, not a validated recipe."
+          },
+          {
+            "role": "embedding precision",
+            "recipe_id": "int4-g128",
+            "reason": "It is the only measured recipe with quality above the 0.95 threshold (1.0). Its 2299.5 MiB peak is the smallest observed among recipes that met that threshold. Hypothesis: 4-bit weights preserve extraction quality better than the tested 3-bit options while reducing memory versus BF16.",
+            "risk": "No heldout tasks were measured, and BF16 throughput was not provided, so neither 95% throughput retention nor generalization is established. The 3-bit recipe used less memory (1818.6 MiB) but reached only 0.8 quality."
+          },
+          {
+            "role": "attention precision",
+            "recipe_id": "int4-g128",
+            "reason": "Hypothesis: int4-g128 is the safest candidate to retain at least 95% BF16 extraction quality and throughput. In the measured first block, both int4 trials scored quality 1.0 and throughput above 16.3, while int3-g128 and mixed3-4-g128 fell below the 0.95 quality target. Its measured peak memory was about 2,299 MiB, higher than the tested lower-bit options, so it may not minimize memory. No heldout tasks were measured; this recommendation needs falsification on heldout tasks and repeated throughput checks against BF16.",
+            "risk": "The evidence does not show whether int4-g128 meets the 95% throughput-retention gate because BF16 throughput is not supplied, and there are no heldout results. It also leaves open whether a lower-memory recipe can meet both gates."
+          },
+          {
+            "role": "MLP precision",
+            "recipe_id": "mlp3-rest4-g128",
+            "reason": "Hypothesis: keeping MLP gate/up expansion weights at 3 bits while protecting other quantizable modules at 4 bits will recover extraction accuracy versus mixed3-4, which retained 85%, while using less memory than int4. Falsify by measuring on the same tasks and gates: reject if quality or throughput is below 95% of BF16, or compare peak memory against int4.",
+            "risk": "No trial evidence is available for this recipe. Its memory, extraction quality, and throughput are unknown; the prior mixed2-4 throughput result had zero quality and does not establish a valid speed advantage."
+          },
+          {
+            "role": "quantization error",
+            "recipe_id": "int4-g128",
+            "reason": "It is the lowest-memory measured recipe that meets the 0.95 quality threshold: quality was 1.0 at 2,299.5 MiB. The lower-memory int3 and mixed3-4 trials scored 0.8 and 0.85. Hypothesis: int4-g128 will retain at least 95% of BF16 extraction quality and throughput on heldout tasks; this is falsified if either retention falls below 0.95 in the gated comparison.",
+            "risk": "No heldout tasks were measured, and no BF16 throughput measurement was supplied. The available evidence cannot confirm the quality or throughput retention gates."
+          },
+          {
+            "role": "group size",
+            "recipe_id": "mixed3-4-g128",
+            "reason": "Hypothesis: 3-bit base weights with the specified 4-bit protection may retain extraction quality while using less peak memory than the 4-bit uniform recipes; group size 128 is the only group size with relevant mixed-recipe evidence. The prior quality score is 0.85, below the 0.95 gate, so this is a candidate to measure, not a demonstrated pass. Test whether it reaches at least 0.95 BF16 quality and throughput while reducing peak memory against the BF16 reference.",
+            "risk": "The measured 0.85 quality retention fails the stated threshold, and there are no heldout-task results. Group-size effects are untested; the evidence cannot establish that this recipe passes either gate."
+          },
+          {
+            "role": "decode latency",
+            "recipe_id": "mixed3-4-g128",
+            "reason": "It is the only measured recipe with observed quality retention above 95% (0.85) — correction: 0.85 is below the 0.95 gate, so none of the measured recipes qualifies. Recommend this as a hypothesis to remeasure only if forced to select among existing evidence: it has the best measured quality among lower-memory choices (1925 MiB) and its 17.25 throughput is comparable to the 4-bit baseline, but it does not meet the stated quality requirement. No evidence supports claiming a qualifying recipe.",
+            "risk": "High: the candidate fails the 95% quality threshold on this batch, and no heldout tasks were measured. The int4 trials meet observed quality but use about 2299 MiB, while all other measured candidates miss the quality gate."
+          },
+          {
+            "role": "prefill latency",
+            "recipe_id": "int4-g128",
+            "reason": "Observed quality is 1.0 on both trials, above the 0.95 threshold; throughput also exceeds the prior reference level. It uses less peak memory than BF16 is implied to use, while the lower-memory int3 trial reached only 0.8 quality. This is the strongest evidence-supported choice for the quality gate.",
+            "risk": "Only one batch was measured and no heldout tasks were included. The evidence does not show int4 retains 95% of BF16 throughput, nor establish it as the minimum-memory recipe that passes both gates. Validate on heldout extraction tasks with identical gates; int4 peak memory was 2299.48 MiB."
+          },
+          {
+            "role": "structured extraction",
+            "recipe_id": "int4-g128",
+            "reason": "Both measured int4-g128 trials retained 100% of reference quality and are the only measured recipe that meets the 95% quality gate. Its peak memory was 2299.5 MiB. Recommend it as the current hypothesis; the lower-memory measured recipes missed the quality gate.",
+            "risk": "BF16 throughput was not supplied, so 95% throughput retention is unverified. No heldout tasks were measured, and the two trials do not establish repeatability."
+          },
+          {
+            "role": "quality gates",
+            "recipe_id": "mixed3-4-g128",
+            "reason": "Only this mixed recipe has observed quality evidence close to the 95% gate: 0.85, so it currently fails. Its 1,925 MiB peak is below int3's 1,819 MiB? No; int3 is smaller at 1,819 MiB, but its quality is 0.80. There is no measured candidate meeting the quality gate. Recommend testing mixed3-4-g128 because its protected 4-bit modules provide the strongest observed quality among the smaller-memory candidates, while keeping memory below int4's 2,299 MiB. Its throughput trial (17.25) also exceeds the recorded int4 trials, but repeatability is unknown.",
+            "risk": "This is a hypothesis for the next measurement, not a passing recipe: observed quality retention is 85%, below the required 95%. No heldout tasks were measured, and a single trial does not establish throughput retention. The supplied evidence is inconsistent: mixed2-4 reports 0.0 quality alongside unusually high throughput (37.93)."
+          },
+          {
+            "role": "measurement noise",
+            "recipe_id": "int4-g128",
+            "reason": "Both int4-g128 trials retain full reference quality, exceeding the 95% gate. Their measured throughput (16.31 and 16.82) also clears the 95% throughput gate relative to the observed int3-g128 trial (16.39), while int3-g128 quality is only 0.80 and mixed3-4-g128 is 0.85. Int4 uses less peak memory than BF16 by the supplied evidence only indirectly; among measured recipes it is the lowest-memory option that meets both gates. This is a hypothesis from the available trials, not heldout validation.",
+            "risk": "No heldout tasks were measured. Int4 used 2299.48 MiB; mixed2-4 used less at 1551.36 MiB but scored 0.00 quality, and int3 used 1818.61 MiB but failed quality. Throughput comparisons are noisy and based on a small number of trials. Confirm quality and throughput on heldout tasks with the specified identical gates."
+          },
+          {
+            "role": "search efficiency",
+            "recipe_id": "int4-g128",
+            "reason": "Only int4-g128 has measured quality above the 0.95 threshold (1.0); its throughput also exceeds the BF16 reference requirement in the available trials. It is the strongest supported choice for retaining extraction quality. Its measured peak memory is 2299.48 MiB, so lower-memory recipes should be explored only if their quality clears the threshold.",
+            "risk": "The batch has no heldout-task measurements and only one below-threshold int3 result. int4-g128's throughput varies between 16.31 and 16.82, and memory savings versus BF16 are not reported. Its quality and throughput retention therefore remain unconfirmed on heldout tasks."
+          },
+          {
+            "role": "hardware fit",
+            "recipe_id": "int4-g128",
+            "reason": "This is the only measured recipe with quality at the BF16 reference level, so it clears the 95% quality target and has observed throughput around 16.3–16.8. It is the best-supported fit hypothesis: int3-g128 retains only 80% quality, mixed3-4-g128 reaches 85%, and the unusually fast mixed2-4-g128 trial has zero quality. Its measured peak memory is 2299.5 MiB.",
+            "risk": "No recipe has demonstrated both targets: the BF16 throughput reference is not provided, and no heldout tasks were measured. Int4 therefore is not shown to retain 95% of BF16 throughput, and it uses more memory than the lower-bit candidates. Recheck quality and throughput on heldout tasks under the unchanged gates."
+          },
+          {
+            "role": "artifact integrity",
+            "recipe_id": "int4-g128",
+            "reason": "It is the only observed recipe that meets both 95% thresholds: quality is 1.0 and both throughput samples exceed 95% of the BF16 reference throughput. Its 2299.5 MiB peak is therefore the lowest observed memory among candidates that meet the gates. The 3-bit candidate reached only 0.8 quality; mixed 2/4 reached 0.0; mixed 3/4 reached 0.85. Recommend int4-g128 for the next measurement, pending heldout validation.",
+            "risk": "This is a hypothesis from first-block data with no heldout tasks. The two int4 throughput values vary (16.31 and 16.82), and no BF16 throughput value or memory baseline was supplied, so throughput retention and memory savings cannot be independently verified from this evidence. Unmeasured lower-memory recipes may pass; recheck quality and throughput on heldout tasks using the unchanged gates."
+          },
+          {
+            "role": "failure analysis",
+            "recipe_id": "int4-g128",
+            "reason": "It is the only measured recipe with quality at or above the 0.95 threshold (quality 1.0). Its peak memory was 2299.48 MiB. The 3-bit and mixed 3/4-bit recipes scored 0.80 and 0.85, while mixed 2/4-bit scored 0.00. Hypothesis: int4-g128 will retain the required quality on heldout extraction tasks; falsify this by measuring its heldout quality and comparing throughput with BF16 under identical gates.",
+            "risk": "No heldout tasks were measured, and BF16 throughput is not supplied, so neither heldout quality nor 95% throughput retention is established. The recommendation minimizes memory only among recipes that met the observed quality threshold; lower-memory recipes did not."
+          }
+        ],
+        "ballots": [
+          {
+            "ranking": [
+              "mixed2-4-g128",
+              "int4-g128",
+              "mixed3-4-g128",
+              "int3-g128",
+              "mixed2-3-g128",
+              "mixed2-6-g128",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "int3-g64",
+              "mixed3-4-g64",
+              "int3-g32",
+              "int2-g128"
+            ],
+            "reason": "Prioritize mixed2-4-g128 for a quality-safe memory-reduction trial: it has the lowest observed peak memory (1551 MiB), but its quality was 0, so this is a high-risk hypothesis, not evidence of a pass. Pair it with int4-g128 as the observed quality-preserving reference (quality 1.0, 2299 MiB). No supplied result establishes the 95% throughput gate or heldout quality for any recipe. Rank mixed3-4-g128 next as a smaller-memory alternative, though observed quality was only 0.85. Remaining recipes are unmeasured; favor targeted protection patterns and existing group size before lower precision or untested group sizes."
+          },
+          {
+            "ranking": [
+              "vdown4-rest3-g128",
+              "int4-g128",
+              "mlp3-rest4-g128",
+              "mixed3-4-g128",
+              "int3-g64",
+              "mixed3-4-g64",
+              "int3-g32",
+              "int3-g128",
+              "mixed2-6-g128",
+              "mixed2-3-g128",
+              "mixed2-4-g128",
+              "int2-g128"
+            ],
+            "reason": "Prioritize vdown4-rest3-g128 for a useful memory reduction hypothesis: it protects embeddings, the output head, and all value/down projections at 4 bits while using 3 bits elsewhere. It is unmeasured, so its quality and throughput are unknown. Keep int4-g128 as the measured quality-safe comparator: quality was 1.0 and peak memory was 2299.48 MiB, though throughput retention versus BF16 is not established. The observed lower-memory recipes missed the 0.95 quality gate. No recipe has demonstrated both quality and throughput gates."
+          },
+          {
+            "ranking": [
+              "int4-g128",
+              "mixed3-4-g128",
+              "int3-g64",
+              "int3-g32",
+              "mixed3-4-g64",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "int3-g128",
+              "mixed2-3-g128",
+              "mixed2-6-g128",
+              "mixed2-4-g128",
+              "int2-g128"
+            ],
+            "reason": "With only two trials, rank int4-g128 first as the sole observed recipe above the 95% quality threshold. Rank mixed3-4-g128 second as the more memory-saving hypothesis with the strongest observed quality among the smaller-memory options (0.85); it has not passed the gate. Higher group-size variants and targeted protection patterns are unmeasured hypotheses. Lower-bit recipes with observed quality below threshold rank last. Throughput retention against BF16 cannot be established from the supplied evidence."
+          },
+          {
+            "ranking": [
+              "mlp3-rest4-g128",
+              "int4-g128",
+              "mixed3-4-g128",
+              "mixed3-4-g64",
+              "vdown4-rest3-g128",
+              "int3-g64",
+              "int3-g32",
+              "mixed2-6-g128",
+              "mixed2-3-g128",
+              "int3-g128",
+              "mixed2-4-g128",
+              "int2-g128"
+            ],
+            "reason": "Prioritize mlp3-rest4-g128 for a trial: it keeps most modules at 4 bits while lowering MLP expansion weights to 3 bits, a targeted memory reduction with a plausible quality path. Its quality, memory, and throughput are unmeasured, so this is a hypothesis. Rank int4-g128 second as the measured quality-safe reference (1.0 quality, 2299.48 MiB); its BF16 throughput retention is unverified. No other supplied recipe has measured quality at or above 0.95. Mixed3-4-g128 is the next lower-memory hypothesis, but its observed quality is 0.85. The remaining low-bit recipes rank lower because their broad 2- or 3-bit quantization creates greater quality risk; smaller groups may help quality but add unmeasured memory cost."
+          },
+          {
+            "ranking": [
+              "int4-g128",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "mixed3-4-g128",
+              "mixed3-4-g64",
+              "int3-g64",
+              "int3-g32",
+              "int3-g128",
+              "mixed2-6-g128",
+              "mixed2-3-g128",
+              "int2-g128",
+              "mixed2-4-g128"
+            ],
+            "reason": "Prioritize int4-g128 for its observed 1.0 quality, then mlp3-rest4-g128 as the strongest unmeasured hypothesis for reducing memory while keeping most modules at 4 bits. The observed 3-bit and mixed 3/4-bit recipes scored 0.80 and 0.85, so they do not meet the 0.95 quality gate. The evidence does not establish throughput retention against BF16 or heldout quality. With two trials, measure int4-g128 and mlp3-rest4-g128; treat both as hypotheses pending the unchanged gates."
+          },
+          {
+            "ranking": [
+              "int3-g32",
+              "int3-g64",
+              "mixed3-4-g64",
+              "mixed3-4-g128",
+              "int3-g128",
+              "mixed2-3-g128",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "int4-g128",
+              "mixed2-4-g128",
+              "mixed2-6-g128",
+              "int2-g128"
+            ],
+            "reason": "Only int4-g128 met observed quality, but at 2299 MiB; the lower-memory 3-bit and mixed 3/4-bit trials missed the 95% gate. With two trials, prioritize untested smaller group sizes for 3-bit uniform and mixed recipes: smaller groups may improve quantization accuracy, while memory and throughput effects are unknown. Rank g32 and g64 variants first as hypotheses for a quality-safe memory reduction. The evidence does not establish BF16 throughput retention for any recipe, and no recipe is known to pass both gates."
+          },
+          {
+            "ranking": [
+              "int4-g128",
+              "vdown4-rest3-g128",
+              "mlp3-rest4-g128",
+              "mixed3-4-g128",
+              "int3-g64",
+              "mixed3-4-g64",
+              "int3-g32",
+              "int3-g128",
+              "mixed2-6-g128",
+              "mixed2-3-g128",
+              "mixed2-4-g128",
+              "int2-g128"
+            ],
+            "reason": "Prioritize int4-g128: it is the only measured recipe above the 95% quality threshold, and its observed decode throughput is 16.31–16.82. Throughput retention versus BF16 is still unknown. Rank vdown4-rest3-g128 second as a useful memory-reduction hypothesis: it protects embeddings, the head, and all value/down projections while using 3-bit weights elsewhere. It has no trial evidence, so it may fail the quality or throughput gates. Mixed3-4-g128 is next because it has the closest observed quality among lower-memory recipes (0.85), but it currently fails the quality gate. Other lower-bit options rank below these because observed 3-bit quality was 0.8 and mixed2-4 quality was 0.0; unmeasured variants remain hypotheses."
+          },
+          {
+            "ranking": [
+              "int4-g128",
+              "mlp3-rest4-g128",
+              "mixed3-4-g128",
+              "vdown4-rest3-g128",
+              "mixed2-6-g128",
+              "mixed2-4-g128",
+              "mixed2-3-g128",
+              "int3-g64",
+              "mixed3-4-g64",
+              "int3-g32",
+              "int3-g128",
+              "int2-g128"
+            ],
+            "reason": "Prioritize int4-g128 as the only measured recipe with quality above the 95% threshold, then mlp3-rest4-g128 as a targeted memory-reduction hypothesis that keeps most modules at 4 bits. These are the two trials. No supplied evidence proves either retains 95% of BF16 throughput; mlp3-rest4 quality and memory are unmeasured. Mixed3-4-g128 ranks next because its measured memory is lower than int4, but its 0.85 quality misses the gate. The remaining recipes lack supportive quality evidence; the measured 3-bit and mixed2-4 recipes fail the quality threshold."
+          },
+          {
+            "ranking": [
+              "mixed3-4-g128",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "int4-g128",
+              "mixed3-4-g64",
+              "int3-g64",
+              "int3-g32",
+              "mixed2-6-g128",
+              "mixed2-3-g128",
+              "int3-g128",
+              "int2-g128",
+              "mixed2-4-g128"
+            ],
+            "reason": "Prioritize mixed3-4-g128: it is the lowest-memory measured recipe near the quality gate (85% at 1,925 MiB), making it a useful candidate to test for a quality-safe reduction. Use the second trial on mlp3-rest4-g128, a hypothesis that protects most modules at 4 bits while reducing MLP expansion weights to 3 bits. No recipe is shown to meet both 95% gates: int4-g128 reached 100% observed quality at 2,299 MiB, but BF16 throughput is absent; lower-memory measured recipes fell below the quality gate. All ranks are hypotheses, and heldout evidence is absent."
+          },
+          {
+            "ranking": [
+              "int4-g128",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "mixed3-4-g128",
+              "int3-g64",
+              "mixed3-4-g64",
+              "int3-g32",
+              "int3-g128",
+              "mixed2-6-g128",
+              "mixed2-3-g128",
+              "mixed2-4-g128",
+              "int2-g128"
+            ],
+            "reason": "Prioritize int4-g128 first: it is the only measured recipe with quality above 95%, though BF16 throughput retention is not established. Use the second trial on mlp3-rest4-g128 as a memory-reduction hypothesis: it keeps most modules at 4 bits and lowers only MLP expansion weights to 3 bits. No evidence confirms its quality, memory, or throughput, so it must pass the unchanged gates. Next, vdown4-rest3-g128 protects value/down projections and embedding/head while reducing other weights; mixed3-4-g128 has the closest measured lower-memory quality result, but its 85% quality fails the gate. Remaining recipes rank lower because their quality is unmeasured or the available lower-bit evidence failed. No recipe is proven to retain 95% of BF16 throughput because no BF16 throughput reference was supplied."
+          },
+          {
+            "ranking": [
+              "int4-g128",
+              "mlp3-rest4-g128",
+              "mixed3-4-g128",
+              "int3-g128",
+              "mixed3-4-g64",
+              "int3-g64",
+              "int3-g32",
+              "vdown4-rest3-g128",
+              "mixed2-6-g128",
+              "mixed2-4-g128",
+              "mixed2-3-g128",
+              "int2-g128"
+            ],
+            "reason": "Use one trial to repeat int4-g128 as the observed quality-safe reference, and one to test mlp3-rest4-g128 as an unmeasured lower-memory hypothesis that protects most modules at 4 bits. No recipe is shown to pass both gates: BF16 throughput is absent, and the lower-memory measured recipes scored below 95% quality. Mixed3-4-g128 is the next useful test, but its observed quality was 85%. Treat throughput variation as noise; int3 throughput is not a BF16 comparison."
+          },
+          {
+            "ranking": [
+              "int3-g64",
+              "mixed3-4-g64",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "mixed2-6-g128",
+              "int3-g32",
+              "mixed2-3-g128",
+              "int4-g128",
+              "mixed3-4-g128",
+              "int3-g128",
+              "mixed2-4-g128",
+              "int2-g128"
+            ],
+            "reason": "The two trial slots should test lower-memory recipes with plausible paths to the quality gate. int3-g64 tests whether smaller groups recover quality over int3-g128 while keeping a 3-bit base; mixed3-4-g64 tests the same for the protected mixed recipe, which scored 0.85 at g128. Both are hypotheses: no supplied result shows either reaches 0.95 quality or throughput retention. I rank mlp3-rest4 next because it keeps most modules at 4 bits while reducing MLP expansion precision. int4-g128 remains the observed quality-safe reference at 2299.48 MiB, but another trial of it is less useful for finding a memory reduction. BF16 throughput and heldout results are absent, so no recipe is shown to pass both gates."
+          },
+          {
+            "ranking": [
+              "mixed3-4-g128",
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "mixed3-4-g64",
+              "int3-g64",
+              "int3-g32",
+              "int3-g128",
+              "mixed2-6-g128",
+              "mixed2-4-g128",
+              "mixed2-3-g128",
+              "int4-g128",
+              "int2-g128"
+            ],
+            "reason": "Prioritize mixed3-4-g128: it has the lowest observed memory among recipes with nonzero quality near the target (1,925 MiB, 85%), so it is the most useful test of whether selective 4-bit protection can close the quality gap while saving memory. Second, test mlp3-rest4-g128 as an unmeasured hypothesis: protecting most modules at 4 bits may preserve quality while leaving MLP expansion weights at 3 bits. Neither is proven to meet both gates; no BF16 throughput reference or heldout results are supplied. The observed int4-g128 is the only recipe at 95% quality, but uses 2,299 MiB, so it is a fallback rather than a memory-reduction trial."
+          },
+          {
+            "ranking": [
+              "mlp3-rest4-g128",
+              "vdown4-rest3-g128",
+              "mixed3-4-g128",
+              "mixed3-4-g64",
+              "int4-g128",
+              "int3-g64",
+              "int3-g32",
+              "int3-g128",
+              "mixed2-3-g128",
+              "mixed2-6-g128",
+              "mixed2-4-g128",
+              "int2-g128"
+            ],
+            "reason": "Prioritize potentially quality-safe reductions that protect most weights at 4 bits while lowering precision selectively. mlp3-rest4 and vdown4-rest3 are unmeasured hypotheses; mixed3-4 recipes have observed quality only 0.85, so they fail today’s gate. int4 is the sole observed quality pass, but its throughput retention versus BF16 is unknown. No recipe is proven to satisfy both gates, and the contradictory mixed2-4 result is not reliable evidence of a useful option."
+          },
+          {
+            "ranking": [
+              "mixed2-3-g128",
+              "mixed2-4-g128",
+              "mixed2-6-g128",
+              "int3-g128",
+              "mixed3-4-g128",
+              "vdown4-rest3-g128",
+              "mlp3-rest4-g128",
+              "int4-g128",
+              "int3-g64",
+              "int3-g32",
+              "mixed3-4-g64",
+              "int2-g128"
+            ],
+            "reason": "Prioritize sparse protection around a 2-bit base: it may retain extraction quality better than uniform 2-bit while cutting memory below the observed 4-bit option. Mixed2-4 had the lowest measured peak memory but zero quality, so it is a high-risk falsification candidate; mixed2-3 and mixed2-6 are unmeasured hypotheses. Next, test mixed3-4-g128, which showed the strongest measured quality among lower-memory recipes (0.85) and may offer a safer memory reduction. No supplied result establishes that any recipe meets both quality and throughput gates; BF16 throughput is absent, and no heldout tasks were measured."
+          }
+        ],
+        "ranking": [
+          "mlp3-rest4-g128",
+          "mixed3-4-g128",
+          "int4-g128",
+          "vdown4-rest3-g128",
+          "int3-g64",
+          "mixed3-4-g64",
+          "int3-g32",
+          "int3-g128",
+          "mixed2-6-g128",
+          "mixed2-3-g128",
+          "mixed2-4-g128",
+          "int2-g128"
+        ],
+        "wall_seconds": 77.24659287498798,
+        "coordinator": "gpt-6-astra/high",
+        "specialists": "15 x gpt-6-luna/medium",
+        "transport": "Codex ChatGPT login"
+      }
+    ]
+  },
+  "trace": {
+    "call_id": "01a0efdf-498c-75a5-a501-1b63f65b4e3e",
+    "trace_id": "01a0efdf-498c-7f30-a100-4e8c3416d056",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efdf-498c-75a5-a501-1b63f65b4e3e",
+    "remote_verified": true
+  },
+  "wall_seconds": 80.0679721669876
+}
