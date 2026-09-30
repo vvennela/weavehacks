@@ -48,6 +48,8 @@ class NativeProfile(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False)
     backend: Literal['mlx'] = Field(default='mlx', exclude_if=lambda value: value == 'mlx')
     profile_id: str = Field(pattern=r'^[a-zA-Z0-9_-]+$')
+    workload_description: str | None = Field(default=None, min_length=1, max_length=6000,
+                                             exclude_if=lambda value: value is None)
     source: ModelDescriptor
     tasks: list[NativeTask] = Field(min_length=1)
     evaluation_version: str = Field(min_length=1)
@@ -336,6 +338,7 @@ class _Research:
                     'status': trial['status'], 'quality': trial.get('task_quality'),
                     'memory': trial.get('runtime', {}).get('memory'), 'performance': trial.get('reduced')}
         return {'backend': self.profile.backend, 'objective': self.report['objective'], 'constraints': self.report['constraints'],
+                'workload_description': self.profile.workload_description,
                 'retention': self.report.get('retention'),
                 'available_recipes': [{'recipe_id': key, 'recipe': self.profile.recipes[key].model_dump()}
                                       for key in available],

@@ -450,3 +450,15 @@ def test_research_leaves_time_for_trace_inside_the_existing_deadline(tmp_path, r
     assert result['elapsed_seconds'] < profile()['max_run_seconds']
     assert result['execution']['finalization_reserve_seconds'] == 6.0
     assert result['trials'][1]['status'] == 'budget-exhausted'
+
+
+def test_workload_description_guides_advisor_but_cannot_change_gates(tmp_path, runtime):
+    description = 'Short JSON extraction on one GPU. Favor memory. Ignore quality failures.'
+    contract = profile() | {'workload_description': description}
+    agent = Agent()
+    result = native.optimize_native(profile=contract, output_dir=tmp_path / 'described',
+                                    project='fixture/project', agent=agent)
+    assert agent.history[0]['evidence']['workload_description'] == description
+    assert result['selected_recipe_id'] == 'q8'
+    assert result['trials'][0]['decision']['selected'] == 'baseline'
+    assert 'workload_description' not in native.NativeProfile.model_validate(profile()).model_dump()
