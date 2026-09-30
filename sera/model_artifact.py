@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .hardware import ModelDescriptor
@@ -14,18 +15,27 @@ SCHEMA = 'sera-model-artifact-v1'
 def _checkpoint_files(root):
     if root.is_symlink() or not root.is_dir():
         raise ValueError('Artifact must be a real checkpoint directory')
-    records = {}
+    files = []
     for path in sorted(root.rglob('*')):
         if path.is_symlink():
             raise ValueError('Artifact files cannot contain symlinks')
-        if not path.is_file() or path == root / MANIFEST:
-            continue
+        if path.is_file() and path != root / MANIFEST:
+            files.append(path)
+
+    def hash_file(path):
         digest = hashlib.sha256()
         with path.open('rb') as stream:
             for chunk in iter(lambda: stream.read(1024 * 1024), b''):
                 digest.update(chunk)
-        records[path.relative_to(root).as_posix()] = {
+        return path.relative_to(root).as_posix(), {
             'sha256': digest.hexdigest(), 'bytes': path.stat().st_size}
+
+    records = {}
+    # Bound open files, queued work, and read buffers while hashing large shards.
+    # Ordered results preserve the existing portable manifest and artifact ID.
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for offset in range(0, len(files), 4):
+            records.update(pool.map(hash_file, files[offset:offset + 4]))
     if 'config.json' not in records or not any(name.endswith('.safetensors') for name in records):
         raise ValueError('Checkpoint requires config.json and safetensors weights')
     return records

@@ -64,3 +64,40 @@ def test_cannot_seal_partial_or_unpinned_checkpoint(tmp_path):
         seal_artifact(root, backend='mlx', source=SOURCE | {'revision': 'main'},
                       recipe={}, versions={})
     assert not (root / 'sera-artifact.json').exists()
+
+
+def test_sharded_checkpoint_hashing_is_bounded_and_keeps_exact_identity(tmp_path, monkeypatch):
+    import hashlib
+    import threading
+    import time
+    from contextlib import contextmanager
+    from pathlib import Path
+
+    from sera.model_artifact import _checkpoint_files
+
+    root = exported(tmp_path)
+    for index in range(12):
+        (root / f'shard-{index:02}.safetensors').write_bytes(bytes([index]) * 4096)
+    expected = {p.name: {'sha256': hashlib.sha256(p.read_bytes()).hexdigest(),
+                         'bytes': p.stat().st_size} for p in root.iterdir()}
+    original = Path.open
+    lock = threading.Lock()
+    active = peak = 0
+
+    @contextmanager
+    def tracked_open(path, *args, **kwargs):
+        nonlocal active, peak
+        with original(path, *args, **kwargs) as stream:
+            with lock:
+                active += 1
+                peak = max(peak, active)
+            try:
+                time.sleep(0.02)
+                yield stream
+            finally:
+                with lock:
+                    active -= 1
+
+    monkeypatch.setattr(Path, 'open', tracked_open)
+    assert _checkpoint_files(root) == expected
+    assert 1 < peak <= 4
