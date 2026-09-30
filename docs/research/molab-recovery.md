@@ -15,7 +15,7 @@ almost every case — why you should not try to fix it while people are watching
 ## The probe
 
 ```sh
-cd "/Users/barratm/Desktop/Coreweave Hackathon"
+cd weavehacks  # your checkout of this repository
 export MOLAB_URL='https://sb-<id>.sb.molab.run/'
 export MARIMO_TOKEN='<access token>'      # never write this into a file in the repo
 ./scripts/molab_health.sh
