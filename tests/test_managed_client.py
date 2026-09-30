@@ -111,3 +111,15 @@ def test_lost_submit_response_preserves_generated_request_id(monkeypatch):
     assert caught.value.request_id == submitted[0]
     assert submitted[0] in str(caught.value)
     assert TOKEN not in str(caught.value)
+
+
+def test_required_format_failure_is_explicit_and_keeps_baseline_access(monkeypatch):
+    from sera import SeraRequirementsNotMet
+    monkeypatch.setattr(SeraClient, 'submit_intent', lambda *args, **kwargs: {
+        'job_id': 'a'*32, 'status': 'completed', 'result': {
+            'selected_recipe_id': 'baseline', 'selected_artifact_id': 'b'*64,
+            'artifact_path': '/baseline', 'trace': {'remote_verified': True, 'url': 'fixture'},
+            'elapsed_seconds': 1., 'requirements': {'required_precision': 'int4', 'met': False}}})
+    with pytest.raises(SeraRequirementsNotMet) as error:
+        Optimize('Run at INT4', api_key=TOKEN)
+    assert error.value.result.selected_recipe_id == 'baseline'

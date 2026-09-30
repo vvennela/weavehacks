@@ -12,13 +12,22 @@ from .model_artifact import verify_artifact
 
 
 class SeraServiceError(RuntimeError):
-    pass
+    def __init__(self, message, *, status_code=None):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 class SeraNeedsInput(SeraServiceError):
     def __init__(self, job_id, questions):
         super().__init__(' '.join(questions))
         self.job_id, self.questions = job_id, questions
+
+
+class SeraRequirementsNotMet(SeraServiceError):
+    def __init__(self, result):
+        super().__init__('No candidate met the requested precision and quality/performance limits. '
+                         'The verified baseline is available as error.result; it does not meet the requested format.')
+        self.result = result
 
 
 class _NoRedirect(HTTPRedirectHandler):
@@ -40,6 +49,8 @@ class ManagedResult:
     measurements: dict = field(default_factory=dict)
 
     rag: dict | None = None
+    workload: dict | None = None
+    requirements: dict | None = None
 
     def verify(self):
         if self.rag is not None:
@@ -55,7 +66,19 @@ class ManagedResult:
         return RagPipeline(self._load_model(), index, top_k=self.rag['top_k'],
                            max_tokens=self.rag['max_tokens'], seed=self.rag['seed'])
 
-    def _load_model(self):
+    def _load_model(self, *, use_configured_runtime=True):
+        if use_configured_runtime:
+            import os
+            import sys
+
+            from .onboarding import home_path
+            config = home_path() / 'runtime.json'
+            if config.exists():
+                python = json.loads(config.read_text())['python']
+                if os.path.abspath(python) != os.path.abspath(sys.executable):
+                    from .runtime_model import RuntimeModel
+                    return RuntimeModel(python, self)
+
         from .backends.cuda import CUDABackend
         from .backends.mlx import MLXBackend
         from .backends.rocm import ROCmBackend
@@ -90,7 +113,7 @@ class SeraClient:
                 with self._http.open(request, timeout=10) as response:
                     return json.loads(response.read(1024 * 1024))
             except HTTPError as error:
-                raise SeraServiceError(f'Sera request failed with HTTP {error.code}') from None
+                raise SeraServiceError(f'Sera request failed with HTTP {error.code}', status_code=error.code) from None
             except (URLError, TimeoutError, ConnectionError):
                 if attempt == 2:
                     raise SeraServiceError('Sera is unreachable; retry using the same request_id') from None
@@ -100,9 +123,13 @@ class SeraClient:
     def submit(self, profile_id, *, request_id):
         return self._request('POST', '/v1/jobs', {'profile_id': profile_id, 'request_id': request_id})
 
-    def submit_intent(self, intent, *, documents, request_id):
-        return self._request('POST', '/v1/workloads',
-                             {'intent': intent, 'documents': documents, 'request_id': request_id})
+    def submit_intent(self, intent, *, request_id, documents=None, examples=None):
+        body = {'intent': intent, 'request_id': request_id}
+        if documents is not None:
+            body['documents'] = documents
+        if examples is not None:
+            body['examples'] = examples
+        return self._request('POST', '/v1/workloads', body)
 
     def status(self, job_id):
         return self._request('GET', '/v1/jobs/' + self._job_id(job_id))
@@ -117,20 +144,33 @@ class SeraClient:
         return job_id
 
 
-def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_id=None,
-             on_update=None, poll_interval=1.0, documents=None):
-    """Optimize a registered workload, or describe a RAG workload with documents=collection.
+def Optimize(profile_id, *, api_key=None, endpoint=None, request_id=None,
+             on_update=None, poll_interval=1.0, documents=None, examples=None):
+    """Describe inference with examples, connect documents, or use a registered profile.
 
     Reuse request_id after a connection failure to recover the same job.
     Ctrl-C cancels the accepted job. The service owns W&B credentials and gates.
     """
     if type(poll_interval) not in (int, float) or not math.isfinite(poll_interval) or poll_interval <= 0:
         raise ValueError('Supply a positive finite poll interval')
-    client = SeraClient(api_key=api_key, endpoint=endpoint)
+    if api_key is None:
+        from .onboarding import local_connection
+        connection = local_connection()
+        api_key = connection['api_key']
+        endpoint = endpoint or connection['endpoint']
+    client = SeraClient(api_key=api_key, endpoint=endpoint or 'http://127.0.0.1:8765')
     request_id = request_id if request_id is not None else uuid.uuid4().hex
     try:
-        job = (client.submit(profile_id, request_id=request_id) if documents is None else
-               client.submit_intent(profile_id, documents=documents, request_id=request_id))
+        legacy = documents is None and examples is None and isinstance(profile_id, str) and not any(c.isspace() for c in profile_id)
+        if legacy:
+            try:
+                job = client.submit(profile_id, request_id=request_id)
+            except SeraServiceError as error:
+                if error.status_code != 404:
+                    raise
+                job = client.submit_intent(profile_id, request_id=request_id)
+        else:
+            job = client.submit_intent(profile_id, documents=documents, examples=examples, request_id=request_id)
     except SeraServiceError as error:
         recovered = SeraServiceError(f'{error}; retry with request_id={request_id!r}')
         recovered.request_id = request_id
@@ -151,12 +191,15 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
                 result = job['result']
                 if not result.get('trace', {}).get('remote_verified'):
                     raise SeraServiceError('The required trace has not been verified')
-                return ManagedResult(job_id=job['job_id'], selected_recipe_id=result['selected_recipe_id'],
+                managed = ManagedResult(job_id=job['job_id'], selected_recipe_id=result['selected_recipe_id'],
                     artifact_id=result['selected_artifact_id'], artifact_path=result['artifact_path'],
                     trace_url=result['trace']['url'], elapsed_seconds=result['elapsed_seconds'],
                     backend=result.get('backend', 'mlx'), runtime=result.get('runtime'),
                     stop_reason=result.get('stop_reason'), measurements=result.get('measurements', {}),
-                    rag=result.get('rag'))
+                    rag=result.get('rag'), workload=result.get('workload'), requirements=result.get('requirements'))
+                if managed.requirements is not None and not managed.requirements['met']:
+                    raise SeraRequirementsNotMet(managed)
+                return managed
             if job['status'] == 'needs-input':
                 raise SeraNeedsInput(job['job_id'], job['result']['questions'])
             if job['status'] not in {'pending', 'running', 'interrupted'}:

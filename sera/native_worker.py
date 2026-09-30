@@ -68,7 +68,7 @@ class MeasureJob(BaseModel):
     seed: int
     warmup: int = Field(ge=0)
     repetitions: int = Field(ge=1)
-    response_formats: list[dict] | None = None
+    response_formats: list[dict | None] | None = None
     response_format_version: str | None = None
 
     @model_validator(mode='after')
@@ -81,7 +81,7 @@ class MeasureJob(BaseModel):
                 or message['role'] not in {'system', 'user', 'assistant'} for message in prompt
             ):
                 raise ValueError('Supply text chat messages with valid roles')
-        validate_formats(self.prompts, self.response_formats, self.response_format_version)
+        validate_formats(self.prompts, self.response_formats, self.response_format_version, allow_unconstrained=True)
         return self
 
 

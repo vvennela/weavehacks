@@ -6,8 +6,26 @@ build-backend = "hatchling.build"
 name = "sera-inference"
 version = "0.2.0"
 description = "The autonomous auto-research harness for inference"
-readme = "docs/simple-release.md"
+readme = {text = """
+Sera — the autonomous auto-research harness for inference.
+
+Run `sera` or `sera setup` to install the hardware runtime, connect your Codex
+ChatGPT login, register models and quality checks, connect document collections,
+configure operator-owned W&B tracing, and start the local service.
+
+Then run `sera optimize 'Describe your workload' --examples checks.json`, or
+call `sera.Optimize(description, examples=checks)` from Python. Use
+`documents='collection-name'` for document question answering. Setup saves the
+local access key; it does not bundle operator credentials into the package.
+
+Inference experiments run on the registered hardware within fixed quality and
+budget limits. JSON reference answers and explicit text checks grade supplied
+examples; they do not certify arbitrary semantic quality. FP4 and INT4 are
+distinct formats. Requested formats are enforced, and failures remain visible.
+""", content-type = "text/plain"}
 requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 # pydantic and prometheus-client belong to the swarm line; pyyaml and numpy to the
 # two-phase loop. Both packages ship from this project, so both sets are required.
 dependencies = [
@@ -64,6 +82,7 @@ gpu = [
 ]
 
 [project.scripts]
+sera = "sera.__main__:main"
 sera-provider-check = "sera.provider_check:main"
 sera-serve = "sera.managed_service:main"
 

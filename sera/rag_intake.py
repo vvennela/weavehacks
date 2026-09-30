@@ -10,6 +10,13 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from .codex_agent import CodexJSONAgent
+from .intent_contract import (
+    INTENT_RULES,
+    IntentRequirements,
+    apply_requirements,
+    recipe_catalog,
+    verify_explicit_precision,
+)
 from .native_optimizer import validate_native_profile
 from .native_trace import trace_native_job
 from .rag import Corpus, RagExample, RagIndex, make_tasks
@@ -22,7 +29,7 @@ class IntakeNeedsInput(ValueError):
         self.questions = questions
 
 
-class IntakePlan(BaseModel):
+class IntakePlan(IntentRequirements):
     model_config = ConfigDict(strict=True, extra='forbid')
     status: Literal['ready', 'needs-input']
     questions: list[str] = Field(max_length=8, description='Clarification questions for the user only. Must be empty when status is ready. Never put evaluation tests here.')
@@ -177,7 +184,7 @@ def prepare_rag(request, folder, *, agent_factory=CodexJSONAgent, hardware=None)
                               model='gpt-6-astra', reasoning_effort='high', timeout=180)
         catalog = [{k: p.model_dump()[k] for k in ('profile_id', 'source', 'constraints', 'objective',
                     'budget', 'max_tokens', 'max_run_seconds')} | {'backend': p.backend}
-                   for p in compatible.values()]
+                   | {'available_recipes': recipe_catalog(p)} for p in compatible.values()]
         prompt = (
             'You are Astra, the coordinator of Sera, an inference harness. Interpret the workload '
             'description and choose a supported model configuration from the supplied catalog. '
@@ -198,7 +205,7 @@ def prepare_rag(request, folder, *, agent_factory=CodexJSONAgent, hardware=None)
             'distinctive subject name in each question so it can be retrieved. These generated tests '
             'are proxies, never customer acceptance certification. The profile fields and budgets '
             'are immutable. A document count is not a traffic, quality, or memory specification. '
-            'Use the measured corpus count. Do not promise global optimality.\n' + json.dumps({
+            'Use the measured corpus count. Do not promise global optimality.\n' + INTENT_RULES + json.dumps({
                 'intent': request['intent'], 'hardware': hardware, 'catalog': catalog,
                 'corpus': inventory | {'samples': planning_samples}, 'customer_evaluation_supplied': bool(request.get('evaluation'))}))
         plan = IntakePlan.model_validate(agent.request(prompt, _strict_schema(IntakePlan),
@@ -212,6 +219,8 @@ def prepare_rag(request, folder, *, agent_factory=CodexJSONAgent, hardware=None)
         raise IntakeNeedsInput(plan.questions)
     if plan.profile_id not in compatible:
         raise ValueError('Astra chose an unavailable model configuration')
+    verify_explicit_precision(request['intent'], plan)
+    chosen = apply_requirements(compatible[plan.profile_id], plan)
     examples = plan.examples
     quality_scope = 'generated-smoke-tests'
     validation_count = 0
@@ -241,7 +250,6 @@ def prepare_rag(request, folder, *, agent_factory=CodexJSONAgent, hardware=None)
         index = RagIndex.build(request['source'], index_folder, chunk_words=plan.chunk_words,
                                expected_hash=inventory['corpus_hash'])
     tasks, retrieval = make_tasks(index, examples, top_k=plan.top_k)
-    chosen = compatible[plan.profile_id]
     if retrieval['evidence_recall'] < chosen.constraints.quality_floor:
         raise IntakeNeedsInput(['Retrieval misses required evidence. Supply representative questions or clearer documents before optimizing the model.'])
     remaining = request['deadline'] - time.time()
@@ -249,6 +257,7 @@ def prepare_rag(request, folder, *, agent_factory=CodexJSONAgent, hardware=None)
         raise TimeoutError('Workload intake deadline reached')
     profile = chosen.model_dump() | {
         'tasks': [task.model_dump() for task in tasks],
+        'requires_examples': False,
         'workload_description': request['intent'],
         'evaluation_version': 'sera-rag-extractive-v2-' + index.manifest['corpus_hash'],
         'response_format_version': 'sera-rag-answer-source-v1',

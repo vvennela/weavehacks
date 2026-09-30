@@ -27,6 +27,9 @@ jobs:
         run: >-
           uv run --locked --extra dev ruff check
           sera/native_*.py sera/managed_*.py sera/model_artifact.py
+          sera/__main__.py sera/onboarding.py sera/workload_intake.py sera/intent_contract.py
+          sera/runtime_model.py sera/rag_intake.py sera/placement_decoding.py
+          tests/test_onboarding.py tests/test_workload_intake.py tests/test_runtime_model.py
           sera/owned_command.py sera/process_ownership.py sera/codex_agent.py
           tests/test_native_*.py tests/test_managed_*.py
           tests/test_model_artifact.py tests/test_owned_command.py

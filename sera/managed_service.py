@@ -50,6 +50,8 @@ def _result(report):
             'artifact_path', 'trace', 'candidate_trials_used', 'elapsed_seconds')}
     result['stop_reason'] = report.get('stop_reason')
     result['measurements'] = _measurements(report)
+    if report.get('requirements'):
+        result['requirements'] = report['requirements']
     result['backend'] = report['execution']['backend']
     if result['backend'] == 'cuda':
         result['runtime'] = report['execution']['runtime']
@@ -165,14 +167,33 @@ class ManagedService:
         ):
             raise ServiceError(404, 'Profile not found')
         profile = self.profiles[profile_id]
+        if profile.requires_examples:
+            raise ServiceError(400, 'Supply workload examples for this model through workload intake')
         return self._accept(owner, profile_id, request_id,
                             {'profile': profile.model_dump(), 'project': self.project},
                             content_hash({'profile_id': profile_id}), profile.max_run_seconds)
 
-    def submit_intent(self, owner, intent, documents, request_id):
+    def submit_intent(self, owner, intent, request_id, documents=None, examples=None):
         if (not isinstance(request_id, str) or not IDENTIFIER.fullmatch(request_id)
                 or not isinstance(intent, str) or not 0 < len(intent.strip()) <= 6000):
             raise ServiceError(400, 'Supply a workload description and a valid request_id')
+        if documents is None:
+            from .workload_intake import validate_examples
+            try:
+                examples = validate_examples(examples) if examples is not None else None
+            except (ValueError, TypeError):
+                raise ServiceError(400, 'Supply valid evaluation examples') from None
+            allowed = {p for c in self.clients.values() if c['id'] == owner for p in c['profiles']}
+            profiles = [self.profiles[p] for p in sorted(allowed)]
+            if not profiles:
+                raise ServiceError(404, 'No models are available')
+            request = {'workload_request': {'intent': intent, 'examples': examples,
+                       'profiles': [p.model_dump() for p in profiles], 'project': self.project}}
+            return self._accept(owner, 'inference', request_id, request,
+                                content_hash({'intent': intent, 'examples': examples}),
+                                max(p.max_run_seconds for p in profiles))
+        if examples is not None:
+            raise ServiceError(400, 'Register document evaluation questions with the collection')
         collection = self.collections.get(documents) if isinstance(documents, str) else None
         if collection is None or owner not in collection['owners']:
             raise ServiceError(404, 'Document collection not found')
@@ -201,6 +222,8 @@ class ManagedService:
             if any(job['status'] in ACTIVE for job in jobs):
                 raise ServiceError(429, 'The worker is busy')
             deadline = time.time() + max_seconds
+            if 'workload_request' in request:
+                request['workload_request']['deadline'] = deadline
             if 'rag_request' in request:
                 request['rag_request']['deadline'] = deadline
                 if request['rag_request'].get('evaluation'):
@@ -226,6 +249,8 @@ class ManagedService:
     def _public(self, job):
         result = {key: job[key] for key in ('job_id', 'profile_id', 'status', 'result')}
         intake = self.folder / job['job_id'] / 'rag-progress.json'
+        if not intake.exists():
+            intake = self.folder / job['job_id'] / 'workload-progress.json'
         if intake.exists():
             result['progress'] = json.loads(intake.read_text())
         folder = self.folder / job['job_id'] / 'research'
@@ -322,6 +347,14 @@ class ManagedService:
                                         raise ValueError('Research differs from the compiled workload')
                                     result['rag'] = compiled['rag'] | {'research_seconds': result['elapsed_seconds']}
                                     result['elapsed_seconds'] = time.time() - job['created_at']
+                                if (folder / 'workload-compiled.json').exists():
+                                    from .workload_intake import prepare_workload
+                                    accepted = json.loads((folder / 'request.json').read_text())
+                                    compiled = prepare_workload(accepted['workload_request'], folder)
+                                    if report['profile_hash'] != content_hash(compiled['profile']):
+                                        raise ValueError('Research differs from the compiled workload')
+                                    result['workload'] = compiled['workload'] | {'research_seconds': result['elapsed_seconds']}
+                                    result['elapsed_seconds'] = time.time() - job['created_at']
                                 outcome = 'completed'
                             if time.monotonic() >= deadline:
                                 outcome, result = 'timed-out', None
@@ -391,15 +424,19 @@ def make_server(service, *, port):
                     raise ServiceError(401, 'Sera access key required')
                 owner = service.authenticate(header[7:])
                 parts = self.path.split('/')
-                if self.command == 'POST' and self.path in {'/v1/jobs', '/v1/workloads'}:
+                if self.command == 'GET' and self.path == '/v1/health':
+                    result = {'status': 'ready', 'profiles': sorted({p for c in service.clients.values()
+                              if c['id'] == owner for p in c['profiles']})}
+                elif self.command == 'POST' and self.path in {'/v1/jobs', '/v1/workloads'}:
                     length = int(self.headers.get('Content-Length', '0'))
-                    limit = 32768 if self.path == '/v1/workloads' else 4096
+                    limit = 1100000 if self.path == '/v1/workloads' else 4096
                     if not 0 < length <= limit or self.headers.get('Transfer-Encoding'):
                         raise ServiceError(400, 'JSON request exceeds the route limit')
                     body = json.loads(self.rfile.read(length))
-                    fields = ({'intent', 'documents', 'request_id'} if self.path == '/v1/workloads'
+                    fields = ({'intent', 'documents', 'examples', 'request_id'} if self.path == '/v1/workloads'
                               else {'profile_id', 'request_id'})
-                    if not isinstance(body, dict) or set(body) != fields:
+                    required = {'intent', 'request_id'} if self.path == '/v1/workloads' else fields
+                    if not isinstance(body, dict) or not required <= set(body) or set(body) - fields:
                         raise ServiceError(400, 'Supply only the required workload fields')
                     result = (service.submit_intent(owner, **body) if self.path == '/v1/workloads'
                               else service.submit(owner, **body))

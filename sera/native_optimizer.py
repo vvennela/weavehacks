@@ -17,6 +17,7 @@ from .backends.modelopt_export import ModelOptRecipe
 from .backends.rocm import ROCmRecipe
 from .config import Budget, Constraints, Objective
 from .hardware import ModelDescriptor
+from .intent_contract import Precision, recipe_precision
 from .ledger import Ledger, encode_record, read_checkpoint
 from .measurement import constraint_failures, objective_value, select_candidate
 from .model_artifact import verify_artifact
@@ -29,6 +30,23 @@ from .storage import content_hash, save_json
 RESEARCH_TERMINAL = {'awaiting-trace', 'baseline-failed', 'agent-failed',
                      'agent-budget-exhausted', 'budget-exhausted', 'cancelled'}
 
+class TextChecks(BaseModel):
+    """Explicit customer checks for plain text; not a semantic quality judge."""
+    model_config = ConfigDict(strict=True, frozen=True, extra='forbid')
+    exact: str | None = Field(default=None, min_length=1)
+    required: list[str] = Field(default_factory=list, max_length=64)
+    forbidden: list[str] = Field(default_factory=list, max_length=64)
+    max_words: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode='after')
+    def substantive_check(self):
+        if not self.exact and not self.required:
+            raise ValueError('Supply an exact answer or required text for quality checks')
+        if any(not value.strip() for value in self.required + self.forbidden):
+            raise ValueError('Text checks must be nonempty')
+        return self
+
+
 class NativeTask(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False)
     prompt: str | list[dict[str, str]]
@@ -36,12 +54,20 @@ class NativeTask(BaseModel):
     accepted_json: list[JsonValue] | None = Field(default=None, min_length=1, max_length=8,
                                                    exclude_if=lambda value: value is None)
     response_format: dict | None = None
+    text_checks: TextChecks | None = Field(default=None, exclude_if=lambda value: value is None)
+
+    @model_validator(mode='after')
+    def one_evaluator(self):
+        if self.text_checks and (self.expected_json is not None or self.accepted_json is not None
+                                 or self.response_format is not None):
+            raise ValueError('Text checks cannot be combined with JSON grading or constrained decoding')
+        return self
 
 
 class BaselineRetention(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False)
     quality: float = Field(gt=0, le=1)
-    throughput: float = Field(gt=0, le=1)
+    throughput: float | None = Field(default=None, gt=0, le=1, exclude_if=lambda value: value is None)
 
 
 class NativeProfile(BaseModel):
@@ -53,7 +79,9 @@ class NativeProfile(BaseModel):
     workload_description: str | None = Field(default=None, min_length=1, max_length=6000,
                                              exclude_if=lambda value: value is None)
     source: ModelDescriptor
-    tasks: list[NativeTask] = Field(min_length=1)
+    tasks: list[NativeTask]
+    requires_examples: bool = Field(default=False, exclude_if=lambda value: value is False)
+    required_precision: Precision | None = Field(default=None, exclude_if=lambda value: value is None)
     evaluation_version: str = Field(min_length=1)
     response_format_version: str | None = None
     recipes: dict[str, MLXRecipe]
@@ -70,6 +98,8 @@ class NativeProfile(BaseModel):
 
     @model_validator(mode='after')
     def validate_contract(self):
+        if not self.tasks and not self.requires_examples:
+            raise ValueError('Supply evaluation tasks or register an examples-required model template')
         if self.budget.max_candidate_trials is None:
             raise ValueError('Native research requires a bounded trial budget')
         if self.objective.priority != 'memory':
@@ -80,14 +110,19 @@ class NativeProfile(BaseModel):
         hashes = [content_hash(recipe.model_dump()) for recipe in self.recipes.values()]
         if len(set(hashes)) != len(hashes) or any(r.bits == 16 for r in self.recipes.values()):
             raise ValueError('Supply distinct quantized recipes; the reference is BF16')
+        if self.required_precision and any(recipe_precision(self.backend, r) != self.required_precision
+                                           for r in self.recipes.values()):
+            raise ValueError('Every experiment must use the required precision')
         answers = {}
         for task in self.tasks:
             key = content_hash(task.prompt)
-            answer = content_hash({'expected': task.expected_json, 'accepted': task.accepted_json})
+            answer = content_hash({'expected': task.expected_json, 'accepted': task.accepted_json,
+                                   'text_checks': task.text_checks.model_dump() if task.text_checks else None})
             if key in answers and answers[key] != answer:
                 raise ValueError('Identical prompts cannot have conflicting expected outputs')
             answers[key] = answer
-        JOB.validate_python(self.measure_job('/validation-only', 'a' * 64))
+        if self.tasks:
+            JOB.validate_python(self.measure_job('/validation-only', 'a' * 64))
         return self
 
     def prepare_job(self, destination, recipe):
@@ -161,6 +196,18 @@ def _score(text, expected):
             expected, sort_keys=True, allow_nan=False)
     except (ValueError, TypeError, RecursionError):
         return False
+
+
+def score_task(task, text):
+    if task.text_checks is None:
+        return any(_score(text, answer) for answer in [task.expected_json] + (task.accepted_json or []))
+    if not isinstance(text, str) or not text.strip() or len(text) > 16384:
+        return False
+    checks = task.text_checks
+    return ((checks.exact is None or text == checks.exact)
+            and all(value in text for value in checks.required)
+            and not any(value in text for value in checks.forbidden)
+            and (checks.max_words is None or len(text.split()) <= checks.max_words))
 
 
 class NativeRunStopped(RuntimeError):
@@ -297,11 +344,9 @@ class _Research:
         controls.update(sampling='greedy', concurrency=1)
         if 'runtime' in request:
             controls['runtime'] = request['runtime']
-        expected = {content_hash(task.prompt): [task.expected_json] + (task.accepted_json or [])
-                    for task in self.profile.tasks}
+        tasks = {content_hash(task.prompt): task for task in self.profile.tasks}
         result = native_trial(raw, prompts=request['prompts'],
-            evaluator=lambda prompt, text: any(_score(text, answer)
-                                             for answer in expected[content_hash(prompt)]),
+            evaluator=lambda prompt, text: score_task(tasks[content_hash(prompt)], text),
             evaluation_version=self.profile.evaluation_version, floor=self.profile.constraints.quality_floor,
             artifact_id=artifact['artifact_id'], controls=controls, trial_id=trial_id, backend=self.profile.backend)
         result['recipe_id'] = name
@@ -321,16 +366,19 @@ class _Research:
             if reference.get('recipe_id') == 'baseline':
                 controls.append(reference)
             quality = [item.get('task_quality', {}).get('mean') for item in controls]
-            speed = [objective_value(item, 'throughput') for item in controls]
+            speed = ([objective_value(item, 'throughput') for item in controls]
+                     if self.profile.retention.throughput is not None else [])
             if any(type(value) not in (int, float) or not math.isfinite(value) or value <= 0
                    for value in quality + speed):
                 candidate['status'] = 'invalid-retention-reference'
             else:
-                constraints = constraints.model_copy(update={
-                    'quality_floor': max(constraints.quality_floor,
-                                         max(quality) * self.profile.retention.quality),
-                    'min_output_tokens_per_second': max(constraints.min_output_tokens_per_second or 0,
-                                         max(speed) * self.profile.retention.throughput)})
+                updates = {'quality_floor': max(constraints.quality_floor,
+                                                max(quality) * self.profile.retention.quality)}
+                if speed:
+                    updates['min_output_tokens_per_second'] = max(
+                        constraints.min_output_tokens_per_second or 0,
+                        max(speed) * self.profile.retention.throughput)
+                constraints = constraints.model_copy(update=updates)
         return select_candidate(reference, candidate, objective=self.profile.objective,
                                 constraints=constraints)
 
@@ -339,6 +387,9 @@ class _Research:
         verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend=self.profile.backend)
         self.report.update(selected_recipe_id=name, selected_artifact_id=artifact['artifact_id'],
                            artifact_path=artifact['path'])
+        if self.profile.required_precision:
+            self.report['requirements'] = {'required_precision': self.profile.required_precision,
+                'met': name != 'baseline' and recipe_precision(self.profile.backend, self.profile.recipes[name]) == self.profile.required_precision}
         self.selection_validated = True
         self.save()
 
@@ -522,6 +573,8 @@ def optimize_native(*, profile, output_dir, project, agent=None, cancelled=None,
     """Run the operator's fixed profile. This function never changes its gates."""
     started = time.monotonic()
     profile = validate_native_profile(profile)
+    if profile.requires_examples or not profile.tasks:
+        raise ValueError('Compile representative workload examples before starting research')
     encode_record(profile.model_dump())
     folder = Path(output_dir).resolve()
     if not resume:

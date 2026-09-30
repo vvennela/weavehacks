@@ -1,8 +1,8 @@
 """Versioned caller-supplied JSON decoding; no task or answer-key imports."""
 
-from copy import deepcopy
 import json
 import re
+from copy import deepcopy
 
 from .storage import content_hash
 
@@ -26,7 +26,7 @@ def validate_response_format(value):
     return deepcopy(value)
 
 
-def validate_formats(prompts, formats, version):
+def validate_formats(prompts, formats, version, *, allow_unconstrained=False):
     if formats is None:
         if version is not None:
             raise ValueError('response_format_version requires response_formats')
@@ -34,7 +34,8 @@ def validate_formats(prompts, formats, version):
     if (not isinstance(formats, list) or len(formats) != len(prompts)
             or not isinstance(version, str) or not version.strip()):
         raise ValueError('Supply one response_format per prompt and an explicit version')
-    values = [validate_response_format(value) for value in formats]
+    values = [None if value is None and allow_unconstrained else validate_response_format(value)
+              for value in formats]
     known = {}
     for prompt, value in zip(prompts, values):
         key = content_hash(prompt)

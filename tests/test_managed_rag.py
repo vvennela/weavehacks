@@ -86,3 +86,40 @@ def test_rag_result_loads_retriever_and_checkpoint_together(tmp_path, monkeypatc
     loaded = result.load()
     assert isinstance(loaded, RagPipeline)
     assert loaded.model is model
+
+
+def test_general_workload_submission_freezes_examples_and_checks_identity(manager, endpoint):
+    client = SeraClient(api_key=TOKEN, endpoint=endpoint)
+    examples = [{'prompt': 'Classify broken order', 'expected_json': {'category': 'damage'}}]
+    job = client.submit_intent('Classify support tickets', examples=examples, request_id='classification')
+    saved = json.loads((manager.folder / job['job_id'] / 'request.json').read_text())['workload_request']
+    assert saved['examples'][0]['expected_json'] == {'category': 'damage'}
+    assert saved['profiles'][0]['constraints']['quality_floor'] == .99
+    assert client.submit_intent('Classify support tickets', examples=examples,
+                               request_id='classification')['job_id'] == job['job_id']
+    with pytest.raises(SeraServiceError, match='409'):
+        client.submit_intent('Classify support tickets', examples=[{'prompt': 'new', 'expected_json': 1}],
+                             request_id='classification')
+    client.cancel(job['job_id'])
+    wait_for(lambda: client.status(job['job_id'])['status'] == 'cancelled')
+
+
+def test_general_optimize_does_not_require_documents(monkeypatch):
+    seen = []
+    def submit(self, intent, **kwargs):
+        seen.append((intent, kwargs))
+        return {'job_id': 'a'*32, 'status': 'needs-input', 'result': {'questions': ['Add test cases']}}
+    monkeypatch.setattr(SeraClient, 'submit_intent', submit)
+    from sera import SeraNeedsInput
+    with pytest.raises(SeraNeedsInput):
+        Optimize('Extract invoice fields', api_key=TOKEN, examples=[{'prompt': 'Invoice', 'expected_json': {}}])
+    assert seen[0][0] == 'Extract invoice fields'
+    assert seen[0][1]['examples'][0]['prompt'] == 'Invoice'
+
+
+def test_health_check_is_authenticated_and_does_not_expose_credentials(endpoint):
+    client = SeraClient(api_key=TOKEN, endpoint=endpoint)
+    health = client._request('GET', '/v1/health')
+    assert health == {'status': 'ready', 'profiles': ['fixture']}
+    with pytest.raises(SeraServiceError, match='401'):
+        SeraClient(api_key='invalid', endpoint=endpoint)._request('GET', '/v1/health')

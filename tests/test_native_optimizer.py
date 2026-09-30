@@ -616,3 +616,13 @@ def test_final_review_receives_fresh_control_and_both_candidate_measurements(tmp
     result = native.optimize_native(profile=profile(), output_dir=tmp_path / 'review-evidence',
                                     project='fixture/project', agent=Reviewer())
     assert result['selected_recipe_id'] == 'q8'
+
+
+def test_required_precision_failure_is_not_reported_as_format_success(tmp_path, runtime):
+    configured = profile()
+    configured['recipes'] = {'q4': {'bits': 4}}
+    configured['required_precision'] = 'int4'
+    result = native.optimize_native(profile=configured, output_dir=tmp_path/'run',
+                                    project='fixture/project', agent=Agent(('q4',)))
+    assert result['selected_recipe_id'] == 'baseline'
+    assert result['requirements'] == {'required_precision': 'int4', 'met': False}

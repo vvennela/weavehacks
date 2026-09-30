@@ -216,7 +216,7 @@ class ROCmModel:
         if (not isinstance(prompts, list) or not prompts or type(warmup) is not int
                 or warmup < 0 or type(repetitions) is not int or repetitions < 1):
             raise ValueError('Supply prompts, nonnegative warmup, and positive repetitions')
-        formats = validate_formats(prompts, response_formats, response_format_version)
+        formats = validate_formats(prompts, response_formats, response_format_version, allow_unconstrained=True)
         def generate(index, prompt):
             return self.generate(prompt, max_tokens=max_tokens, seed=seed,
                                  response_format=formats[index] if formats is not None else None)

@@ -1,0 +1,5 @@
+[
+  {"prompt": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: My package arrived broken.", "expected_json": {"category": "delivery"}},
+  {"prompt": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: I was charged twice for my order.", "expected_json": {"category": "billing"}},
+  {"prompt": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: The application crashes when I sign in.", "expected_json": {"category": "technical"}}
+]
