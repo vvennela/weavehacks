@@ -76,7 +76,7 @@ def _measurements(report):
 
 
 class ManagedService:
-    def __init__(self, *, folder, profiles, clients, project):
+    def __init__(self, *, folder, profiles, clients, project, collections=None):
         self.profiles = {p.profile_id: p for item in profiles
                          for p in [validate_native_profile(item)]}
         self.clients = clients
@@ -87,6 +87,21 @@ class ManagedService:
                     or set(client) != {'id', 'profiles'} or not IDENTIFIER.fullmatch(client['id'])
                     or not client['profiles'] or not set(client['profiles']) <= self.profiles.keys()):
                 raise ValueError('Invalid customer access configuration')
+        self.collections = collections or {}
+        known_owners = {c['id'] for c in clients.values()}
+        for name, collection in self.collections.items():
+            if (not IDENTIFIER.fullmatch(name) or not isinstance(collection, dict)
+                    or not {'source', 'profiles', 'owners'} <= set(collection)
+                    or set(collection) - {'source', 'profiles', 'owners', 'evaluation'}
+                    or not collection['profiles'] or not set(collection['profiles']) <= self.profiles.keys()
+                    or not collection['owners'] or not set(collection['owners']) <= known_owners
+                    or not isinstance(collection['source'], str)
+                    or not Path(collection['source']).is_absolute()):
+                raise ValueError('Invalid document collection configuration')
+            if collection.get('evaluation') is not None and (
+                    not isinstance(collection['evaluation'], str)
+                    or not Path(collection['evaluation']).is_absolute()):
+                raise ValueError('Supply an absolute evaluation path')
         if not os.environ.get('WANDB_API_KEY'):
             raise ValueError('The operator must configure WANDB_API_KEY')
         if len(project.split('/')) != 2 or any(not part.strip() for part in project.split('/')):
@@ -149,22 +164,52 @@ class ManagedService:
             c['id'] == owner and profile_id in c['profiles'] for c in self.clients.values()
         ):
             raise ServiceError(404, 'Profile not found')
+        profile = self.profiles[profile_id]
+        return self._accept(owner, profile_id, request_id,
+                            {'profile': profile.model_dump(), 'project': self.project},
+                            content_hash({'profile_id': profile_id}), profile.max_run_seconds)
+
+    def submit_intent(self, owner, intent, documents, request_id):
+        if (not isinstance(request_id, str) or not IDENTIFIER.fullmatch(request_id)
+                or not isinstance(intent, str) or not 0 < len(intent.strip()) <= 6000):
+            raise ServiceError(400, 'Supply a workload description and a valid request_id')
+        collection = self.collections.get(documents) if isinstance(documents, str) else None
+        if collection is None or owner not in collection['owners']:
+            raise ServiceError(404, 'Document collection not found')
+        allowed = {p for c in self.clients.values() if c['id'] == owner for p in c['profiles']}
+        profiles = [self.profiles[p] for p in collection['profiles'] if p in allowed]
+        if not profiles:
+            raise ServiceError(404, 'No models are available for this collection')
+        request = {'rag_request': {'intent': intent, 'source': collection['source'],
+                   'evaluation': collection.get('evaluation'),
+                   'profiles': [p.model_dump() for p in profiles], 'project': self.project}}
+        return self._accept(owner, 'rag', request_id, request,
+                            content_hash({'intent': intent, 'documents': documents}),
+                            max(p.max_run_seconds for p in profiles))
+
+    def _accept(self, owner, profile_id, request_id, request, input_hash, max_seconds):
         with self._mutex:
             if self._stop.is_set() or not self._thread.is_alive():
                 raise ServiceError(503, 'Service is stopping')
             jobs = self._all()
             for job in jobs:
                 if job['owner'] == owner and job['request_id'] == request_id:
-                    if job['profile_id'] != profile_id:
-                        raise ServiceError(409, 'Request ID belongs to a different profile')
+                    saved_hash = job.get('input_hash', content_hash({'profile_id': job['profile_id']}))
+                    if saved_hash != input_hash:
+                        raise ServiceError(409, 'Request ID belongs to a different workload')
                     return self._public(job)
             if any(job['status'] in ACTIVE for job in jobs):
                 raise ServiceError(429, 'The worker is busy')
-            profile = self.profiles[profile_id]
-            request = {'profile': profile.model_dump(), 'project': self.project}
+            deadline = time.time() + max_seconds
+            if 'rag_request' in request:
+                request['rag_request']['deadline'] = deadline
+                if request['rag_request'].get('evaluation'):
+                    from .rag_intake import read_evaluation
+                    request['rag_request']['evaluation_examples'] = read_evaluation(
+                        request['rag_request']['evaluation'])
             job = {'job_id': uuid.uuid4().hex, 'owner': owner, 'request_id': request_id,
                    'profile_id': profile_id, 'status': 'pending', 'result': None,
-                   'created_at': time.time(), 'deadline': time.time() + profile.max_run_seconds,
+                   'created_at': time.time(), 'deadline': deadline, 'input_hash': input_hash,
                    'cancel_requested': False, 'pid': None, 'request_hash': content_hash(request)}
             folder = self.folder / job['job_id']
             folder.mkdir(mode=0o700)
@@ -180,6 +225,9 @@ class ManagedService:
 
     def _public(self, job):
         result = {key: job[key] for key in ('job_id', 'profile_id', 'status', 'result')}
+        intake = self.folder / job['job_id'] / 'rag-progress.json'
+        if intake.exists():
+            result['progress'] = json.loads(intake.read_text())
         folder = self.folder / job['job_id'] / 'research'
         if (folder / 'ledger.sqlite3').exists():
             try:
@@ -260,8 +308,21 @@ class ManagedService:
                         break
                     if process.poll() is not None:
                         if process.returncode == 0:
-                            result = _result(read_checkpoint(folder / 'research')[0])
-                            outcome = 'completed'
+                            if (folder / 'needs-input.json').exists():
+                                result = json.loads((folder / 'needs-input.json').read_text())
+                                outcome = 'needs-input'
+                            else:
+                                report = read_checkpoint(folder / 'research')[0]
+                                result = _result(report)
+                                if (folder / 'rag-compiled.json').exists():
+                                    from .rag_intake import prepare_rag
+                                    accepted = json.loads((folder / 'request.json').read_text())
+                                    compiled = prepare_rag(accepted['rag_request'], folder)
+                                    if report['profile_hash'] != content_hash(compiled['profile']):
+                                        raise ValueError('Research differs from the compiled workload')
+                                    result['rag'] = compiled['rag'] | {'research_seconds': result['elapsed_seconds']}
+                                    result['elapsed_seconds'] = time.time() - job['created_at']
+                                outcome = 'completed'
                             if time.monotonic() >= deadline:
                                 outcome, result = 'timed-out', None
                         break
@@ -330,14 +391,18 @@ def make_server(service, *, port):
                     raise ServiceError(401, 'Sera access key required')
                 owner = service.authenticate(header[7:])
                 parts = self.path.split('/')
-                if self.command == 'POST' and self.path == '/v1/jobs':
+                if self.command == 'POST' and self.path in {'/v1/jobs', '/v1/workloads'}:
                     length = int(self.headers.get('Content-Length', '0'))
-                    if not 0 < length <= 4096 or self.headers.get('Transfer-Encoding'):
-                        raise ServiceError(400, 'Supply a JSON request of at most 4096 bytes')
+                    limit = 32768 if self.path == '/v1/workloads' else 4096
+                    if not 0 < length <= limit or self.headers.get('Transfer-Encoding'):
+                        raise ServiceError(400, 'JSON request exceeds the route limit')
                     body = json.loads(self.rfile.read(length))
-                    if not isinstance(body, dict) or set(body) != {'profile_id', 'request_id'}:
-                        raise ServiceError(400, 'Supply only profile_id and request_id')
-                    result = service.submit(owner, **body)
+                    fields = ({'intent', 'documents', 'request_id'} if self.path == '/v1/workloads'
+                              else {'profile_id', 'request_id'})
+                    if not isinstance(body, dict) or set(body) != fields:
+                        raise ServiceError(400, 'Supply only the required workload fields')
+                    result = (service.submit_intent(owner, **body) if self.path == '/v1/workloads'
+                              else service.submit(owner, **body))
                 elif len(parts) == 4 and parts[:3] == ['', 'v1', 'jobs'] and IDENTIFIER.fullmatch(parts[3]):
                     if self.command == 'GET':
                         result = service.get(owner, parts[3])

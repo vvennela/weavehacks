@@ -30,5 +30,5 @@ __all__ += ["OpenAICompatibleAgent"]
 __all__ += ["KernelCandidate", "optimize_kernel", "KernelSpecialistTeam", "KernelAdvisoryTeam",
             "CodexKernelProposer", "HillsKernelEvaluator"]
 
-from .managed_client import Optimize, SeraClient, ManagedResult
-__all__ += ["Optimize", "SeraClient", "ManagedResult"]
+from .managed_client import Optimize, SeraClient, ManagedResult, SeraNeedsInput
+__all__ += ["Optimize", "SeraClient", "ManagedResult", "SeraNeedsInput"]

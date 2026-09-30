@@ -15,6 +15,12 @@ class SeraServiceError(RuntimeError):
     pass
 
 
+class SeraNeedsInput(SeraServiceError):
+    def __init__(self, job_id, questions):
+        super().__init__(' '.join(questions))
+        self.job_id, self.questions = job_id, questions
+
+
 class _NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, request, file, code, message, headers, new_url):
         return None
@@ -33,10 +39,23 @@ class ManagedResult:
     stop_reason: str | None = None
     measurements: dict = field(default_factory=dict)
 
+    rag: dict | None = None
+
     def verify(self):
+        if self.rag is not None:
+            from .rag import RagIndex
+            RagIndex(self.rag["index_path"], expected_hash=self.rag["index_hash"])
         return verify_artifact(self.artifact_path, expected_id=self.artifact_id, backend=self.backend)
 
     def load(self):
+        if self.rag is None:
+            return self._load_model()
+        from .rag import RagIndex, RagPipeline
+        index = RagIndex(self.rag['index_path'], expected_hash=self.rag['index_hash'])
+        return RagPipeline(self._load_model(), index, top_k=self.rag['top_k'],
+                           max_tokens=self.rag['max_tokens'], seed=self.rag['seed'])
+
+    def _load_model(self):
         from .backends.cuda import CUDABackend
         from .backends.mlx import MLXBackend
         from .backends.rocm import ROCmBackend
@@ -81,6 +100,10 @@ class SeraClient:
     def submit(self, profile_id, *, request_id):
         return self._request('POST', '/v1/jobs', {'profile_id': profile_id, 'request_id': request_id})
 
+    def submit_intent(self, intent, *, documents, request_id):
+        return self._request('POST', '/v1/workloads',
+                             {'intent': intent, 'documents': documents, 'request_id': request_id})
+
     def status(self, job_id):
         return self._request('GET', '/v1/jobs/' + self._job_id(job_id))
 
@@ -95,8 +118,8 @@ class SeraClient:
 
 
 def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_id=None,
-             on_update=None, poll_interval=1.0):
-    """Run one registered workload and return its confirmed checkpoint.
+             on_update=None, poll_interval=1.0, documents=None):
+    """Optimize a registered workload, or describe a RAG workload with documents=collection.
 
     Reuse request_id after a connection failure to recover the same job.
     Ctrl-C cancels the accepted job. The service owns W&B credentials and gates.
@@ -106,7 +129,8 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
     client = SeraClient(api_key=api_key, endpoint=endpoint)
     request_id = request_id if request_id is not None else uuid.uuid4().hex
     try:
-        job = client.submit(profile_id, request_id=request_id)
+        job = (client.submit(profile_id, request_id=request_id) if documents is None else
+               client.submit_intent(profile_id, documents=documents, request_id=request_id))
     except SeraServiceError as error:
         recovered = SeraServiceError(f'{error}; retry with request_id={request_id!r}')
         recovered.request_id = request_id
@@ -131,7 +155,10 @@ def Optimize(profile_id, *, api_key, endpoint='http://127.0.0.1:8765', request_i
                     artifact_id=result['selected_artifact_id'], artifact_path=result['artifact_path'],
                     trace_url=result['trace']['url'], elapsed_seconds=result['elapsed_seconds'],
                     backend=result.get('backend', 'mlx'), runtime=result.get('runtime'),
-                    stop_reason=result.get('stop_reason'), measurements=result.get('measurements', {}))
+                    stop_reason=result.get('stop_reason'), measurements=result.get('measurements', {}),
+                    rag=result.get('rag'))
+            if job['status'] == 'needs-input':
+                raise SeraNeedsInput(job['job_id'], job['result']['questions'])
             if job['status'] not in {'pending', 'running', 'interrupted'}:
                 raise SeraServiceError(f"Sera job {job['job_id']} ended: {job['status']}")
             time.sleep(poll_interval)

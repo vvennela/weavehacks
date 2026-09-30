@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from sera.rag import Corpus, RagIndex, RagExample, make_tasks
+from sera.rag import Corpus, RagExample, RagIndex, make_tasks
 
 
 def corpus(tmp_path):

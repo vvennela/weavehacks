@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "sera-inference"
 version = "0.2.0"
-description = "Measured inference configuration experiments"
+description = "Inference harness for measured, workload-aware optimization"
 readme = "docs/simple-release.md"
 requires-python = ">=3.11"
 # pydantic and prometheus-client belong to the swarm line; pyyaml and numpy to the
