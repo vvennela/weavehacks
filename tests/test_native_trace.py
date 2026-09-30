@@ -24,7 +24,7 @@ def setup(monkeypatch, client):
     import sys
     call = SimpleNamespace(id='call', trace_id='trace', ui_url='https://wandb.ai/fixture')
     monkeypatch.setitem(sys.modules, 'weave', SimpleNamespace(
-        init=lambda project: client, get_current_call=lambda: call,
+        init=lambda project: client, get_client=lambda: None, get_current_call=lambda: call,
         op=lambda **kwargs: lambda function: function))
     monkeypatch.setenv('WANDB_API_KEY', 'fixture')
 
@@ -48,3 +48,14 @@ def test_missing_key_fails_before_running_work(monkeypatch):
     monkeypatch.delenv('WANDB_API_KEY', raising=False)
     with pytest.raises(ValueError, match='operator'):
         trace_native_job(project='fixture/project', run=lambda: pytest.fail('No trace key'))
+
+
+def test_active_matching_project_client_is_reused(monkeypatch):
+    import sys
+    client = Client()
+    client.entity, client.project = 'fixture', 'project'
+    setup(monkeypatch, client)
+    weave = sys.modules['weave']
+    weave.get_client = lambda: client
+    weave.init = lambda project: pytest.fail('An active matching client must not be reinitialized')
+    assert trace_native_job(project='fixture/project', run=lambda: 7)['result'] == 7

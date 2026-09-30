@@ -17,7 +17,9 @@ def trace_native_job(*, project, run):
         raise ValueError('Supply the operator entity/project')
     import weave
 
-    client = weave.init(project)
+    client = weave.get_client()
+    if client is None or f'{client.entity}/{client.project}' != project:
+        client = weave.init(project)
     reference = {}
 
     @weave.op(name='sera_native_checkpoint_experiment')
