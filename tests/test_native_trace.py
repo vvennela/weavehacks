@@ -59,3 +59,20 @@ def test_active_matching_project_client_is_reused(monkeypatch):
     weave.get_client = lambda: client
     weave.init = lambda project: pytest.fail('An active matching client must not be reinitialized')
     assert trace_native_job(project='fixture/project', run=lambda: 7)['result'] == 7
+
+
+def test_active_other_project_is_not_reused(monkeypatch):
+    import sys
+    active = Client()
+    active.entity, active.project = 'other', 'project'
+    expected = Client()
+    setup(monkeypatch, expected)
+    weave = sys.modules['weave']
+    weave.get_client = lambda: active
+    initialized = []
+    def initialize(project):
+        initialized.append(project)
+        return expected
+    weave.init = initialize
+    assert trace_native_job(project='fixture/project', run=lambda: 9)['result'] == 9
+    assert initialized == ['fixture/project']

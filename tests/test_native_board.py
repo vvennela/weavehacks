@@ -13,7 +13,8 @@ def test_invalid_ballot_cannot_enter_the_board():
 
 def test_fifteen_specialists_vote_on_shared_board_before_batch_selection(tmp_path):
     import json
-    from sera.native_board import NativeBoard, ROLES
+
+    from sera.native_board import ROLES, NativeBoard
 
     created = []
     class Agent:
