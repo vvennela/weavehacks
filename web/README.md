@@ -2,9 +2,10 @@
 
 This website and proxy preserve the earlier Molab demo. The v1 deployment is the [local Sera service](../README.md#one-setup-one-call).
 
-# Sera local frontend
+## Historical local frontend
 
-From the repository root, run `python3 web/server.py` and open
+The instructions below describe the earlier preview and Molab demo.
+To run that preview from the repository root, run `python3 web/server.py` and open
 http://localhost:8877/. This serves the homepage and the authenticated lab preview.
 
 Sign in with the demo login, shown on the sign-in page and printed at startup:

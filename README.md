@@ -1,6 +1,8 @@
 # SERA
 
-### The autonomous auto-research harness for inference.
+### The auto-research harness for inference.
+
+### Or: An Autonomous Inference Engineer
 
 [![CI](https://github.com/vvennela/weavehacks/actions/workflows/test.yml/badge.svg)](https://github.com/vvennela/weavehacks/actions/workflows/test.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE)
@@ -14,7 +16,7 @@ Get more inference from the hardware you already have. Describe your workload; S
 ## For reviewers
 
 - **Resilience:** [recovery](tests/test_native_optimizer.py), [service cancellation and restart](tests/test_managed_service.py), [worker deadlines and cleanup](tests/test_native_worker.py), and [process ownership](tests/test_owned_command.py).
-- **Tests and CI:** install [uv](https://docs.astral.sh/uv/), then run `bash check.sh`. This runs the full suite, lint, source and wheel builds, and package checks without live credentials or a GPU. [GitHub Actions](https://github.com/vvennela/weavehacks/actions/workflows/test.yml) runs the same checks on Linux and macOS; the badge above shows its status.
+- **Tests and CI:** install [uv](https://docs.astral.sh/uv/), then run `bash check.sh`. This runs the full suite, lint, source and wheel builds, and package checks without live credentials or a GPU. [GitHub Actions](https://github.com/vvennela/weavehacks/actions/workflows/test.yml) runs these checks plus an installed-wheel import and CLI check on Linux and macOS; the badge above shows its status.
 - **Architecture:** `Sera.Optimize` submits to an authenticated local service. Astra and 15 Luna specialists rank experiments; the Python controller runs isolated hardware workers and enforces quality and budget limits. A passing run returns a verified checkpoint and W&B trace. [Service](sera/managed_service.py) · [Controller](sera/native_optimizer.py) · [Agent board](sera/native_board.py).
 
 ```mermaid

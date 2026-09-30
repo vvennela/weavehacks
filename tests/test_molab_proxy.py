@@ -36,9 +36,6 @@ from web.molab_proxy import MolabError, ProxyServer, validate  # noqa: E402
 
 TOKEN = 'tok_SUPERSECRET_do_not_leak_a1b2c3d4'
 SESSION_COOKIE = 'sess-abc123'
-# How long the fake stalls between the two halves of its event stream. Long enough
-# that a buffering proxy is unmistakable, short enough not to slow the suite.
-STREAM_GAP = 0.8
 WS_GUID = '258EAFA5-E914-47DA-95CA-5AB0DC85B11C'
 
 MARIMO_STATUS = {
@@ -219,12 +216,14 @@ class FakeMarimoHandler(BaseHTTPRequestHandler):
         self.send_header('Transfer-Encoding', 'chunked')
         self.end_headers()
         self.wfile.write(chunk(b'data: first\n\n'))
-        self.server.first_chunk_at = time.monotonic()
-        time.sleep(STREAM_GAP)
+        # The client releases the second chunk only after receiving the first.
+        if not self.server.release_stream.wait(timeout=10):
+            self.close_connection = True
+            return
         self.wfile.write(chunk(b'data: second\n\n'))
         self.wfile.write(b'0\r\n\r\n')
-        self.server.finished_at = time.monotonic()
         self.close_connection = True
+        self.server.stream_finished.set()
 
     def websocket(self):
         key = self.headers.get('Sec-WebSocket-Key')
@@ -265,8 +264,8 @@ class FakeMarimo(ThreadingHTTPServer):
         self.status_payload = dict(MARIMO_STATUS)
         self.status_needs_auth = True
         self.status_delay = 0.0
-        self.first_chunk_at = None
-        self.finished_at = None
+        self.release_stream = threading.Event()
+        self.stream_finished = threading.Event()
         super().__init__(('127.0.0.1', 0), FakeMarimoHandler)
 
     @property
@@ -622,7 +621,6 @@ def test_a_stream_is_relayed_as_it_is_produced(fake, make_proxy):
     proxy = make_proxy(lambda: validate(fake.origin, TOKEN, timeout=5))
     sock = open_socket(proxy)
     try:
-        started = time.monotonic()
         sock.sendall(f'GET /stream HTTP/1.1\r\n'
                      f'Host: 127.0.0.1:{proxy.server_port}\r\n\r\n'.encode())
         buffer = b''
@@ -630,11 +628,10 @@ def test_a_stream_is_relayed_as_it_is_produced(fake, make_proxy):
             data = sock.recv(4096)
             assert data, 'proxy closed before sending anything'
             buffer += data
-        first_seen = time.monotonic() - started
 
-        assert fake.finished_at is None, 'upstream had already finished — we buffered'
-        assert first_seen < STREAM_GAP / 2, f'first bytes took {first_seen:.2f}s'
+        assert not fake.stream_finished.is_set(), 'upstream finished before the first chunk arrived'
         assert b'text/event-stream' in buffer
+        fake.release_stream.set()
 
         while b'second' not in buffer:
             data = sock.recv(4096)
@@ -642,8 +639,9 @@ def test_a_stream_is_relayed_as_it_is_produced(fake, make_proxy):
                 break
             buffer += data
         assert b'second' in buffer
-        assert fake.first_chunk_at is not None and fake.finished_at is not None
+        assert fake.stream_finished.wait(timeout=5), 'upstream did not finish the stream'
     finally:
+        fake.release_stream.set()
         sock.close()
 
 
