@@ -1,0 +1,165 @@
+{
+  "result": {
+    "job_id": "603db156a5414ccdbd9ad75023bbf4cb",
+    "selected_recipe_id": "mlx-int8",
+    "artifact_id": "57c2068daa7bf8566d5bb000519d495bc27745289e7ee0ecd391bed67100e1a8",
+    "artifact_path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-rag-release/service/603db156a5414ccdbd9ad75023bbf4cb/research/artifacts/mlx-int8-0004",
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f09e-c667-76fb-8996-cdffa61f61a2",
+    "elapsed_seconds": 288.145290851593,
+    "backend": "mlx",
+    "runtime": null,
+    "stop_reason": null,
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1487832012,
+        "quality": 1.0,
+        "p95_latency_ms": 555.7687500258908,
+        "output_tokens_per_second": 42.905213885958
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 582124516,
+            "quality": 0.7692307692307693,
+            "p95_latency_ms": 513.7128749629483,
+            "output_tokens_per_second": 46.14930703536089
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 879723800,
+            "quality": 1.0,
+            "p95_latency_ms": 483.8638750370592,
+            "output_tokens_per_second": 49.517211413636666
+          },
+          "confirmation": {
+            "peak_bytes": 879723800,
+            "quality": 1.0,
+            "p95_latency_ms": 481.3887500204146,
+            "output_tokens_per_second": 49.33516503804063
+          },
+          "baseline_control": {
+            "peak_bytes": 1501184996,
+            "quality": 1.0,
+            "p95_latency_ms": 580.6059580063447,
+            "output_tokens_per_second": 43.4011671939786
+          },
+          "accepted": true
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "rag": {
+      "index_path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-rag-release/service/603db156a5414ccdbd9ad75023bbf4cb/rag-index",
+      "index_hash": "fd7fb766dfc271cc94b0766b87fdc22f4e16b9c1e7037fb7ab3d8e991651b512",
+      "corpus_hash": "a83b749dccfae10a59b028f3c95b86139338337f07b2ae81b1b6c259b0815015",
+      "document_count": 100000,
+      "chunk_count": 100000,
+      "chunk_words": 128,
+      "index_build_seconds": 0.8485147089813836,
+      "top_k": 1,
+      "max_tokens": 64,
+      "seed": 0,
+      "quality_scope": "customer-supplied-tests",
+      "validation_questions": 0,
+      "evaluation_questions": 13,
+      "retrieval": {
+        "evidence_recall": 1.0,
+        "questions": 13,
+        "retrieval_latency_ms": [
+          30.76758299721405,
+          28.488291951362044,
+          45.68216699408367,
+          30.53449996514246,
+          28.004207997582853,
+          46.028624987229705,
+          30.68700002040714,
+          29.052916972432286,
+          46.38583300402388,
+          31.38212498743087,
+          29.199792013969272,
+          46.357667015399784,
+          29.081457993015647
+        ],
+        "top_k": 1
+      },
+      "optimization_scope": "generator quantization on frozen retrieved contexts",
+      "plan_reason": "The MLX profile supports this single-user extractive RAG workload. The measured corpus contains 100,000 documents. Use 128-word chunks for the short records and retrieve one context for service-specific questions. Preserve the 0.99 quality floor, 5% minimum memory improvement, two-trial budget, and 300-second run limit. Optimize generator quantization with fixed retrieved contexts. No performance gain is established. The generated tests are smoke-test proxies, not customer acceptance certification.",
+      "hardware": {
+        "system": "Darwin",
+        "machine": "arm64",
+        "backends": [
+          "mlx"
+        ],
+        "mlx": {
+          "backend": "mlx",
+          "device": {
+            "device_name": "Apple M4 Pro",
+            "max_recommended_working_set_size": 19069665280,
+            "memory_size": 25769803776,
+            "architecture": "applegpu_g16s",
+            "max_buffer_length": 14302248960,
+            "resource_limit": 499000
+          },
+          "versions": {
+            "mlx": "0.32.3",
+            "mlx-lm": "0.31.3",
+            "transformers": "5.17.0"
+          },
+          "weight_bits": [
+            16,
+            8,
+            4,
+            3,
+            2
+          ],
+          "mixed_precision": true,
+          "memory_metric": "mlx-active-allocator-bytes",
+          "checkpoint_format": "mlx-safetensors",
+          "concurrent_requests": false
+        }
+      },
+      "intake_trace": {
+        "call_id": "01a0f09e-bdef-72c0-aacf-1a8ea9832478",
+        "trace_id": "01a0f09e-bdee-77e8-a2d7-14576ae1692f",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f09e-bdef-72c0-aacf-1a8ea9832478",
+        "remote_verified": true
+      },
+      "research_seconds": 238.17940345796524
+    }
+  },
+  "independent_answers": [
+    {
+      "answer": "24 days",
+      "source": "doc-000042",
+      "supported": true,
+      "reason": "extractive-support",
+      "latency_ms": 797.681583033409
+    },
+    {
+      "answer": "Team Delta",
+      "source": "doc-099999",
+      "supported": true,
+      "reason": "extractive-support",
+      "latency_ms": 486.18408397305757
+    }
+  ],
+  "wall_seconds": 291.85776691604406
+}

@@ -1,0 +1,55 @@
+{
+  "full_suite": {
+    "passed": 2076,
+    "skipped": 1,
+    "seconds": 115.16,
+    "location": "Clean source snapshot outside the synced working folder, with the final tagline update."
+  },
+  "installed_wheel_tests": {
+    "passed": 186,
+    "seconds": 16.92,
+    "location": "/tmp/sera-rag-installed-tests",
+    "package_location": "/tmp/sera-rag-validation-tests/lib/python3.12/site-packages/sera",
+    "scope": "Managed client/service/agent/RAG; native board/advisor/optimizer/worker/measurement/trace/provider; CUDA adapter contract tests. Repository-only benchmark scripts were checked in the full suite."
+  },
+  "ci": {
+    "head": "67e8d411a1156eecdc97753f77d88ff5e59136a2",
+    "status": "success",
+    "url": "https://github.com/vvennela/weavehacks/actions/runs/36670510953"
+  },
+  "recovery": {
+    "result": {
+      "reconnected_job_id": "603db156a5414ccdbd9ad75023bbf4cb",
+      "same_artifact": true,
+      "reconnect_seconds": 0.016730000032112002,
+      "cancelled_job_id": "2a3a27b59a044c4c908d7dfea5617fee",
+      "cancellation_seconds": 0.11018445796798915,
+      "cancelled_status": "cancelled",
+      "process_tree_alive_after_cancel": false,
+      "device_lock_released": true
+    },
+    "trace": {
+      "call_id": "01a0f0a5-af23-7ccb-a573-fb1b2d774ad4",
+      "trace_id": "01a0f0a5-af23-7d3b-bd6d-2f6a09df71c2",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0a5-af23-7ccb-a573-fb1b2d774ad4",
+      "remote_verified": true
+    }
+  },
+  "validation_failures_and_resolution": [
+    "Initial full-suite run had one loopback advisor state timeout and stalled reading local saved evidence. Isolated advisor test passed; the unchanged complete suite passed in a fresh source snapshot.",
+    "The first installed-test staging omitted shared test helpers; copied the missing provider/CUDA helpers and reran the complete installed selection successfully.",
+    "The first cancellation probe failed before intake because the document file returned EOF despite a nonzero stat size. Recreated the deterministic corpus outside the synced folder, checked its corpus hash, then reran cancellation successfully. The service failed closed for the unreadable corpus."
+  ],
+  "new_cloud_resources": 0,
+  "aws_spending_in_this_change": 0,
+  "secret_scan": "All exported evidence, including decompressed JSON, checked against configured operator secret values. Wheel checked separately.",
+  "exported_artifact_check": {
+    "installed_package": "/tmp/sera-rag-validated-runtime/lib/python3.12/site-packages/sera/__init__.py",
+    "artifact_and_index_verified": true,
+    "verification_seconds": 1.1535268329898827,
+    "recovery_corpus_hash_matches_original": true
+  },
+  "corpus_reproduction": {
+    "generator_output_equals_validation_source_bytes": true
+  }
+}

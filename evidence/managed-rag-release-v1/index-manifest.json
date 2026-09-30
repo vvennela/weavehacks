@@ -1,0 +1,13 @@
+{
+  "version": "sera-rag-index-v1",
+  "corpus_hash": "a83b749dccfae10a59b028f3c95b86139338337f07b2ae81b1b6c259b0815015",
+  "document_count": 100000,
+  "chunk_count": 100000,
+  "chunk_words": 128,
+  "overlap_words": 32,
+  "retriever": "sqlite-fts5-bm25",
+  "sqlite_version": "3.50.4",
+  "database_sha256": "c04a3b6794ebc65ca7fbf80d36ca9849a2ae7221427f04e8bdcfd9887fa102b9",
+  "build_seconds": 0.8485147089813836,
+  "index_hash": "fd7fb766dfc271cc94b0766b87fdc22f4e16b9c1e7037fb7ab3d8e991651b512"
+}

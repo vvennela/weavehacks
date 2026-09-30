@@ -1,0 +1,106 @@
+{
+  "seed": 20260930,
+  "repetitions": 3,
+  "examples": [
+    {
+      "question": "How long are backups kept for service svc060658?",
+      "answer": "15 days",
+      "document_id": "doc-060658",
+      "evidence": "Service svc060658 has a backup retention period of 15 days. The service owner is Team Cedar. Its daily backup starts at 10:00 UTC."
+    },
+    {
+      "question": "Who owns service svc060658?",
+      "answer": "Team Cedar",
+      "document_id": "doc-060658",
+      "evidence": "Service svc060658 has a backup retention period of 15 days. The service owner is Team Cedar. Its daily backup starts at 10:00 UTC."
+    },
+    {
+      "question": "At what time does service svc060658 start its daily backup?",
+      "answer": "10:00 UTC",
+      "document_id": "doc-060658",
+      "evidence": "Service svc060658 has a backup retention period of 15 days. The service owner is Team Cedar. Its daily backup starts at 10:00 UTC."
+    },
+    {
+      "question": "How long are backups kept for service svc053147?",
+      "answer": "29 days",
+      "document_id": "doc-053147",
+      "evidence": "Service svc053147 has a backup retention period of 29 days. The service owner is Team Delta. Its daily backup starts at 11:00 UTC."
+    },
+    {
+      "question": "Who owns service svc053147?",
+      "answer": "Team Delta",
+      "document_id": "doc-053147",
+      "evidence": "Service svc053147 has a backup retention period of 29 days. The service owner is Team Delta. Its daily backup starts at 11:00 UTC."
+    },
+    {
+      "question": "At what time does service svc053147 start its daily backup?",
+      "answer": "11:00 UTC",
+      "document_id": "doc-053147",
+      "evidence": "Service svc053147 has a backup retention period of 29 days. The service owner is Team Delta. Its daily backup starts at 11:00 UTC."
+    },
+    {
+      "question": "How long are backups kept for service svc082645?",
+      "answer": "27 days",
+      "document_id": "doc-082645",
+      "evidence": "Service svc082645 has a backup retention period of 27 days. The service owner is Team Birch. Its daily backup starts at 13:00 UTC."
+    },
+    {
+      "question": "Who owns service svc082645?",
+      "answer": "Team Birch",
+      "document_id": "doc-082645",
+      "evidence": "Service svc082645 has a backup retention period of 27 days. The service owner is Team Birch. Its daily backup starts at 13:00 UTC."
+    },
+    {
+      "question": "At what time does service svc082645 start its daily backup?",
+      "answer": "13:00 UTC",
+      "document_id": "doc-082645",
+      "evidence": "Service svc082645 has a backup retention period of 27 days. The service owner is Team Birch. Its daily backup starts at 13:00 UTC."
+    },
+    {
+      "question": "How long are backups kept for service svc095646?",
+      "answer": "28 days",
+      "document_id": "doc-095646",
+      "evidence": "Service svc095646 has a backup retention period of 28 days. The service owner is Team Cedar. Its daily backup starts at 06:00 UTC."
+    },
+    {
+      "question": "Who owns service svc095646?",
+      "answer": "Team Cedar",
+      "document_id": "doc-095646",
+      "evidence": "Service svc095646 has a backup retention period of 28 days. The service owner is Team Cedar. Its daily backup starts at 06:00 UTC."
+    },
+    {
+      "question": "At what time does service svc095646 start its daily backup?",
+      "answer": "06:00 UTC",
+      "document_id": "doc-095646",
+      "evidence": "Service svc095646 has a backup retention period of 28 days. The service owner is Team Cedar. Its daily backup starts at 06:00 UTC."
+    },
+    {
+      "question": "Who owns service svc099999?",
+      "answer": "Team Delta",
+      "document_id": "doc-099999",
+      "evidence": "Service svc099999 has a backup retention period of 31 days. The service owner is Team Delta. Its daily backup starts at 15:00 UTC."
+    }
+  ],
+  "retrieval": {
+    "evidence_recall": 1.0,
+    "questions": 13,
+    "retrieval_latency_ms": [
+      29.942957975436002,
+      28.18691701395437,
+      45.64408300211653,
+      29.346957977395505,
+      28.090834035538137,
+      45.32274999655783,
+      29.98604194726795,
+      28.963415999896824,
+      45.430708036292344,
+      29.99579202150926,
+      27.790166961494833,
+      44.84574997331947,
+      28.51716597797349
+    ],
+    "top_k": 1
+  },
+  "task_hash": "d25237ec7fc328b9cd4579980b845d55093489482db3d50e145603b354ed2cdb",
+  "note": "Independent paraphrased questions frozen after optimization, not used for candidate selection."
+}

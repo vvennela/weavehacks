@@ -1,0 +1,18 @@
+{
+  "result": {
+    "reconnected_job_id": "603db156a5414ccdbd9ad75023bbf4cb",
+    "same_artifact": true,
+    "reconnect_seconds": 0.016730000032112002,
+    "cancelled_job_id": "2a3a27b59a044c4c908d7dfea5617fee",
+    "cancellation_seconds": 0.11018445796798915,
+    "cancelled_status": "cancelled",
+    "process_tree_alive_after_cancel": false,
+    "device_lock_released": true
+  },
+  "trace": {
+    "call_id": "01a0f0a5-af23-7ccb-a573-fb1b2d774ad4",
+    "trace_id": "01a0f0a5-af23-7d3b-bd6d-2f6a09df71c2",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0a5-af23-7ccb-a573-fb1b2d774ad4",
+    "remote_verified": true
+  }
+}

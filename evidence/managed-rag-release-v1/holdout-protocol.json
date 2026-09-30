@@ -1,0 +1,255 @@
+{
+  "seed": 2026093001,
+  "repetitions": 3,
+  "examples": [
+    {
+      "question": "How many days are backups kept for service svc011710?",
+      "answer": "17",
+      "document_id": "doc-011710",
+      "evidence": "Service svc011710 has a backup retention period of 17 days. The service owner is Team Cedar. Its daily backup starts at 22:00 UTC.",
+      "accepted_answers": [
+        "17 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc011710?",
+      "answer": "Team Cedar",
+      "document_id": "doc-011710",
+      "evidence": "Service svc011710 has a backup retention period of 17 days. The service owner is Team Cedar. Its daily backup starts at 22:00 UTC.",
+      "accepted_answers": [
+        "Cedar"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc011710 start its daily backup?",
+      "answer": "22:00 UTC",
+      "document_id": "doc-011710",
+      "evidence": "Service svc011710 has a backup retention period of 17 days. The service owner is Team Cedar. Its daily backup starts at 22:00 UTC.",
+      "accepted_answers": [
+        "22:00"
+      ]
+    },
+    {
+      "question": "How many days are backups kept for service svc080607?",
+      "answer": "14",
+      "document_id": "doc-080607",
+      "evidence": "Service svc080607 has a backup retention period of 14 days. The service owner is Team Delta. Its daily backup starts at 15:00 UTC.",
+      "accepted_answers": [
+        "14 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc080607?",
+      "answer": "Team Delta",
+      "document_id": "doc-080607",
+      "evidence": "Service svc080607 has a backup retention period of 14 days. The service owner is Team Delta. Its daily backup starts at 15:00 UTC.",
+      "accepted_answers": [
+        "Delta"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc080607 start its daily backup?",
+      "answer": "15:00 UTC",
+      "document_id": "doc-080607",
+      "evidence": "Service svc080607 has a backup retention period of 14 days. The service owner is Team Delta. Its daily backup starts at 15:00 UTC.",
+      "accepted_answers": [
+        "15:00"
+      ]
+    },
+    {
+      "question": "How many days are backups kept for service svc038376?",
+      "answer": "8",
+      "document_id": "doc-038376",
+      "evidence": "Service svc038376 has a backup retention period of 8 days. The service owner is Team Amber. Its daily backup starts at 00:00 UTC.",
+      "accepted_answers": [
+        "8 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc038376?",
+      "answer": "Team Amber",
+      "document_id": "doc-038376",
+      "evidence": "Service svc038376 has a backup retention period of 8 days. The service owner is Team Amber. Its daily backup starts at 00:00 UTC.",
+      "accepted_answers": [
+        "Amber"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc038376 start its daily backup?",
+      "answer": "00:00 UTC",
+      "document_id": "doc-038376",
+      "evidence": "Service svc038376 has a backup retention period of 8 days. The service owner is Team Amber. Its daily backup starts at 00:00 UTC.",
+      "accepted_answers": [
+        "00:00"
+      ]
+    },
+    {
+      "question": "How many days are backups kept for service svc025450?",
+      "answer": "7",
+      "document_id": "doc-025450",
+      "evidence": "Service svc025450 has a backup retention period of 7 days. The service owner is Team Cedar. Its daily backup starts at 10:00 UTC.",
+      "accepted_answers": [
+        "7 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc025450?",
+      "answer": "Team Cedar",
+      "document_id": "doc-025450",
+      "evidence": "Service svc025450 has a backup retention period of 7 days. The service owner is Team Cedar. Its daily backup starts at 10:00 UTC.",
+      "accepted_answers": [
+        "Cedar"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc025450 start its daily backup?",
+      "answer": "10:00 UTC",
+      "document_id": "doc-025450",
+      "evidence": "Service svc025450 has a backup retention period of 7 days. The service owner is Team Cedar. Its daily backup starts at 10:00 UTC.",
+      "accepted_answers": [
+        "10:00"
+      ]
+    },
+    {
+      "question": "How many days are backups kept for service svc010703?",
+      "answer": "10",
+      "document_id": "doc-010703",
+      "evidence": "Service svc010703 has a backup retention period of 10 days. The service owner is Team Delta. Its daily backup starts at 23:00 UTC.",
+      "accepted_answers": [
+        "10 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc010703?",
+      "answer": "Team Delta",
+      "document_id": "doc-010703",
+      "evidence": "Service svc010703 has a backup retention period of 10 days. The service owner is Team Delta. Its daily backup starts at 23:00 UTC.",
+      "accepted_answers": [
+        "Delta"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc010703 start its daily backup?",
+      "answer": "23:00 UTC",
+      "document_id": "doc-010703",
+      "evidence": "Service svc010703 has a backup retention period of 10 days. The service owner is Team Delta. Its daily backup starts at 23:00 UTC.",
+      "accepted_answers": [
+        "23:00"
+      ]
+    },
+    {
+      "question": "How many days are backups kept for service svc050651?",
+      "answer": "8",
+      "document_id": "doc-050651",
+      "evidence": "Service svc050651 has a backup retention period of 8 days. The service owner is Team Delta. Its daily backup starts at 11:00 UTC.",
+      "accepted_answers": [
+        "8 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc050651?",
+      "answer": "Team Delta",
+      "document_id": "doc-050651",
+      "evidence": "Service svc050651 has a backup retention period of 8 days. The service owner is Team Delta. Its daily backup starts at 11:00 UTC.",
+      "accepted_answers": [
+        "Delta"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc050651 start its daily backup?",
+      "answer": "11:00 UTC",
+      "document_id": "doc-050651",
+      "evidence": "Service svc050651 has a backup retention period of 8 days. The service owner is Team Delta. Its daily backup starts at 11:00 UTC.",
+      "accepted_answers": [
+        "11:00"
+      ]
+    },
+    {
+      "question": "How many days are backups kept for service svc096939?",
+      "answer": "21",
+      "document_id": "doc-096939",
+      "evidence": "Service svc096939 has a backup retention period of 21 days. The service owner is Team Delta. Its daily backup starts at 03:00 UTC.",
+      "accepted_answers": [
+        "21 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc096939?",
+      "answer": "Team Delta",
+      "document_id": "doc-096939",
+      "evidence": "Service svc096939 has a backup retention period of 21 days. The service owner is Team Delta. Its daily backup starts at 03:00 UTC.",
+      "accepted_answers": [
+        "Delta"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc096939 start its daily backup?",
+      "answer": "03:00 UTC",
+      "document_id": "doc-096939",
+      "evidence": "Service svc096939 has a backup retention period of 21 days. The service owner is Team Delta. Its daily backup starts at 03:00 UTC.",
+      "accepted_answers": [
+        "03:00"
+      ]
+    },
+    {
+      "question": "How many days are backups kept for service svc077596?",
+      "answer": "28",
+      "document_id": "doc-077596",
+      "evidence": "Service svc077596 has a backup retention period of 28 days. The service owner is Team Amber. Its daily backup starts at 04:00 UTC.",
+      "accepted_answers": [
+        "28 days"
+      ]
+    },
+    {
+      "question": "Who owns service svc077596?",
+      "answer": "Team Amber",
+      "document_id": "doc-077596",
+      "evidence": "Service svc077596 has a backup retention period of 28 days. The service owner is Team Amber. Its daily backup starts at 04:00 UTC.",
+      "accepted_answers": [
+        "Amber"
+      ]
+    },
+    {
+      "question": "At what UTC time does service svc077596 start its daily backup?",
+      "answer": "04:00 UTC",
+      "document_id": "doc-077596",
+      "evidence": "Service svc077596 has a backup retention period of 28 days. The service owner is Team Amber. Its daily backup starts at 04:00 UTC.",
+      "accepted_answers": [
+        "04:00"
+      ]
+    }
+  ],
+  "retrieval": {
+    "evidence_recall": 1.0,
+    "questions": 24,
+    "retrieval_latency_ms": [
+      33.06637500645593,
+      28.84699997957796,
+      49.301000020932406,
+      33.315790991764516,
+      28.059792006388307,
+      48.75395802082494,
+      33.472875016741455,
+      28.00316602224484,
+      49.193124985322356,
+      33.60404196428135,
+      28.545084001962095,
+      49.46004203520715,
+      33.592874999158084,
+      28.841833001933992,
+      50.272124994080514,
+      33.930915989913046,
+      29.24862498184666,
+      50.64808297902346,
+      34.630667010787874,
+      28.767542040441185,
+      50.577167014125735,
+      34.95150001253933,
+      29.172791983000934,
+      54.34641696047038
+    ],
+    "top_k": 1
+  },
+  "task_hash": "2204c1a7f30e2258c484b879b48f876100852e9bf5844aad7dffcf5b27fe75f1",
+  "note": "New documents and questions, frozen before loading either model. Not used for optimization."
+}

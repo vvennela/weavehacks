@@ -1,0 +1,410 @@
+[
+  {
+    "attempt": 1,
+    "job_id": "7df52226c9db42e0bbf693e62e8ff8a4",
+    "status": "needs-input",
+    "note": "Astra placed examples in questions. Corrected the schema descriptions and prompt."
+  },
+  {
+    "attempt": 2,
+    "job_id": "edbae4d179bf404cb1cc0b00f8fbe349",
+    "selected_recipe_id": "mlx-int4",
+    "elapsed_seconds": 174.05119341699174,
+    "stop_reason": null,
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1501184988,
+        "quality": 1.0,
+        "p95_latency_ms": 530.6528749642894,
+        "output_tokens_per_second": 44.66768846071317
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 581403612,
+            "quality": 1.0,
+            "p95_latency_ms": 458.9521670131944,
+            "output_tokens_per_second": 51.222078795339705
+          },
+          "confirmation": {
+            "peak_bytes": 581403612,
+            "quality": 1.0,
+            "p95_latency_ms": 472.9713749838993,
+            "output_tokens_per_second": 51.12693150789659
+          },
+          "baseline_control": {
+            "peak_bytes": 1501184988,
+            "quality": 1.0,
+            "p95_latency_ms": 583.174749976024,
+            "output_tokens_per_second": 42.155633003664555
+          },
+          "accepted": true
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 879002576,
+            "quality": 1.0,
+            "p95_latency_ms": 488.3130000089295,
+            "output_tokens_per_second": 49.34944730823855
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f073-b38f-77ad-a221-60bf761195e3",
+    "note": "Generated 8-question tests missed quality regressions. The subsequent 13-question test scored int4 10/13; 61% memory savings are not a quality-qualified release result."
+  },
+  {
+    "attempt": 3,
+    "job_id": "eeb99e8eef364f669eb4b5cc3a913107",
+    "status": "baseline-failed",
+    "note": "Correct answer 18 was rejected against gold 18 days. Added explicit frozen accepted-answer alternatives; no post-hoc normalization."
+  },
+  {
+    "attempt": 4,
+    "job_id": "a27a7a44a493460fa9739c650ee7c8bb",
+    "selected_recipe_id": "baseline",
+    "elapsed_seconds": 293.2815887928009,
+    "stop_reason": "budget-exhausted",
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1503364072,
+        "quality": 1.0,
+        "p95_latency_ms": 580.8132499805652,
+        "output_tokens_per_second": 41.42937244084267
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 582124520,
+            "quality": 0.9375,
+            "p95_latency_ms": 467.8489590296522,
+            "output_tokens_per_second": 48.73332070585739
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "budget-exhausted",
+          "measurement": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f084-3393-7e5c-bcf3-b1de23b1c9da",
+    "note": "Disjoint generated tests rejected int4. Returned baseline after budget exhaustion; old synced runtime also incurred fingerprint delay."
+  },
+  {
+    "attempt": 5,
+    "job_id": "98c796884c524f159e1a3c13dcf34e7c",
+    "selected_recipe_id": "mlx-int4",
+    "elapsed_seconds": 294.38546085357666,
+    "stop_reason": "budget-exhausted",
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1503364076,
+        "quality": 1.0,
+        "p95_latency_ms": 562.9433750291355,
+        "output_tokens_per_second": 41.84570630247979
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 588039148,
+            "quality": 1.0,
+            "p95_latency_ms": 469.18266598368064,
+            "output_tokens_per_second": 49.80502626676178
+          },
+          "confirmation": {
+            "peak_bytes": 588039148,
+            "quality": 1.0,
+            "p95_latency_ms": 464.70004197908565,
+            "output_tokens_per_second": 50.14066914823223
+          },
+          "baseline_control": {
+            "peak_bytes": 1509278700,
+            "quality": 1.0,
+            "p95_latency_ms": 548.7163329962641,
+            "output_tokens_per_second": 41.818388522931805
+          },
+          "accepted": true
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "budget-exhausted",
+          "measurement": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f088-352c-7303-81c0-b3aaab04cc74",
+    "note": "A different generated 16-question set accepted int4, but a known owner question still returned null. Generated tests alone are insufficient."
+  },
+  {
+    "attempt": 6,
+    "job_id": "819cdbcf127b4be18a0b60fbd66b2527",
+    "selected_recipe_id": "baseline",
+    "elapsed_seconds": 260.7199749946594,
+    "stop_reason": null,
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1503364068,
+        "quality": 1.0,
+        "p95_latency_ms": 542.6364169688895,
+        "output_tokens_per_second": 44.266146605702495
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 582124516,
+            "quality": 0.7692307692307693,
+            "p95_latency_ms": 470.0020829914138,
+            "output_tokens_per_second": 46.5369123865967
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 879723800,
+            "quality": 1.0,
+            "p95_latency_ms": 495.38041703635827,
+            "output_tokens_per_second": 48.564994090315366
+          },
+          "confirmation": {
+            "peak_bytes": 879723800,
+            "quality": 1.0,
+            "p95_latency_ms": 501.1614160030149,
+            "output_tokens_per_second": 49.32932923435043
+          },
+          "baseline_control": {
+            "peak_bytes": 1503364068,
+            "quality": 1.0,
+            "p95_latency_ms": 600.3676250111312,
+            "output_tokens_per_second": 41.77536418410366
+          },
+          "accepted": false
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f08d-9dc0-79ab-9c23-d2854bec9704",
+    "note": "Frozen 13-question supplied regression rejected int4 and int8 passed repeated software gates. Astra requested revision because the review payload omitted explicit repeated evidence; returned baseline."
+  },
+  {
+    "attempt": 7,
+    "job_id": "8898dcaa581f4ca0bc16ea16118c4f9b",
+    "selected_recipe_id": "baseline",
+    "elapsed_seconds": 293.9787130355835,
+    "stop_reason": "budget-exhausted",
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1503364068,
+        "quality": 1.0,
+        "p95_latency_ms": 655.4943750379607,
+        "output_tokens_per_second": 40.50711248779139
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 582124516,
+            "quality": 0.7692307692307693,
+            "p95_latency_ms": 494.399625051301,
+            "output_tokens_per_second": 45.04673931140859
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "budget-exhausted",
+          "measurement": {
+            "peak_bytes": 879723800,
+            "quality": 1.0,
+            "p95_latency_ms": 568.5677499859594,
+            "output_tokens_per_second": 44.86761536370266
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f094-101e-7b41-a429-7792bb561bb2",
+    "note": "Final code with corrected review evidence. Slow planning consumed confirmation budget; safely returned baseline."
+  },
+  {
+    "attempt": 8,
+    "job_id": "603db156a5414ccdbd9ad75023bbf4cb",
+    "selected_recipe_id": "mlx-int8",
+    "elapsed_seconds": 288.145290851593,
+    "stop_reason": null,
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1487832012,
+        "quality": 1.0,
+        "p95_latency_ms": 555.7687500258908,
+        "output_tokens_per_second": 42.905213885958
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 582124516,
+            "quality": 0.7692307692307693,
+            "p95_latency_ms": 513.7128749629483,
+            "output_tokens_per_second": 46.14930703536089
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 879723800,
+            "quality": 1.0,
+            "p95_latency_ms": 483.8638750370592,
+            "output_tokens_per_second": 49.517211413636666
+          },
+          "confirmation": {
+            "peak_bytes": 879723800,
+            "quality": 1.0,
+            "p95_latency_ms": 481.3887500204146,
+            "output_tokens_per_second": 49.33516503804063
+          },
+          "baseline_control": {
+            "peak_bytes": 1501184996,
+            "quality": 1.0,
+            "p95_latency_ms": 580.6059580063447,
+            "output_tokens_per_second": 43.4011671939786
+          },
+          "accepted": true
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    },
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f09e-c667-76fb-8996-cdffa61f61a2",
+    "note": "Final code. Supplied acceptance tests rejected int4; repeated int8 passed and Astra adopted it within 300 seconds."
+  }
+]

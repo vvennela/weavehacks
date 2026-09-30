@@ -1,0 +1,132 @@
+{
+  "schema_version": "sera-managed-rag-release-v1",
+  "tagline": "Sera \u2014 the autonomous auto-research harness for inference",
+  "code_commit": "67e8d411a1156eecdc97753f77d88ff5e59136a2",
+  "status": "tested-local-release-candidate",
+  "entry_point": "sera.Optimize(description, documents=collection_name, api_key=sera_access_key)",
+  "customer_result": "An extractive question-answering pipeline and a validated lower-memory generator checkpoint.",
+  "operator_setup": "Register document collections, permitted pinned model profiles, acceptance tests, access keys and the operator W&B project. The Sera worker and caller run on the same host.",
+  "workload": {
+    "documents": 100000,
+    "kind": "synthetic short service records",
+    "source_format": "JSONL",
+    "retrieval": "SQLite FTS5 BM25",
+    "chunk_words": 128,
+    "top_k": 1,
+    "corpus_hash": "a83b749dccfae10a59b028f3c95b86139338337f07b2ae81b1b6c259b0815015",
+    "acceptance_questions": 13,
+    "acceptance_source": "Operator-supplied synthetic regression tests. These were earlier failed independent tests and are no longer held out.",
+    "new_holdout_questions": 24,
+    "holdout_document_ids_disjoint_from_acceptance": true,
+    "repetitions_per_question": 3,
+    "concurrent_requests": 1
+  },
+  "hardware": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "backends": [
+      "mlx"
+    ],
+    "mlx": {
+      "backend": "mlx",
+      "device": {
+        "device_name": "Apple M4 Pro",
+        "max_recommended_working_set_size": 19069665280,
+        "memory_size": 25769803776,
+        "architecture": "applegpu_g16s",
+        "max_buffer_length": 14302248960,
+        "resource_limit": 499000
+      },
+      "versions": {
+        "mlx": "0.32.3",
+        "mlx-lm": "0.31.3",
+        "transformers": "5.17.0"
+      },
+      "weight_bits": [
+        16,
+        8,
+        4,
+        3,
+        2
+      ],
+      "mixed_precision": true,
+      "memory_metric": "mlx-active-allocator-bytes",
+      "checkpoint_format": "mlx-safetensors",
+      "concurrent_requests": false
+    }
+  },
+  "model": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "baseline": "bf16",
+    "selected": "mlx-int8",
+    "group_size": 64
+  },
+  "result": {
+    "job_id": "603db156a5414ccdbd9ad75023bbf4cb",
+    "job_elapsed_seconds": 288.145290851593,
+    "native_research_seconds": 238.17940345796524,
+    "hard_job_limit_seconds": 300,
+    "wall_seconds_including_verify_reload_and_two_new_answers": 291.85776691604406,
+    "candidate_trials": 2,
+    "board_model_calls_completed": 32,
+    "board": "Astra assigns 15 roles; 15 Luna specialists propose and rank recipes; Astra reviews repeated results. All 32 board calls use Codex ChatGPT login.",
+    "intake_model_calls": 1,
+    "selected_artifact_id": "57c2068daa7bf8566d5bb000519d495bc27745289e7ee0ecd391bed67100e1a8",
+    "baseline_peak_bytes": [
+      1487832012,
+      1501184996
+    ],
+    "candidate_peak_bytes": [
+      879723800,
+      879723800
+    ],
+    "memory_reduction_fractions": [
+      0.4087210162809698,
+      0.41398042057169615
+    ],
+    "conservative_memory_saved_gib": 0.5663449056446552,
+    "memory_metric_scope": "MLX allocator; not system-wide unified memory or free VRAM",
+    "acceptance_quality": {
+      "baseline": 1.0,
+      "baseline_control": 1.0,
+      "int4_rejected": 0.7692307692307693,
+      "int8": 1.0,
+      "int8_repeat": 1.0
+    },
+    "holdout_quality": {
+      "baseline": {
+        "score": 1.0,
+        "requests": 72,
+        "passed": true
+      },
+      "selected": {
+        "score": 1.0,
+        "requests": 72,
+        "passed": true
+      }
+    },
+    "baseline_p95_latency_ms": [
+      555.7687500258908,
+      580.6059580063447
+    ],
+    "candidate_p95_latency_ms": [
+      483.8638750370592,
+      481.3887500204146
+    ],
+    "latency_scope": "Generator-only latency on frozen retrieved contexts; two measurement blocks, not a statistical speedup claim.",
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f09e-c667-76fb-8996-cdffa61f61a2",
+    "holdout_trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0a2-a70f-7e1c-9385-0fea3c6da9b8"
+  },
+  "limits": [
+    "The 100,000 documents are short synthetic records, not customer documents or enterprise RAG certification.",
+    "Generator quantization is optimized on frozen retrieved contexts. Retrieval settings are selected at intake, not jointly searched.",
+    "Generated questions missed real regressions in earlier attempts; supplied acceptance tests remain necessary for customer quality requirements.",
+    "A previous run of the final code exhausted the five-minute confirmation budget and returned baseline. Savings are not guaranteed within every five-minute run.",
+    "Memory measures the MLX allocator, not system-wide unified memory or free NVIDIA VRAM.",
+    "Extractive citation checks establish phrase support, not full semantic correctness.",
+    "The new prompt-to-RAG flow has been run on MLX. Existing CUDA optimization has separate evidence; this RAG flow has no live CUDA or ROCm validation.",
+    "The client uses a loopback service and server-local model/index paths. This release is not a remote multi-tenant SaaS.",
+    "No fixed-search superiority, global optimality or world-first claim is established."
+  ]
+}

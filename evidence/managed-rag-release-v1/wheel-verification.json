@@ -1,0 +1,14 @@
+{
+  "code_commit": "67e8d411a1156eecdc97753f77d88ff5e59136a2",
+  "wheel_sha256": "08dc38c7a4c70412b4cb6ca9c3e0898998001ab2d8fbd3cd45aeca8e96f843ac",
+  "source_modules_matching_checkout": 76,
+  "operator_keys_absent": true,
+  "measured_wheel": {
+    "code_commit": "72d09b5b90164dad0ab845a8d4bb48e4f6a1bef2",
+    "wheel_sha256": "c3578c2ae434a1582304eeb380ef6ba039474e1cc2215ee30ef7b123f9702e60",
+    "source_modules_matching_checkout": 76,
+    "operator_keys_absent": true
+  },
+  "all_sera_source_modules_identical_to_measured_wheel": true,
+  "wheel_metadata_difference": "Updated product tagline only; same version and package source."
+}
