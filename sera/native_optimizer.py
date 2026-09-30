@@ -342,13 +342,23 @@ class _Research:
         self.selection_validated = True
         self.save()
 
-    def review(self, name, candidate, decision):
+    def review(self, name, candidate, decision, *, measurements):
         review = getattr(self.agent, 'review', None)
         if review is None:
             return {'decision': 'adopt', 'reason': 'Injected advisor has no review method.'}
+        def summary(measurement):
+            quality = measurement.get('task_quality', {})
+            return {'trial_id': measurement['trial_id'], 'recipe_id': measurement.get('recipe_id'),
+                    'artifact_id': measurement.get('native_measurement', {}).get('artifact_id'),
+                    'quality': {key: quality.get(key) for key in ('mean', 'floor', 'passed')},
+                    'memory': measurement.get('runtime', {}).get('memory'),
+                    'performance': measurement.get('reduced')}
         try:
             response = review({
                 'recipe_id': name, 'software_gates_passed': True,
+                'model': self.profile.source.model_dump(),
+                'workload': {'tasks': len(self.profile.tasks), 'repetitions': self.profile.repetitions},
+                'measurements': {role: summary(value) for role, value in measurements.items()},
                 'quality': candidate['task_quality'],
                 'memory_mib': objective_value(candidate, 'memory'),
                 'throughput': objective_value(candidate, 'throughput'),
@@ -415,7 +425,9 @@ class _Research:
                 self.report.setdefault('recovery_confirmations', []).append([first, second])
                 if all(self.decision(baseline, item)['selected'] == 'candidate' for item in (first, second)):
                     worst = max([first, second], key=lambda t: objective_value(t, 'memory'))
-                    review = self.review(name, worst, self.decision(baseline, worst))
+                    review = self.review(name, worst, self.decision(baseline, worst), measurements={
+                        'initial_baseline': self.report['initial_baseline'], 'fresh_baseline': baseline,
+                        'initial_candidate': first, 'repeated_candidate': second})
                     self.report.setdefault('recovery_reviews', []).append(review)
                     if review['decision'] == 'adopt':
                         best = worst
@@ -470,7 +482,9 @@ class _Research:
                     if (trial['repeated_decision']['selected'] == 'candidate'
                             and self.decision(best, worst_candidate)['selected'] == 'candidate'):
                         trial['advisor_review'] = self.review(name, worst_candidate,
-                                                               trial['repeated_decision'])
+                                                               trial['repeated_decision'], measurements={
+                            'initial_baseline': self.report['initial_baseline'], 'fresh_baseline': control,
+                            'initial_candidate': measured, 'repeated_candidate': confirmation})
                         if trial['advisor_review']['decision'] != 'adopt':
                             continue
                         best = worst_candidate

@@ -597,3 +597,22 @@ def test_board_receives_model_hardware_and_remaining_measurement_budget(tmp_path
                                     project='fixture/project', agent=InformedAgent())
     assert result['selected_recipe_id'] == 'q8'
     assert all(job['wall_seconds'] >= 0 for job in result['jobs'])
+
+
+def test_final_review_receives_fresh_control_and_both_candidate_measurements(tmp_path, runtime):
+    class Reviewer(Agent):
+        def review(self, result, **kwargs):
+            evidence = result.get('measurements', {})
+            if set(evidence) != {'initial_baseline', 'fresh_baseline', 'initial_candidate', 'repeated_candidate'}:
+                return {'decision': 'revise', 'reason': 'Missing confirmation evidence'}
+            assert evidence['fresh_baseline']['trial_id'] == 'q8-control'
+            assert evidence['initial_candidate']['trial_id'] == 'q8'
+            assert evidence['repeated_candidate']['trial_id'] == 'q8-confirmation'
+            assert evidence['fresh_baseline']['memory']['peak_bytes'] == 100
+            assert evidence['repeated_candidate']['memory']['peak_bytes'] == 60
+            assert evidence['repeated_candidate']['quality']['mean'] == 1.0
+            assert 'expected_json' not in json.dumps(evidence)
+            return {'decision': 'adopt', 'reason': 'Measurements confirm the gates'}
+    result = native.optimize_native(profile=profile(), output_dir=tmp_path / 'review-evidence',
+                                    project='fixture/project', agent=Reviewer())
+    assert result['selected_recipe_id'] == 'q8'
