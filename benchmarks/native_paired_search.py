@@ -70,11 +70,18 @@ def run(args):
     root.mkdir(parents=True, exist_ok=False)
     profile = NativeProfile.model_validate_json(Path(args.profile).read_text())
     heldout = NativeProfile.model_validate_json(Path(args.heldout).read_text())
-    profile = NativeProfile.model_validate(profile.model_dump() | {'recipes': CATALOG})
+    catalog = json.loads(Path(args.catalog).read_text()) if args.catalog else CATALOG
+    fixed = args.fixed or FIXED
+    profile = NativeProfile.model_validate(profile.model_dump() | {'recipes': catalog})
+    if len(fixed) != 2 or len(set(fixed)) != 2 or any(name not in catalog for name in fixed):
+        raise ValueError('Fixed search requires two distinct listed recipes')
+    prior = json.loads(Path(args.prior_evidence).read_text()) if args.prior_evidence else (
+        'Previous 4-bit group128 passed 20 extraction tasks and heldout; measured 2.43GB vs BF16 8.17GB. No 2/3-bit measurements exist.')
     artifacts = json.loads(Path(args.artifacts).read_text())
-    artifacts = {name: {k: item[k] for k in ('path', 'artifact_id')} for name, item in artifacts.items()}
+    artifacts = {name: {k: item[k] for k in ('path', 'artifact_id')} for name, item in artifacts.items()
+                 if name == 'baseline' or name in catalog}
     registration = {'profile': profile.model_dump(), 'heldout': heldout.model_dump(),
-        'catalog': CATALOG, 'fixed_order': FIXED, 'candidate_trials_per_policy': 2,
+        'catalog': catalog, 'fixed_order': fixed, 'candidate_trials_per_policy': 2,
         'blocks': 3, 'policy_order': [['fixed', 'sera'], ['sera', 'fixed'], ['fixed', 'sera']],
         'power': power_state(), 'deadline_unix': args.deadline, 'start_unix': time.time(),
         'workload_description': WORKLOAD,
@@ -82,7 +89,7 @@ def run(args):
         'claim_rule': 'All 3 blocks and independent heldout pass 95% quality/speed gates; Sera uses >5% less peak memory in every block.',
         'time_rule': 'Report full board + own candidate + own confirmation seconds; all catalog exports are shared setup, reported separately. Shared BF16 controls excluded symmetrically.',
         'heldout_rule': 'Validate each unique selected artifact after all choices freeze; no heldout feedback to search.',
-        'prior': 'Previous 4-bit group128 passed 20 extraction tasks and heldout; measured 2.43GB vs BF16 8.17GB. No 2/3-bit measurements exist.'}
+        'prior': prior}
     registration['hash'] = content_hash(registration)
     save_json(root / 'registration.json', registration)
     rows, blocks, boards, traces = [], [], [], []
@@ -121,10 +128,10 @@ def run(args):
                 manifest = verify_artifact(artifact['path'], expected_id=artifact['artifact_id'], backend='mlx')
                 if manifest['source'] != profile.source.model_dump():
                     raise ValueError('Shared artifact source differs from frozen model')
-                expected = MLXRecipe() if name == 'baseline' else MLXRecipe(**CATALOG[name])
+                expected = MLXRecipe() if name == 'baseline' else MLXRecipe(**catalog[name])
                 if manifest['recipe'] != expected.model_dump():
                     raise ValueError('Shared artifact recipe mismatch')
-            for name, recipe in CATALOG.items():
+            for name, recipe in catalog.items():
                 if name in artifacts:
                     continue
                 destination = root / 'artifacts' / name
@@ -140,15 +147,16 @@ def run(args):
                 if power_state() != registration['power']:
                     raise RuntimeError('Power mode changed')
                 evidence = {'workload': WORKLOAD, 'prior': registration['prior'],
-                    'available_recipes': [{'recipe_id': key, 'recipe': value} for key, value in CATALOG.items()],
+                    'available_recipes': [{'recipe_id': key, 'recipe': value} for key, value in catalog.items()],
                     'candidate_budget': 2, 'quality_retention': .95, 'throughput_retention': .95,
+                    'pattern_definitions': {'all-v-down': 'All value and down projections plus embedding/head use protected bits; other modules use base bits.', 'all-except-mlp-expansion': 'Only MLP gate_proj and up_proj use base bits; all other quantizable modules use protected bits.', 'default': 'Sparse boundary/every-third v/down plus embedding/head protection.'},
                     'selection': 'Jointly rank all recipes, top two will be measured with identical software gates.'}
                 board = NativeBoard(root / f'board-{block}')
                 boards.append(board)
                 plan, board_seconds = traced(f'board-{block}', lambda b=board, e=evidence: {
                     'selected': b.plan(e, timeout_seconds=min(180, remaining())),
                     'history': b.history})
-                plans = {'fixed': FIXED, 'sera': plan['selected']}
+                plans = {'fixed': fixed, 'sera': plan['selected']}
                 print(json.dumps({'event': 'plan', 'block': block, 'plans': plans, 'board_seconds': board_seconds}), flush=True)
                 before, _ = measure(f'block-{block}-control-before', 'baseline')
                 data = {'block': block, 'plans': plans, 'controls': [before], 'policies': {}}
@@ -221,6 +229,9 @@ def main():
     parser.add_argument('--profile', default='benchmarks/profiles/qwen3-4b-search.json')
     parser.add_argument('--heldout', default='benchmarks/profiles/qwen3-4b-heldout.json')
     parser.add_argument('--artifacts', default='.local/sera-customer-pilot/retained-candidates/index.json')
+    parser.add_argument('--catalog')
+    parser.add_argument('--fixed', nargs=2)
+    parser.add_argument('--prior-evidence')
     parser.add_argument('--output', required=True)
     parser.add_argument('--project', default='vvennela-n-a/wandb_agent_default_project')
     parser.add_argument('--deadline', type=float, required=True)
