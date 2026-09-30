@@ -1,0 +1,19 @@
+{
+  "source_suite": {
+    "passed": 2037,
+    "skipped": 1,
+    "skip_reason": "Optional marimo notebook dependency is not installed"
+  },
+  "installed_wheel_suite": {
+    "passed": 85
+  },
+  "weave_transport_suite": {
+    "passed": 7
+  },
+  "lock_check": "passed",
+  "scoped_lint": "passed",
+  "live_model_execution": "passed",
+  "service_restart_and_same_request_recovery": "passed",
+  "owned_process_tree_released": true,
+  "profile_hash": "e65e118db5642b11dc896cf195751db1edd2d8aba9f41bb1146a32582a848563"
+}

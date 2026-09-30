@@ -1,0 +1,74 @@
+{
+  "result": {
+    "job_id": "414a1b05f9b747d2acac89e6ae7275d3",
+    "selected_recipe_id": "mlx-int8",
+    "artifact_id": "57c2068daa7bf8566d5bb000519d495bc27745289e7ee0ecd391bed67100e1a8",
+    "artifact_path": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-release-tonight/live-service/414a1b05f9b747d2acac89e6ae7275d3/research/artifacts/mlx-int8-0004",
+    "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f00b-8826-7733-8ec7-34e910c1a554",
+    "elapsed_seconds": 166.59390220901696,
+    "backend": "mlx",
+    "runtime": null,
+    "stop_reason": null,
+    "measurements": {
+      "baseline": {
+        "peak_bytes": 1390969552,
+        "quality": 1.0,
+        "p95_latency_ms": 437.80554202385247,
+        "output_tokens_per_second": 17.8571960035283
+      },
+      "trials": [
+        {
+          "recipe_id": "mlx-int4",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 559678244,
+            "quality": 0.875,
+            "p95_latency_ms": 373.00120800500736,
+            "output_tokens_per_second": 20.433942145344623
+          },
+          "confirmation": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "baseline_control": {
+            "peak_bytes": null,
+            "quality": null,
+            "p95_latency_ms": null,
+            "output_tokens_per_second": null
+          },
+          "accepted": false
+        },
+        {
+          "recipe_id": "mlx-int8",
+          "status": "measured",
+          "measurement": {
+            "peak_bytes": 858981084,
+            "quality": 1.0,
+            "p95_latency_ms": 409.1528330463916,
+            "output_tokens_per_second": 18.94822144166149
+          },
+          "confirmation": {
+            "peak_bytes": 858948316,
+            "quality": 1.0,
+            "p95_latency_ms": 392.82470900798216,
+            "output_tokens_per_second": 19.308315538648635
+          },
+          "baseline_control": {
+            "peak_bytes": 1400472296,
+            "quality": 1.0,
+            "p95_latency_ms": 435.2733749547042,
+            "output_tokens_per_second": 18.009464367909917
+          },
+          "accepted": true
+        }
+      ],
+      "scope": "MLX allocator; not system-wide unified memory or free VRAM"
+    }
+  },
+  "independent_output": "{\"answer\": 15}",
+  "installed_package": "/Users/vishnuv/Documents/Documents/weavehacks/.local/sera-release-tonight/runtime-env/lib/python3.12/site-packages/sera/__init__.py",
+  "wall_seconds": 3.3117322079488076,
+  "artifact_verified": true
+}
