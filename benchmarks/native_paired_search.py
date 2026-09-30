@@ -2,6 +2,7 @@
 import argparse
 import fcntl
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -43,6 +44,8 @@ def same_contract_passes(baseline, candidate, profile):
 
 
 def choose_confirmed(controls, trials, profile, *, gate=same_contract_passes, metric=objective_value):
+    if len(controls) != 2:
+        return None
     valid = {name: max(metric(item, 'memory') for item in measurements)
              for name, measurements in trials.items() if len(measurements) >= 2
              and all(gate(control, item, profile) for control in controls for item in measurements)}
@@ -51,7 +54,9 @@ def choose_confirmed(controls, trials, profile, *, gate=same_contract_passes, me
 
 def comparison_summary(rows):
     complete = (len(rows) == 3 and {r['block'] for r in rows} == {0, 1, 2}
-                and all(r.get('qualified') for r in rows))
+                and all(r.get('qualified') and all(type(r.get(key)) in (int, float)
+                    and math.isfinite(r[key]) and r[key] > 0
+                    for key in ('sera_peak_mib', 'fixed_peak_mib')) for r in rows))
     return {'complete': complete, 'sera_beats_fixed':
             all(r['sera_peak_mib'] < .95 * r['fixed_peak_mib'] for r in rows) if complete else None}
 

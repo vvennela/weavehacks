@@ -32,3 +32,14 @@ def test_pair_rejects_changed_input_and_runtime(monkeypatch):
     assert not module.same_contract_passes(baseline, baseline | {'input_token_ids': [[2]]}, None)
     changed = baseline | {'runtime': {'device': {'name': 'b'}, 'versions': {'mlx': '1'}}}
     assert not module.same_contract_passes(baseline, changed, None)
+
+
+def test_missing_controls_cannot_confirm_a_candidate():
+    trials = {'candidate': [{'memory': 10}, {'memory': 10}]}
+    assert choose_confirmed([], trials, None, gate=lambda *args: True,
+                            metric=lambda item, _: item['memory']) is None
+
+
+def test_invalid_memory_cannot_establish_a_win():
+    rows = [{'block': i, 'qualified': True, 'sera_peak_mib': -1, 'fixed_peak_mib': 20} for i in range(3)]
+    assert comparison_summary(rows)['sera_beats_fixed'] is None
