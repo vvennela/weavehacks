@@ -12,7 +12,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ..hardware import ModelDescriptor
 from ..model_artifact import seal_artifact, verify_artifact
@@ -28,8 +28,33 @@ def _json_processor(model, tokenizer, response_format):
 
 class MLXRecipe(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid')
-    bits: Literal[4, 8, 16] = 16
+    bits: Literal[2, 3, 4, 8, 16] = 16
     group_size: Literal[32, 64, 128] = 64
+    protected_bits: Literal[3, 4, 6, 8] | None = Field(default=None, exclude_if=lambda v: v is None)
+
+    @model_validator(mode='after')
+    def validate_precision(self):
+        if self.protected_bits is not None and self.protected_bits <= self.bits:
+            raise ValueError('Protected modules require higher precision')
+        return self
+
+
+def mixed_quantization_predicate(recipe, num_layers):
+    """Protect embeddings and selected value/down projections from low precision."""
+    if recipe.protected_bits is None or type(num_layers) is not int or num_layers < 1:
+        raise ValueError('Mixed quantization requires protected bits and a layer count')
+
+    def choose(path, module):
+        parts = path.split('.')
+        index = next((int(part) for part in parts if part.isdigit()), None)
+        sensitive = index is not None and (
+            index < num_layers // 8 or index >= 7 * num_layers // 8
+            or (index - num_layers // 8) % 3 == 2)
+        protected = parts[-1] in {'embed_tokens', 'lm_head'} or (
+            sensitive and parts[-1] in {'v_proj', 'down_proj'})
+        return {'bits': recipe.protected_bits if protected else recipe.bits,
+                'group_size': recipe.group_size, 'mode': 'affine'}
+    return choose
 
 
 def _runtime():
@@ -48,7 +73,8 @@ class MLXBackend:
         mx = _runtime()
         return {'backend': self.name, 'device': mx.device_info(),
                     'versions': {name: version(name) for name in ('mlx', 'mlx-lm', 'transformers')},
-                    'weight_bits': [16, 8, 4], 'memory_metric': 'mlx-active-allocator-bytes',
+                    'weight_bits': [16, 8, 4, 3, 2], 'mixed_precision': True,
+                    'memory_metric': 'mlx-active-allocator-bytes',
                     'checkpoint_format': 'mlx-safetensors', 'concurrent_requests': False}
 
     def prepare(self, *, source, destination, recipe):
@@ -67,10 +93,15 @@ class MLXBackend:
             allow_patterns=['*.json', '*.safetensors', '*.txt', '*.jinja', '*.model'])
         # MLX-LM save reopens repo IDs without their revision. A resolved local
         # snapshot keeps both the weights and copied tokenizer/config files pinned.
+        options = {}
+        if recipe.protected_bits is not None:
+            config = json.loads((Path(snapshot) / 'config.json').read_text())
+            layer_count = config.get('text_config', config).get('num_hidden_layers')
+            options['quant_predicate'] = mixed_quantization_predicate(recipe, layer_count)
         convert(snapshot, mlx_path=str(destination),
                 quantize=recipe.bits != 16, q_bits=recipe.bits if recipe.bits != 16 else None,
                 q_group_size=recipe.group_size, q_mode='affine', dtype='bfloat16',
-                trust_remote_code=False)
+                trust_remote_code=False, **options)
         record = seal_artifact(destination, backend=self.name, source=source.model_dump(),
                                recipe=recipe.model_dump(), versions=capabilities['versions'])
         return {'artifact': record, 'preparation_seconds': time.perf_counter() - started}

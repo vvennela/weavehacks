@@ -7,7 +7,7 @@ import pytest
 from sera.backends.mlx import MLXBackend, MLXRecipe
 
 
-@pytest.mark.parametrize('recipe', [{'bits': 3}, {'bits': True}, {'group_size': 7}, {'unknown': 1}])
+@pytest.mark.parametrize('recipe', [{'bits': 1}, {'bits': True}, {'group_size': 7}, {'unknown': 1}])
 def test_invalid_recipe_is_rejected(recipe):
     with pytest.raises(ValueError):
         MLXRecipe.model_validate(recipe)
@@ -105,3 +105,27 @@ def test_structured_measurement_rejects_unversioned_formats_before_runtime(monke
     with pytest.raises(ValueError, match='version'):
         model.measure(['Question'], max_tokens=64, seed=0, warmup=1, repetitions=3,
                       response_formats=[{}])
+
+
+@pytest.mark.parametrize('bits', [2, 3])
+def test_lower_precision_recipe_is_supported(bits):
+    assert MLXRecipe(bits=bits).bits == bits
+
+
+def test_mixed_recipe_preserves_sensitive_modules_and_serializes_identity():
+    from sera.backends.mlx import mixed_quantization_predicate
+    recipe = MLXRecipe(bits=2, group_size=128, protected_bits=4)
+    choose = mixed_quantization_predicate(recipe, 32)
+    assert choose('model.embed_tokens', object())['bits'] == 4
+    assert choose('lm_head', object())['bits'] == 4
+    assert choose('model.layers.0.mlp.down_proj', object())['bits'] == 4
+    assert choose('model.layers.10.self_attn.q_proj', object())['bits'] == 2
+    assert choose('model.layers.9.mlp.down_proj', object())['bits'] == 4
+    assert choose('model.layers.10.mlp.down_proj', object())['bits'] == 2
+    assert recipe.model_dump()['protected_bits'] == 4
+    assert MLXRecipe(bits=4).model_dump() == {'bits': 4, 'group_size': 64}
+
+
+def test_mixed_recipe_rejects_non_increasing_precision():
+    with pytest.raises(ValueError):
+        MLXRecipe(bits=4, protected_bits=3)
