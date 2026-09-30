@@ -69,6 +69,10 @@ def test_board_resume_keeps_pending_batch_and_request_budget(tmp_path):
     assert board.propose(evidence, timeout_seconds=10).recipe_id == 'a'
     assert len(board.model_calls) == 31
     resumed = NativeBoard(folder, agent_factory=SchemaAgent, max_model_calls=64, resume=True)
+    # The optimizer has not durably charged this choice yet. Repeat it after
+    # restart until the optimizer removes it from its available recipe set.
+    assert resumed.propose(evidence, timeout_seconds=10).recipe_id == 'a'
+    evidence = {'available_recipes': [{'recipe_id': x} for x in ['b', 'c']]}
     assert resumed.propose(evidence, timeout_seconds=10).recipe_id == 'b'
     assert len(resumed.model_calls) == 31
     evidence = {'available_recipes': [{'recipe_id': 'c'}]}

@@ -160,6 +160,12 @@ class NativeBoard:
     def propose(self, evidence, *, timeout_seconds, cancelled=None):
         if cancelled is not None and cancelled.is_set():
             return None
+        available = {item['recipe_id'] for item in evidence['available_recipes']}
+        # The optimizer acknowledges a proposal by durably charging its trial
+        # and removing it from available recipes. Keep unacknowledged choices
+        # across a controller crash between proposal and trial creation.
+        self.pending = [choice for choice in self.pending if choice in available]
+        self._save()
         if not self.pending:
             try:
                 self.plan(evidence, timeout_seconds=timeout_seconds)
@@ -168,10 +174,7 @@ class NativeBoard:
                     self.history[-1].update(status='failed', error_type=type(error).__name__)
                 self._save()
                 return None
-        available = {item['recipe_id'] for item in evidence['available_recipes']}
-        while self.pending:
-            choice = self.pending.pop(0)
-            self._save()
+        for choice in self.pending:
             if choice in available:
                 return NativeProposal(recipe_id=choice, reason='Joint ranking of the 15-specialist board.',
                     prediction='Must pass measured quality and speed gates with lower memory.')
