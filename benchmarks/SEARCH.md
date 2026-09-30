@@ -2,7 +2,7 @@
 
 `benchmarks.search` implements the replay mechanics in spec sections 19–20. It is a benchmark control, not Sera's public optimizer. It performs no GPU trials, network requests, model calls, or file writes. It does not change task cases, prompts, thresholds, or production selection.
 
-The executable collector and current three-investigator replay adapter are now described in [benchmark collection](../docs/benchmark-collection.md). Use `python -m benchmarks.run_search --help`. The older two-control-role adapter below remains available as a bounded subset, not the current full swarm. No real collection has been performed by the new command.
+The executable collector and current three-investigator replay adapter are now described in [benchmark collection](../docs/research/benchmark-collection.md). Use `python -m benchmarks.run_search --help`. The older two-control-role adapter below remains available as a bounded subset, not the current full swarm. No real collection has been performed by the new command.
 
 ## Freeze before collecting outcomes
 

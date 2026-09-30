@@ -12,11 +12,11 @@ Both services in the passing joint run recorded these package versions:
 | transformers | 5.17.0 |
 | flashinfer-python | 0.6.14 |
 
-The sources are the saved [Qwen runtime](../evidence/live-placement-total-v1/trial-001/joint-0/runtime.json)
-and [GLM runtime](../evidence/live-placement-total-v1/trial-001/joint-1/runtime.json).
+The sources are the saved [Qwen runtime](../../evidence/live-placement-total-v1/trial-001/joint-0/runtime.json)
+and [GLM runtime](../../evidence/live-placement-total-v1/trial-001/joint-1/runtime.json).
 They record an RTX PRO 6000 Blackwell Server Edition, compute capability 12.0,
 97,887 MiB physical memory, and driver 595.71.05. The
-[earlier environment record](../evidence/qwen-baseline-cuda-link/environment.json)
+[earlier environment record](../../evidence/qwen-baseline-cuda-link/environment.json)
 records Python 3.13.11, Linux x86_64 under gVisor, and the CUDA 13 wheel versions.
 That earlier record is not a fresh inventory of the final joint process.
 
@@ -33,7 +33,7 @@ rejects. Do not treat `pip install 'sera-inference[gpu]'` alone as a checked
 deployment recipe. `SeraModel.start()` requires vLLM 0.26.0 before GPU access;
 other package versions are recorded but are not all enforced by that guard.
 
-The release checkout provides [optional package constraints](../constraints/gpu-sm120-tested.txt)
+The release checkout provides [optional package constraints](../../constraints/gpu-sm120-tested.txt)
 for a separate, deliberate environment build. Use them as a package manager's
 `-c` input when preparing that environment. Constraints restrict selected
 versions; they do not install packages. This file is not embedded in the wheel,

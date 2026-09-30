@@ -8,7 +8,7 @@ Jena reports up to 925 GiB/s for four-Z-register consecutive LD1W and 376 GiB/s 
 
 ## What the exact best source already does
 
-The inspected source is [`evidence/cpu-best-kernel-repeatability-2026-09-25/search/trial-001/source/kernel.c`](../evidence/cpu-best-kernel-repeatability-2026-09-25/search/trial-001/source/kernel.c), hash `eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf`. At `gemm` (lines 769–780), n=512 calls `sera_libxsmm_panel32`; the nearby full-512 NN body is not the active 512 path. Other sizes use the unchanged fallback.
+The inspected source is [`evidence/cpu-best-kernel-repeatability-2026-09-25/search/trial-001/source/kernel.c`](../../evidence/cpu-best-kernel-repeatability-2026-09-25/search/trial-001/source/kernel.c), hash `eb091b1eca431f0760d0d61e4c0c6e748c1a9e34466a87ac15ad9cb238b5aecf`. At `gemm` (lines 769–780), n=512 calls `sera_libxsmm_panel32`; the nearby full-512 NN body is not the active 512 path. Other sizes use the unchanged fallback.
 
 The active panel routine has one `SMSTART` at line 848 and one `SMSTOP` at line 1214 around the entire 16-band call. It allocates one 64 KiB scratch panel (lines 849–856), packs each 32-row A band into K-major form, and reuses that band across the 16 output-column panels (outer loops at 857 and 1041). Reducing transitions or merely moving to one SME region is already done.
 

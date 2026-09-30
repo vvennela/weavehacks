@@ -11,7 +11,7 @@ do not replace that GPU runtime.
 
 ## Keys and model identity
 
-For the blank, step-by-step demo, open [Example run.ipynb](../notebooks/Example%20run.ipynb)
+For the blank, step-by-step demo, open [Example run.ipynb](../../notebooks/Example%20run.ipynb)
 from the repository checkout. It has no saved keys or outputs. Use its hidden
 runtime prompts, then check each service before GPU work.
 

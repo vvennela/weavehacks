@@ -2,7 +2,7 @@
 
 ## Latest recorded package check
 
-The [final combined package audit](../evidence/final-package-release-v3/README.md)
+The [final combined package audit](../../evidence/final-package-release-v3/README.md)
 checks source `6130d9e60a91e558c9dff6130ed608066dbe818f`:
 
 - Package: `sera-inference` 0.2.0.
@@ -15,9 +15,9 @@ checks source `6130d9e60a91e558c9dff6130ed608066dbe818f`:
   and explicit total-device accounting checks. Service execution is stubbed.
 - The installed swarm API smoke and provider-check help pass outside the checkout.
 - The recorded focused source suite passes 147 tests. Exact commands and outputs
-  are saved in [result.json](../evidence/final-package-release-v3/result.json).
+  are saved in [result.json](../../evidence/final-package-release-v3/result.json).
 
-The [task-verified joint run](../evidence/live-placement-total-v1/README.md) used
+The [task-verified joint run](../../evidence/live-placement-total-v1/README.md) used
 the same source revision through an explicitly selected checkout. Both models
 passed quality and latency gates, returned usable runners, and closed cleanly.
 That is source-runtime evidence, not an installed-wheel GPU rehearsal. The older
@@ -27,7 +27,7 @@ The wheel contains both `sera` and the partner's independent `sera_loop` package
 The investigator swarm and placement evidence above concern `import sera`;
 they do not certify the other package's loop. See the
 [current release checklist](release-acceptance.md) and
-[completion checkpoint](release.md) for scope and unproven acceptance.
+[completion checkpoint](../release.md) for scope and unproven acceptance.
 Use the wheel hash, not only version 0.2.0, to identify the tested artifact.
 
 ## Historical merged API candidate
@@ -42,7 +42,7 @@ The merged API and recovery wheel was checked again outside the checkout.
 - Combined API, recovery, and benchmark suite at `316de88`: **917 passed**.
 - The same wheel was installed in Molab through marimo's package manager. A fresh isolated process found `sera.api.optimize` in site-packages and accepted the existing 34-case Luna certificate. It reused the existing GPU runtime and cached model files.
 
-The [separate live installed-package check](../evidence/public-api-release-v1/README.md) passed its runtime acceptance: three investigation rounds, a returned runner, a Weave trace, and cleanup. It used quick-mode token agreement and failed arithmetic correctness. Do not treat either the local smoke or that runtime acceptance as task-quality validation.
+The [separate live installed-package check](../../evidence/public-api-release-v1/README.md) passed its runtime acceptance: three investigation rounds, a returned runner, a Weave trace, and cleanup. It used quick-mode token agreement and failed arithmetic correctness. Do not treat either the local smoke or that runtime acceptance as task-quality validation.
 
 ## Historical original API worker check
 

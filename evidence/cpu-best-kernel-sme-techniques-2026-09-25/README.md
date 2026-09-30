@@ -50,4 +50,4 @@ No result here establishes a 2000 GFLOP/s M4 Pro peak or causal benefit from an
 individual change.
 
 Evidence: [`verification.json`](verification.json), the frozen signed reports under
-`search/`, and [the hardware-specific reference note](../../docs/sera-sme-throughput-references-2026-09-25.md).
+`search/`, and [the hardware-specific reference note](../../docs/research/sera-sme-throughput-references-2026-09-25.md).

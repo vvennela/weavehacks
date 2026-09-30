@@ -1,6 +1,6 @@
 # ModelOpt search comparison proposal
 
-Historical proposal. Implementation and measured results are in the [current release status](release.md).
+Historical proposal. Implementation and measured results are in the [current release status](../release.md).
 
 Status: ModelOpt integration and backend-independent direction requested;
 benchmark rules pending user decision; no GPU experiments run.
@@ -10,7 +10,7 @@ Update, September 29: the user approved native MLX first, followed by CUDA and
 ROCm runtime adapters, and optimized checkpoint export. The product is managed
 by Sera with our W&B key; the repository stays public. These decisions supersede
 the earlier CUDA-first proposal. Formal agent-versus-control benchmark rules
-still need a decision. [Native MLX smoke results](../evidence/native-mlx-smoke-v1/README.md)
+still need a decision. [Native MLX smoke results](../../evidence/native-mlx-smoke-v1/README.md)
 are compatibility evidence, not that comparison.
 
 ## User-defined product goal

@@ -1,6 +1,6 @@
 # Managed native Sera: implementation decision
 
-Historical proposal. Implementation and measured results are in the [current release status](release.md).
+Historical proposal. Implementation and measured results are in the [current release status](../release.md).
 
 September 29, 2026. The repository remains public. The product is a Sera-managed
 agent with mandatory service-owned W&B tracing. The exported model runs on the
@@ -19,7 +19,7 @@ customer's hardware. Customers never receive our W&B key.
 - A built wheel installed into a clean environment and loaded the export for
   a new application request outside the checkout.
 
-See [raw evidence and reproduction](../evidence/native-mlx-smoke-v1/README.md).
+See [raw evidence and reproduction](../../evidence/native-mlx-smoke-v1/README.md).
 
 ## Recommended integration
 

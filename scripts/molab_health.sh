@@ -27,7 +27,7 @@ if [ -z "${MOLAB_URL:-}" ] || [ -z "${MARIMO_TOKEN:-}" ]; then
     echo "molab_health: MOLAB_URL and MARIMO_TOKEN must both be set in the environment." >&2
     echo "  export MOLAB_URL=https://sb-<id>.sb.molab.run/" >&2
     echo "  export MARIMO_TOKEN=<access token>   # never write it into a file in this repo" >&2
-    echo "Both are minted together when the GPU is attached; see docs/live-molab-setup.md." >&2
+    echo "Both are minted together when the GPU is attached; see docs/research/live-molab-setup.md." >&2
     exit 2
 fi
 export MARIMO_TOKEN

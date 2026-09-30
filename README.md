@@ -30,7 +30,7 @@ flowchart LR
     C --> G["Verified checkpoint + W&B trace"]
 ```
 
-**Review scope:** `sera/`, `tests/`, and the [release evidence index](evidence/README.md). CPU kernel modules are a separate research path. `src/sera_loop`, `experiments/`, notebooks, and the Molab website/deployment are labeled legacy; `sera_loop` remains installed and tested for existing callers. Working notes and old pitches are in [`docs/internal/`](docs/internal/).
+**Review scope:** `sera/`, `tests/`, and the [release evidence index](evidence/README.md). CPU kernel modules are a separate research path. `src/sera_loop`, `experiments/`, notebooks, and the Molab website/deployment are labeled legacy; `sera_loop` remains installed and tested for existing callers. Research history is in [`docs/research/`](docs/research/). Working notes and old pitches are in [`docs/internal/`](docs/internal/).
 
 ## The numbers
 

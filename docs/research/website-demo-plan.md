@@ -25,11 +25,11 @@ for this review.
 | `/notebook`, local tab | Browser-based `sera_loop` analytic simulator | Simulated measurements, not the saved GPU swarm. First load needs external runtime packages; offline operation depends on the cache. |
 | Root `demo.py` | Reads saved, measured `sera` evidence and links the actual Weave trace | Correct evidence source, but mainly tables rather than an animated, step-by-step loop. |
 
-Sources: [website guide](../web/README.md), [server](../web/server.py),
-[dashboard code](../output/sera-lab.js), [notebook launcher](../output/sera-notebook.js),
-[GPU notebook](../notebooks/molab_lab.py), [current evidence demo](internal/demo.py).
+Sources: [website guide](../../web/README.md), [server](../../web/server.py),
+[dashboard code](../../output/sera-lab.js), [notebook launcher](../../output/sera-notebook.js),
+[GPU notebook](../../notebooks/molab_lab.py), [current evidence demo](../internal/demo.py).
 
-The repository contains two separate systems, as the [root README](../README.md)
+The repository contains two separate systems, as the [root README](../../README.md)
 states. The website's `sera_loop` specialists use rule-based Python policies.
 The measured `sera` swarm uses three concurrent LM investigators:
 `scheduling`, `memory_context`, and `output_quality`. These investigation focuses
@@ -59,7 +59,7 @@ Fix these presentation risks before using the website:
 - Keep metrics bound to one configuration. Lowest latency, peak throughput, and
   lowest memory can belong to three different trials.
 - Use actual investigator names and no fixed trial cap for the measured swarm.
-- Do not use the old [demo script](internal/demo-script.md) unchanged. Its 35% improvement
+- Do not use the old [demo script](../internal/demo-script.md) unchanged. Its 35% improvement
   and rejected FP8 example are fixed example data, not the current measured run.
 - Mark two-model and multi-GPU claims by their own evidence status. Do not infer
   them from the single-model recording.
@@ -129,9 +129,9 @@ that span records an already-completed request. Use its saved `latency_ms` field
 Model request latency, server startup, agent time, and whole-round time are four
 different measurements.
 
-Sources: [Astra recording](../evidence/live-astra-expanded-v1/README.md),
-[Luna recording](../evidence/live-luna-expanded-v2/README.md), and the
-[reproducible timing audit](../evidence/demo-iteration-timing-v1/result.json),
+Sources: [Astra recording](../../evidence/live-astra-expanded-v1/README.md),
+[Luna recording](../../evidence/live-luna-expanded-v2/README.md), and the
+[reproducible timing audit](../../evidence/demo-iteration-timing-v1/result.json),
 which binds the saved Weave exports to their source hashes and trial IDs.
 
 ## Three-minute judge flow
@@ -203,7 +203,7 @@ Acceptance tests before presenting:
 2. **GPU or connection unavailable:** show the same recorded GPU trace and result,
    clearly labeled. Open the saved request and cleanup evidence.
 3. **Website integration incomplete:** use root `demo.py` and the
-   [existing comparison script](../evidence/expanded-swarm-comparison/README.md).
+   [existing comparison script](../../evidence/expanded-swarm-comparison/README.md).
 4. **No network:** use a rehearsed local recording or static export of that same
    evidence. The website's simulator is a separate, labeled UI demonstration,
    not a substitute for a measured result.

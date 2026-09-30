@@ -5,17 +5,17 @@ setup. It is a controlled deployment release, not a claim of general production
 readiness. The independent `sera_loop` package and partner website remain in the
 repository; these measurements do not certify that separate implementation.
 
-See [completion.md](release.md) for the full product status. Historical
+See [completion.md](../release.md) for the full product status. Historical
 recordings remain unchanged, including failed experiments.
 
 ## Release gates
 
 | Gate | Evidence and status |
 | --- | --- |
-| Autonomous single-model loop | Passed: three investigators, shared findings, arbiter selection, measured feedback, progress-based stop, usable returned runner, and cleanup in the saved [Astra and Luna runs](../evidence/expanded-swarm-comparison/README.md). |
-| Joint model acceptance | Passed: the specified Qwen0.6B + GLM9B pair meets unchanged quality, latency, overlap, total-device memory, returned-runner, and cleanup gates. [Independent audit](../evidence/live-placement-total-v1/README.md). |
+| Autonomous single-model loop | Passed: three investigators, shared findings, arbiter selection, measured feedback, progress-based stop, usable returned runner, and cleanup in the saved [Astra and Luna runs](../../evidence/expanded-swarm-comparison/README.md). |
+| Joint model acceptance | Passed: the specified Qwen0.6B + GLM9B pair meets unchanged quality, latency, overlap, total-device memory, returned-runner, and cleanup gates. [Independent audit](../../evidence/live-placement-total-v1/README.md). |
 | Source regression suite | 1,512 passed, one optional marimo skip on `befda96`, in a fresh frozen development environment. |
-| Clean package installation | Passed for the final [staged release wheel](../evidence/stable-release-package-v2/README.md): 23 checks, 68 source files matched, two byte-identical builds. |
+| Clean package installation | Passed for the final [staged release wheel](../../evidence/stable-release-package-v2/README.md): 23 checks, 68 source files matched, two byte-identical builds. |
 | Installed-package live joint run | Failed: GLM p95 was 192.68 ms against the fixed 187.93 ms ceiling. Both task gates, memory, and cleanup passed. The earlier passing source run does not override this repeat. |
 | Credential handling | Keys stay in the environment. Reports do not contain secret values. A local Codex controller remains required for the demonstrated investigator route. |
 
@@ -59,7 +59,7 @@ PYTHONPATH=. uv run --frozen python evidence/live-placement-total-v1/audit.py
 
 The first command checks source behavior. The second rechecks saved measurements
 without GPU or provider calls. Neither is a new live performance measurement.
-Use the [README quick check](../README.md#quick-test-does-the-loop-work) for a
+Use the [README quick check](../../README.md#quick-test-does-the-loop-work) for a
 short offline loop rehearsal. Clean installation and live execution must record
 their wheel hash, imported package location, exact configurations, and cleanup.
 

@@ -23,7 +23,7 @@ vLLM 0.26.0, and an RTX PRO 6000 Blackwell. This page covers single-model
 backends and arbitrary model loading are not supported by this path.
 
 The separate `sera.optimize_placement` API has a
-[passing constrained two-model run](../evidence/live-placement-total-v1/README.md).
+[passing constrained two-model run](../../evidence/live-placement-total-v1/README.md).
 Actual multiple-GPU validation remains unproven. The wheel also contains the
 partner's independent `sera_loop` package; its rule-based loop and reports are
 not the measured investigator swarm documented here. Use `import sera` for this

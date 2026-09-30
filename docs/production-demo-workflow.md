@@ -1,6 +1,6 @@
 # Sera demo
 
-**Sera — the autonomous auto-research harness for inference.**
+**Sera — the auto-research harness for inference.**
 
 ## Show the product
 

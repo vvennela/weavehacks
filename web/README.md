@@ -47,7 +47,7 @@ completion came back in **587.9 ms for 40 tokens**. This is what
 `specs/molab.yaml` was written against.
 
 Full runbook, including the exact commands and the measured baseline sweep:
-**[`docs/live-molab-setup.md`](../docs/live-molab-setup.md)**.
+**[`docs/research/live-molab-setup.md`](../docs/research/live-molab-setup.md)**.
 
 **On embedding — the earlier note in this file was wrong.** It said a molab
 session cannot be embedded and that an iframe only ever gets a read-only
@@ -117,7 +117,7 @@ than appearing all at once at the end.
 
 For what a single served model actually does on this card — 69.71 output tok/s at
 concurrency 1, rising to 450.15 at concurrency 8, with e2e p50 going 1837 ms →
-2270 ms — see the measured table in `docs/live-molab-setup.md`.
+2270 ms — see the measured table in `docs/research/live-molab-setup.md`.
 
 ## What was verified
 
