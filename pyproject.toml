@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "ruff>=0.6"]
+dev = ["pytest>=8,<10", "ruff>=0.6", "safetensors>=0.6,<1"]
 agent = ["openai>=2,<4"]
 litellm = ["litellm==1.82.0"]
 # Weave creates httpx.BasicAuth. gql 4.4 can select httpx2 and reject that object.
