@@ -1,0 +1,63 @@
+{
+  "profile_id": "qwen",
+  "workload_description": "Minimize memory for incident summarization. Preserve the supplied required facts, forbidden claims, and word limit.",
+  "source": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+  },
+  "tasks": [
+    {
+      "prompt": [
+        {
+          "role": "user",
+          "content": "Summarize this incident in one sentence under 20 words: An outage interrupted the website. Engineers restored service after ten minutes."
+        }
+      ],
+      "expected_json": null,
+      "response_format": null,
+      "text_checks": {
+        "exact": null,
+        "required": [
+          "outage",
+          "service",
+          "ten minutes"
+        ],
+        "forbidden": [
+          "data loss"
+        ],
+        "max_words": 20
+      }
+    }
+  ],
+  "evaluation_version": "sera-supplied-examples-v1-959e9b1a45f8c58d14b49df788422cadb70a7e918ebf52e02ab795fde9fa50ac",
+  "response_format_version": null,
+  "recipes": {
+    "int4": {
+      "bits": 4,
+      "group_size": 64
+    },
+    "int8": {
+      "bits": 8,
+      "group_size": 64
+    }
+  },
+  "constraints": {
+    "quality_floor": 0.99,
+    "p95_latency_ms": null,
+    "max_memory_mib": null,
+    "min_output_tokens_per_second": null
+  },
+  "objective": {
+    "priority": "memory",
+    "min_improvement_fraction": 0.05
+  },
+  "budget": {
+    "max_candidate_trials": 2
+  },
+  "max_run_seconds": 282.21971893310547,
+  "job_timeout_seconds": 180.0,
+  "max_tokens": 64,
+  "seed": 0,
+  "warmup": 1,
+  "repetitions": 3
+}

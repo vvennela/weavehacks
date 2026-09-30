@@ -1,0 +1,17 @@
+{
+  "source": "research.json.gz",
+  "metric": "output_tokens_per_second",
+  "baseline": [
+    14.132200910939309,
+    14.13314841969372
+  ],
+  "selected_fp8": [
+    22.33190924050779,
+    22.2783877853267
+  ],
+  "conservative_improvement_fraction": 0.5763216463702499,
+  "formula": "min(selected repeated measurements) / max(baseline and baseline control) - 1",
+  "model": "Qwen/Qwen3-8B",
+  "hardware": "NVIDIA L4",
+  "concurrency": 1
+}

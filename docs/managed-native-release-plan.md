@@ -1,5 +1,7 @@
 # Managed native Sera: implementation decision
 
+Historical proposal. Implementation and measured results are in the [current release status](../completion.md).
+
 September 29, 2026. The repository remains public. The product is a Sera-managed
 agent with mandatory service-owned W&B tracing. The exported model runs on the
 customer's hardware. Customers never receive our W&B key.

@@ -1,0 +1,41 @@
+[
+  {
+    "case": "fp4",
+    "status": "passed",
+    "outcome": "needs-input",
+    "questions": [
+      "Can you provide a registered profile with an FP4/NVFP4 recipe for this workload?"
+    ]
+  },
+  {
+    "case": "int4",
+    "status": "passed",
+    "required_precision": "int4",
+    "recipes": [
+      "int4"
+    ],
+    "throughput_retention": 0.95,
+    "trace": {
+      "call_id": "01a0f0de-75df-7b54-8e13-5d1988072821",
+      "trace_id": "01a0f0de-75de-7d9f-be46-06fad645d2c4",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0de-75df-7b54-8e13-5d1988072821",
+      "remote_verified": true
+    }
+  },
+  {
+    "case": "memory",
+    "status": "passed",
+    "required_precision": null,
+    "recipes": [
+      "int4",
+      "int8"
+    ],
+    "throughput_retention": 0.95,
+    "trace": {
+      "call_id": "01a0f0de-a038-7da3-9c02-959935ce9383",
+      "trace_id": "01a0f0de-a038-74cd-9d49-0a8bcaf10fd7",
+      "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0de-a038-7da3-9c02-959935ce9383",
+      "remote_verified": true
+    }
+  }
+]

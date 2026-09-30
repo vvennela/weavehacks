@@ -1,0 +1,360 @@
+{
+  "schema_version": "sera-managed-workloads-release-v1",
+  "results": [
+    {
+      "workload": "classification",
+      "code_revision": "b8d562486ec9cd1020f238a97e633e988b8f3dc9",
+      "job_id": "bef082dc15bb4921b109e16384558b66",
+      "status": "completed",
+      "backend": "mlx",
+      "hardware": {
+        "system": "Darwin",
+        "machine": "arm64",
+        "backends": [
+          "mlx"
+        ],
+        "mlx": {
+          "backend": "mlx",
+          "device": {
+            "device_name": "Apple M4 Pro",
+            "max_recommended_working_set_size": 19069665280,
+            "memory_size": 25769803776,
+            "architecture": "applegpu_g16s",
+            "max_buffer_length": 14302248960,
+            "resource_limit": 499000
+          },
+          "versions": {
+            "mlx": "0.32.3",
+            "mlx-lm": "0.31.3",
+            "transformers": "5.17.0"
+          },
+          "weight_bits": [
+            16,
+            8,
+            4,
+            3,
+            2
+          ],
+          "mixed_precision": true,
+          "memory_metric": "mlx-active-allocator-bytes",
+          "checkpoint_format": "mlx-safetensors",
+          "concurrent_requests": false
+        }
+      },
+      "model": {
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+      },
+      "selected_recipe": "int8",
+      "artifact_id": "57c2068daa7bf8566d5bb000519d495bc27745289e7ee0ecd391bed67100e1a8",
+      "artifact_manifest": "classification-artifact.json",
+      "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0d8-1d02-7781-90d9-b876ec73bc3d",
+      "remote_trace_verified": true,
+      "elapsed_seconds": 160.33331418037415,
+      "quality_scope": {
+        "kind": "supplied JSON answer checks",
+        "examples": 3,
+        "repetitions_per_load": 3,
+        "scores": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "memory": {
+        "metric": "MLX allocator peak bytes",
+        "baseline": [
+          1367835280,
+          1367835280
+        ],
+        "selected": [
+          823100036,
+          823100036
+        ],
+        "conservative_reduction_fraction": 0.39824623035019246
+      },
+      "throughput": {
+        "metric": "output tokens per second",
+        "baseline": [
+          12.556161418075375,
+          12.422410259004875
+        ],
+        "selected": [
+          13.536908866410746,
+          13.262016428735981
+        ],
+        "conservative_improvement_fraction": 0.05621582800333269
+      },
+      "latency": {
+        "metric": "p95 request latency milliseconds",
+        "baseline": [
+          580.5095830000937,
+          593.6522919801064
+        ],
+        "selected": [
+          571.9043330173008,
+          547.4717910401523
+        ],
+        "conservative_reduction_fraction": 0.01482361400189236
+      },
+      "swarm": {
+        "coordinator": "gpt-6-astra/high",
+        "specialists": "15 gpt-6-luna/medium",
+        "transport": "Codex ChatGPT login",
+        "model_calls": 32,
+        "proposal_counts": [
+          15
+        ],
+        "ballot_counts": [
+          15
+        ],
+        "rankings": [
+          [
+            "int8",
+            "int4"
+          ]
+        ]
+      },
+      "worker_cleanup_passed": true,
+      "checkpoint_reload_passed": true
+    },
+    {
+      "workload": "extraction",
+      "code_revision": "66c503ad2612b7b837eb511162176b3963e36f0c",
+      "job_id": "3177281085aa4c368ace59fdb9490a79",
+      "status": "completed",
+      "backend": "mlx",
+      "hardware": {
+        "system": "Darwin",
+        "machine": "arm64",
+        "backends": [
+          "mlx"
+        ],
+        "mlx": {
+          "backend": "mlx",
+          "device": {
+            "device_name": "Apple M4 Pro",
+            "max_recommended_working_set_size": 19069665280,
+            "memory_size": 25769803776,
+            "architecture": "applegpu_g16s",
+            "max_buffer_length": 14302248960,
+            "resource_limit": 499000
+          },
+          "versions": {
+            "mlx": "0.32.3",
+            "mlx-lm": "0.31.3",
+            "transformers": "5.17.0"
+          },
+          "weight_bits": [
+            16,
+            8,
+            4,
+            3,
+            2
+          ],
+          "mixed_precision": true,
+          "memory_metric": "mlx-active-allocator-bytes",
+          "checkpoint_format": "mlx-safetensors",
+          "concurrent_requests": false
+        }
+      },
+      "model": {
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+      },
+      "selected_recipe": "int4",
+      "artifact_id": "cf4ec4b5aa45ee5f7a568a98d6ce06bcb8eee5a229417842fa3cf51ab53de55f",
+      "artifact_manifest": "extraction-artifact.json",
+      "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0dc-e35f-7a0c-a999-7d17e7a30be4",
+      "remote_trace_verified": true,
+      "elapsed_seconds": 185.672691822052,
+      "quality_scope": {
+        "kind": "supplied JSON answer checks",
+        "examples": 3,
+        "repetitions_per_load": 3,
+        "scores": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "memory": {
+        "metric": "MLX allocator peak bytes",
+        "baseline": [
+          1298203092,
+          1298203092
+        ],
+        "selected": [
+          489980336,
+          489980336
+        ],
+        "conservative_reduction_fraction": 0.6225703520354888
+      },
+      "throughput": {
+        "metric": "output tokens per second",
+        "baseline": [
+          33.067558572109775,
+          33.29762452151219
+        ],
+        "selected": [
+          42.00815181172862,
+          41.95201896493466
+        ],
+        "conservative_improvement_fraction": 0.2599102659059427
+      },
+      "latency": {
+        "metric": "p95 request latency milliseconds",
+        "baseline": [
+          923.5184160061181,
+          947.2492499626242
+        ],
+        "selected": [
+          626.1345000239089,
+          648.2276250026189
+        ],
+        "conservative_reduction_fraction": 0.2980891189956254
+      },
+      "swarm": {
+        "coordinator": "gpt-6-astra/high",
+        "specialists": "15 gpt-6-luna/medium",
+        "transport": "Codex ChatGPT login",
+        "model_calls": 32,
+        "proposal_counts": [
+          15
+        ],
+        "ballot_counts": [
+          15
+        ],
+        "rankings": [
+          [
+            "int4",
+            "int8"
+          ]
+        ]
+      },
+      "worker_cleanup_passed": true,
+      "checkpoint_reload_passed": true
+    },
+    {
+      "workload": "text",
+      "code_revision": "66c503ad2612b7b837eb511162176b3963e36f0c",
+      "job_id": "a662cbdbdb53481887dd78bb457d6788",
+      "status": "completed",
+      "backend": "mlx",
+      "hardware": {
+        "system": "Darwin",
+        "machine": "arm64",
+        "backends": [
+          "mlx"
+        ],
+        "mlx": {
+          "backend": "mlx",
+          "device": {
+            "device_name": "Apple M4 Pro",
+            "max_recommended_working_set_size": 19069665280,
+            "memory_size": 25769803776,
+            "architecture": "applegpu_g16s",
+            "max_buffer_length": 14302248960,
+            "resource_limit": 499000
+          },
+          "versions": {
+            "mlx": "0.32.3",
+            "mlx-lm": "0.31.3",
+            "transformers": "5.17.0"
+          },
+          "weight_bits": [
+            16,
+            8,
+            4,
+            3,
+            2
+          ],
+          "mixed_precision": true,
+          "memory_metric": "mlx-active-allocator-bytes",
+          "checkpoint_format": "mlx-safetensors",
+          "concurrent_requests": false
+        }
+      },
+      "model": {
+        "model_id": "Qwen/Qwen3-0.6B",
+        "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+      },
+      "selected_recipe": "int4",
+      "artifact_id": "cf4ec4b5aa45ee5f7a568a98d6ce06bcb8eee5a229417842fa3cf51ab53de55f",
+      "artifact_manifest": "text-artifact.json",
+      "trace_url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f0e0-7a61-7d2b-95d8-3024618ef80f",
+      "remote_trace_verified": true,
+      "elapsed_seconds": 140.40687108039856,
+      "quality_scope": {
+        "kind": "supplied required-text, forbidden-text and word-count checks",
+        "examples": 1,
+        "repetitions_per_load": 3,
+        "scores": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "memory": {
+        "metric": "MLX allocator peak bytes",
+        "baseline": [
+          1280852368,
+          1274773904
+        ],
+        "selected": [
+          467468676,
+          467468676
+        ],
+        "conservative_reduction_fraction": 0.6332928729297238
+      },
+      "throughput": {
+        "metric": "output tokens per second",
+        "baseline": [
+          69.35018042307142,
+          74.45458910792887
+        ],
+        "selected": [
+          89.67151083682197,
+          95.22785860016303
+        ],
+        "conservative_improvement_fraction": 0.20437856029041734
+      },
+      "latency": {
+        "metric": "p95 request latency milliseconds",
+        "baseline": [
+          220.77287500724196,
+          208.76883302116767
+        ],
+        "selected": [
+          183.19116695784032,
+          165.95108399633318
+        ],
+        "conservative_reduction_fraction": 0.12251668840211383
+      },
+      "swarm": {
+        "coordinator": "gpt-6-astra/high",
+        "specialists": "15 gpt-6-luna/medium",
+        "transport": "Codex ChatGPT login",
+        "model_calls": 32,
+        "proposal_counts": [
+          15
+        ],
+        "ballot_counts": [
+          15
+        ],
+        "rankings": [
+          [
+            "int4",
+            "int8"
+          ]
+        ]
+      },
+      "worker_cleanup_passed": true,
+      "checkpoint_reload_passed": true
+    }
+  ],
+  "comparison": "Conservative comparison of two candidate measurements against baseline and baseline control. Each model load repeats the frozen workload three times."
+}

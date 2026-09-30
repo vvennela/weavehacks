@@ -1,0 +1,158 @@
+{
+  "profile_id": "qwen",
+  "workload_description": "Minimize memory for invoice field extraction. Preserve the supplied JSON fields and answer checks.",
+  "source": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+  },
+  "tasks": [
+    {
+      "prompt": [
+        {
+          "role": "user",
+          "content": "Extract invoice, vendor, and total as JSON. Invoice: INV-101. Vendor: Acme. Total: 120 dollars."
+        }
+      ],
+      "expected_json": {
+        "invoice": "INV-101",
+        "vendor": "Acme",
+        "total": 120
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "invoice",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "invoice": {
+                "type": "string"
+              },
+              "vendor": {
+                "type": "string"
+              },
+              "total": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "invoice",
+              "vendor",
+              "total"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "user",
+          "content": "Extract invoice, vendor, and total as JSON. Invoice: INV-202. Vendor: Northwind. Total: 85 dollars."
+        }
+      ],
+      "expected_json": {
+        "invoice": "INV-202",
+        "vendor": "Northwind",
+        "total": 85
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "invoice",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "invoice": {
+                "type": "string"
+              },
+              "vendor": {
+                "type": "string"
+              },
+              "total": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "invoice",
+              "vendor",
+              "total"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "user",
+          "content": "Extract invoice, vendor, and total as JSON. Invoice: INV-303. Vendor: Orion. Total: 240 dollars."
+        }
+      ],
+      "expected_json": {
+        "invoice": "INV-303",
+        "vendor": "Orion",
+        "total": 240
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "invoice",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "invoice": {
+                "type": "string"
+              },
+              "vendor": {
+                "type": "string"
+              },
+              "total": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "invoice",
+              "vendor",
+              "total"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ],
+  "evaluation_version": "sera-supplied-examples-v1-5fe6be023fad735584e8442d792d6987ec1d4fe9ada4efe82a76617419a18d4c",
+  "response_format_version": "sera-supplied-formats-v1",
+  "recipes": {
+    "int4": {
+      "bits": 4,
+      "group_size": 64
+    },
+    "int8": {
+      "bits": 8,
+      "group_size": 64
+    }
+  },
+  "constraints": {
+    "quality_floor": 0.99,
+    "p95_latency_ms": null,
+    "max_memory_mib": null,
+    "min_output_tokens_per_second": null
+  },
+  "objective": {
+    "priority": "memory",
+    "min_improvement_fraction": 0.05
+  },
+  "budget": {
+    "max_candidate_trials": 2
+  },
+  "max_run_seconds": 289.83571696281433,
+  "job_timeout_seconds": 180.0,
+  "max_tokens": 64,
+  "seed": 0,
+  "warmup": 1,
+  "repetitions": 3
+}

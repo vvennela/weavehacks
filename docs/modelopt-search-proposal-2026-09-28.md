@@ -1,5 +1,7 @@
 # ModelOpt search comparison proposal
 
+Historical proposal. Implementation and measured results are in the [current release status](../completion.md).
+
 Status: ModelOpt integration and backend-independent direction requested;
 benchmark rules pending user decision; no GPU experiments run.
 Date: 2026-09-28.

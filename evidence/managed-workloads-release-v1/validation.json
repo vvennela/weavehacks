@@ -1,0 +1,45 @@
+{
+  "code_revision": "66c503ad2612b7b837eb511162176b3963e36f0c",
+  "source_suite": {
+    "source_revision": "b8d562486ec9cd1020f238a97e633e988b8f3dc9",
+    "passed": 2110,
+    "skipped": 1,
+    "seconds": 145.73
+  },
+  "installed_wheel_tests": {
+    "passed": 183,
+    "seconds": 22.04,
+    "outside_repository": true
+  },
+  "ci": {
+    "url": "https://github.com/vvennela/weavehacks/actions/runs/36674813826",
+    "jobs": [
+      {
+        "name": "test (ubuntu-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (macos-latest)",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "wheel": {
+    "name": "sera_inference-0.2.0-py3-none-any.whl",
+    "sha256": "c17231798280b45cca2045aee5dba1cecd2f2a80edd6a5c278817834c5b458a0",
+    "license": "Apache-2.0"
+  },
+  "first_run": {
+    "core_only_install_then_automatic_runtime_install": true,
+    "codex_chatgpt_login_reused": true,
+    "operator_wandb_configured": true,
+    "local_service_started": true,
+    "model_checks_and_budget_registered": true
+  },
+  "public_cli_fp4": {
+    "status": "needs-input",
+    "questions": [
+      "Can you provide a registered FP4/NVFP4 profile, or explicitly change the required format to INT4 or INT8?"
+    ]
+  }
+}

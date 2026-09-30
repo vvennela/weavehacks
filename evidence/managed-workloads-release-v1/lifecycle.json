@@ -1,0 +1,18 @@
+{
+  "stop_removed_process_record": true,
+  "stopped_health_unreachable": true,
+  "restart_new_pid": true,
+  "authorized_health_passed": true,
+  "wrong_key_rejected_401": true,
+  "reused_saved_customer_key": true,
+  "same_request_recovered_same_job": true,
+  "recovered_artifact_verified": true,
+  "recovery_seconds": 0.2568546670372598,
+  "service_status": "ready",
+  "private_modes": {
+    "credentials.json": "0o600",
+    "client.json": "0o600",
+    "service.json": "0o600",
+    "runtime.json": "0o600"
+  }
+}

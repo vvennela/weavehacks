@@ -1,0 +1,155 @@
+{
+  "profile_id": "qwen",
+  "workload_description": "Minimize memory for support-ticket classification. Preserve all supplied answer checks.",
+  "source": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+  },
+  "tasks": [
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "You classify support tickets. Category delivery includes shipping delays and damaged packages. Category billing includes payments, charges, and refunds. Category technical includes software errors, crashes, and login problems. Return only JSON with one key category."
+        },
+        {
+          "role": "user",
+          "content": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: My package arrived broken."
+        }
+      ],
+      "expected_json": {
+        "category": "delivery"
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "ticket_category",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "billing",
+                  "delivery",
+                  "technical"
+                ]
+              }
+            },
+            "required": [
+              "category"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "You classify support tickets. Category delivery includes shipping delays and damaged packages. Category billing includes payments, charges, and refunds. Category technical includes software errors, crashes, and login problems. Return only JSON with one key category."
+        },
+        {
+          "role": "user",
+          "content": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: I was charged twice for my order."
+        }
+      ],
+      "expected_json": {
+        "category": "billing"
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "ticket_category",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "billing",
+                  "delivery",
+                  "technical"
+                ]
+              }
+            },
+            "required": [
+              "category"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "You classify support tickets. Category delivery includes shipping delays and damaged packages. Category billing includes payments, charges, and refunds. Category technical includes software errors, crashes, and login problems. Return only JSON with one key category."
+        },
+        {
+          "role": "user",
+          "content": "Classify this support ticket as billing, delivery, or technical. Return only JSON with key category. Ticket: The application crashes when I sign in."
+        }
+      ],
+      "expected_json": {
+        "category": "technical"
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "ticket_category",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "billing",
+                  "delivery",
+                  "technical"
+                ]
+              }
+            },
+            "required": [
+              "category"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ],
+  "evaluation_version": "sera-supplied-examples-v1-0fe188fe43bb9b8b3bc66b33e4d87064391a4bc1a67030b89dfd967197f7d621",
+  "response_format_version": "sera-supplied-formats-v1",
+  "recipes": {
+    "int4": {
+      "bits": 4,
+      "group_size": 64
+    },
+    "int8": {
+      "bits": 8,
+      "group_size": 64
+    }
+  },
+  "constraints": {
+    "quality_floor": 0.99,
+    "p95_latency_ms": null,
+    "max_memory_mib": null,
+    "min_output_tokens_per_second": null
+  },
+  "objective": {
+    "priority": "memory",
+    "min_improvement_fraction": 0.05
+  },
+  "budget": {
+    "max_candidate_trials": 2
+  },
+  "max_run_seconds": 290.0014841556549,
+  "job_timeout_seconds": 180.0,
+  "max_tokens": 64,
+  "seed": 0,
+  "warmup": 1,
+  "repetitions": 3
+}

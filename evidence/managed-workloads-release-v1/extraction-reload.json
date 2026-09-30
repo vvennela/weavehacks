@@ -1,0 +1,103 @@
+{
+  "text": "{\"invoice\": \"INV-404\", \"vendor\": \"Apollo\", \"total\": 310}",
+  "token_ids": [
+    4913,
+    22217,
+    788,
+    330,
+    62931,
+    12,
+    19,
+    15,
+    19,
+    497,
+    330,
+    19213,
+    788,
+    330,
+    95909,
+    497,
+    330,
+    5035,
+    788,
+    220,
+    18,
+    16,
+    15,
+    92,
+    151645
+  ],
+  "prompt_token_ids": [
+    151644,
+    872,
+    198,
+    28959,
+    24615,
+    11,
+    20728,
+    11,
+    323,
+    2790,
+    438,
+    4718,
+    13,
+    40190,
+    25,
+    66924,
+    12,
+    19,
+    15,
+    19,
+    13,
+    45136,
+    25,
+    35150,
+    13,
+    10657,
+    25,
+    220,
+    18,
+    16,
+    15,
+    11192,
+    13,
+    151645,
+    198,
+    151644,
+    77091,
+    198,
+    151667,
+    271,
+    151668,
+    271
+  ],
+  "latency_ms": 720.4875419847667,
+  "error": null,
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "invoice",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "type": "string"
+          },
+          "vendor": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "invoice",
+          "vendor",
+          "total"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "finish_reason": "stop"
+}
