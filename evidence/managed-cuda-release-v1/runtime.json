@@ -1,0 +1,26 @@
+{
+  "python": "3.12.3",
+  "platform": "Linux-7.0.0-1013-aws-x86_64-with-glibc2.39",
+  "versions": {
+    "torch": "2.13.0",
+    "transformers": "5.17.0",
+    "vllm": "0.30.0",
+    "nvidia-modelopt": "0.46.1",
+    "flashinfer-python": "0.6.18.post1",
+    "safetensors": "0.8.0",
+    "weave": "0.53.2",
+    "numpy": "2.3.5",
+    "pydantic": "2.13.5"
+  },
+  "installed_module_sha256": {
+    "native_optimizer.py": "ae8442b69855e5c121048993ec21f5986161c21763e7b6a04f67ac9ecfb71238",
+    "native_advisor.py": "2fa2b2478149df3c373edc472dac4f9af33bd6971f935c5c94b82a1d3feb2b33",
+    "native_board.py": "b82aaa008c118d8b1bb31aa0f6ff8a6f9e03ec917d42791c033c347b9404fc60",
+    "native_worker.py": "98823dd0e94ece30e5954bc7792de8f945ab76a90467f174af6cc875e94c0e65",
+    "managed_service.py": "c1fc35c8e13e92e8f9b25c3a04c4f14bd473cd074445674c365f96572b6c87ec",
+    "managed_client.py": "a0d29bdb116c256b5e768f1c389af05ba374aafbc50cec6bafea814b06ab5ffd",
+    "model_artifact.py": "c4821c58413b1f69018692567eeacb4f95e3d9e44b2b06330239cb7ec3056357",
+    "backends/cuda.py": "17b5e3692c0b60ae83373e80aa4f93361f2aa0157a1316aeebab4b44d0ef3db3",
+    "backends/modelopt_export.py": "a5fbef1a277439bc4fac9f344306e5c1fe320725a627ce037f49ddddd91484b0"
+  }
+}

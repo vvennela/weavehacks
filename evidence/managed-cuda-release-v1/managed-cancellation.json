@@ -1,0 +1,18 @@
+{
+  "result": {
+    "scope": "Customer HTTP cancellation fault injection, not a performance measurement",
+    "job_id": "fabda66e2a794723b04cd305d0d73543",
+    "terminal_status": "cancelled",
+    "allocated_bytes_at_cancellation": 13288472576,
+    "before_bytes": 491651072,
+    "after_bytes": 491651072,
+    "remaining_compute_processes": 0,
+    "cancellation_cleanup_seconds": 0.2501646990003792
+  },
+  "trace": {
+    "call_id": "01a0f04d-6103-7dbd-b3a2-71b3b8c731c2",
+    "trace_id": "01a0f04d-6101-7fef-bad2-249bb33e6cd4",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f04d-6103-7dbd-b3a2-71b3b8c731c2",
+    "remote_verified": true
+  }
+}

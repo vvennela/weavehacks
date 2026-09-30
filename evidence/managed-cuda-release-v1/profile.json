@@ -1,0 +1,325 @@
+{
+  "backend": "cuda",
+  "profile_id": "cuda-qwen3-8b-demo-v1",
+  "source": {
+    "model_id": "Qwen/Qwen3-8B",
+    "revision": "b968826d9c46dd6066d109eabc6255188de91218"
+  },
+  "tasks": [
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "What is 2 + 3? Return the integer in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": 5
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "Which integer is larger: 4 or 9? Return that integer in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": 9
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "In Python, what is len(['red', 'blue', 'green'])? Return the integer in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": 3
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "In Python, items = [10, 20]. What is items[0]? Return the integer in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": 10
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "In Python, x = 2, then x = x + 1. What is the final value of x? Return the integer in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": 3
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "Read this record: {\"name\":\"job\",\"count\":4}. What is count? Return its integer value in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": 4
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "Records: [{\"id\":\"a\",\"ok\":true},{\"id\":\"b\",\"ok\":false}]. Return the IDs with ok equal to true, in order. Put the array in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": [
+          "a"
+        ]
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "prompt": [
+        {
+          "role": "system",
+          "content": "Solve the task. Return only one JSON object with exactly one key, \"answer\". Use the JSON type required by the question. Do not include explanation, Markdown, or code fences. Use JSON true, false, and null, not Python literals."
+        },
+        {
+          "role": "user",
+          "content": "In Python, what does 'cat'.upper() return? Return the string in a JSON object with one key named answer."
+        }
+      ],
+      "expected_json": {
+        "answer": "CAT"
+      },
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "answer",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "answer"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ],
+  "evaluation_version": "sera-task-v1-easy-json",
+  "response_format_version": "easy-requested-json-types-v1",
+  "recipes": {
+    "modelopt-fp8": {
+      "format": "fp8",
+      "calibration": {
+        "prompts": [
+          "Explain how a compiler translates a program into instructions.",
+          "Describe the water cycle and the formation of clouds.",
+          "A customer asks for a summary of the quarterly inventory report.",
+          "Write a short explanation of addition and subtraction for a beginner.",
+          "Compare a list and a dictionary as data structures.",
+          "Explain how to sort a table by its date column.",
+          "Summarize the steps used to test a software release.",
+          "Describe how an electric motor converts energy into motion."
+        ],
+        "seed": 0,
+        "max_length": 128
+      }
+    }
+  },
+  "constraints": {
+    "quality_floor": 0.99,
+    "p95_latency_ms": null,
+    "max_memory_mib": null,
+    "min_output_tokens_per_second": null
+  },
+  "objective": {
+    "priority": "memory",
+    "min_improvement_fraction": 0.05
+  },
+  "budget": {
+    "max_candidate_trials": 2
+  },
+  "max_run_seconds": 300.0,
+  "job_timeout_seconds": 180.0,
+  "max_tokens": 64,
+  "seed": 0,
+  "warmup": 1,
+  "repetitions": 3,
+  "runtime": {
+    "gpu_uuid": "GPU-cf564df1-6161-ad61-3e73-9920bb0ec56a",
+    "max_model_len": 512,
+    "kv_cache_memory_bytes": 268435456,
+    "memory_sample_interval_seconds": 0.01
+  }
+}

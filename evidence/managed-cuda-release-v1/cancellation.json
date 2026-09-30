@@ -1,0 +1,23 @@
+{
+  "result": {
+    "scope": "Cancellation fault injection, not a performance measurement",
+    "allocated_bytes_at_cancellation": 10239213568,
+    "before_bytes": 491651072,
+    "after_bytes": 491651072,
+    "remaining_compute_processes": 0,
+    "wall_seconds": 15.826483567999958,
+    "worker": {
+      "job_hash": "24ddc62ba93cd7a8a9ebcdb622638f37b36838821353c5be73cf7fcc97df0d6e",
+      "status": "cancelled",
+      "cleanup_pass": true,
+      "pid": 15939,
+      "elapsed_seconds": 15.824480210000274
+    }
+  },
+  "trace": {
+    "call_id": "01a0f049-9024-7a4c-922b-8e4c67eb75ae",
+    "trace_id": "01a0f049-9024-75d4-a0ec-4b5cddc1c424",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f049-9024-7a4c-922b-8e4c67eb75ae",
+    "remote_verified": true
+  }
+}

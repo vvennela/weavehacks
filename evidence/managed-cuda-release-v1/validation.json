@@ -1,0 +1,49 @@
+{
+  "source_commit": "585bf0ec4f2c4a92e2569b46bb18fb52b0f91dbd",
+  "wheel": {
+    "filename": "sera_inference-0.2.0-py3-none-any.whl",
+    "sha256": "6f370868927773a5556c8ff9d1e2d0a6867cd3142078db7d96b562f7ce221775"
+  },
+  "full_suite": {
+    "passed": 2048,
+    "skipped": 1,
+    "skip": "Optional marimo integration",
+    "seconds": 116.72
+  },
+  "installed_package_tests": {
+    "passed": 151,
+    "seconds": 15.61,
+    "scope": "Installed wheel outside checkout; repository-only benchmark tests covered by full suite"
+  },
+  "ci": {
+    "url": "https://github.com/vvennela/weavehacks/actions/runs/36662485626",
+    "linux": "success",
+    "macos": "success"
+  },
+  "hashing": {
+    "sequential": {
+      "seconds": [
+        10.466748693,
+        10.471433014000013,
+        10.477739904000032
+      ],
+      "artifact_id": "6e0acde988abdd9f2a1c0b998929ecb6fdb8132dd76a6e70d9bea0e3c76a4f3b"
+    },
+    "parallel": {
+      "seconds": [
+        5.137247127000023,
+        5.12284713400004,
+        5.13695192199998
+      ],
+      "artifact_id": "6e0acde988abdd9f2a1c0b998929ecb6fdb8132dd76a6e70d9bea0e3c76a4f3b"
+    },
+    "parallel_large_shards_first": {
+      "seconds": [
+        3.362827253999967,
+        3.3611619910000172,
+        3.3607206389999646
+      ],
+      "artifact_id": "6e0acde988abdd9f2a1c0b998929ecb6fdb8132dd76a6e70d9bea0e3c76a4f3b"
+    }
+  }
+}

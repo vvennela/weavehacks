@@ -1,0 +1,82 @@
+{
+  "schema_version": "sera-model-artifact-v1",
+  "backend": "cuda",
+  "source": {
+    "model_id": "Qwen/Qwen3-8B",
+    "revision": "b968826d9c46dd6066d109eabc6255188de91218"
+  },
+  "recipe": {
+    "format": "fp8",
+    "calibration": {
+      "prompts": [
+        "Explain how a compiler translates a program into instructions.",
+        "Describe the water cycle and the formation of clouds.",
+        "A customer asks for a summary of the quarterly inventory report.",
+        "Write a short explanation of addition and subtraction for a beginner.",
+        "Compare a list and a dictionary as data structures.",
+        "Explain how to sort a table by its date column.",
+        "Summarize the steps used to test a software release.",
+        "Describe how an electric motor converts energy into motion."
+      ],
+      "seed": 0,
+      "max_length": 128
+    }
+  },
+  "versions": {
+    "torch": "2.13.0",
+    "transformers": "5.17.0",
+    "nvidia-modelopt": "0.46.1",
+    "safetensors": "0.8.0"
+  },
+  "files": {
+    "chat_template.jinja": {
+      "sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+      "bytes": 4168
+    },
+    "config.json": {
+      "sha256": "160854d33e8cb908e67f21da1a62029652d281059a8b8393f68e5d323dee5e3d",
+      "bytes": 2571
+    },
+    "generation_config.json": {
+      "sha256": "893b0dccf83626cdfdc498e5b2a255a935b4c3c693350aed18f7003c1a3f3de9",
+      "bytes": 214
+    },
+    "hf_quant_config.json": {
+      "sha256": "77eabafdf3786f47c6b213865184b069002923c816e8f44ecec08de6be85d2f4",
+      "bytes": 273
+    },
+    "model-00001-of-00005.safetensors": {
+      "sha256": "cad729275afabf9da3ff1d711894fcc77caba10f7f7261bdc5ef048bd58773f8",
+      "bytes": 1966141536
+    },
+    "model-00002-of-00005.safetensors": {
+      "sha256": "5111d22224759723b3868daaea21bdee1a8df74bc819e4faa34b059c8487295f",
+      "bytes": 1996701544
+    },
+    "model-00003-of-00005.safetensors": {
+      "sha256": "ccd2c7204616c2e625b4b9e7b6197f7bcff32771b2b1c0a4eb6cf410b5d5e647",
+      "bytes": 1954743104
+    },
+    "model-00004-of-00005.safetensors": {
+      "sha256": "e9f89230ca051c7b433ef4e63fab6488f7193b26f563fb163535e2f306f1c144",
+      "bytes": 1979907552
+    },
+    "model-00005-of-00005.safetensors": {
+      "sha256": "91ca0f28b65550d5b87dcb207e00a251b3fb182061c46b6d42b3cf15f6e07c25",
+      "bytes": 1538306232
+    },
+    "model.safetensors.index.json": {
+      "sha256": "8c9147f165b3fcb09bb2b826273d5f987836cfc03625d0953ce28f3743ea37d0",
+      "bytes": 76585
+    },
+    "tokenizer.json": {
+      "sha256": "6adb90dd2c38b281238c0f606f444f129358c61dc015dd772cf77654df557cee",
+      "bytes": 11422748
+    },
+    "tokenizer_config.json": {
+      "sha256": "1cc816812993bff176eb4f7495433b736f06fba9b6e7b05cac7b4a1780650c95",
+      "bytes": 692
+    }
+  },
+  "artifact_id": "88b0fe82b7020b6bca4a086544393191d08dbfb7ea00fecfd9189ec8acb54cea"
+}

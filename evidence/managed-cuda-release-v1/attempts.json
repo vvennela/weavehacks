@@ -1,0 +1,41 @@
+[
+  {
+    "attempt": 1,
+    "research_status": "completed",
+    "selected_recipe_id": "baseline",
+    "elapsed_seconds": 287.918095572,
+    "trials": [
+      {
+        "status": "budget-exhausted",
+        "review": null,
+        "confirmation_completed": false
+      }
+    ]
+  },
+  {
+    "attempt": 2,
+    "research_status": "completed",
+    "selected_recipe_id": "baseline",
+    "elapsed_seconds": 287.7968106640001,
+    "trials": [
+      {
+        "status": "budget-exhausted",
+        "review": null,
+        "confirmation_completed": false
+      }
+    ]
+  },
+  {
+    "attempt": 3,
+    "research_status": "completed",
+    "selected_recipe_id": "baseline",
+    "elapsed_seconds": 288.68799084499983,
+    "trials": [
+      {
+        "status": "measured",
+        "review": null,
+        "confirmation_completed": true
+      }
+    ]
+  }
+]

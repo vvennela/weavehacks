@@ -1,0 +1,93 @@
+{
+  "schema_version": "sera-cuda-release-v1",
+  "source_commit": "585bf0ec4f2c4a92e2569b46bb18fb52b0f91dbd",
+  "backend": "cuda",
+  "device": {
+    "device_name": "NVIDIA L4",
+    "memory_size": 23661248512,
+    "uuid": "GPU-cf564df1-6161-ad61-3e73-9920bb0ec56a",
+    "backend": "cuda",
+    "compute_capability": "8.9",
+    "driver": "595.91.07"
+  },
+  "model": "Qwen/Qwen3-8B",
+  "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+  "selected_recipe_id": "modelopt-fp8",
+  "research_seconds": 281.51468740099995,
+  "end_to_end_with_independent_request_seconds": 310.71015698300016,
+  "memory": {
+    "scope": "Sampled NVIDIA device memory including runtime and KV cache; not an exact high-water mark",
+    "baseline_peak_bytes": [
+      17516331008,
+      17516331008
+    ],
+    "candidate_peak_bytes": [
+      10652352512,
+      10652352512
+    ],
+    "conservative_reduction_fraction": 0.3918616571509814,
+    "freed_gib": 6.392578125
+  },
+  "latency": {
+    "baseline_p95_ms": [
+      556.119752000086,
+      556.2188890000925
+    ],
+    "candidate_p95_ms": [
+      350.30765299984523,
+      351.400564999949
+    ],
+    "conservative_reduction_fraction": 0.36812069030791295
+  },
+  "quality": {
+    "scope": "Eight fixed JSON tasks, three measured repetitions per model load, one warmup per task. No broad quality claim.",
+    "scores": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "floor": 0.99
+  },
+  "advisor": {
+    "transport": "Local Codex ChatGPT login through authenticated SSH loopback bridge",
+    "coordinator": "gpt-6-astra/high",
+    "specialists": "15 gpt-6-luna/medium",
+    "model_calls": 32,
+    "review": {
+      "decision": "adopt",
+      "reason": "Software gates passed. Peak allocated memory fell 39.19% to 10,158.875 MiB, exceeding the required 5% improvement. Verified task quality was 1.0 against the 0.99 floor, with no candidate constraint failures. Throughput was 22.33 tokens/s; no minimum was configured. The separate baseline token-agreement self-check failed, but both task-quality checks passed."
+    }
+  },
+  "independent_checkpoint_reload_passed": true,
+  "reconnect": {
+    "same_job_id": true,
+    "wall_seconds": 0.028761756999983845,
+    "selected_recipe_id": "modelopt-fp8"
+  },
+  "trace": {
+    "call_id": "01a0f044-430a-7ef5-a982-990de8a75f9c",
+    "trace_id": "01a0f044-4308-776c-8f23-2f0ef7fa38c5",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0f044-430a-7ef5-a982-990de8a75f9c",
+    "remote_verified": true
+  },
+  "limitations": [
+    "Only this pinned Qwen3-8B workload on one L4 is validated.",
+    "Memory is sampled device usage, not an exact high-water mark.",
+    "This does not establish an advantage over fixed search.",
+    "The successful run used a downloaded model and compiled runtime kernels. Cold setup and earlier deadline failures are retained."
+  ],
+  "service_status": "completed",
+  "checkpoint_artifact_id": "88b0fe82b7020b6bca4a086544393191d08dbfb7ea00fecfd9189ec8acb54cea",
+  "runtime_versions": {
+    "torch": "2.13.0",
+    "transformers": "5.17.0",
+    "vllm": "0.30.0",
+    "nvidia-modelopt": "0.46.1",
+    "flashinfer-python": "0.6.18.post1",
+    "safetensors": "0.8.0",
+    "weave": "0.53.2",
+    "numpy": "2.3.5",
+    "pydantic": "2.13.5"
+  }
+}
