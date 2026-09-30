@@ -1,0 +1,10 @@
+{
+  "red_test_exit": 1,
+  "green_test_exit": 0,
+  "green_test_output": "........................................................................ [ 96%]\n...                                                                      [100%]\n75 passed in 6.59s",
+  "lint_exit": 0,
+  "research_executor_commit": "79b1448",
+  "budget_fix_commit": "304bb9707b742ad493bd367e336647d535a8b881",
+  "customer_validation_exit": 0,
+  "note": "The deadline fix was applied after measurements. It does not change the recorded comparison outcomes."
+}

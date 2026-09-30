@@ -1,0 +1,262 @@
+{
+  "rows": [
+    {
+      "policy": "sera",
+      "block": 0,
+      "seed": 0,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "int8-g128",
+      "trace": {
+        "call_id": "01a0ef8f-c89e-7994-ab11-8ee1911d549a",
+        "trace_id": "01a0ef8f-c89e-7f0a-b03a-24596b88e2a5",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef8f-c89e-7994-ab11-8ee1911d549a",
+        "remote_verified": true
+      },
+      "candidate_trials": 1,
+      "native_jobs": 6,
+      "agent_calls": 1,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 303.36892183404416,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "fixed",
+      "block": 0,
+      "seed": 0,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "int4-g128",
+      "trace": {
+        "call_id": "01a0ef94-6c87-7ef8-af96-b8ec3bed0abe",
+        "trace_id": "01a0ef94-6c87-7d4f-baed-af48a3a9052c",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef94-6c87-7ef8-af96-b8ec3bed0abe",
+        "remote_verified": true
+      },
+      "candidate_trials": 2,
+      "native_jobs": 8,
+      "agent_calls": 2,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 303.78291254199576,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "random",
+      "block": 0,
+      "seed": 0,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "int8-g32",
+      "trace": {
+        "call_id": "01a0ef99-1683-7fff-b900-721b5c54962d",
+        "trace_id": "01a0ef99-1683-71e8-a373-87f9b579a744",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef99-1683-7fff-b900-721b5c54962d",
+        "remote_verified": true
+      },
+      "candidate_trials": 2,
+      "native_jobs": 7,
+      "agent_calls": 2,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 304.2076291660196,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "fixed",
+      "block": 1,
+      "seed": 1,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "int4-g128",
+      "trace": {
+        "call_id": "01a0ef9d-bddd-767f-a6c4-962f8fb80560",
+        "trace_id": "01a0ef9d-bddd-7891-a95c-b30eef8f3dd9",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef9d-bddd-767f-a6c4-962f8fb80560",
+        "remote_verified": true
+      },
+      "candidate_trials": 2,
+      "native_jobs": 7,
+      "agent_calls": 2,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 303.1032007079921,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "random",
+      "block": 1,
+      "seed": 1,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "baseline",
+      "trace": {
+        "call_id": "01a0efa2-65c9-73fd-8678-246d193350fa",
+        "trace_id": "01a0efa2-65c9-7096-b283-7dae3a591c5e",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efa2-65c9-73fd-8678-246d193350fa",
+        "remote_verified": true
+      },
+      "candidate_trials": 1,
+      "native_jobs": 6,
+      "agent_calls": 1,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 302.624292374996,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "sera",
+      "block": 1,
+      "seed": 1,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "baseline",
+      "trace": {
+        "call_id": "01a0efa7-10d9-7e83-9568-4454bcf80d2f",
+        "trace_id": "01a0efa7-10d9-73bc-aa36-3a88f866d531",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efa7-10d9-7e83-9568-4454bcf80d2f",
+        "remote_verified": true
+      },
+      "candidate_trials": 1,
+      "native_jobs": 6,
+      "agent_calls": 1,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 303.27434979204554,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "random",
+      "block": 2,
+      "seed": 2,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "baseline",
+      "trace": {
+        "call_id": "01a0efab-befc-7cc4-a554-6bbb67562dd7",
+        "trace_id": "01a0efab-befc-7d88-8879-3695de9e93ed",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efab-befc-7cc4-a554-6bbb67562dd7",
+        "remote_verified": true
+      },
+      "candidate_trials": 1,
+      "native_jobs": 6,
+      "agent_calls": 1,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 303.0898106659879,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "sera",
+      "block": 2,
+      "seed": 2,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "int4-g32",
+      "trace": {
+        "call_id": "01a0efb0-6aa3-7cad-9e16-8c03ef3ff0c5",
+        "trace_id": "01a0efb0-6aa3-70d1-b515-16ba664a7db4",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efb0-6aa3-7cad-9e16-8c03ef3ff0c5",
+        "remote_verified": true
+      },
+      "candidate_trials": 2,
+      "native_jobs": 7,
+      "agent_calls": 2,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 303.15740349999396,
+      "intermediate_exports_removed": true
+    },
+    {
+      "policy": "fixed",
+      "block": 2,
+      "seed": 2,
+      "status": "budget-exhausted",
+      "heldout_passed": false,
+      "selected_recipe_id": "int4-g128",
+      "trace": {
+        "call_id": "01a0efb5-1116-7623-81f3-1fda8ab9ad54",
+        "trace_id": "01a0efb5-1116-7c1f-80ee-9b597313f54b",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efb5-1116-7623-81f3-1fda8ab9ad54",
+        "remote_verified": true
+      },
+      "candidate_trials": 2,
+      "native_jobs": 8,
+      "agent_calls": 2,
+      "power_before": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_after": {
+        "source": "Now drawing from 'AC Power'",
+        "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+      },
+      "power_unchanged": true,
+      "wall_seconds": 302.3934724580031,
+      "intermediate_exports_removed": true
+    }
+  ],
+  "summary": {
+    "complete": false,
+    "sera_beats_fixed": null,
+    "sera_beats_random": null,
+    "policy_summary": {}
+  }
+}

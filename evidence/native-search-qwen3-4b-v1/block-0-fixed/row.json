@@ -1,0 +1,28 @@
+{
+  "policy": "fixed",
+  "block": 0,
+  "seed": 0,
+  "status": "budget-exhausted",
+  "heldout_passed": false,
+  "selected_recipe_id": "int4-g128",
+  "trace": {
+    "call_id": "01a0ef94-6c87-7ef8-af96-b8ec3bed0abe",
+    "trace_id": "01a0ef94-6c87-7d4f-baed-af48a3a9052c",
+    "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef94-6c87-7ef8-af96-b8ec3bed0abe",
+    "remote_verified": true
+  },
+  "candidate_trials": 2,
+  "native_jobs": 8,
+  "agent_calls": 2,
+  "power_before": {
+    "source": "Now drawing from 'AC Power'",
+    "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "power_after": {
+    "source": "Now drawing from 'AC Power'",
+    "settings": "Battery Power:\n powermode            1\n Sleep On Power Button 1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             0\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 0\n networkoversleep     0\n sleep                3\n tcpkeepalive         1\n lessbright           1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                5\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "power_unchanged": true,
+  "wall_seconds": 303.78291254199576,
+  "intermediate_exports_removed": true
+}

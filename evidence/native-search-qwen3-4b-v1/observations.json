@@ -1,0 +1,184 @@
+{
+  "scope": "Qwen3-4B, M4 Pro MLX, synthetic structured extraction; not GLM or multi-GPU capacity.",
+  "executor_commit": "79b1448",
+  "rows": [
+    {
+      "run": "block-0-fixed",
+      "status": "budget-exhausted",
+      "selected_recipe": "int4-g128",
+      "selected_artifact_id": "4f07a387ea77d19c57e3b3fe4d9ff132f5f602636dff7daf0eea26ec85b5d117",
+      "candidate_trials": 2,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0ef94-6c87-7ef8-af96-b8ec3bed0abe",
+        "trace_id": "01a0ef94-6c87-7d4f-baed-af48a3a9052c",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef94-6c87-7ef8-af96-b8ec3bed0abe",
+        "remote_verified": true
+      },
+      "confirmed": true,
+      "selected_peak_bytes": 2411183720,
+      "minimum_search_quality": 1.0,
+      "throughput_range": [
+        17.120639767325624,
+        17.148454910344125
+      ],
+      "memory_reduction_fraction": 0.7045883673978244
+    },
+    {
+      "run": "block-0-random",
+      "status": "budget-exhausted",
+      "selected_recipe": "int8-g32",
+      "selected_artifact_id": "d62a0457627980aa8e0b7dc4fe49e11de34881ad7a17839b5b2eab28a8accef4",
+      "candidate_trials": 2,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0ef99-1683-7fff-b900-721b5c54962d",
+        "trace_id": "01a0ef99-1683-71e8-a373-87f9b579a744",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef99-1683-7fff-b900-721b5c54962d",
+        "remote_verified": true
+      },
+      "confirmed": true,
+      "selected_peak_bytes": 4738448928,
+      "minimum_search_quality": 1.0,
+      "throughput_range": [
+        13.892346012681926,
+        14.275400410499344
+      ],
+      "memory_reduction_fraction": 0.4194582012927206
+    },
+    {
+      "run": "block-0-sera",
+      "status": "budget-exhausted",
+      "selected_recipe": "int8-g128",
+      "selected_artifact_id": "8efb18b5650556a083f5ba32b6ab28d9d446d134337469b1dbb7bf561ccc1033",
+      "candidate_trials": 1,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0ef8f-c89e-7994-ab11-8ee1911d549a",
+        "trace_id": "01a0ef8f-c89e-7f0a-b03a-24596b88e2a5",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef8f-c89e-7994-ab11-8ee1911d549a",
+        "remote_verified": true
+      },
+      "confirmed": true,
+      "selected_peak_bytes": 4391108152,
+      "minimum_search_quality": 1.0,
+      "throughput_range": [
+        14.23442730779637,
+        14.924051750453062
+      ],
+      "memory_reduction_fraction": 0.46201344287649615
+    },
+    {
+      "run": "block-1-fixed",
+      "status": "budget-exhausted",
+      "selected_recipe": "int4-g128",
+      "selected_artifact_id": "4f07a387ea77d19c57e3b3fe4d9ff132f5f602636dff7daf0eea26ec85b5d117",
+      "candidate_trials": 2,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0ef9d-bddd-767f-a6c4-962f8fb80560",
+        "trace_id": "01a0ef9d-bddd-7891-a95c-b30eef8f3dd9",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0ef9d-bddd-767f-a6c4-962f8fb80560",
+        "remote_verified": true
+      },
+      "confirmed": true,
+      "selected_peak_bytes": 2411183720,
+      "minimum_search_quality": 1.0,
+      "throughput_range": [
+        16.340738157656435,
+        16.604943958195705
+      ],
+      "memory_reduction_fraction": 0.7045883673978244
+    },
+    {
+      "run": "block-1-random",
+      "status": "budget-exhausted",
+      "selected_recipe": "baseline",
+      "selected_artifact_id": "6ad3a31f1ad272ad633a73a89bfca9d428d15736646a4781c6eaa2d176d42d8f",
+      "candidate_trials": 1,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0efa2-65c9-73fd-8678-246d193350fa",
+        "trace_id": "01a0efa2-65c9-7096-b283-7dae3a591c5e",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efa2-65c9-73fd-8678-246d193350fa",
+        "remote_verified": true
+      },
+      "confirmed": true
+    },
+    {
+      "run": "block-1-sera",
+      "status": "budget-exhausted",
+      "selected_recipe": "baseline",
+      "selected_artifact_id": "6ad3a31f1ad272ad633a73a89bfca9d428d15736646a4781c6eaa2d176d42d8f",
+      "candidate_trials": 1,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0efa7-10d9-7e83-9568-4454bcf80d2f",
+        "trace_id": "01a0efa7-10d9-73bc-aa36-3a88f866d531",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efa7-10d9-7e83-9568-4454bcf80d2f",
+        "remote_verified": true
+      },
+      "confirmed": true
+    },
+    {
+      "run": "block-2-fixed",
+      "status": "budget-exhausted",
+      "selected_recipe": "int4-g128",
+      "selected_artifact_id": "4f07a387ea77d19c57e3b3fe4d9ff132f5f602636dff7daf0eea26ec85b5d117",
+      "candidate_trials": 2,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0efb5-1116-7623-81f3-1fda8ab9ad54",
+        "trace_id": "01a0efb5-1116-7c1f-80ee-9b597313f54b",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efb5-1116-7623-81f3-1fda8ab9ad54",
+        "remote_verified": true
+      },
+      "confirmed": true,
+      "selected_peak_bytes": 2411183720,
+      "minimum_search_quality": 1.0,
+      "throughput_range": [
+        16.374714274468936,
+        16.540805718217392
+      ],
+      "memory_reduction_fraction": 0.7045883673978244
+    },
+    {
+      "run": "block-2-random",
+      "status": "budget-exhausted",
+      "selected_recipe": "baseline",
+      "selected_artifact_id": "6ad3a31f1ad272ad633a73a89bfca9d428d15736646a4781c6eaa2d176d42d8f",
+      "candidate_trials": 1,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0efab-befc-7cc4-a554-6bbb67562dd7",
+        "trace_id": "01a0efab-befc-7d88-8879-3695de9e93ed",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efab-befc-7cc4-a554-6bbb67562dd7",
+        "remote_verified": true
+      },
+      "confirmed": true
+    },
+    {
+      "run": "block-2-sera",
+      "status": "budget-exhausted",
+      "selected_recipe": "int4-g32",
+      "selected_artifact_id": "a88883d2791f35b841f79a29f4c8388406461efd9908398efe334bc0eb3cf0b0",
+      "candidate_trials": 2,
+      "baseline_peak_bytes": 8162115008,
+      "trace": {
+        "call_id": "01a0efb0-6aa3-7cad-9e16-8c03ef3ff0c5",
+        "trace_id": "01a0efb0-6aa3-70d1-b515-16ba664a7db4",
+        "url": "https://wandb.ai/vvennela-n-a/wandb_agent_default_project/r/call/01a0efb0-6aa3-7cad-9e16-8c03ef3ff0c5",
+        "remote_verified": true
+      },
+      "confirmed": true,
+      "selected_peak_bytes": 2786213480,
+      "minimum_search_quality": 1.0,
+      "throughput_range": [
+        15.458809700477003,
+        15.559433476185983
+      ],
+      "memory_reduction_fraction": 0.6586407472488287
+    }
+  ],
+  "qualification": "These are confirmed search observations. Budget-exhausted rows are not successful deliveries and do not complete the preregistered held-out comparison."
+}
