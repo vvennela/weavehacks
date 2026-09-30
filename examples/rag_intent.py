@@ -8,7 +8,7 @@ from sera import Optimize, SeraNeedsInput
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Sera: the inference harness')
+    parser = argparse.ArgumentParser(description='Sera: the autonomous auto-research harness for inference')
     parser.add_argument('workload', help='Describe the document question-answering workload')
     parser.add_argument('--documents', required=True, help='Connected document collection name')
     parser.add_argument('--endpoint', default='http://127.0.0.1:8765')
