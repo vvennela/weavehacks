@@ -27,12 +27,22 @@ def _normal(text):
     return ' '.join(text.split())
 
 
+def _contains_answer(text, answer):
+    value = _normal(answer)
+    if not value:
+        return False
+    start = r'(?<!\w)' if re.match(r'\w', value[0]) else ''
+    end = r'(?!\w)' if re.match(r'\w', value[-1]) else ''
+    return re.search(start + re.escape(value) + end, _normal(text)) is not None
+
+
 class RagExample(BaseModel):
     model_config = ConfigDict(strict=True, extra='forbid', frozen=True)
     question: str = Field(min_length=1, max_length=2000)
     answer: str = Field(min_length=1, max_length=500)
     document_id: str = Field(min_length=1, max_length=512)
     evidence: str = Field(min_length=1, max_length=2000)
+    accepted_answers: list[str] = Field(default_factory=list, max_length=4)
 
 
 class Corpus:
@@ -207,8 +217,9 @@ def make_tasks(index, examples, *, top_k):
         text = _normal(index.document(example.document_id))
         if _normal(example.evidence) not in text:
             raise ValueError('Evaluation evidence is not present in its document')
-        if _normal(example.answer) not in _normal(example.evidence):
-            raise ValueError('Evaluation answer is not supported by its evidence')
+        for answer in [example.answer] + example.accepted_answers:
+            if not answer.strip() or len(answer) > 500 or not _contains_answer(example.evidence, answer):
+                raise ValueError('Evaluation answer is not supported by its evidence')
         started = time.perf_counter()
         passages = index.search(example.question, top_k=top_k)
         timings.append((time.perf_counter() - started) * 1000)
@@ -216,6 +227,8 @@ def make_tasks(index, examples, *, top_k):
                         _normal(example.evidence) in _normal(p['text']) for p in passages)
         tasks.append(NativeTask(prompt=rag_prompt(example.question, passages),
                                 expected_json={'answer': example.answer, 'source': example.document_id},
+                                accepted_json=([{'answer': value, 'source': example.document_id}
+                                                for value in example.accepted_answers] or None),
                                 response_format=rag_format(passages)))
     return tasks, {'evidence_recall': recalled / len(examples), 'questions': len(examples),
                    'retrieval_latency_ms': timings, 'top_k': top_k}
@@ -242,7 +255,7 @@ class RagPipeline:
         supported = (isinstance(parsed, dict) and set(parsed) == {'answer', 'source'}
                      and isinstance(parsed['answer'], str) and bool(parsed['answer'].strip())
                      and any(parsed['source'] == p['document_id'] and
-                             _normal(parsed['answer']) in _normal(p['text']) for p in passages))
+                             _contains_answer(p['text'], parsed['answer']) for p in passages))
         return {'answer': parsed['answer'] if supported else None,
                 'source': parsed['source'] if supported else None, 'supported': bool(supported),
                 'reason': 'extractive-support' if supported else 'unsupported-generation',

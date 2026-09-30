@@ -124,3 +124,22 @@ def test_directory_enumeration_obeys_document_limit(tmp_path, monkeypatch):
     monkeypatch.setattr(type(folder), 'rglob', oversized_tree)
     with pytest.raises(ValueError, match='limits'):
         list(Corpus(folder).documents())
+
+
+def test_answer_variants_are_explicit_grounded_and_not_in_prompt(tmp_path):
+    index = RagIndex.build(corpus(tmp_path), tmp_path / 'index', chunk_words=128)
+    value = {'question': 'How many days does Cedar retain backups?', 'answer': '14 days',
+             'document_id': 'cedar', 'evidence': 'Retention is 14 days.', 'accepted_answers': ['14']}
+    tasks, _ = make_tasks(index, [value], top_k=1)
+    assert tasks[0].accepted_json == [{'answer': '14', 'source': 'cedar'}]
+    assert 'accepted_answers' not in tasks[0].prompt[1]['content']
+    with pytest.raises(ValueError, match='answer'):
+        make_tasks(index, [value | {'accepted_answers': ['30']}], top_k=1)
+
+
+def test_answer_support_rejects_partial_numbers_and_words(tmp_path):
+    index = RagIndex.build(corpus(tmp_path), tmp_path / 'index', chunk_words=128)
+    value = {'question': 'How many days are backups retained?', 'answer': '14 days',
+             'document_id': 'cedar', 'evidence': 'Retention is 14 days.', 'accepted_answers': ['4']}
+    with pytest.raises(ValueError, match='answer'):
+        make_tasks(index, [value], top_k=1)

@@ -54,9 +54,9 @@ def discover_hardware():
     return evidence
 
 
-def _plan_schema():
+def _strict_schema(model):
     # Codex strict schemas require every object field to be listed as required.
-    value = IntakePlan.model_json_schema()
+    value = model.model_json_schema()
     def strict(node):
         if isinstance(node, dict):
             if node.get('type') == 'object':
@@ -102,11 +102,14 @@ def _independent_examples(request, folder, samples, corpus_hash, agent_factory):
             'from the documents. Vary question forms across the set. Ask one unambiguous fact per '
             'question, include the distinctive subject identifier needed for retrieval, and use '
             'a short verbatim answer from that document. Each evidence quote must contain the answer. '
+            'In accepted_answers list up to four shorter verbatim forms that express the SAME fact '
+            'and fully answer this question, such as a value without an optional unit when the question '
+            'already names that unit. Never accept another fact, a partial value, or an empty answer. '
             'Never invent facts or document IDs. These are generated smoke tests, not customer '
             'acceptance certification. Return the examples array only.\n' + json.dumps({
                 'intent': request['intent'], 'documents': samples}))
         validation = ValidationPlan.model_validate(agent.request(
-            prompt, ValidationPlan.model_json_schema(), timeout=min(180, remaining)))
+            prompt, _strict_schema(ValidationPlan), timeout=min(180, remaining)))
         record = {'identity': identity, 'validation': validation.model_dump()}
         save_json(path, record)
     if (len(validation.examples) != len(samples) or
@@ -188,14 +191,17 @@ def prepare_rag(request, folder, *, agent_factory=CodexJSONAgent, hardware=None)
             'within the schema for this corpus. Generate one short factual smoke test for EACH sampled document '
             'from the supplied sampled documents. Put these structured tests in examples. questions is '
             'ONLY for user clarifications and MUST be empty when status is ready. Each answer must be a short verbatim substring '
-            'of its evidence, and evidence must be verbatim from the cited document. Include the '
+            'of its evidence, and evidence must be verbatim from the cited document. In accepted_answers '
+            'list up to four shorter verbatim forms of the SAME correct fact that fully answer the '
+            'question (for example omitting a unit already named in the question). Never accept '
+            'another fact, a partial value, or an empty answer. Include the '
             'distinctive subject name in each question so it can be retrieved. These generated tests '
             'are proxies, never customer acceptance certification. The profile fields and budgets '
             'are immutable. A document count is not a traffic, quality, or memory specification. '
             'Use the measured corpus count. Do not promise global optimality.\n' + json.dumps({
                 'intent': request['intent'], 'hardware': hardware, 'catalog': catalog,
                 'corpus': inventory | {'samples': planning_samples}, 'customer_evaluation_supplied': bool(request.get('evaluation'))}))
-        plan = IntakePlan.model_validate(agent.request(prompt, _plan_schema(),
+        plan = IntakePlan.model_validate(agent.request(prompt, _strict_schema(IntakePlan),
                     timeout=min(180, max(0.001, request['deadline'] - time.time()))))
         record = {'request_hash': request_hash, 'corpus_hash': inventory['corpus_hash'],
                   'evaluation_hash': content_hash(evaluation_snapshot), 'plan': plan.model_dump()}
@@ -244,7 +250,7 @@ def prepare_rag(request, folder, *, agent_factory=CodexJSONAgent, hardware=None)
     profile = chosen.model_dump() | {
         'tasks': [task.model_dump() for task in tasks],
         'workload_description': request['intent'],
-        'evaluation_version': 'sera-rag-extractive-v1-' + index.manifest['corpus_hash'],
+        'evaluation_version': 'sera-rag-extractive-v2-' + index.manifest['corpus_hash'],
         'response_format_version': 'sera-rag-answer-source-v1',
         'max_run_seconds': min(chosen.max_run_seconds, remaining)}
     profile = validate_native_profile(profile).model_dump()

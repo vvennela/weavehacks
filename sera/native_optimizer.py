@@ -33,6 +33,8 @@ class NativeTask(BaseModel):
     model_config = ConfigDict(strict=True, frozen=True, extra='forbid', allow_inf_nan=False)
     prompt: str | list[dict[str, str]]
     expected_json: JsonValue
+    accepted_json: list[JsonValue] | None = Field(default=None, min_length=1, max_length=8,
+                                                   exclude_if=lambda value: value is None)
     response_format: dict | None = None
 
 
@@ -81,7 +83,7 @@ class NativeProfile(BaseModel):
         answers = {}
         for task in self.tasks:
             key = content_hash(task.prompt)
-            answer = content_hash(task.expected_json)
+            answer = content_hash({'expected': task.expected_json, 'accepted': task.accepted_json})
             if key in answers and answers[key] != answer:
                 raise ValueError('Identical prompts cannot have conflicting expected outputs')
             answers[key] = answer
@@ -293,9 +295,11 @@ class _Research:
         controls.update(sampling='greedy', concurrency=1)
         if 'runtime' in request:
             controls['runtime'] = request['runtime']
-        expected = {content_hash(task.prompt): task.expected_json for task in self.profile.tasks}
+        expected = {content_hash(task.prompt): [task.expected_json] + (task.accepted_json or [])
+                    for task in self.profile.tasks}
         result = native_trial(raw, prompts=request['prompts'],
-            evaluator=lambda prompt, text: _score(text, expected[content_hash(prompt)]),
+            evaluator=lambda prompt, text: any(_score(text, answer)
+                                             for answer in expected[content_hash(prompt)]),
             evaluation_version=self.profile.evaluation_version, floor=self.profile.constraints.quality_floor,
             artifact_id=artifact['artifact_id'], controls=controls, trial_id=trial_id, backend=self.profile.backend)
         result['recipe_id'] = name

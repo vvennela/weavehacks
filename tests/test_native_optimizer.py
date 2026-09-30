@@ -567,3 +567,17 @@ def test_operator_advisor_bridge_is_explicit_and_used_by_default(tmp_path, runti
     assert result['elapsed_seconds'] >= 0.5
     assert made[0]['max_model_calls'] == 48
     assert 'fixture-private-token' not in json.dumps(result)
+
+
+def test_native_tasks_accept_only_predeclared_json_variants(tmp_path, runtime):
+    value = profile()
+    value['tasks'][0]['expected_json'] = {'answer': 'one'}
+    value['tasks'][0]['accepted_json'] = [{'answer': 1}]
+    result = native.optimize_native(profile=value, output_dir=tmp_path / 'variants',
+                                    project='fixture/project', agent=Agent())
+    assert result['status'] == 'completed'
+    assert result['selected_recipe_id'] == 'q8'
+    assert result['trials'][0]['measurement']['task_quality']['mean'] == 0
+    value['tasks'].append(value['tasks'][0] | {'accepted_json': [{'answer': 2}]})
+    with pytest.raises(ValueError, match='conflicting'):
+        native.validate_native_profile(value)
