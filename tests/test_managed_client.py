@@ -24,6 +24,10 @@ def test_one_call_returns_verified_checkpoint(manager, endpoint):
     result = Optimize('fixture', api_key=TOKEN, endpoint=endpoint,
                       request_id='one-call', poll_interval=0.02)
     assert result.selected_recipe_id == 'q8'
+    assert result.measurements['baseline']['peak_bytes'] == 100
+    selected = next(t for t in result.measurements['trials'] if t['recipe_id'] == 'q8')
+    assert selected['accepted'] is True
+    assert selected['confirmation']['peak_bytes'] == 60
     assert result.verify()['artifact_id'] == result.artifact_id
     repeated = Optimize('fixture', api_key=TOKEN, endpoint=endpoint,
                         request_id='one-call', poll_interval=0.02)
